@@ -22,26 +22,12 @@
 }
 
 .brand-cluster,
-.header-actions,
-.system-status,
-.auth-footer {
+.header-actions {
   display: flex;
   align-items: center;
 }
 
 .brand-cluster { gap: 0.45rem; }
-
-.window-controls { display: inline-flex; gap: 0.28rem; margin-right: 0.45rem; }
-.window-controls i,
-.status-dot {
-  width: 0.38rem;
-  height: 0.38rem;
-  border-radius: 50%;
-  background: var(--color-status-success);
-}
-.window-controls i:nth-child(1) { background: var(--color-status-danger); }
-.window-controls i:nth-child(2) { background: var(--color-accent); }
-.window-controls i:nth-child(3) { background: var(--color-status-success); }
 
 .brand-mark {
   display: grid;
@@ -66,39 +52,12 @@
   color: var(--color-text-primary);
 }
 
-.build-tag {
-  padding: 0.15rem 0.32rem;
-  border: 1px solid var(--color-border);
-  border-radius: 0.2rem;
-  color: var(--color-accent);
-  font-family: var(--font-mono);
-  font-size: 0.52rem;
-  font-weight: 700;
-}
-
 .header-actions {
   display: flex;
   align-items: center;
   gap: 0.5rem;
 }
 
-.system-status { gap: 1.15rem; margin-right: 0.75rem; }
-.system-status span,
-.auth-footer span {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.35rem;
-  color: var(--color-text-secondary);
-  font-family: var(--font-mono);
-  font-size: 0.57rem;
-  font-weight: 600;
-}
-.status-shield {
-  width: 0.45rem;
-  height: 0.55rem;
-  border: 1px solid var(--color-accent);
-  border-radius: 0.15rem 0.15rem 0.3rem 0.3rem;
-}
 
 .auth-main {
   position: relative;
@@ -126,27 +85,12 @@
   // El panel lateral (login/registro) necesita más ancho para dos columnas;
   // las demás pantallas de auth se quedan en el ancho angosto de siempre.
   &:has(.auth-split) {
-    max-width: 54rem;
+    max-width: 50rem;
     padding: 0;
     overflow: hidden;
   }
 }
 
-.auth-footer {
-  position: relative;
-  z-index: 1;
-  min-height: 2rem;
-  gap: 1.2rem;
-  padding: 0 0.75rem;
-  border-top: 1px solid var(--color-border);
-  background: var(--color-surface-glass);
-}
-.auth-footer .status-dot { width: 0.3rem; height: 0.3rem; }
-.footer-version { margin-left: auto; }
-
 @media (max-width: 44rem) {
-  .system-status,
-  .build-tag,
-  .auth-footer span:not(:first-child) { display: none; }
-  .auth-card:has(.auth-split) { max-width: 30rem; }
+  .auth-card:has(.auth-split) { max-width: 27rem; }
 }
