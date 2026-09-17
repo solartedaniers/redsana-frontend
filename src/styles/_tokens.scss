@@ -26,6 +26,14 @@
   --color-status-neutral: #6b7280;
 
   --color-focus-ring: rgb(212 175 55 / 50%);
+
+  // Card "glass" de las pantallas de auth (login/registro/etc.): fondo
+  // translúcido + borde + sombra con resplandor dorado sobre el fondo 3D.
+  --color-glass-bg: rgb(11 15 23 / 82%);
+  --color-glass-border: rgb(212 175 55 / 22%);
+  --shadow-glass:
+    0 20px 50px -20px rgb(0 0 0 / 70%),
+    0 0 35px -5px rgb(212 175 55 / 20%);
 }
 
 // Override de la paleta clara. Se declara FUERA del bloque @theme a propósito:
@@ -55,4 +63,12 @@
   --color-status-neutral: #6b7280;
 
   --color-focus-ring: rgb(138 98 18 / 45%);
+
+  // En claro el glass pierde el resplandor dorado: solo un fondo casi
+  // opaco y una sombra neutra, igual que en la referencia de diseño.
+  --color-glass-bg: rgb(255 255 255 / 95%);
+  --color-glass-border: rgb(219 224 230 / 90%);
+  --shadow-glass:
+    0 20px 50px -20px rgb(16 21 29 / 12%),
+    0 0 30px -10px rgb(138 98 18 / 8%);
 }

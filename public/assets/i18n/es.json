@@ -18,20 +18,61 @@
     "toggleToDark": "Cambiar a modo oscuro"
   },
   "auth": {
+    "showPassword": "Mostrar contraseña",
+    "hidePassword": "Ocultar contraseña",
     "login": {
       "title": "Iniciar sesión",
       "email": "Correo electrónico",
       "password": "Contraseña",
       "submit": "Entrar",
       "forgotPasswordLink": "¿Olvidaste tu contraseña?",
-      "registerLink": "¿No tienes cuenta? Regístrate"
+      "registerLink": "¿No tienes cuenta? Regístrate",
+      "panel": {
+        "eyebrow": "Monitoreo de red doméstica",
+        "title": "Tu red, bajo control",
+        "description": "RedSana vigila la salud y seguridad de tu red doméstica: latencia, dispositivos conectados y alertas, todo en un solo lugar.",
+        "features": {
+          "monitoring": {
+            "title": "Monitoreo en tiempo real",
+            "description": "Latencia, jitter y pérdida de paquetes de un vistazo."
+          },
+          "security": {
+            "title": "Puntaje de seguridad",
+            "description": "Evalúa la configuración de tu router con recomendaciones claras."
+          },
+          "alerts": {
+            "title": "Alertas predictivas",
+            "description": "Entérate de cortes y picos de latencia antes de que te afecten."
+          }
+        }
+      }
     },
     "register": {
       "title": "Crear cuenta",
       "fullName": "Nombre completo",
       "confirmPassword": "Confirmar contraseña",
       "submit": "Crear cuenta",
-      "loginLink": "¿Ya tienes cuenta? Inicia sesión"
+      "loginLink": "¿Ya tienes cuenta? Inicia sesión",
+      "panel": {
+        "eyebrow": "Nueva cuenta",
+        "title": "Únete a RedSana",
+        "description": "Crea tu cuenta para empezar a monitorear la salud y seguridad de tu red doméstica en minutos.",
+        "hasAccount": "¿Ya tienes cuenta?",
+        "features": {
+          "monitoring": {
+            "title": "Visibilidad total",
+            "description": "Métricas de tu red en tiempo real desde tu panel."
+          },
+          "security": {
+            "title": "Puntaje de seguridad",
+            "description": "Recomendaciones priorizadas para proteger tu router."
+          },
+          "devices": {
+            "title": "Dispositivos conectados",
+            "description": "Identifica qué está conectado a tu red en todo momento."
+          }
+        }
+      }
     },
     "forgotPassword": {
       "title": "Recuperar contraseña",

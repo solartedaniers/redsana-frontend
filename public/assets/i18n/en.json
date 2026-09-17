@@ -18,20 +18,61 @@
     "toggleToDark": "Switch to dark mode"
   },
   "auth": {
+    "showPassword": "Show password",
+    "hidePassword": "Hide password",
     "login": {
       "title": "Log in",
       "email": "Email",
       "password": "Password",
       "submit": "Sign in",
       "forgotPasswordLink": "Forgot your password?",
-      "registerLink": "Don't have an account? Sign up"
+      "registerLink": "Don't have an account? Sign up",
+      "panel": {
+        "eyebrow": "Home network monitoring",
+        "title": "Your network, under control",
+        "description": "RedSana watches over your home network's health and security: latency, connected devices and alerts, all in one place.",
+        "features": {
+          "monitoring": {
+            "title": "Real-time monitoring",
+            "description": "Latency, jitter and packet loss at a glance."
+          },
+          "security": {
+            "title": "Security score",
+            "description": "Assess your router's configuration with clear recommendations."
+          },
+          "alerts": {
+            "title": "Predictive alerts",
+            "description": "Find out about outages and latency spikes before they affect you."
+          }
+        }
+      }
     },
     "register": {
       "title": "Create account",
       "fullName": "Full name",
       "confirmPassword": "Confirm password",
       "submit": "Create account",
-      "loginLink": "Already have an account? Log in"
+      "loginLink": "Already have an account? Log in",
+      "panel": {
+        "eyebrow": "New account",
+        "title": "Join RedSana",
+        "description": "Create your account to start monitoring your home network's health and security in minutes.",
+        "hasAccount": "Already have an account?",
+        "features": {
+          "monitoring": {
+            "title": "Full visibility",
+            "description": "Real-time network metrics right from your dashboard."
+          },
+          "security": {
+            "title": "Security score",
+            "description": "Prioritized recommendations to protect your router."
+          },
+          "devices": {
+            "title": "Connected devices",
+            "description": "Know what's connected to your network at all times."
+          }
+        }
+      }
     },
     "forgotPassword": {
       "title": "Reset password",

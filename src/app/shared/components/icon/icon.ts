@@ -11,7 +11,11 @@ export type IconName =
   | 'logout'
   | 'chevron-right'
   | 'warning'
-  | 'check';
+  | 'check'
+  | 'mail'
+  | 'lock'
+  | 'eye'
+  | 'eye-off';
 
 // Set fijo de iconos en un solo componente: evita repetir SVGs en sidebar,
 // top-bar y alertas, y mantiene el estilo (stroke, grosor) consistente.

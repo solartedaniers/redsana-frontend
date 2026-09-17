@@ -1,12 +1,19 @@
 <div class="auth-layout">
-  <div class="top-actions">
-    <app-language-toggle />
-    <app-theme-toggle />
-  </div>
-  <div class="auth-card">
+  <app-network-background />
+
+  <header class="auth-header">
     <span class="brand">{{ 'common.appName' | translate }}</span>
-    <div [@routeTransition]="true">
-      <router-outlet />
+    <div class="header-actions">
+      <app-language-toggle />
+      <app-theme-toggle />
     </div>
-  </div>
+  </header>
+
+  <main class="auth-main">
+    <div class="auth-card">
+      <div [@routeTransition]="true">
+        <router-outlet />
+      </div>
+    </div>
+  </main>
 </div>

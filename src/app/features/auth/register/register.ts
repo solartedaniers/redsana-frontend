@@ -4,12 +4,13 @@ import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../../core/auth/auth.service';
 import { TranslatePipe } from '../../../core/i18n/translate.pipe';
 import { passwordsMatchValidator } from '../../../core/validators/passwords-match.validator';
+import { Icon } from '../../../shared/components/icon/icon';
 
 const MIN_PASSWORD_LENGTH = 8;
 
 @Component({
   selector: 'app-register',
-  imports: [ReactiveFormsModule, RouterLink, TranslatePipe],
+  imports: [ReactiveFormsModule, RouterLink, TranslatePipe, Icon],
   templateUrl: './register.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -20,6 +21,8 @@ export class Register {
 
   protected readonly isSubmitting = signal(false);
   protected readonly errorKey = signal<string | null>(null);
+  protected readonly showPassword = signal(false);
+  protected readonly showConfirmPassword = signal(false);
 
   protected readonly form = this.fb.nonNullable.group(
     {
