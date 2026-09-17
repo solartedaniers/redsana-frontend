@@ -1,0 +1,45 @@
+<app-page-header titleKey="user.devicesMap.title" subtitleKey="user.devicesMap.subtitle" />
+
+<div class="scan-bar">
+  <button type="button" class="scan-button" (click)="scan()" [disabled]="isScanning()">
+    <app-icon name="shield" />
+    {{ (isScanning() ? 'user.devicesMap.scanning' : 'user.devicesMap.scan') | translate }}
+  </button>
+
+  @if (lastScanFindings(); as findings) {
+    @if (findings.length === 0) {
+      <p class="scan-result ok">{{ 'user.devicesMap.scanClear' | translate }}</p>
+    } @else {
+      <p class="scan-result warning">
+        {{ 'user.devicesMap.scanFindings' | translate: { count: findings.length } }}
+      </p>
+    }
+  }
+</div>
+
+<div class="devices-list">
+  @for (device of devices(); track device.id) {
+    <article class="device-card" [attr.data-trust]="device.trust">
+      <div class="device-info">
+        <p class="device-name">{{ device.name }}</p>
+        <p class="device-meta">{{ device.macAddress }} · {{ device.ipAddress }}</p>
+        <p class="device-meta">
+          {{ 'user.devicesMap.lastSeen' | translate }}: {{ device.lastSeen | date: 'short' }}
+        </p>
+      </div>
+      <span class="trust-badge">{{ 'user.devicesMap.trust.' + device.trust | translate }}</span>
+      <div class="device-actions">
+        @if (device.trust !== 'trusted') {
+          <button type="button" (click)="setTrust(device.id, 'trusted')">
+            {{ 'user.devicesMap.markTrusted' | translate }}
+          </button>
+        }
+        @if (device.trust !== 'blocked') {
+          <button type="button" class="danger" (click)="setTrust(device.id, 'blocked')">
+            {{ 'user.devicesMap.block' | translate }}
+          </button>
+        }
+      </div>
+    </article>
+  }
+</div>

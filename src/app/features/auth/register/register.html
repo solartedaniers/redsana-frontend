@@ -1,0 +1,47 @@
+<h2 class="form-title">{{ 'auth.register.title' | translate }}</h2>
+
+<form class="auth-form" [formGroup]="form" (ngSubmit)="submit()">
+  <label class="field">
+    <span>{{ 'auth.register.fullName' | translate }}</span>
+    <input type="text" formControlName="fullName" autocomplete="name" />
+    @if (form.controls.fullName.invalid && form.controls.fullName.touched) {
+      <small class="field-error">{{ 'auth.errors.required' | translate }}</small>
+    }
+  </label>
+
+  <label class="field">
+    <span>{{ 'auth.login.email' | translate }}</span>
+    <input type="email" formControlName="email" autocomplete="email" />
+    @if (form.controls.email.invalid && form.controls.email.touched) {
+      <small class="field-error">{{ 'auth.errors.invalidEmail' | translate }}</small>
+    }
+  </label>
+
+  <label class="field">
+    <span>{{ 'auth.login.password' | translate }}</span>
+    <input type="password" formControlName="password" autocomplete="new-password" />
+    @if (form.controls.password.invalid && form.controls.password.touched) {
+      <small class="field-error">{{ 'auth.errors.passwordTooShort' | translate }}</small>
+    }
+  </label>
+
+  <label class="field">
+    <span>{{ 'auth.register.confirmPassword' | translate }}</span>
+    <input type="password" formControlName="confirmPassword" autocomplete="new-password" />
+    @if (form.errors?.['passwordsMismatch'] && form.controls.confirmPassword.touched) {
+      <small class="field-error">{{ 'auth.errors.passwordsMismatch' | translate }}</small>
+    }
+  </label>
+
+  @if (errorKey()) {
+    <p class="form-error">{{ errorKey() | translate }}</p>
+  }
+
+  <button type="submit" class="submit-button" [disabled]="isSubmitting()">
+    {{ (isSubmitting() ? 'common.loading' : 'auth.register.submit') | translate }}
+  </button>
+
+  <div class="form-links">
+    <a routerLink="/auth/login">{{ 'auth.register.loginLink' | translate }}</a>
+  </div>
+</form>

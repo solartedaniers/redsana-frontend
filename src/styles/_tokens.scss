@@ -1,0 +1,58 @@
+// Fuente única de verdad para todos los colores de RedSana.
+// Ningún componente ni hoja de estilos individual debe declarar un color propio:
+// siempre se consume una de estas custom properties vía var(--color-*).
+//
+// El bloque @theme registra la paleta oscura como valor por defecto y hace que
+// Tailwind genere utilidades a partir de cada variable (bg-accent, text-status-danger, etc).
+@theme {
+  --color-bg-app: #030712;
+  --color-bg-surface: #0b1220;
+  --color-bg-surface-alt: #131b2c;
+
+  --color-border: #1f2937;
+  --color-border-strong: #374151;
+
+  --color-text-primary: #f3f4f6;
+  --color-text-secondary: #9ca3af;
+  --color-text-inverse: #0b1220;
+
+  --color-accent: #d4af37;
+  --color-accent-hover: #e4c158;
+  --color-accent-muted: rgb(212 175 55 / 15%);
+
+  --color-status-success: #22c55e;
+  --color-status-warning: #eab308;
+  --color-status-danger: #ef4444;
+  --color-status-neutral: #6b7280;
+
+  --color-focus-ring: rgb(212 175 55 / 50%);
+}
+
+// Override de la paleta clara. Se declara FUERA del bloque @theme a propósito:
+// Tailwind mete el @theme dentro de su @layer interno, y las capas sin nombre
+// (esta regla) siempre ganan sobre cualquier capa nombrada sin importar el
+// orden — así el atributo [data-theme] puede pisar los valores por defecto
+// en tiempo de ejecución sin pelear con la cascada de capas de Tailwind.
+:root[data-theme='light'] {
+  --color-bg-app: #f5f6f8;
+  --color-bg-surface: #ffffff;
+  --color-bg-surface-alt: #eef0f4;
+
+  --color-border: #dbe0e6;
+  --color-border-strong: #b9c0ca;
+
+  --color-text-primary: #10151d;
+  --color-text-secondary: #545b66;
+  --color-text-inverse: #ffffff;
+
+  --color-accent: #8a6212;
+  --color-accent-hover: #a9791b;
+  --color-accent-muted: rgb(138 98 18 / 12%);
+
+  --color-status-success: #16a34a;
+  --color-status-warning: #ca8a04;
+  --color-status-danger: #dc2626;
+  --color-status-neutral: #6b7280;
+
+  --color-focus-ring: rgb(138 98 18 / 45%);
+}

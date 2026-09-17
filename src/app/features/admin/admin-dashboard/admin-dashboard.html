@@ -1,0 +1,14 @@
+<app-page-header titleKey="admin.dashboard.title" subtitleKey="admin.dashboard.subtitle" />
+
+@if (metrics(); as data) {
+  <div class="metrics-grid">
+    <app-metric-card labelKey="admin.dashboard.totalUsers" [value]="data.totalUsers" />
+    <app-metric-card labelKey="admin.dashboard.monitoredHouseholds" [value]="data.monitoredHouseholds" />
+    <app-metric-card labelKey="admin.dashboard.activeAlerts" [value]="data.activeAlerts" />
+    <app-metric-card
+      labelKey="admin.dashboard.averageSecurityScore"
+      [value]="data.averageSecurityScore"
+      unit="%"
+    />
+  </div>
+}

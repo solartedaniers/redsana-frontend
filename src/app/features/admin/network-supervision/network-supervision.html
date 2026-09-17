@@ -1,0 +1,21 @@
+<app-page-header titleKey="admin.networkSupervision.title" subtitleKey="admin.networkSupervision.subtitle" />
+
+<div class="households-list">
+  @for (household of households(); track household.id) {
+    <article class="household-card">
+      <div class="household-info">
+        <p class="owner">{{ household.ownerName }}</p>
+        <p class="label">{{ household.label }}</p>
+        <p class="meta">
+          {{ 'admin.networkSupervision.lastActivity' | translate }}:
+          {{ household.lastActivity | date: 'short' }}
+        </p>
+      </div>
+      <app-network-status-light [status]="household.status" />
+      <span class="score">{{ household.securityScore }}%</span>
+      <a class="view-button" [routerLink]="[household.id]">
+        {{ 'admin.networkSupervision.viewDashboard' | translate }}
+      </a>
+    </article>
+  }
+</div>

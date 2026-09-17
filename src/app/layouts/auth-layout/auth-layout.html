@@ -1,0 +1,12 @@
+<div class="auth-layout">
+  <div class="top-actions">
+    <app-language-toggle />
+    <app-theme-toggle />
+  </div>
+  <div class="auth-card">
+    <span class="brand">{{ 'common.appName' | translate }}</span>
+    <div [@routeTransition]="true">
+      <router-outlet />
+    </div>
+  </div>
+</div>

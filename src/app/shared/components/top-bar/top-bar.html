@@ -1,0 +1,18 @@
+<header class="top-bar">
+  <span class="brand">{{ 'common.appName' | translate }}</span>
+  <div class="actions">
+    <app-language-toggle />
+    <app-theme-toggle />
+    @if (auth.currentUser(); as user) {
+      <span class="user-name">{{ user.fullName }}</span>
+    }
+    <button
+      type="button"
+      class="logout-button"
+      (click)="signOut.emit()"
+      [attr.aria-label]="'common.logout' | translate"
+    >
+      <app-icon name="logout" />
+    </button>
+  </div>
+</header>

@@ -1,0 +1,28 @@
+@if (household(); as home) {
+  <app-page-header [titleKey]="'admin.networkSupervision.detailTitle'" />
+  <a class="back-link" routerLink="/admin/network-supervision">
+    {{ 'common.back' | translate }}
+  </a>
+
+  <div class="household-summary">
+    <div>
+      <p class="owner">{{ home.ownerName }}</p>
+      <p class="label">{{ home.label }}</p>
+    </div>
+    <app-network-status-light [status]="home.status" />
+    <app-score-gauge [score]="home.securityScore" />
+  </div>
+
+  @if (snapshot(); as data) {
+    <div class="metrics-grid">
+      <app-metric-card labelKey="user.dashboard.latency" [value]="data.latencyMs" unit="ms" />
+      <app-metric-card labelKey="user.dashboard.jitter" [value]="data.jitterMs" unit="ms" />
+      <app-metric-card labelKey="user.dashboard.packetLoss" [value]="data.packetLossPercent" unit="%" />
+    </div>
+  }
+
+  <section class="history-section">
+    <h2>{{ 'user.dashboard.historyTitle' | translate }}</h2>
+    <app-history-chart [samples]="history()" />
+  </section>
+}

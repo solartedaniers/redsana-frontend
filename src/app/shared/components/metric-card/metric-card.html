@@ -1,0 +1,9 @@
+<article class="metric-card">
+  <p class="label">{{ labelKey() | translate }}</p>
+  <p class="value">
+    {{ value() }}
+    @if (unit()) {
+      <span class="unit">{{ unit() }}</span>
+    }
+  </p>
+</article>

@@ -1,0 +1,22 @@
+// Fuente única de verdad para duraciones y curvas de easing en CSS puro
+// (transiciones de tema, hover/focus). El espejo en TypeScript para
+// @angular/animations vive en core/animations/motion.constants.ts —
+// los valores deben mantenerse iguales en ambos archivos.
+:root {
+  --motion-duration-fast: 120ms;
+  --motion-duration-base: 200ms;
+  --motion-duration-slow: 320ms;
+
+  --motion-easing-standard: cubic-bezier(0.4, 0, 0.2, 1);
+  --motion-easing-decelerate: cubic-bezier(0, 0, 0.2, 1);
+  --motion-easing-accelerate: cubic-bezier(0.4, 0, 1, 1);
+}
+
+// Transición discreta de colores al cambiar de tema: evita el salto brusco
+// pedido en los requisitos sin animar layout (solo color/background/border).
+body,
+[data-theme] * {
+  transition-property: background-color, border-color, color, box-shadow;
+  transition-duration: var(--motion-duration-base);
+  transition-timing-function: var(--motion-easing-standard);
+}

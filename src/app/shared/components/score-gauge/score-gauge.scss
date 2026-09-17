@@ -1,0 +1,49 @@
+.score-gauge {
+  position: relative;
+  width: 8rem;
+  height: 8rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+svg {
+  width: 100%;
+  height: 100%;
+  transform: rotate(-90deg);
+}
+
+.track {
+  fill: none;
+  stroke: var(--color-border);
+  stroke-width: 10;
+}
+
+.progress {
+  fill: none;
+  stroke-width: 10;
+  stroke-linecap: round;
+  stroke: var(--color-status-neutral);
+  transition:
+    stroke-dashoffset var(--motion-duration-slow) var(--motion-easing-decelerate),
+    stroke var(--motion-duration-base) var(--motion-easing-standard);
+}
+
+.score-gauge[data-band='good'] .progress {
+  stroke: var(--color-status-success);
+}
+
+.score-gauge[data-band='warning'] .progress {
+  stroke: var(--color-status-warning);
+}
+
+.score-gauge[data-band='critical'] .progress {
+  stroke: var(--color-status-danger);
+}
+
+.score-value {
+  position: absolute;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--color-text-primary);
+}

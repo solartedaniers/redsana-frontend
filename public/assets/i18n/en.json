@@ -1,0 +1,191 @@
+{
+  "common": {
+    "appName": "RedSana",
+    "save": "Save",
+    "cancel": "Cancel",
+    "loading": "Loading...",
+    "back": "Back",
+    "logout": "Log out",
+    "networkStatus": {
+      "good": "Network healthy",
+      "warning": "Network degraded",
+      "critical": "Network critical",
+      "unknown": "Status unknown"
+    }
+  },
+  "theme": {
+    "toggleToLight": "Switch to light mode",
+    "toggleToDark": "Switch to dark mode"
+  },
+  "auth": {
+    "login": {
+      "title": "Log in",
+      "email": "Email",
+      "password": "Password",
+      "submit": "Sign in",
+      "forgotPasswordLink": "Forgot your password?",
+      "registerLink": "Don't have an account? Sign up"
+    },
+    "register": {
+      "title": "Create account",
+      "fullName": "Full name",
+      "confirmPassword": "Confirm password",
+      "submit": "Create account",
+      "loginLink": "Already have an account? Log in"
+    },
+    "forgotPassword": {
+      "title": "Reset password",
+      "submit": "Send instructions",
+      "successMessage": "If that email exists, we've sent recovery instructions.",
+      "backToLogin": "Back to login"
+    },
+    "profile": {
+      "title": "My profile",
+      "infoTitle": "Personal information",
+      "securityTitle": "Change password",
+      "currentPassword": "Current password",
+      "newPassword": "New password",
+      "changePassword": "Update password",
+      "savedMessage": "Profile updated successfully.",
+      "passwordChangedMessage": "Password updated successfully."
+    },
+    "errors": {
+      "required": "This field is required.",
+      "invalidEmail": "Enter a valid email address.",
+      "passwordTooShort": "Password must be at least 8 characters.",
+      "passwordsMismatch": "Passwords do not match.",
+      "invalidCredentials": "Incorrect email or password.",
+      "emailTaken": "That email is already registered.",
+      "userNotFound": "User not found.",
+      "wrongCurrentPassword": "Current password is incorrect."
+    }
+  },
+  "user": {
+    "dashboard": {
+      "title": "Dashboard",
+      "subtitle": "Real-time status of your home network",
+      "latency": "Latency",
+      "jitter": "Jitter",
+      "packetLoss": "Packet loss",
+      "historyTitle": "Latency history"
+    },
+    "securityAssistant": {
+      "title": "Security assistant",
+      "subtitle": "Answer a few questions to get your home security score",
+      "questions": {
+        "defaultPassword": "Have you changed your router's default password?",
+        "firmwareUpdated": "Is your router firmware up to date?",
+        "wpa3Enabled": "Is WPA3 (or at least WPA2) encryption enabled?",
+        "guestNetwork": "Do you use a separate guest network for visitors?",
+        "remoteManagementOff": "Is remote router management disabled?"
+      },
+      "yes": "Yes",
+      "no": "No",
+      "submit": "See my score",
+      "restart": "Answer again",
+      "recommendationsTitle": "Prioritized guide",
+      "allGood": "Great! No pending recommendations.",
+      "recommendations": {
+        "changeDefaultPassword": {
+          "title": "Change the default password",
+          "description": "Default credentials are publicly known and are the easiest way in for an attacker."
+        },
+        "updateFirmware": {
+          "title": "Update your router firmware",
+          "description": "Manufacturers patch known vulnerabilities in every firmware release."
+        },
+        "enableWpa3": {
+          "title": "Enable WPA3 encryption",
+          "description": "Stronger encryption makes it far harder to intercept your traffic."
+        },
+        "enableGuestNetwork": {
+          "title": "Set up a guest network",
+          "description": "Keeps visitor devices isolated from your trusted devices."
+        },
+        "disableRemoteManagement": {
+          "title": "Disable remote management",
+          "description": "Prevents your router from being configured from outside your home network."
+        }
+      }
+    },
+    "alertsCenter": {
+      "title": "Alerts center",
+      "subtitle": "Outage history and predictive alerts",
+      "acknowledge": "Acknowledge alert",
+      "messages": {
+        "briefOutage": "Brief connectivity outage detected ({{minutes}} min).",
+        "congestionForecast": "Network congestion expected during peak hours tonight.",
+        "latencySpikePredicted": "A latency spike is predicted in the next few minutes."
+      }
+    },
+    "devicesMap": {
+      "title": "Connected devices",
+      "subtitle": "All devices currently seen on your network",
+      "scan": "Scan for intruders",
+      "scanning": "Scanning network...",
+      "scanClear": "No suspicious devices found.",
+      "scanFindings": "{{count}} device(s) require your attention.",
+      "lastSeen": "Last seen",
+      "markTrusted": "Mark as trusted",
+      "block": "Block",
+      "trust": {
+        "trusted": "Trusted",
+        "unknown": "Unknown",
+        "blocked": "Blocked"
+      }
+    }
+  },
+  "admin": {
+    "dashboard": {
+      "title": "Admin dashboard",
+      "subtitle": "Platform-wide overview across all monitored households",
+      "totalUsers": "Total users",
+      "monitoredHouseholds": "Monitored households",
+      "activeAlerts": "Active alerts",
+      "averageSecurityScore": "Average security score"
+    },
+    "networkSupervision": {
+      "title": "Network supervision",
+      "subtitle": "Monitor the network health of every registered household",
+      "lastActivity": "Last activity",
+      "viewDashboard": "View dashboard",
+      "detailTitle": "Household dashboard"
+    },
+    "userManagement": {
+      "title": "User management",
+      "subtitle": "Create, edit and remove platform user accounts",
+      "newUser": "New user",
+      "editUser": "Edit user",
+      "table": {
+        "name": "Name",
+        "email": "Email",
+        "role": "Role",
+        "status": "Status",
+        "actions": "Actions"
+      },
+      "role": {
+        "admin": "Admin",
+        "standard": "Standard user"
+      },
+      "status": {
+        "active": "Active",
+        "suspended": "Suspended"
+      },
+      "form": {
+        "fullName": "Full name",
+        "email": "Email",
+        "role": "Role",
+        "status": "Status"
+      },
+      "actions": {
+        "edit": "Edit",
+        "delete": "Delete"
+      },
+      "deleteConfirm": "Delete this user? This action cannot be undone.",
+      "errors": {
+        "emailTaken": "This email is already registered",
+        "userNotFound": "User not found"
+      }
+    }
+  }
+}

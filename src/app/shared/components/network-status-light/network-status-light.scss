@@ -1,0 +1,47 @@
+.status-light {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.dot {
+  width: 0.75rem;
+  height: 0.75rem;
+  border-radius: 9999px;
+  background: var(--color-status-neutral);
+  color: var(--color-status-neutral);
+  transition: background-color var(--motion-duration-base) var(--motion-easing-standard);
+}
+
+// El resplandor usa currentColor para heredar el color del estado sin
+// quemar ningún valor: "color" se fija por estado y el box-shadow lo copia.
+.status-light[data-status='good'] .dot {
+  background: var(--color-status-success);
+  color: var(--color-status-success);
+}
+
+.status-light[data-status='warning'] .dot,
+.status-light[data-status='critical'] .dot {
+  animation: pulse-glow var(--motion-duration-slow) var(--motion-easing-standard) infinite alternate;
+}
+
+.status-light[data-status='warning'] .dot {
+  background: var(--color-status-warning);
+  color: var(--color-status-warning);
+}
+
+.status-light[data-status='critical'] .dot {
+  background: var(--color-status-danger);
+  color: var(--color-status-danger);
+}
+
+@keyframes pulse-glow {
+  from {
+    box-shadow: 0 0 0 0 currentColor;
+  }
+  to {
+    box-shadow: 0 0 6px 2px currentColor;
+  }
+}

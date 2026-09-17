@@ -1,0 +1,11 @@
+<div class="app-shell">
+  <aside class="sidebar">
+    <app-sidebar-nav [items]="navItems()" />
+  </aside>
+  <div class="shell-main">
+    <app-top-bar (signOut)="onSignOut()" />
+    <main class="shell-content" [@routeTransition]="true">
+      <router-outlet />
+    </main>
+  </div>
+</div>

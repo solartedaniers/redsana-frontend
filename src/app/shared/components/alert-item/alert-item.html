@@ -1,0 +1,21 @@
+<article
+  class="alert-item"
+  [attr.data-severity]="alert().severity"
+  [class.acknowledged]="alert().acknowledged"
+>
+  <app-icon [name]="alert().severity === 'info' ? 'bell' : 'warning'" />
+  <div class="content">
+    <p class="message">{{ alert().messageKey | translate: alert().messageParams }}</p>
+    <time>{{ alert().timestamp | date: 'short' }}</time>
+  </div>
+  @if (!alert().acknowledged) {
+    <button
+      type="button"
+      class="ack-button"
+      (click)="acknowledge.emit(alert().id)"
+      [attr.aria-label]="'user.alertsCenter.acknowledge' | translate"
+    >
+      <app-icon name="check" />
+    </button>
+  }
+</article>

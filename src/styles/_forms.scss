@@ -1,0 +1,91 @@
+// Estilos compartidos por las 4 pantallas de auth (login, registro,
+// recuperación, perfil): mismos campos y botón, evita repetir las reglas
+// en cada componente ya que ninguno necesita nada visualmente distinto.
+.form-title {
+  margin: 0 0 1.5rem;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  text-align: center;
+}
+
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  font-size: 0.85rem;
+  color: var(--color-text-secondary);
+
+  input {
+    padding: 0.6rem 0.75rem;
+    border-radius: 0.5rem;
+    border: 1px solid var(--color-border);
+    background: var(--color-bg-surface-alt);
+    color: var(--color-text-primary);
+    font-size: 0.95rem;
+    transition: border-color var(--motion-duration-fast) var(--motion-easing-standard);
+
+    &:focus-visible {
+      outline: none;
+      border-color: var(--color-accent);
+    }
+  }
+}
+
+.field-error,
+.form-error {
+  color: var(--color-status-danger);
+  font-size: 0.8rem;
+}
+
+.form-success {
+  color: var(--color-status-success);
+  font-size: 0.85rem;
+}
+
+.submit-button {
+  padding: 0.7rem;
+  border-radius: 0.5rem;
+  border: none;
+  background: var(--color-accent);
+  color: var(--color-text-inverse);
+  font-weight: 700;
+  cursor: pointer;
+  transition:
+    background-color var(--motion-duration-fast) var(--motion-easing-standard),
+    transform var(--motion-duration-fast) var(--motion-easing-standard);
+
+  &:hover:not(:disabled) {
+    background: var(--color-accent-hover);
+  }
+
+  &:active:not(:disabled) {
+    transform: scale(0.98);
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
+
+.form-links {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.8rem;
+
+  a {
+    color: var(--color-text-secondary);
+    text-decoration: none;
+
+    &:hover {
+      color: var(--color-accent);
+    }
+  }
+}

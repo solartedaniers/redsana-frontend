@@ -1,0 +1,54 @@
+<app-page-header titleKey="user.securityAssistant.title" subtitleKey="user.securityAssistant.subtitle" />
+
+@if (result(); as data) {
+  <div class="result-panel">
+    <app-score-gauge [score]="data.score" />
+
+    <div class="recommendations">
+      <h2>{{ 'user.securityAssistant.recommendationsTitle' | translate }}</h2>
+      @if (data.recommendations.length === 0) {
+        <p class="all-good">{{ 'user.securityAssistant.allGood' | translate }}</p>
+      } @else {
+        <ol>
+          @for (recommendation of data.recommendations; track recommendation.id) {
+            <li>
+              <strong>{{ recommendation.titleKey | translate }}</strong>
+              <p>{{ recommendation.descriptionKey | translate }}</p>
+            </li>
+          }
+        </ol>
+      }
+      <button type="button" class="submit-button" (click)="restart()">
+        {{ 'user.securityAssistant.restart' | translate }}
+      </button>
+    </div>
+  </div>
+} @else {
+  <form class="questionnaire" (ngSubmit)="submit()">
+    @for (question of questions(); track question.id) {
+      <div class="question">
+        <p>{{ question.textKey | translate }}</p>
+        <div class="answer-toggle">
+          <button
+            type="button"
+            [class.selected]="answers()[question.id] === true"
+            (click)="answer(question.id, true)"
+          >
+            {{ 'user.securityAssistant.yes' | translate }}
+          </button>
+          <button
+            type="button"
+            [class.selected]="answers()[question.id] === false"
+            (click)="answer(question.id, false)"
+          >
+            {{ 'user.securityAssistant.no' | translate }}
+          </button>
+        </div>
+      </div>
+    }
+
+    <button type="submit" class="submit-button" [disabled]="!allAnswered() || isSubmitting()">
+      {{ (isSubmitting() ? 'common.loading' : 'user.securityAssistant.submit') | translate }}
+    </button>
+  </form>
+}

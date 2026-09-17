@@ -1,0 +1,191 @@
+{
+  "common": {
+    "appName": "RedSana",
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "loading": "Cargando...",
+    "back": "Volver",
+    "logout": "Cerrar sesión",
+    "networkStatus": {
+      "good": "Red saludable",
+      "warning": "Red degradada",
+      "critical": "Red crítica",
+      "unknown": "Estado desconocido"
+    }
+  },
+  "theme": {
+    "toggleToLight": "Cambiar a modo claro",
+    "toggleToDark": "Cambiar a modo oscuro"
+  },
+  "auth": {
+    "login": {
+      "title": "Iniciar sesión",
+      "email": "Correo electrónico",
+      "password": "Contraseña",
+      "submit": "Entrar",
+      "forgotPasswordLink": "¿Olvidaste tu contraseña?",
+      "registerLink": "¿No tienes cuenta? Regístrate"
+    },
+    "register": {
+      "title": "Crear cuenta",
+      "fullName": "Nombre completo",
+      "confirmPassword": "Confirmar contraseña",
+      "submit": "Crear cuenta",
+      "loginLink": "¿Ya tienes cuenta? Inicia sesión"
+    },
+    "forgotPassword": {
+      "title": "Recuperar contraseña",
+      "submit": "Enviar instrucciones",
+      "successMessage": "Si ese correo existe, enviamos instrucciones de recuperación.",
+      "backToLogin": "Volver a iniciar sesión"
+    },
+    "profile": {
+      "title": "Mi perfil",
+      "infoTitle": "Información personal",
+      "securityTitle": "Cambiar contraseña",
+      "currentPassword": "Contraseña actual",
+      "newPassword": "Nueva contraseña",
+      "changePassword": "Actualizar contraseña",
+      "savedMessage": "Perfil actualizado correctamente.",
+      "passwordChangedMessage": "Contraseña actualizada correctamente."
+    },
+    "errors": {
+      "required": "Este campo es obligatorio.",
+      "invalidEmail": "Ingresa un correo electrónico válido.",
+      "passwordTooShort": "La contraseña debe tener al menos 8 caracteres.",
+      "passwordsMismatch": "Las contraseñas no coinciden.",
+      "invalidCredentials": "Correo o contraseña incorrectos.",
+      "emailTaken": "Ese correo ya está registrado.",
+      "userNotFound": "Usuario no encontrado.",
+      "wrongCurrentPassword": "La contraseña actual es incorrecta."
+    }
+  },
+  "user": {
+    "dashboard": {
+      "title": "Panel principal",
+      "subtitle": "Estado en tiempo real de tu red doméstica",
+      "latency": "Latencia",
+      "jitter": "Jitter",
+      "packetLoss": "Pérdida de paquetes",
+      "historyTitle": "Historial de latencia"
+    },
+    "securityAssistant": {
+      "title": "Asistente de seguridad",
+      "subtitle": "Responde algunas preguntas para obtener tu puntaje de seguridad",
+      "questions": {
+        "defaultPassword": "¿Cambiaste la contraseña por defecto de tu router?",
+        "firmwareUpdated": "¿El firmware de tu router está actualizado?",
+        "wpa3Enabled": "¿Tienes activado el cifrado WPA3 (o al menos WPA2)?",
+        "guestNetwork": "¿Usas una red de invitados separada para visitas?",
+        "remoteManagementOff": "¿Está deshabilitada la administración remota del router?"
+      },
+      "yes": "Sí",
+      "no": "No",
+      "submit": "Ver mi puntaje",
+      "restart": "Responder de nuevo",
+      "recommendationsTitle": "Guía priorizada",
+      "allGood": "¡Excelente! No hay recomendaciones pendientes.",
+      "recommendations": {
+        "changeDefaultPassword": {
+          "title": "Cambia la contraseña por defecto",
+          "description": "Las credenciales de fábrica son públicas y es la vía de entrada más fácil para un atacante."
+        },
+        "updateFirmware": {
+          "title": "Actualiza el firmware de tu router",
+          "description": "Los fabricantes corrigen vulnerabilidades conocidas en cada versión de firmware."
+        },
+        "enableWpa3": {
+          "title": "Activa el cifrado WPA3",
+          "description": "Un cifrado más fuerte dificulta mucho más interceptar tu tráfico."
+        },
+        "enableGuestNetwork": {
+          "title": "Configura una red de invitados",
+          "description": "Mantiene los dispositivos de visitas aislados de tus dispositivos de confianza."
+        },
+        "disableRemoteManagement": {
+          "title": "Deshabilita la administración remota",
+          "description": "Evita que tu router pueda configurarse desde fuera de tu red doméstica."
+        }
+      }
+    },
+    "alertsCenter": {
+      "title": "Centro de alertas",
+      "subtitle": "Historial de cortes y alertas predictivas",
+      "acknowledge": "Marcar alerta como vista",
+      "messages": {
+        "briefOutage": "Se detectó un corte breve de conectividad ({{minutes}} min).",
+        "congestionForecast": "Se espera congestión de red esta noche en horas pico.",
+        "latencySpikePredicted": "Se predice un pico de latencia en los próximos minutos."
+      }
+    },
+    "devicesMap": {
+      "title": "Dispositivos conectados",
+      "subtitle": "Todos los dispositivos vistos actualmente en tu red",
+      "scan": "Escanear en busca de intrusos",
+      "scanning": "Escaneando la red...",
+      "scanClear": "No se encontraron dispositivos sospechosos.",
+      "scanFindings": "{{count}} dispositivo(s) requieren tu atención.",
+      "lastSeen": "Última vez visto",
+      "markTrusted": "Marcar como confiable",
+      "block": "Bloquear",
+      "trust": {
+        "trusted": "Confiable",
+        "unknown": "Desconocido",
+        "blocked": "Bloqueado"
+      }
+    }
+  },
+  "admin": {
+    "dashboard": {
+      "title": "Panel de administración",
+      "subtitle": "Visión general de toda la plataforma y sus hogares monitoreados",
+      "totalUsers": "Usuarios totales",
+      "monitoredHouseholds": "Hogares monitoreados",
+      "activeAlerts": "Alertas activas",
+      "averageSecurityScore": "Puntaje de seguridad promedio"
+    },
+    "networkSupervision": {
+      "title": "Supervisión de red",
+      "subtitle": "Monitorea la salud de red de cada hogar registrado",
+      "lastActivity": "Última actividad",
+      "viewDashboard": "Ver panel",
+      "detailTitle": "Panel del hogar"
+    },
+    "userManagement": {
+      "title": "Gestión de usuarios",
+      "subtitle": "Crea, edita y elimina cuentas de usuario de la plataforma",
+      "newUser": "Nuevo usuario",
+      "editUser": "Editar usuario",
+      "table": {
+        "name": "Nombre",
+        "email": "Correo",
+        "role": "Rol",
+        "status": "Estado",
+        "actions": "Acciones"
+      },
+      "role": {
+        "admin": "Administrador",
+        "standard": "Usuario estándar"
+      },
+      "status": {
+        "active": "Activo",
+        "suspended": "Suspendido"
+      },
+      "form": {
+        "fullName": "Nombre completo",
+        "email": "Correo",
+        "role": "Rol",
+        "status": "Estado"
+      },
+      "actions": {
+        "edit": "Editar",
+        "delete": "Eliminar"
+      },
+      "deleteConfirm": "¿Eliminar este usuario? Esta acción no se puede deshacer.",
+      "errors": {
+        "emailTaken": "Este correo ya está registrado",
+        "userNotFound": "Usuario no encontrado"
+      }
+    }
+  }
+}

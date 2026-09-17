@@ -1,0 +1,4 @@
+<div class="language-toggle" role="group" aria-label="Language">
+  <button type="button" [class.active]="i18n.language() === 'es'" (click)="switchTo('es')">ES</button>
+  <button type="button" [class.active]="i18n.language() === 'en'" (click)="switchTo('en')">EN</button>
+</div>

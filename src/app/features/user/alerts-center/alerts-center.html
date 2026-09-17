@@ -1,0 +1,7 @@
+<app-page-header titleKey="user.alertsCenter.title" subtitleKey="user.alertsCenter.subtitle" />
+
+<div class="alerts-list" [@listStagger]="alerts().length">
+  @for (alert of alerts(); track alert.id) {
+    <app-alert-item [alert]="alert" (acknowledge)="onAcknowledge($event)" />
+  }
+</div>

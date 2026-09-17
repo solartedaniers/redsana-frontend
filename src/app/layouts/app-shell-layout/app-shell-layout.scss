@@ -1,0 +1,25 @@
+.app-shell {
+  min-height: 100dvh;
+  display: grid;
+  grid-template-columns: 15rem 1fr;
+  background: var(--color-bg-app);
+}
+
+.sidebar {
+  border-right: 1px solid var(--color-border);
+  background: var(--color-bg-surface);
+  padding: 1.5rem 0.75rem;
+}
+
+.shell-main {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.shell-content {
+  flex: 1;
+  padding: 1.75rem;
+  position: relative;
+  overflow-y: auto;
+}

@@ -1,0 +1,14 @@
+<div class="score-gauge" [attr.data-band]="band()">
+  <svg viewBox="0 0 120 120">
+    <circle class="track" cx="60" cy="60" r="52" />
+    <circle
+      class="progress"
+      cx="60"
+      cy="60"
+      r="52"
+      [attr.stroke-dasharray]="circumference"
+      [attr.stroke-dashoffset]="dashOffset()"
+    />
+  </svg>
+  <span class="score-value">{{ score() }}%</span>
+</div>

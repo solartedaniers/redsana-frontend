@@ -1,0 +1,21 @@
+<button
+  type="button"
+  class="theme-toggle"
+  (click)="theme.toggle()"
+  [attr.aria-label]="(theme.mode() === 'dark' ? 'theme.toggleToLight' : 'theme.toggleToDark') | translate"
+>
+  @if (theme.mode() === 'dark') {
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+      <circle cx="12" cy="12" r="4" />
+      <path
+        d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"
+      />
+    </svg>
+  } @else {
+    <svg viewBox="0 0 24 24" fill="currentColor">
+      <path
+        d="M20.742 13.045a8.088 8.088 0 0 1-2.077.273c-4.508 0-8.16-3.653-8.16-8.16 0-.712.093-1.403.267-2.06a.75.75 0 0 0-.985-.897A10.14 10.14 0 1 0 21.64 14.03a.75.75 0 0 0-.898-.984Z"
+      />
+    </svg>
+  }
+</button>

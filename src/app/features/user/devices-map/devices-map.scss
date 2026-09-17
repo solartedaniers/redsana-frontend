@@ -1,0 +1,119 @@
+.scan-bar {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.scan-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.6rem 1.25rem;
+  border-radius: 0.5rem;
+  border: none;
+  background: var(--color-accent);
+  color: var(--color-text-inverse);
+  font-weight: 700;
+  cursor: pointer;
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
+
+.scan-result {
+  margin: 0;
+  font-size: 0.9rem;
+
+  &.ok {
+    color: var(--color-status-success);
+  }
+
+  &.warning {
+    color: var(--color-status-warning);
+  }
+}
+
+.devices-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  max-width: 44rem;
+}
+
+.device-card {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem 1.25rem;
+  border-radius: 0.65rem;
+  border: 1px solid var(--color-border);
+  border-left-width: 3px;
+  background: var(--color-bg-surface);
+
+  &[data-trust='trusted'] {
+    border-left-color: var(--color-status-success);
+  }
+
+  &[data-trust='unknown'] {
+    border-left-color: var(--color-status-warning);
+  }
+
+  &[data-trust='blocked'] {
+    border-left-color: var(--color-status-danger);
+  }
+}
+
+.device-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.device-name {
+  margin: 0;
+  color: var(--color-text-primary);
+  font-weight: 600;
+}
+
+.device-meta {
+  margin: 0.2rem 0 0;
+  color: var(--color-text-secondary);
+  font-size: 0.8rem;
+}
+
+.trust-badge {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--color-text-secondary);
+}
+
+.device-actions {
+  display: flex;
+  gap: 0.5rem;
+
+  button {
+    padding: 0.4rem 0.75rem;
+    border-radius: 0.4rem;
+    border: 1px solid var(--color-border);
+    background: transparent;
+    color: var(--color-text-secondary);
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition:
+      color var(--motion-duration-fast) var(--motion-easing-standard),
+      border-color var(--motion-duration-fast) var(--motion-easing-standard);
+
+    &:hover {
+      color: var(--color-accent);
+      border-color: var(--color-accent);
+    }
+
+    &.danger:hover {
+      color: var(--color-status-danger);
+      border-color: var(--color-status-danger);
+    }
+  }
+}

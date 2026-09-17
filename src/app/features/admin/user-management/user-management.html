@@ -1,0 +1,78 @@
+<app-page-header titleKey="admin.userManagement.title" subtitleKey="admin.userManagement.subtitle" />
+
+<button type="button" class="new-user-button" (click)="openCreateDialog()">
+  {{ 'admin.userManagement.newUser' | translate }}
+</button>
+
+<table class="users-table">
+  <thead>
+    <tr>
+      <th>{{ 'admin.userManagement.table.name' | translate }}</th>
+      <th>{{ 'admin.userManagement.table.email' | translate }}</th>
+      <th>{{ 'admin.userManagement.table.role' | translate }}</th>
+      <th>{{ 'admin.userManagement.table.status' | translate }}</th>
+      <th>{{ 'admin.userManagement.table.actions' | translate }}</th>
+    </tr>
+  </thead>
+  <tbody>
+    @for (user of users(); track user.id) {
+      <tr>
+        <td>{{ user.fullName }}</td>
+        <td>{{ user.email }}</td>
+        <td>{{ 'admin.userManagement.role.' + user.role | translate }}</td>
+        <td>
+          <span class="status-badge" [class.suspended]="user.status === 'suspended'">
+            {{ 'admin.userManagement.status.' + user.status | translate }}
+          </span>
+        </td>
+        <td class="actions-cell">
+          <button type="button" class="link-button" (click)="openEditDialog(user)">
+            {{ 'admin.userManagement.actions.edit' | translate }}
+          </button>
+          <button type="button" class="link-button danger" (click)="deleteUser(user)">
+            {{ 'admin.userManagement.actions.delete' | translate }}
+          </button>
+        </td>
+      </tr>
+    }
+  </tbody>
+</table>
+
+<dialog #userDialog class="user-dialog" (close)="errorKey.set(null)">
+  <form [formGroup]="form" (ngSubmit)="submit()" class="auth-form">
+    <h2 class="form-title">
+      {{ (editingUserId() ? 'admin.userManagement.editUser' : 'admin.userManagement.newUser') | translate }}
+    </h2>
+
+    @if (errorKey(); as key) {
+      <p class="form-error">{{ key | translate }}</p>
+    }
+
+    <label class="field">
+      <span>{{ 'admin.userManagement.form.fullName' | translate }}</span>
+      <input type="text" formControlName="fullName" />
+    </label>
+
+    <label class="field">
+      <span>{{ 'admin.userManagement.form.email' | translate }}</span>
+      <input type="email" formControlName="email" />
+    </label>
+
+    <label class="field">
+      <span>{{ 'admin.userManagement.form.role' | translate }}</span>
+      <select formControlName="role">
+        <option value="standard">{{ 'admin.userManagement.role.standard' | translate }}</option>
+        <option value="admin">{{ 'admin.userManagement.role.admin' | translate }}</option>
+      </select>
+    </label>
+
+    <div class="dialog-actions">
+      <button type="button" class="link-button" (click)="closeDialog()">
+        {{ 'common.cancel' | translate }}
+      </button>
+      <button type="submit" class="submit-button" [disabled]="form.invalid">
+        {{ 'common.save' | translate }}
+      </button>
+    </div>
+  </form>
+</dialog>

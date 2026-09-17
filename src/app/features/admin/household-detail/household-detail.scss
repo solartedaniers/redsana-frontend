@@ -1,0 +1,54 @@
+.back-link {
+  display: inline-block;
+  margin-bottom: 1.25rem;
+  color: var(--color-text-secondary);
+  text-decoration: none;
+  font-size: 0.85rem;
+
+  &:hover {
+    color: var(--color-accent);
+  }
+}
+
+.household-summary {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  padding: 1.5rem;
+  border-radius: 0.75rem;
+  border: 1px solid var(--color-border);
+  background: var(--color-bg-surface);
+  margin-bottom: 1.75rem;
+}
+
+.owner {
+  margin: 0;
+  font-weight: 700;
+  color: var(--color-text-primary);
+}
+
+.label {
+  margin: 0.25rem 0 0;
+  color: var(--color-text-secondary);
+  font-size: 0.85rem;
+}
+
+.metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.75rem;
+}
+
+.history-section {
+  padding: 1.5rem;
+  border-radius: 0.75rem;
+  border: 1px solid var(--color-border);
+  background: var(--color-bg-surface);
+
+  h2 {
+    margin: 0 0 1rem;
+    font-size: 1.05rem;
+    color: var(--color-text-primary);
+  }
+}
