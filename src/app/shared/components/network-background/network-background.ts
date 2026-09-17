@@ -17,7 +17,7 @@ import { ThemeService } from '../../../core/theme/theme.service';
 // pantalla completa) y "ambient" para el shell de usuario/admin (de fondo,
 // discreto, sin competir con tablas y formularios).
 const INTENSITY_PRESETS = {
-  hero: { nodeCount: 65, cameraZ: 85, connectDistance: 24, hubConnectDistance: 38 },
+  hero: { nodeCount: 76, cameraZ: 72, connectDistance: 28, hubConnectDistance: 42 },
   ambient: { nodeCount: 30, cameraZ: 110, connectDistance: 20, hubConnectDistance: 34 },
 } as const;
 
@@ -50,9 +50,9 @@ export class NetworkBackground implements AfterViewInit, OnDestroy {
   private camera?: THREE.PerspectiveCamera;
   private readonly group = new THREE.Group();
   private readonly nodes: THREE.Mesh[] = [];
-  private readonly nodeGeometry = new THREE.SphereGeometry(0.85, 12, 12);
+  private readonly nodeGeometry = new THREE.SphereGeometry(1.1, 12, 12);
   private readonly nodeMaterials: THREE.MeshBasicMaterial[] = [];
-  private readonly hubGeometry = new THREE.OctahedronGeometry(4.2, 1);
+  private readonly hubGeometry = new THREE.OctahedronGeometry(5.1, 1);
   private readonly hubMaterial = new THREE.MeshBasicMaterial({ wireframe: true });
   private hub?: THREE.Mesh;
   private readonly lineMaterial = new THREE.LineBasicMaterial({ transparent: true, opacity: 0.26 });
@@ -156,7 +156,7 @@ export class NetworkBackground implements AfterViewInit, OnDestroy {
       const v = Math.random();
       const theta = u * 2 * Math.PI;
       const phi = Math.acos(2 * v - 1);
-      const r = 24 + Math.random() * 34;
+      const r = 26 + Math.random() * 38;
 
       const origin = new THREE.Vector3(
         r * Math.sin(phi) * Math.cos(theta),
@@ -179,7 +179,7 @@ export class NetworkBackground implements AfterViewInit, OnDestroy {
     this.group.add(this.lines);
 
     for (let i = 0; i < 3; i++) {
-      const ringGeometry = new THREE.RingGeometry(9 + i * 11, 9.4 + i * 11, 64);
+      const ringGeometry = new THREE.RingGeometry(11 + i * 13, 11.5 + i * 13, 64);
       const ringMaterial = new THREE.MeshBasicMaterial({
         transparent: true,
         opacity: 0.28 - i * 0.07,
