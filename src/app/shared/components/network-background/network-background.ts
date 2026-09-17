@@ -17,19 +17,19 @@ import { ThemeService } from '../../../core/theme/theme.service';
 // pantalla completa) y "ambient" para el shell de usuario/admin (de fondo,
 // discreto, sin competir con tablas y formularios).
 const INTENSITY_PRESETS = {
-  hero: { nodeCount: 56, cameraZ: 42, connectDistance: 9, hubConnectDistance: 17 },
-  ambient: { nodeCount: 24, cameraZ: 60, connectDistance: 10, hubConnectDistance: 18 },
+  hero: { nodeCount: 65, cameraZ: 85, connectDistance: 24, hubConnectDistance: 38 },
+  ambient: { nodeCount: 30, cameraZ: 110, connectDistance: 20, hubConnectDistance: 34 },
 } as const;
 
-const SPREAD_X = 34;
-const SPREAD_Y = 20;
-const SPREAD_Z = 14;
-
 interface NodeUserData {
-  velocity: THREE.Vector3;
+  origin: THREE.Vector3;
+  speed: number;
+  phase: number;
 }
 
-// Fondo decorativo con una nube de nodos conectados tipo topología de red.
+// Fondo decorativo con una nube de nodos conectados tipo topología de red,
+// distribuidos en un cascarón esférico (más densos hacia los bordes de la
+// vista, centro despejado para no competir con la tarjeta de autenticación).
 // Vive en un layout compartido (AuthLayout / AppShellLayout), no en cada
 // pantalla, para no reiniciar la escena al navegar entre rutas del mismo módulo.
 @Component({
@@ -50,17 +50,19 @@ export class NetworkBackground implements AfterViewInit, OnDestroy {
   private camera?: THREE.PerspectiveCamera;
   private readonly group = new THREE.Group();
   private readonly nodes: THREE.Mesh[] = [];
-  private readonly nodeGeometry = new THREE.SphereGeometry(0.45, 12, 12);
+  private readonly nodeGeometry = new THREE.SphereGeometry(0.85, 12, 12);
   private readonly nodeMaterials: THREE.MeshBasicMaterial[] = [];
-  private readonly hubGeometry = new THREE.OctahedronGeometry(3, 1);
+  private readonly hubGeometry = new THREE.OctahedronGeometry(4.2, 1);
   private readonly hubMaterial = new THREE.MeshBasicMaterial({ wireframe: true });
   private hub?: THREE.Mesh;
-  private readonly lineMaterial = new THREE.LineBasicMaterial({ transparent: true, opacity: 0.25 });
+  private readonly lineMaterial = new THREE.LineBasicMaterial({ transparent: true, opacity: 0.26 });
   private readonly lineGeometry = new THREE.BufferGeometry();
   private lines?: THREE.LineSegments;
   private readonly rings: THREE.Mesh[] = [];
 
   private animationFrameId: number | null = null;
+  private pointerTargetX = 0;
+  private pointerTargetY = 0;
   private pointerX = 0;
   private pointerY = 0;
   private ready = false;
@@ -115,8 +117,8 @@ export class NetworkBackground implements AfterViewInit, OnDestroy {
 
   @HostListener('window:pointermove', ['$event'])
   onPointerMove(event: PointerEvent): void {
-    this.pointerX = (event.clientX / window.innerWidth - 0.5) * 2;
-    this.pointerY = (event.clientY / window.innerHeight - 0.5) * 2;
+    this.pointerTargetX = (event.clientX - window.innerWidth / 2) * 0.00045;
+    this.pointerTargetY = (event.clientY - window.innerHeight / 2) * 0.00045;
   }
 
   private buildScene(): void {
@@ -144,20 +146,29 @@ export class NetworkBackground implements AfterViewInit, OnDestroy {
       new THREE.MeshBasicMaterial()
     );
 
+    // Distribución en cascarón esférico: nodos concentrados hacia los bordes
+    // de la vista, con el centro despejado para no competir con la tarjeta.
     for (let i = 0; i < preset.nodeCount; i++) {
       const material = this.nodeMaterials[i % this.nodeMaterials.length];
       const node = new THREE.Mesh(this.nodeGeometry, material);
-      node.position.set(
-        (Math.random() - 0.5) * SPREAD_X,
-        (Math.random() - 0.5) * SPREAD_Y,
-        (Math.random() - 0.5) * SPREAD_Z
+
+      const u = Math.random();
+      const v = Math.random();
+      const theta = u * 2 * Math.PI;
+      const phi = Math.acos(2 * v - 1);
+      const r = 24 + Math.random() * 34;
+
+      const origin = new THREE.Vector3(
+        r * Math.sin(phi) * Math.cos(theta),
+        r * Math.sin(phi) * Math.sin(theta) * 0.65,
+        r * Math.cos(phi) * 0.8
       );
+      node.position.copy(origin);
+
       const userData: NodeUserData = {
-        velocity: new THREE.Vector3(
-          (Math.random() - 0.5) * 0.02,
-          (Math.random() - 0.5) * 0.02,
-          (Math.random() - 0.5) * 0.01
-        ),
+        origin,
+        speed: 0.25 + Math.random() * 0.7,
+        phase: Math.random() * Math.PI * 2,
       };
       node.userData = userData;
       this.nodes.push(node);
@@ -168,17 +179,19 @@ export class NetworkBackground implements AfterViewInit, OnDestroy {
     this.group.add(this.lines);
 
     for (let i = 0; i < 3; i++) {
-      const ringGeometry = new THREE.RingGeometry(9 + i * 8, 9.25 + i * 8, 48);
+      const ringGeometry = new THREE.RingGeometry(9 + i * 11, 9.4 + i * 11, 64);
       const ringMaterial = new THREE.MeshBasicMaterial({
         transparent: true,
-        opacity: 0.16 - i * 0.05,
+        opacity: 0.28 - i * 0.07,
         side: THREE.DoubleSide,
       });
       const ring = new THREE.Mesh(ringGeometry, ringMaterial);
-      ring.rotation.x = Math.PI / 2.4;
+      ring.rotation.x = Math.PI / 2.3;
       this.group.add(ring);
       this.rings.push(ring);
     }
+
+    this.updateConnections();
   }
 
   // Lee los tokens de color actuales (--color-accent, etc.) y los aplica a
@@ -197,35 +210,15 @@ export class NetworkBackground implements AfterViewInit, OnDestroy {
     this.rings.forEach((ring) => (ring.material as THREE.MeshBasicMaterial).color.set(accent));
   }
 
-  private animate = (): void => {
-    this.animationFrameId = requestAnimationFrame(this.animate);
-    if (!this.renderer || !this.scene || !this.camera) {
-      return;
-    }
-
+  // Recalcula las líneas de conexión (hub-nodo y nodo-nodo cercano). Es
+  // costoso en O(n²), por lo que animate() lo llama cada pocos frames.
+  private updateConnections(): void {
     const preset = INTENSITY_PRESETS[this.intensity()];
-    this.elapsed += 0.016;
-
-    this.group.rotation.y += 0.0009 + this.pointerX * 0.0006;
-    this.group.rotation.x += 0.0004 + this.pointerY * 0.0004;
-
-    if (this.hub) {
-      this.hub.rotation.x += 0.004;
-      this.hub.rotation.y += 0.006;
-      const pulse = 1 + Math.sin(this.elapsed * 1.4) * 0.06;
-      this.hub.scale.setScalar(pulse);
-    }
-
     const positions: number[] = [];
+
     for (let i = 0; i < this.nodes.length; i++) {
       const node = this.nodes[i];
-      const { velocity } = node.userData as NodeUserData;
-      node.position.add(velocity);
-      if (Math.abs(node.position.x) > SPREAD_X / 2) velocity.x *= -1;
-      if (Math.abs(node.position.y) > SPREAD_Y / 2) velocity.y *= -1;
-      if (Math.abs(node.position.z) > SPREAD_Z / 2) velocity.z *= -1;
-
-      if (node.position.length() < preset.hubConnectDistance) {
+      if (i % 3 === 0 && node.position.length() < preset.hubConnectDistance) {
         positions.push(0, 0, 0, node.position.x, node.position.y, node.position.z);
       }
 
@@ -243,12 +236,47 @@ export class NetworkBackground implements AfterViewInit, OnDestroy {
         }
       }
     }
+
     this.lineGeometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+  }
+
+  private animate = (): void => {
+    this.animationFrameId = requestAnimationFrame(this.animate);
+    if (!this.renderer || !this.scene || !this.camera) {
+      return;
+    }
+
+    this.elapsed += 0.016;
+    const time = this.elapsed;
+
+    this.pointerX += (this.pointerTargetX - this.pointerX) * 0.05;
+    this.pointerY += (this.pointerTargetY - this.pointerY) * 0.05;
+
+    this.group.rotation.y = time * 0.07 + this.pointerX;
+    this.group.rotation.x = Math.sin(time * 0.04) * 0.12 + this.pointerY;
+
+    if (this.hub) {
+      this.hub.rotation.x = time * 0.35;
+      this.hub.rotation.y = time * 0.55;
+      const pulse = 1 + Math.sin(time * 2.2) * 0.08;
+      this.hub.scale.setScalar(pulse);
+    }
+
+    this.nodes.forEach((node) => {
+      const { origin, speed, phase } = node.userData as NodeUserData;
+      node.position.y = origin.y + Math.sin(time * speed + phase) * 2.2;
+      node.position.x = origin.x + Math.cos(time * (speed * 0.75) + phase) * 1.4;
+    });
 
     this.rings.forEach((ring, index) => {
-      const scale = ring.scale.x + 0.0025 * (index + 1);
-      ring.scale.setScalar(scale > 1.8 ? 0.6 : scale);
+      ring.rotation.z = -time * (0.08 + index * 0.04);
+      const scale = 1 + ((time * 0.35 + index * 0.25) % 1.5) * 0.28;
+      ring.scale.setScalar(scale);
     });
+
+    if (Math.floor(time * 60) % 6 === 0) {
+      this.updateConnections();
+    }
 
     this.renderer.render(this.scene, this.camera);
   };

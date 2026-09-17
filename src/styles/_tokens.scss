@@ -16,30 +16,30 @@
   --color-text-secondary: #9ca3af;
   --color-text-inverse: #0b1220;
 
-  --color-accent: #d4af37;
-  --color-accent-hover: #e4c158;
-  --color-accent-muted: rgb(212 175 55 / 15%);
+  --color-accent: #f59e0b;
+  --color-accent-hover: #fbbf24;
+  --color-accent-muted: rgb(245 158 11 / 15%);
 
   --color-status-success: #22c55e;
   --color-status-warning: #eab308;
   --color-status-danger: #ef4444;
   --color-status-neutral: #6b7280;
 
-  --color-focus-ring: rgb(212 175 55 / 50%);
+  --color-focus-ring: rgb(245 158 11 / 50%);
 
   // Card "glass" protagonista (card grande de auth, score-gauge destacado):
-  // fondo translúcido + borde + sombra con resplandor dorado.
+  // fondo translúcido + borde + sombra con resplandor ámbar.
   --color-glass-bg: rgb(11 15 23 / 82%);
-  --color-glass-border: rgb(212 175 55 / 22%);
+  --color-glass-border: rgb(245 158 11 / 22%);
   --shadow-glass:
-    0 20px 50px -20px rgb(0 0 0 / 70%),
-    0 0 35px -5px rgb(212 175 55 / 20%);
+    0 10px 40px -10px rgb(0 0 0 / 70%),
+    0 0 35px -5px rgb(245 158 11 / 25%);
 
   // Glass "de trabajo": sidebar, top-bar y tarjetas del shell (más liviano
   // que --color-glass-bg, que queda reservado a paneles protagonistas).
   --color-surface-glass: rgb(17 23 36 / 70%);
   --shadow-elevated: 0 12px 30px -14px rgb(0 0 0 / 55%);
-  --color-glow-accent: rgb(212 175 55 / 45%);
+  --color-glow-accent: rgb(245 158 11 / 45%);
 
   --font-sans: 'Plus Jakarta Sans Variable', system-ui, sans-serif;
   --font-mono: 'JetBrains Mono Variable', ui-monospace, monospace;
@@ -51,6 +51,7 @@
 // orden — así el atributo [data-theme] puede pisar los valores por defecto
 // en tiempo de ejecución sin pelear con la cascada de capas de Tailwind.
 :root[data-theme='light'] {
+  color-scheme: light;
   --color-bg-app: #f5f6f8;
   --color-bg-surface: #ffffff;
   --color-bg-surface-alt: #eef0f4;
@@ -62,26 +63,63 @@
   --color-text-secondary: #545b66;
   --color-text-inverse: #ffffff;
 
-  --color-accent: #8a6212;
-  --color-accent-hover: #a9791b;
-  --color-accent-muted: rgb(138 98 18 / 12%);
+  --color-accent: #d97706;
+  --color-accent-hover: #b45309;
+  --color-accent-muted: rgb(217 119 6 / 12%);
 
   --color-status-success: #16a34a;
   --color-status-warning: #ca8a04;
   --color-status-danger: #dc2626;
   --color-status-neutral: #6b7280;
 
-  --color-focus-ring: rgb(138 98 18 / 45%);
+  --color-focus-ring: rgb(245 158 11 / 35%);
 
-  // En claro el glass pierde el resplandor dorado: solo un fondo casi
+  // En claro el glass pierde el resplandor ámbar: solo un fondo casi
   // opaco y una sombra neutra, igual que en la referencia de diseño.
   --color-glass-bg: rgb(255 255 255 / 95%);
   --color-glass-border: rgb(219 224 230 / 90%);
   --shadow-glass:
-    0 20px 50px -20px rgb(16 21 29 / 12%),
-    0 0 30px -10px rgb(138 98 18 / 8%);
+    0 25px 50px -12px rgb(148 163 184 / 30%),
+    0 4px 12px -4px rgb(148 163 184 / 20%);
 
   --color-surface-glass: rgb(255 255 255 / 75%);
   --shadow-elevated: 0 12px 28px -16px rgb(16 21 29 / 14%);
-  --color-glow-accent: rgb(138 98 18 / 30%);
+  --color-glow-accent: rgb(217 119 6 / 30%);
+}
+
+// El tema oscuro se declara de forma explícita, igual que el claro. Así el
+// cambio desde un tema claro ya activo no depende de los valores iniciales
+// registrados por Tailwind y cada superficie vuelve siempre a ser oscura.
+:root[data-theme='dark'] {
+  color-scheme: dark;
+  --color-bg-app: #07090e;
+  --color-bg-surface: #0b0f17;
+  --color-bg-surface-alt: #111724;
+
+  --color-border: #1f2937;
+  --color-border-strong: #374151;
+
+  --color-text-primary: #f3f4f6;
+  --color-text-secondary: #9ca3af;
+  --color-text-inverse: #0b1220;
+
+  --color-accent: #f59e0b;
+  --color-accent-hover: #fbbf24;
+  --color-accent-muted: rgb(245 158 11 / 15%);
+
+  --color-status-success: #22c55e;
+  --color-status-warning: #eab308;
+  --color-status-danger: #ef4444;
+  --color-status-neutral: #6b7280;
+
+  --color-focus-ring: rgb(245 158 11 / 50%);
+  --color-glass-bg: rgb(11 15 23 / 82%);
+  --color-glass-border: rgb(245 158 11 / 22%);
+  --shadow-glass:
+    0 10px 40px -10px rgb(0 0 0 / 70%),
+    0 0 35px -5px rgb(245 158 11 / 25%);
+
+  --color-surface-glass: rgb(17 23 36 / 70%);
+  --shadow-elevated: 0 12px 30px -14px rgb(0 0 0 / 55%);
+  --color-glow-accent: rgb(245 158 11 / 45%);
 }

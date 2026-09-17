@@ -2,30 +2,37 @@
 // recuperación, perfil): mismos campos y botón, evita repetir las reglas
 // en cada componente ya que ninguno necesita nada visualmente distinto.
 .form-title {
-  margin: 0 0 1.5rem;
-  font-size: 1.25rem;
-  font-weight: 700;
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 800;
+  letter-spacing: -0.01em;
   color: var(--color-text-primary);
-  text-align: center;
+}
+
+.form-subtitle {
+  margin: 0.3rem 0 1.1rem;
+  font-size: 0.64rem;
+  color: var(--color-text-secondary);
 }
 
 .auth-form {
   display: flex;
   flex-direction: column;
-  gap: 1.1rem;
+  gap: 0.75rem;
 }
 
 .field {
   display: flex;
   flex-direction: column;
   gap: 0.45rem;
-  font-size: 0.85rem;
+  font-size: 0.68rem;
   color: var(--color-text-secondary);
 
   // Etiqueta estilo "consola de operador": mono, mayúsculas, tracking amplio.
-  > span:first-child {
+  > span:first-child,
+  .field-label-row > span:first-child {
     font-family: var(--font-mono);
-    font-size: 0.7rem;
+    font-size: 0.56rem;
     font-weight: 600;
     letter-spacing: 0.08em;
     text-transform: uppercase;
@@ -33,12 +40,13 @@
   }
 
   input {
-    padding: 0.65rem 0.85rem;
-    border-radius: 0.75rem;
+    padding: 0.5rem 0.65rem;
+    border-radius: 0.4rem;
     border: 1px solid var(--color-border);
-    background: var(--color-bg-surface-alt);
+    background: var(--color-bg-app);
     color: var(--color-text-primary);
-    font-size: 0.95rem;
+    font-family: var(--font-mono);
+    font-size: 0.62rem;
     transition:
       border-color var(--motion-duration-fast) var(--motion-easing-standard),
       box-shadow var(--motion-duration-fast) var(--motion-easing-standard);
@@ -48,6 +56,25 @@
       border-color: var(--color-accent);
       box-shadow: 0 0 0 3px var(--color-accent-muted);
     }
+  }
+}
+
+.field-label-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.field-hint-link {
+  font-family: var(--font-mono);
+  font-size: 0.56rem;
+  font-weight: 600;
+  color: var(--color-accent);
+  text-decoration: none;
+
+  &:hover {
+    color: var(--color-accent-hover);
   }
 }
 
@@ -63,12 +90,13 @@
 }
 
 .submit-button {
-  padding: 0.75rem;
-  border-radius: 0.75rem;
+  padding: 0.58rem;
+  border-radius: 0.4rem;
   border: none;
   background: linear-gradient(120deg, var(--color-accent), var(--color-accent-hover));
   color: var(--color-text-inverse);
-  font-weight: 700;
+  font-size: 0.65rem;
+  font-weight: 800;
   cursor: pointer;
   box-shadow: 0 10px 25px -10px var(--color-glow-accent);
   transition:
@@ -92,7 +120,8 @@
 .form-links {
   display: flex;
   justify-content: space-between;
-  font-size: 0.8rem;
+  justify-content: center;
+  font-size: 0.58rem;
 
   a {
     color: var(--color-text-secondary);
@@ -110,7 +139,7 @@
   display: grid;
   grid-template-columns: 1fr;
 
-  @media (min-width: 64rem) {
+  @media (min-width: 48rem) {
     grid-template-columns: 5fr 7fr;
   }
 }
@@ -119,11 +148,11 @@
   display: none;
   flex-direction: column;
   justify-content: space-between;
-  padding: 2.25rem;
-  border-right: 1px solid var(--color-border);
-  background: var(--color-bg-surface-alt);
+  padding: 1.7rem;
+  border-right: 1px solid var(--color-glass-border);
+  background: color-mix(in srgb, var(--color-bg-app) 70%, transparent);
 
-  @media (min-width: 64rem) {
+  @media (min-width: 48rem) {
     display: flex;
   }
 }
@@ -131,12 +160,7 @@
 .side-panel-eyebrow {
   display: inline-flex;
   align-items: center;
-  gap: 0.5rem;
-  width: fit-content;
-  padding: 0.3rem 0.7rem;
-  border-radius: 9999px;
-  border: 1px solid var(--color-accent-muted);
-  background: var(--color-accent-muted);
+  gap: 0.45rem;
   color: var(--color-accent);
   font-family: var(--font-mono);
   font-size: 0.7rem;
@@ -145,24 +169,25 @@
   text-transform: uppercase;
 
   .dot {
-    width: 0.4rem;
-    height: 0.4rem;
+    width: 0.35rem;
+    height: 0.35rem;
     border-radius: 9999px;
     background: var(--color-accent);
   }
 }
 
 .side-panel-title {
-  margin: 1rem 0 0.5rem;
-  font-size: 1.4rem;
-  font-weight: 800;
+  margin: 0.75rem 0 0.4rem;
+  font-size: 1.05rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
   color: var(--color-text-primary);
 }
 
 .side-panel-description {
   margin: 0;
-  font-size: 0.85rem;
-  line-height: 1.5;
+  font-size: 0.75rem;
+  line-height: 1.6;
   color: var(--color-text-secondary);
 }
 
@@ -170,15 +195,15 @@
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
-  margin-top: 1.5rem;
+  margin-top: 1.1rem;
 }
 
 .side-panel-feature {
   display: flex;
   align-items: flex-start;
   gap: 0.75rem;
-  padding: 0.75rem;
-  border-radius: 0.75rem;
+  padding: 0.55rem;
+  border-radius: 0.45rem;
   border: 1px solid var(--color-border);
   background: var(--color-bg-surface);
   transition:
@@ -191,24 +216,24 @@
   }
 
   .icon {
-    width: 1.4rem;
-    height: 1.4rem;
+    width: 1rem;
+    height: 1rem;
     flex-shrink: 0;
-    padding: 0.35rem;
+    padding: 0.28rem;
     box-sizing: content-box;
-    border-radius: 0.5rem;
+    border-radius: 0.35rem;
     color: var(--color-accent);
     background: var(--color-accent-muted);
   }
 
   strong {
     display: block;
-    font-size: 0.85rem;
+    font-size: 0.68rem;
     color: var(--color-text-primary);
   }
 
   span {
-    font-size: 0.75rem;
+    font-size: 0.58rem;
     color: var(--color-text-secondary);
   }
 }
@@ -242,7 +267,7 @@
 }
 
 .form-panel {
-  padding: 2.25rem;
+  padding: 1.7rem;
 }
 
 .field-row {
@@ -261,11 +286,11 @@
   .input-wrap {
     display: flex;
     align-items: center;
-    gap: 0.6rem;
-    padding: 0 0.85rem;
-    border-radius: 0.75rem;
+    gap: 0.45rem;
+    padding: 0 0.65rem;
+    border-radius: 0.4rem;
     border: 1px solid var(--color-border);
-    background: var(--color-bg-surface-alt);
+    background: var(--color-bg-app);
     transition:
       border-color var(--motion-duration-fast) var(--motion-easing-standard),
       box-shadow var(--motion-duration-fast) var(--motion-easing-standard);
@@ -283,7 +308,7 @@
     input {
       flex: 1;
       min-width: 0;
-      padding: 0.6rem 0;
+      padding: 0.48rem 0;
       border: none;
       background: transparent;
     }
@@ -314,7 +339,24 @@
   }
 
   .icon {
-    width: 1.1rem;
-    height: 1.1rem;
+    width: 0.82rem;
+    height: 0.82rem;
   }
 }
+
+.encryption-status,
+.credential-notice {
+  display: flex;
+  align-items: center;
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-family: var(--font-mono);
+  font-size: 0.53rem;
+}
+
+.encryption-status { gap: 0.45rem; }
+.encryption-status strong { margin-left: auto; color: var(--color-status-success); font-size: inherit; }
+.encryption-meter { display: inline-flex; flex: 1; gap: 0.16rem; }
+.encryption-meter i { height: 0.18rem; flex: 1; border-radius: 999px; background: var(--color-status-success); }
+.credential-notice { gap: 0.35rem; }
+.credential-notice .icon { width: 0.7rem; height: 0.7rem; color: var(--color-accent); }

@@ -2,9 +2,11 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 2.25rem;
-  height: 2.25rem;
-  border-radius: 9999px;
+  gap: 0.3rem;
+  min-width: 3.35rem;
+  height: 1.65rem;
+  padding: 0 0.45rem;
+  border-radius: 0.35rem;
   border: 1px solid var(--color-border);
   background: var(--color-bg-surface-alt);
   color: var(--color-text-secondary);
@@ -15,9 +17,11 @@
     transform var(--motion-duration-fast) var(--motion-easing-standard);
 
   svg {
-    width: 1.1rem;
-    height: 1.1rem;
+    width: 0.75rem;
+    height: 0.75rem;
   }
+
+  span { font-family: var(--font-mono); font-size: 0.57rem; font-weight: 700; }
 
   &:hover {
     color: var(--color-accent);

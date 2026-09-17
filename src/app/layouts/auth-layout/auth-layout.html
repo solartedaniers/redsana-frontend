@@ -2,8 +2,17 @@
   <app-network-background />
 
   <header class="auth-header">
-    <span class="brand">{{ 'common.appName' | translate }}</span>
+    <div class="brand-cluster">
+      <span class="window-controls" aria-hidden="true"><i></i><i></i><i></i></span>
+      <span class="brand-mark" aria-hidden="true"><span></span></span>
+      <span class="brand">{{ 'common.appName' | translate }}</span>
+      <span class="build-tag">{{ 'common.buildTag' | translate }}</span>
+    </div>
     <div class="header-actions">
+      <div class="system-status" aria-label="System status">
+        <span><i class="status-dot"></i>{{ 'auth.console.networkStatus' | translate }}</span>
+        <span><i class="status-shield"></i>{{ 'auth.console.secureTunnel' | translate }}</span>
+      </div>
       <app-language-toggle />
       <app-theme-toggle />
     </div>
@@ -16,4 +25,11 @@
       </div>
     </div>
   </main>
+
+  <footer class="auth-footer">
+    <span><i class="status-dot"></i>{{ 'auth.console.nodeStatus' | translate }}</span>
+    <span>{{ 'auth.console.protectionMode' | translate }}</span>
+    <span class="footer-version"><i class="status-dot"></i>{{ 'auth.console.serviceVersion' | translate }}</span>
+    <span>{{ 'auth.console.hash' | translate }}</span>
+  </footer>
 </div>

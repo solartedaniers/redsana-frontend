@@ -6,6 +6,7 @@
     "loading": "Loading...",
     "back": "Back",
     "logout": "Log out",
+    "buildTag": "SEC-v2.4",
     "networkStatus": {
       "good": "Network healthy",
       "warning": "Network degraded",
@@ -15,18 +16,24 @@
   },
   "theme": {
     "toggleToLight": "Switch to light mode",
-    "toggleToDark": "Switch to dark mode"
+    "toggleToDark": "Switch to dark mode",
+    "lightLabel": "Light",
+    "darkLabel": "Dark"
   },
   "auth": {
     "showPassword": "Show password",
     "hidePassword": "Hide password",
     "login": {
-      "title": "Log in",
+      "title": "Access authentication",
+      "subtitle": "Enter your credentials to access your network monitoring dashboard.",
       "email": "Email",
       "password": "Password",
       "submit": "Sign in",
       "forgotPasswordLink": "Forgot your password?",
       "registerLink": "Don't have an account? Sign up",
+      "encryptionStatus": "Encryption strength",
+      "encryptionLevel": "OPTIMAL",
+      "credentialNotice": "Credentials are encrypted in memory.",
       "panel": {
         "eyebrow": "Home network monitoring",
         "title": "Your network, under control",
@@ -46,6 +53,14 @@
           }
         }
       }
+    },
+    "console": {
+      "networkStatus": "Network monitor active",
+      "secureTunnel": "Secure tunnel",
+      "nodeStatus": "Node connection: synchronized",
+      "protectionMode": "Protection mode: enabled",
+      "serviceVersion": "RedSana Suite v2.4.1 (Stable)",
+      "hash": "Hash: 3f4c62e...90ff"
     },
     "register": {
       "title": "Create account",

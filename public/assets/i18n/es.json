@@ -6,6 +6,7 @@
     "loading": "Cargando...",
     "back": "Volver",
     "logout": "Cerrar sesión",
+    "buildTag": "SEC-v2.4",
     "networkStatus": {
       "good": "Red saludable",
       "warning": "Red degradada",
@@ -15,18 +16,24 @@
   },
   "theme": {
     "toggleToLight": "Cambiar a modo claro",
-    "toggleToDark": "Cambiar a modo oscuro"
+    "toggleToDark": "Cambiar a modo oscuro",
+    "lightLabel": "Claro",
+    "darkLabel": "Oscuro"
   },
   "auth": {
     "showPassword": "Mostrar contraseña",
     "hidePassword": "Ocultar contraseña",
     "login": {
-      "title": "Iniciar sesión",
+      "title": "Autenticación de acceso",
+      "subtitle": "Ingresa tus credenciales para acceder al panel de monitoreo de tu red.",
       "email": "Correo electrónico",
       "password": "Contraseña",
       "submit": "Entrar",
       "forgotPasswordLink": "¿Olvidaste tu contraseña?",
       "registerLink": "¿No tienes cuenta? Regístrate",
+      "encryptionStatus": "Fortaleza de cifrado",
+      "encryptionLevel": "ÓPTIMA",
+      "credentialNotice": "Las credenciales se cifran en memoria.",
       "panel": {
         "eyebrow": "Monitoreo de red doméstica",
         "title": "Tu red, bajo control",
@@ -46,6 +53,14 @@
           }
         }
       }
+    },
+    "console": {
+      "networkStatus": "Monitor de red activo",
+      "secureTunnel": "Túnel seguro",
+      "nodeStatus": "Conexión de nodo: sincronizada",
+      "protectionMode": "Modo de protección: habilitado",
+      "serviceVersion": "RedSana Suite v2.4.1 (Estable)",
+      "hash": "Hash: 3f4c62e...90ff"
     },
     "register": {
       "title": "Crear cuenta",

@@ -36,6 +36,7 @@
 
   <div class="form-panel">
     <h2 class="form-title">{{ 'auth.login.title' | translate }}</h2>
+    <p class="form-subtitle">{{ 'auth.login.subtitle' | translate }}</p>
 
     <form class="auth-form" [formGroup]="form" (ngSubmit)="submit()">
       <label class="field has-icon">
@@ -49,8 +50,21 @@
         }
       </label>
 
+      <div class="encryption-status" aria-live="polite">
+        <span>{{ 'auth.login.encryptionStatus' | translate }}</span>
+        <span class="encryption-meter" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+        <strong>{{ 'auth.login.encryptionLevel' | translate }}</strong>
+      </div>
+
+      <p class="credential-notice"><app-icon name="shield" />{{ 'auth.login.credentialNotice' | translate }}</p>
+
       <label class="field has-icon">
-        <span>{{ 'auth.login.password' | translate }}</span>
+        <div class="field-label-row">
+          <span>{{ 'auth.login.password' | translate }}</span>
+          <a class="field-hint-link" routerLink="/auth/forgot-password">
+            {{ 'auth.login.forgotPasswordLink' | translate }}
+          </a>
+        </div>
         <div class="input-wrap">
           <app-icon name="lock" />
           <input
@@ -81,7 +95,6 @@
       </button>
 
       <div class="form-links">
-        <a routerLink="/auth/forgot-password">{{ 'auth.login.forgotPasswordLink' | translate }}</a>
         <a routerLink="/auth/register">{{ 'auth.login.registerLink' | translate }}</a>
       </div>
     </form>
