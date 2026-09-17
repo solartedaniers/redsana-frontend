@@ -18,22 +18,35 @@
 .field {
   display: flex;
   flex-direction: column;
-  gap: 0.4rem;
+  gap: 0.45rem;
   font-size: 0.85rem;
   color: var(--color-text-secondary);
 
+  // Etiqueta estilo "consola de operador": mono, mayúsculas, tracking amplio.
+  > span:first-child {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-text-secondary);
+  }
+
   input {
-    padding: 0.6rem 0.75rem;
-    border-radius: 0.5rem;
+    padding: 0.65rem 0.85rem;
+    border-radius: 0.75rem;
     border: 1px solid var(--color-border);
     background: var(--color-bg-surface-alt);
     color: var(--color-text-primary);
     font-size: 0.95rem;
-    transition: border-color var(--motion-duration-fast) var(--motion-easing-standard);
+    transition:
+      border-color var(--motion-duration-fast) var(--motion-easing-standard),
+      box-shadow var(--motion-duration-fast) var(--motion-easing-standard);
 
     &:focus-visible {
       outline: none;
       border-color: var(--color-accent);
+      box-shadow: 0 0 0 3px var(--color-accent-muted);
     }
   }
 }
@@ -50,19 +63,20 @@
 }
 
 .submit-button {
-  padding: 0.7rem;
-  border-radius: 0.5rem;
+  padding: 0.75rem;
+  border-radius: 0.75rem;
   border: none;
-  background: var(--color-accent);
+  background: linear-gradient(120deg, var(--color-accent), var(--color-accent-hover));
   color: var(--color-text-inverse);
   font-weight: 700;
   cursor: pointer;
+  box-shadow: 0 10px 25px -10px var(--color-glow-accent);
   transition:
-    background-color var(--motion-duration-fast) var(--motion-easing-standard),
+    filter var(--motion-duration-fast) var(--motion-easing-standard),
     transform var(--motion-duration-fast) var(--motion-easing-standard);
 
   &:hover:not(:disabled) {
-    background: var(--color-accent-hover);
+    filter: brightness(1.08);
   }
 
   &:active:not(:disabled) {
@@ -124,6 +138,7 @@
   border: 1px solid var(--color-accent-muted);
   background: var(--color-accent-muted);
   color: var(--color-accent);
+  font-family: var(--font-mono);
   font-size: 0.7rem;
   font-weight: 700;
   letter-spacing: 0.08em;
@@ -166,6 +181,14 @@
   border-radius: 0.75rem;
   border: 1px solid var(--color-border);
   background: var(--color-bg-surface);
+  transition:
+    border-color var(--motion-duration-fast) var(--motion-easing-standard),
+    transform var(--motion-duration-fast) var(--motion-easing-standard);
+
+  &:hover {
+    border-color: var(--color-glass-border);
+    transform: translateY(-1px);
+  }
 
   .icon {
     width: 1.4rem;
@@ -239,14 +262,17 @@
     display: flex;
     align-items: center;
     gap: 0.6rem;
-    padding: 0 0.75rem;
-    border-radius: 0.5rem;
+    padding: 0 0.85rem;
+    border-radius: 0.75rem;
     border: 1px solid var(--color-border);
     background: var(--color-bg-surface-alt);
-    transition: border-color var(--motion-duration-fast) var(--motion-easing-standard);
+    transition:
+      border-color var(--motion-duration-fast) var(--motion-easing-standard),
+      box-shadow var(--motion-duration-fast) var(--motion-easing-standard);
 
     &:focus-within {
       border-color: var(--color-accent);
+      box-shadow: 0 0 0 3px var(--color-accent-muted);
     }
 
     .icon {

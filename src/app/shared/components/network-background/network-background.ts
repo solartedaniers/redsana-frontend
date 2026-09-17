@@ -7,25 +7,31 @@ import {
   OnDestroy,
   effect,
   inject,
+  input,
   viewChild,
 } from '@angular/core';
 import * as THREE from 'three';
 import { ThemeService } from '../../../core/theme/theme.service';
 
-const NODE_COUNT = 40;
-const CONNECT_DISTANCE = 9;
+// Perfiles de densidad: "hero" para pantallas de auth (protagonista, a
+// pantalla completa) y "ambient" para el shell de usuario/admin (de fondo,
+// discreto, sin competir con tablas y formularios).
+const INTENSITY_PRESETS = {
+  hero: { nodeCount: 56, cameraZ: 42, connectDistance: 9, hubConnectDistance: 17 },
+  ambient: { nodeCount: 24, cameraZ: 60, connectDistance: 10, hubConnectDistance: 18 },
+} as const;
+
 const SPREAD_X = 34;
 const SPREAD_Y = 20;
 const SPREAD_Z = 14;
-const CAMERA_Z = 42;
 
 interface NodeUserData {
   velocity: THREE.Vector3;
 }
 
 // Fondo decorativo con una nube de nodos conectados tipo topología de red.
-// Vive en AuthLayout (no en cada pantalla) para no reiniciar la escena al
-// navegar entre login/registro/recuperación.
+// Vive en un layout compartido (AuthLayout / AppShellLayout), no en cada
+// pantalla, para no reiniciar la escena al navegar entre rutas del mismo módulo.
 @Component({
   selector: 'app-network-background',
   imports: [],
@@ -34,6 +40,8 @@ interface NodeUserData {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class NetworkBackground implements AfterViewInit, OnDestroy {
+  readonly intensity = input<keyof typeof INTENSITY_PRESETS>('hero');
+
   private readonly theme = inject(ThemeService);
   private readonly canvasRef = viewChild.required<ElementRef<HTMLCanvasElement>>('canvas');
 
@@ -56,6 +64,7 @@ export class NetworkBackground implements AfterViewInit, OnDestroy {
   private pointerX = 0;
   private pointerY = 0;
   private ready = false;
+  private elapsed = 0;
 
   constructor() {
     // Recolorea la escena cuando cambia el tema, sin reconstruirla.
@@ -111,13 +120,14 @@ export class NetworkBackground implements AfterViewInit, OnDestroy {
   }
 
   private buildScene(): void {
+    const preset = INTENSITY_PRESETS[this.intensity()];
     const canvas = this.canvasRef().nativeElement;
     const width = canvas.clientWidth || window.innerWidth;
     const height = canvas.clientHeight || window.innerHeight;
 
     this.scene = new THREE.Scene();
     this.camera = new THREE.PerspectiveCamera(55, width / height, 0.1, 1000);
-    this.camera.position.z = CAMERA_Z;
+    this.camera.position.z = preset.cameraZ;
 
     this.renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
     this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
@@ -134,7 +144,7 @@ export class NetworkBackground implements AfterViewInit, OnDestroy {
       new THREE.MeshBasicMaterial()
     );
 
-    for (let i = 0; i < NODE_COUNT; i++) {
+    for (let i = 0; i < preset.nodeCount; i++) {
       const material = this.nodeMaterials[i % this.nodeMaterials.length];
       const node = new THREE.Mesh(this.nodeGeometry, material);
       node.position.set(
@@ -157,7 +167,7 @@ export class NetworkBackground implements AfterViewInit, OnDestroy {
     this.lines = new THREE.LineSegments(this.lineGeometry, this.lineMaterial);
     this.group.add(this.lines);
 
-    for (let i = 0; i < 2; i++) {
+    for (let i = 0; i < 3; i++) {
       const ringGeometry = new THREE.RingGeometry(9 + i * 8, 9.25 + i * 8, 48);
       const ringMaterial = new THREE.MeshBasicMaterial({
         transparent: true,
@@ -193,12 +203,17 @@ export class NetworkBackground implements AfterViewInit, OnDestroy {
       return;
     }
 
+    const preset = INTENSITY_PRESETS[this.intensity()];
+    this.elapsed += 0.016;
+
     this.group.rotation.y += 0.0009 + this.pointerX * 0.0006;
     this.group.rotation.x += 0.0004 + this.pointerY * 0.0004;
 
     if (this.hub) {
       this.hub.rotation.x += 0.004;
       this.hub.rotation.y += 0.006;
+      const pulse = 1 + Math.sin(this.elapsed * 1.4) * 0.06;
+      this.hub.scale.setScalar(pulse);
     }
 
     const positions: number[] = [];
@@ -210,9 +225,13 @@ export class NetworkBackground implements AfterViewInit, OnDestroy {
       if (Math.abs(node.position.y) > SPREAD_Y / 2) velocity.y *= -1;
       if (Math.abs(node.position.z) > SPREAD_Z / 2) velocity.z *= -1;
 
+      if (node.position.length() < preset.hubConnectDistance) {
+        positions.push(0, 0, 0, node.position.x, node.position.y, node.position.z);
+      }
+
       for (let j = i + 1; j < this.nodes.length; j++) {
         const other = this.nodes[j];
-        if (node.position.distanceTo(other.position) < CONNECT_DISTANCE) {
+        if (node.position.distanceTo(other.position) < preset.connectDistance) {
           positions.push(
             node.position.x,
             node.position.y,

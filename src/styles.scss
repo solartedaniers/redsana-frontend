@@ -1,3 +1,5 @@
+@use "@fontsource-variable/plus-jakarta-sans";
+@use "@fontsource-variable/jetbrains-mono";
 @use "styles/tokens";
 @use "styles/motion";
 @use "styles/forms";
@@ -7,11 +9,7 @@
 body {
   background-color: var(--color-bg-app);
   color: var(--color-text-primary);
-  font-family: system-ui, -apple-system, sans-serif;
+  font-family: var(--font-sans);
   margin: 0;
   padding: 0;
-}
-
-.gold-glow {
-  box-shadow: 0 0 25px -5px var(--color-accent-muted);
 }

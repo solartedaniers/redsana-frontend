@@ -5,9 +5,9 @@
 // El bloque @theme registra la paleta oscura como valor por defecto y hace que
 // Tailwind genere utilidades a partir de cada variable (bg-accent, text-status-danger, etc).
 @theme {
-  --color-bg-app: #030712;
-  --color-bg-surface: #0b1220;
-  --color-bg-surface-alt: #131b2c;
+  --color-bg-app: #07090e;
+  --color-bg-surface: #0b0f17;
+  --color-bg-surface-alt: #111724;
 
   --color-border: #1f2937;
   --color-border-strong: #374151;
@@ -27,13 +27,22 @@
 
   --color-focus-ring: rgb(212 175 55 / 50%);
 
-  // Card "glass" de las pantallas de auth (login/registro/etc.): fondo
-  // translúcido + borde + sombra con resplandor dorado sobre el fondo 3D.
+  // Card "glass" protagonista (card grande de auth, score-gauge destacado):
+  // fondo translúcido + borde + sombra con resplandor dorado.
   --color-glass-bg: rgb(11 15 23 / 82%);
   --color-glass-border: rgb(212 175 55 / 22%);
   --shadow-glass:
     0 20px 50px -20px rgb(0 0 0 / 70%),
     0 0 35px -5px rgb(212 175 55 / 20%);
+
+  // Glass "de trabajo": sidebar, top-bar y tarjetas del shell (más liviano
+  // que --color-glass-bg, que queda reservado a paneles protagonistas).
+  --color-surface-glass: rgb(17 23 36 / 70%);
+  --shadow-elevated: 0 12px 30px -14px rgb(0 0 0 / 55%);
+  --color-glow-accent: rgb(212 175 55 / 45%);
+
+  --font-sans: 'Plus Jakarta Sans Variable', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono Variable', ui-monospace, monospace;
 }
 
 // Override de la paleta clara. Se declara FUERA del bloque @theme a propósito:
@@ -71,4 +80,8 @@
   --shadow-glass:
     0 20px 50px -20px rgb(16 21 29 / 12%),
     0 0 30px -10px rgb(138 98 18 / 8%);
+
+  --color-surface-glass: rgb(255 255 255 / 75%);
+  --shadow-elevated: 0 12px 28px -16px rgb(16 21 29 / 14%);
+  --color-glow-accent: rgb(138 98 18 / 30%);
 }
