@@ -24,9 +24,9 @@ import { DevicesHttpRepository } from './core/repositories/devices-http.reposito
 import { AdminMetricsRepository } from './core/repositories/admin-metrics.repository';
 import { MockAdminMetricsRepository } from './core/repositories/admin-metrics-mock.repository';
 import { NetworkSupervisionRepository } from './core/repositories/network-supervision.repository';
-import { MockNetworkSupervisionRepository } from './core/repositories/network-supervision-mock.repository';
+import { NetworkSupervisionHttpRepository } from './core/repositories/network-supervision-http.repository';
 import { UsersRepository } from './core/repositories/users.repository';
-import { MockUsersRepository } from './core/repositories/users-mock.repository';
+import { UsersHttpRepository } from './core/repositories/users-http.repository';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -44,8 +44,8 @@ export const appConfig: ApplicationConfig = {
     { provide: AlertsRepository, useClass: AlertsHttpRepository },
     { provide: DevicesRepository, useClass: DevicesHttpRepository },
     { provide: AdminMetricsRepository, useClass: MockAdminMetricsRepository },
-    { provide: NetworkSupervisionRepository, useClass: MockNetworkSupervisionRepository },
-    { provide: UsersRepository, useClass: MockUsersRepository },
+    { provide: NetworkSupervisionRepository, useClass: NetworkSupervisionHttpRepository },
+    { provide: UsersRepository, useClass: UsersHttpRepository },
 
     // Carga idioma y restaura sesión antes de renderizar: evita parpadeo de
     // claves crudas y evita un salto visual login->dashboard en cada recarga.
