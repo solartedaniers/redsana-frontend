@@ -11,9 +11,8 @@ import { HistoryChart } from '../../../shared/components/history-chart/history-c
 import { ScoreGauge } from '../../../shared/components/score-gauge/score-gauge';
 import { TranslatePipe } from '../../../core/i18n/translate.pipe';
 
-// La lista de hogares no tiene un endpoint "por id" en el mock: se reutiliza
-// getHouseholds() y se filtra en cliente, suficiente para el volumen de datos
-// simulados de este panel de administración.
+// El backend no expone un endpoint "por id" para hogares: se reutiliza
+// getHouseholds() y se filtra en cliente.
 @Component({
   selector: 'app-household-detail',
   imports: [RouterLink, PageHeader, NetworkStatusLight, MetricCard, HistoryChart, ScoreGauge, TranslatePipe],
