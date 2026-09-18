@@ -1,3 +1,6 @@
+mod ping;
+mod wifi;
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
   tauri::Builder::default()
@@ -11,6 +14,11 @@ pub fn run() {
       }
       Ok(())
     })
+    .invoke_handler(tauri::generate_handler![
+      ping::measure_latency,
+      ping::measure_network_quality,
+      wifi::get_wifi_encryption
+    ])
     .run(tauri::generate_context!())
     .expect("error while running tauri application");
 }

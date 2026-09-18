@@ -27,6 +27,9 @@ import { NetworkSupervisionRepository } from './core/repositories/network-superv
 import { NetworkSupervisionHttpRepository } from './core/repositories/network-supervision-http.repository';
 import { UsersRepository } from './core/repositories/users.repository';
 import { UsersHttpRepository } from './core/repositories/users-http.repository';
+import { NetworkMeasurementGateway } from './core/network-measurement/network-measurement.gateway';
+import { NetworkMeasurementTauriGateway } from './core/network-measurement/network-measurement-tauri.gateway';
+import { NetworkMeasurementService } from './core/network-measurement/network-measurement.service';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -46,10 +49,13 @@ export const appConfig: ApplicationConfig = {
     { provide: AdminMetricsRepository, useClass: MockAdminMetricsRepository },
     { provide: NetworkSupervisionRepository, useClass: NetworkSupervisionHttpRepository },
     { provide: UsersRepository, useClass: UsersHttpRepository },
+    { provide: NetworkMeasurementGateway, useClass: NetworkMeasurementTauriGateway },
 
     // Carga idioma y restaura sesión antes de renderizar: evita parpadeo de
     // claves crudas y evita un salto visual login->dashboard en cada recarga.
     provideAppInitializer(() => inject(I18nService).load()),
     provideAppInitializer(() => inject(AuthService).restoreSession()),
+    // start() dispara su propio ciclo periódico en segundo plano; no hay nada que esperar aquí.
+    provideAppInitializer(() => inject(NetworkMeasurementService).start()),
   ],
 };

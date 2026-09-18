@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable, interval, map, startWith, switchMap } from 'rxjs';
 import { environment } from '../../../environments/environment';
-import { NetworkMetricSample, NetworkMetricSnapshot, NetworkStatus } from '../models/network.model';
+import { NetworkMetricSample, NetworkMetricSnapshot, NetworkQualityMeasurement, NetworkStatus } from '../models/network.model';
 import { NetworkMetricsRepository } from './network-metrics.repository';
 
 const LIVE_UPDATE_INTERVAL_MS = 4000;
@@ -44,6 +44,15 @@ export class NetworkMetricsHttpRepository extends NetworkMetricsRepository {
     return this.http
       .get<BackendSample[]>(`${this.baseUrl}/history`, { params: this.ownerParams(householdId) })
       .pipe(map((samples) => samples.map((sample) => this.toSample(sample))));
+  }
+
+  record(measurement: NetworkQualityMeasurement): Observable<NetworkMetricSnapshot> {
+    const body = {
+      latency_ms: measurement.latencyMs,
+      jitter_ms: measurement.jitterMs,
+      packet_loss_percent: measurement.packetLossPercent,
+    };
+    return this.http.post<BackendSnapshot>(this.baseUrl, body).pipe(map((snapshot) => this.toSnapshot(snapshot)));
   }
 
   // El backend por defecto scopea al usuario autenticado; user_id solo aplica
