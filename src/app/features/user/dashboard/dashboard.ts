@@ -6,10 +6,12 @@ import { NetworkStatusLight } from '../../../shared/components/network-status-li
 import { MetricCard } from '../../../shared/components/metric-card/metric-card';
 import { HistoryChart } from '../../../shared/components/history-chart/history-chart';
 import { TranslatePipe } from '../../../core/i18n/translate.pipe';
+import { DatePipe } from '@angular/common';
+import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-dashboard',
-  imports: [PageHeader, NetworkStatusLight, MetricCard, HistoryChart, TranslatePipe],
+  imports: [PageHeader, NetworkStatusLight, MetricCard, HistoryChart, TranslatePipe, DatePipe, RouterLink],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

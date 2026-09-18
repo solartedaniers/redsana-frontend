@@ -1,7 +1,20 @@
-<app-page-header titleKey="user.alertsCenter.title" subtitleKey="user.alertsCenter.subtitle" />
+<section class="alerts-hero surface-panel">
+  <app-page-header titleKey="user.alertsCenter.title" subtitleKey="user.alertsCenter.subtitle" />
+  <span class="status-badge">IA</span>
+</section>
 
-<div class="alerts-list" [@listStagger]="alerts().length">
-  @for (alert of alerts(); track alert.id) {
-    <app-alert-item [alert]="alert" (acknowledge)="onAcknowledge($event)" />
-  }
+<div class="alerts-layout workspace-grid workspace-grid--two">
+  <section class="alerts-list surface-panel" [@listStagger]="alerts().length">
+    <div class="surface-panel__header"><h2 class="surface-panel__title">{{ 'user.alertsCenter.title' | translate }}</h2></div>
+    <div class="alerts-list__content">
+      @for (alert of alerts(); track alert.id) {
+        <app-alert-item [alert]="alert" (acknowledge)="onAcknowledge($event)" />
+      }
+    </div>
+  </section>
+  <aside class="prediction-panel surface-panel">
+    <div class="surface-panel__header"><h2 class="surface-panel__title">{{ 'user.alertsCenter.subtitle' | translate }}</h2></div>
+    <div class="prediction-signal"></div>
+    <p>{{ 'user.alertsCenter.messages.congestionForecast' | translate }}</p>
+  </aside>
 </div>

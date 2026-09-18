@@ -18,5 +18,9 @@ export const USER_ROUTES: Routes = [
     path: 'devices',
     loadComponent: () => import('./devices-map/devices-map').then((m) => m.DevicesMap),
   },
+  {
+    path: 'provider-history',
+    loadComponent: () => import('./provider-history/provider-history').then((m) => m.ProviderHistory),
+  },
   { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
 ];

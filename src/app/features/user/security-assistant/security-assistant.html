@@ -1,10 +1,13 @@
-<app-page-header titleKey="user.securityAssistant.title" subtitleKey="user.securityAssistant.subtitle" />
+<section class="assistant-hero surface-panel">
+  <app-page-header titleKey="user.securityAssistant.title" subtitleKey="user.securityAssistant.subtitle" />
+  <span class="status-badge">{{ 'common.networkStatus.good' | translate }}</span>
+</section>
 
 @if (result(); as data) {
-  <div class="result-panel">
-    <app-score-gauge [score]="data.score" />
+  <div class="result-panel workspace-grid workspace-grid--aside">
+    <section class="assessment-card surface-panel"><app-score-gauge [score]="data.score" /><p>{{ 'user.securityAssistant.allGood' | translate }}</p></section>
 
-    <div class="recommendations">
+    <div class="recommendations surface-panel">
       <h2>{{ 'user.securityAssistant.recommendationsTitle' | translate }}</h2>
       @if (data.recommendations.length === 0) {
         <p class="all-good">{{ 'user.securityAssistant.allGood' | translate }}</p>
@@ -24,7 +27,9 @@
     </div>
   </div>
 } @else {
-  <form class="questionnaire" (ngSubmit)="submit()">
+  <form class="questionnaire workspace-grid workspace-grid--aside" (ngSubmit)="submit()">
+    <aside class="assessment-card surface-panel"><app-score-gauge [score]="78" /><p>{{ 'user.securityAssistant.subtitle' | translate }}</p></aside>
+    <section class="questions-panel surface-panel">
     @for (question of questions(); track question.id) {
       <div class="question">
         <p>{{ question.textKey | translate }}</p>
@@ -50,5 +55,6 @@
     <button type="submit" class="submit-button" [disabled]="!allAnswered() || isSubmitting()">
       {{ (isSubmitting() ? 'common.loading' : 'user.securityAssistant.submit') | translate }}
     </button>
+    </section>
   </form>
 }

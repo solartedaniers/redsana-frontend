@@ -1,4 +1,7 @@
-<app-page-header titleKey="user.devicesMap.title" subtitleKey="user.devicesMap.subtitle" />
+<section class="devices-hero surface-panel">
+  <app-page-header titleKey="user.devicesMap.title" subtitleKey="user.devicesMap.subtitle" />
+  <span class="status-badge">{{ devices().length }}</span>
+</section>
 
 <div class="scan-bar">
   <button type="button" class="scan-button" (click)="scan()" [disabled]="isScanning()">
@@ -17,7 +20,9 @@
   }
 </div>
 
-<div class="devices-list">
+<div class="devices-workspace workspace-grid workspace-grid--two">
+  <section class="topology surface-panel"><div class="topology__hub"><app-icon name="devices" /></div>@for (device of devices(); track device.id) { <span class="topology__node" [attr.data-trust]="device.trust"></span> }</section>
+  <div class="devices-list surface-panel">
   @for (device of devices(); track device.id) {
     <article class="device-card" [attr.data-trust]="device.trust">
       <div class="device-info">
@@ -42,4 +47,5 @@
       </div>
     </article>
   }
+  </div>
 </div>

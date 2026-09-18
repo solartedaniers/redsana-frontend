@@ -1,18 +1,35 @@
-<app-page-header titleKey="user.dashboard.title" subtitleKey="user.dashboard.subtitle" />
+<section class="dashboard-hero surface-panel">
+  <div>
+    <span class="status-badge">{{ 'common.networkStatus.good' | translate }}</span>
+    <app-page-header titleKey="user.dashboard.title" subtitleKey="user.dashboard.subtitle" />
+  </div>
+  @if (snapshot(); as data) { <app-network-status-light [status]="data.status" /> }
+</section>
 
 @if (snapshot(); as data) {
-  <div class="status-row">
-    <app-network-status-light [status]="data.status" />
-  </div>
-
-  <div class="metrics-grid">
+  <div class="metrics-grid metric-strip">
     <app-metric-card labelKey="user.dashboard.latency" [value]="data.latencyMs" unit="ms" />
     <app-metric-card labelKey="user.dashboard.jitter" [value]="data.jitterMs" unit="ms" />
     <app-metric-card labelKey="user.dashboard.packetLoss" [value]="data.packetLossPercent" unit="%" />
+    <article class="metric-tile surface-panel">
+      <p class="metric-tile__label">{{ 'user.dashboard.updated' | translate }}</p>
+      <p class="metric-tile__value">{{ data.updatedAt | date: 'shortTime' }}</p>
+      <p class="metric-tile__detail">{{ 'user.dashboard.live' | translate }}</p>
+    </article>
   </div>
 
-  <section class="history-section">
-    <h2>{{ 'user.dashboard.historyTitle' | translate }}</h2>
-    <app-history-chart [samples]="history()" />
-  </section>
+  <div class="workspace-grid workspace-grid--two">
+    <section class="history-section surface-panel">
+      <div class="surface-panel__header">
+        <h2 class="surface-panel__title">{{ 'user.dashboard.historyTitle' | translate }}</h2>
+        <p class="surface-panel__copy">{{ 'user.dashboard.historyDetail' | translate }}</p>
+      </div>
+      <app-history-chart [samples]="history()" />
+    </section>
+    <aside class="router-summary surface-panel">
+      <div class="surface-panel__header"><h2 class="surface-panel__title">{{ 'user.dashboard.routerTitle' | translate }}</h2></div>
+      <dl><div><dt>{{ 'user.dashboard.gateway' | translate }}</dt><dd>192.168.1.1</dd></div><div><dt>{{ 'user.dashboard.connected' | translate }}</dt><dd>{{ 'user.dashboard.connectedValue' | translate }}</dd></div><div><dt>{{ 'user.dashboard.channel' | translate }}</dt><dd>{{ 'user.dashboard.channelValue' | translate }}</dd></div></dl>
+      <a class="action-button" routerLink="/user/security-assistant">{{ 'user.dashboard.diagnose' | translate }}</a>
+    </aside>
+  </div>
 }

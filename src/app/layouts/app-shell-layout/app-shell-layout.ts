@@ -5,12 +5,14 @@ import { routeTransitionAnimation } from '../../core/animations/route-transition
 import { SidebarNav } from '../../shared/components/sidebar-nav/sidebar-nav';
 import { NavItem } from '../../shared/components/sidebar-nav/nav-item.model';
 import { TopBar } from '../../shared/components/top-bar/top-bar';
+import { NetworkBackground } from '../../shared/components/network-background/network-background';
 
 const USER_NAV_ITEMS: NavItem[] = [
   { labelKey: 'user.dashboard.title', route: '/user/dashboard', icon: 'dashboard' },
   { labelKey: 'user.securityAssistant.title', route: '/user/security-assistant', icon: 'shield' },
   { labelKey: 'user.alertsCenter.title', route: '/user/alerts', icon: 'bell' },
   { labelKey: 'user.devicesMap.title', route: '/user/devices', icon: 'devices' },
+  { labelKey: 'user.providerHistory.title', route: '/user/provider-history', icon: 'dashboard' },
 ];
 
 const ADMIN_NAV_ITEMS: NavItem[] = [
@@ -29,7 +31,7 @@ const PROFILE_NAV_ITEM: NavItem = {
 // ambos roles es qué items de navegación se muestran, no la estructura.
 @Component({
   selector: 'app-shell-layout',
-  imports: [RouterOutlet, SidebarNav, TopBar],
+  imports: [RouterOutlet, SidebarNav, TopBar, NetworkBackground],
   templateUrl: './app-shell-layout.html',
   styleUrl: './app-shell-layout.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

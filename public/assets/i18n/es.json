@@ -6,7 +6,6 @@
     "loading": "Cargando...",
     "back": "Volver",
     "logout": "Cerrar sesión",
-    "buildTag": "SEC-v2.4",
     "networkStatus": {
       "good": "Red saludable",
       "warning": "Red degradada",
@@ -58,9 +57,7 @@
       "networkStatus": "Monitor de red activo",
       "secureTunnel": "Túnel seguro",
       "nodeStatus": "Conexión de nodo: sincronizada",
-      "protectionMode": "Modo de protección: habilitado",
-      "serviceVersion": "RedSana Suite v2.4.1 (Estable)",
-      "hash": "Hash: 3f4c62e...90ff"
+      "protectionMode": "Modo de protección: habilitado"
     },
     "register": {
       "title": "Crear cuenta",
@@ -123,7 +120,17 @@
       "latency": "Latencia",
       "jitter": "Jitter",
       "packetLoss": "Pérdida de paquetes",
-      "historyTitle": "Historial de latencia"
+      "historyTitle": "Historial de latencia",
+      "updated": "Actualización",
+      "live": "Telemetría en vivo",
+      "historyDetail": "Medición continua del enlace y de la latencia perimetral.",
+      "routerTitle": "Resumen del router",
+      "gateway": "Puerta de enlace",
+      "connected": "Dispositivos conectados",
+      "connectedValue": "14 activos",
+      "channel": "Canal inalámbrico",
+      "channelValue": "Canal 36 · estable",
+      "diagnose": "Ejecutar diagnóstico"
     },
     "securityAssistant": {
       "title": "Asistente de seguridad",
@@ -173,6 +180,22 @@
         "congestionForecast": "Se espera congestión de red esta noche en horas pico.",
         "latencySpikePredicted": "Se predice un pico de latencia en los próximos minutos."
       }
+    },
+    "providerHistory": {
+      "title": "Historial y comparativa de proveedor",
+      "subtitle": "Evidencia de estabilidad, cortes y calidad del enlace ISP",
+      "availability": "Disponibilidad del servicio",
+      "latency": "Latencia promedio",
+      "loss": "Pérdida de paquetes",
+      "cost": "Costo mensual estimado",
+      "chartTitle": "Comparativa semanal de estabilidad",
+      "chartDetail": "Tu red frente al promedio de tu proveedor.",
+      "verdictTitle": "¿Quién tiene la culpa del corte?",
+      "verdict": "La evidencia apunta a una incidencia externa del proveedor.",
+      "incidentsTitle": "Bitácora semanal de caídas mayores",
+      "incidentOne": "Microcorte confirmado durante hora pico",
+      "incidentTwo": "Degradación de latencia registrada",
+      "report": "Generar reporte técnico"
     },
     "devicesMap": {
       "title": "Dispositivos conectados",

@@ -1,0 +1,21 @@
+<section class="provider-hero surface-panel">
+  <app-page-header titleKey="user.providerHistory.title" subtitleKey="user.providerHistory.subtitle" />
+  <button type="button" class="action-button">{{ 'user.providerHistory.report' | translate }}</button>
+</section>
+
+<div class="metric-strip provider-metrics">
+  <article class="metric-tile surface-panel"><p class="metric-tile__label">{{ 'user.providerHistory.availability' | translate }}</p><p class="metric-tile__value">99.6%</p><p class="metric-tile__detail">+0.4%</p></article>
+  <article class="metric-tile surface-panel"><p class="metric-tile__label">{{ 'user.providerHistory.latency' | translate }}</p><p class="metric-tile__value">18.4 ms</p><p class="metric-tile__detail">Estable</p></article>
+  <article class="metric-tile surface-panel"><p class="metric-tile__label">{{ 'user.providerHistory.loss' | translate }}</p><p class="metric-tile__value">0.02%</p><p class="metric-tile__detail">Sin impacto</p></article>
+  <article class="metric-tile surface-panel"><p class="metric-tile__label">{{ 'user.providerHistory.cost' | translate }}</p><p class="metric-tile__value">$18.50</p><p class="metric-tile__detail">Mensual</p></article>
+</div>
+
+<div class="workspace-grid workspace-grid--two">
+  <section class="surface-panel chart-panel">
+    <div class="surface-panel__header"><h2 class="surface-panel__title">{{ 'user.providerHistory.chartTitle' | translate }}</h2><p class="surface-panel__copy">{{ 'user.providerHistory.chartDetail' | translate }}</p></div>
+    <div class="chart" aria-hidden="true"><span></span><span></span><span></span><svg viewBox="0 0 600 210" preserveAspectRatio="none"><path d="M0 125 C65 92 90 155 150 124 S230 65 285 123 S385 180 440 95 S535 55 600 116" /></svg></div>
+  </section>
+  <aside class="surface-panel verdict-panel"><div class="surface-panel__header"><h2 class="surface-panel__title">{{ 'user.providerHistory.verdictTitle' | translate }}</h2></div><p>{{ 'user.providerHistory.verdict' | translate }}</p><span class="status-badge">ISP</span></aside>
+</div>
+
+<section class="surface-panel incidents"><div class="surface-panel__header"><h2 class="surface-panel__title">{{ 'user.providerHistory.incidentsTitle' | translate }}</h2></div><div><p><span>01</span>{{ 'user.providerHistory.incidentOne' | translate }}</p><p><span>02</span>{{ 'user.providerHistory.incidentTwo' | translate }}</p></div></section>

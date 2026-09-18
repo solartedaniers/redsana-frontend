@@ -1,6 +1,10 @@
 .alerts-list {
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-  max-width: 40rem;
+  overflow: hidden;
 }
+.alerts-hero { display: flex; justify-content: space-between; align-items: center; gap: 1rem; padding: 1.25rem; margin-bottom: 1rem; }
+.alerts-hero .page-header { margin: 0; }
+.alerts-list__content { display: grid; gap: .75rem; padding: 1rem; }
+.prediction-panel { min-height: 15rem; }
+.prediction-panel p { margin: 1rem; color: var(--color-text-secondary); line-height: 1.6; }
+.prediction-signal { height: 5rem; margin: 1rem; border-radius: .7rem; background: repeating-linear-gradient(90deg, var(--color-accent-muted) 0 .5rem, transparent .5rem 1rem); border: 1px solid var(--color-border); animation: signal-shift var(--motion-duration-slow) linear infinite; }
+@keyframes signal-shift { to { background-position-x: 2rem; } }

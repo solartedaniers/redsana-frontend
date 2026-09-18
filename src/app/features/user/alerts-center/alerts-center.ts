@@ -3,11 +3,12 @@ import { AlertsRepository } from '../../../core/repositories/alerts.repository';
 import { NetworkAlert } from '../../../core/models/alert.model';
 import { PageHeader } from '../../../shared/components/page-header/page-header';
 import { AlertItem } from '../../../shared/components/alert-item/alert-item';
+import { TranslatePipe } from '../../../core/i18n/translate.pipe';
 import { listStaggerAnimation } from '../../../core/animations/list-stagger.animation';
 
 @Component({
   selector: 'app-alerts-center',
-  imports: [PageHeader, AlertItem],
+  imports: [PageHeader, AlertItem, TranslatePipe],
   templateUrl: './alerts-center.html',
   styleUrl: './alerts-center.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
