@@ -20,7 +20,7 @@ import { MockSecurityAssistantRepository } from './core/repositories/security-as
 import { AlertsRepository } from './core/repositories/alerts.repository';
 import { MockAlertsRepository } from './core/repositories/alerts-mock.repository';
 import { DevicesRepository } from './core/repositories/devices.repository';
-import { MockDevicesRepository } from './core/repositories/devices-mock.repository';
+import { DevicesHttpRepository } from './core/repositories/devices-http.repository';
 import { AdminMetricsRepository } from './core/repositories/admin-metrics.repository';
 import { MockAdminMetricsRepository } from './core/repositories/admin-metrics-mock.repository';
 import { NetworkSupervisionRepository } from './core/repositories/network-supervision.repository';
@@ -42,7 +42,7 @@ export const appConfig: ApplicationConfig = {
     { provide: NetworkMetricsRepository, useClass: MockNetworkMetricsRepository },
     { provide: SecurityAssistantRepository, useClass: MockSecurityAssistantRepository },
     { provide: AlertsRepository, useClass: MockAlertsRepository },
-    { provide: DevicesRepository, useClass: MockDevicesRepository },
+    { provide: DevicesRepository, useClass: DevicesHttpRepository },
     { provide: AdminMetricsRepository, useClass: MockAdminMetricsRepository },
     { provide: NetworkSupervisionRepository, useClass: MockNetworkSupervisionRepository },
     { provide: UsersRepository, useClass: MockUsersRepository },

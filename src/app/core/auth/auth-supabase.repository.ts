@@ -77,8 +77,13 @@ export class SupabaseAuthRepository extends AuthRepository {
         if (error) {
           return throwError(() => new Error(this.mapAuthError(error.message)));
         }
-        return from(supabaseClient.auth.getSession());
+        // Supabase Auth ya quedo actualizado; sincroniza la tabla propia para que no diverja.
+        return this.http.patch<void>(`${environment.apiBaseUrl}/api/me`, {
+          full_name: payload.fullName,
+          email: payload.email,
+        });
       }),
+      switchMap(() => from(supabaseClient.auth.getSession())),
       switchMap(({ data }) => {
         if (!data.session) {
           return throwError(() => new Error('auth.errors.userNotFound'));
