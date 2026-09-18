@@ -18,7 +18,7 @@ import { NetworkMetricsHttpRepository } from './core/repositories/network-metric
 import { SecurityAssistantRepository } from './core/repositories/security-assistant.repository';
 import { MockSecurityAssistantRepository } from './core/repositories/security-assistant-mock.repository';
 import { AlertsRepository } from './core/repositories/alerts.repository';
-import { MockAlertsRepository } from './core/repositories/alerts-mock.repository';
+import { AlertsHttpRepository } from './core/repositories/alerts-http.repository';
 import { DevicesRepository } from './core/repositories/devices.repository';
 import { DevicesHttpRepository } from './core/repositories/devices-http.repository';
 import { AdminMetricsRepository } from './core/repositories/admin-metrics.repository';
@@ -41,7 +41,7 @@ export const appConfig: ApplicationConfig = {
     { provide: AuthRepository, useClass: SupabaseAuthRepository },
     { provide: NetworkMetricsRepository, useClass: NetworkMetricsHttpRepository },
     { provide: SecurityAssistantRepository, useClass: MockSecurityAssistantRepository },
-    { provide: AlertsRepository, useClass: MockAlertsRepository },
+    { provide: AlertsRepository, useClass: AlertsHttpRepository },
     { provide: DevicesRepository, useClass: DevicesHttpRepository },
     { provide: AdminMetricsRepository, useClass: MockAdminMetricsRepository },
     { provide: NetworkSupervisionRepository, useClass: MockNetworkSupervisionRepository },
