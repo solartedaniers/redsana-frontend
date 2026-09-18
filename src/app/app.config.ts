@@ -14,7 +14,7 @@ import { SupabaseAuthRepository } from './core/auth/auth-supabase.repository';
 import { authInterceptor } from './core/auth/auth.interceptor';
 import { AuthService } from './core/auth/auth.service';
 import { NetworkMetricsRepository } from './core/repositories/network-metrics.repository';
-import { MockNetworkMetricsRepository } from './core/repositories/network-metrics-mock.repository';
+import { NetworkMetricsHttpRepository } from './core/repositories/network-metrics-http.repository';
 import { SecurityAssistantRepository } from './core/repositories/security-assistant.repository';
 import { MockSecurityAssistantRepository } from './core/repositories/security-assistant-mock.repository';
 import { AlertsRepository } from './core/repositories/alerts.repository';
@@ -39,7 +39,7 @@ export const appConfig: ApplicationConfig = {
     // el useClass de cada uno por su implementación HTTP/Supabase, sin tocar
     // servicios ni componentes que dependen de la clase abstracta.
     { provide: AuthRepository, useClass: SupabaseAuthRepository },
-    { provide: NetworkMetricsRepository, useClass: MockNetworkMetricsRepository },
+    { provide: NetworkMetricsRepository, useClass: NetworkMetricsHttpRepository },
     { provide: SecurityAssistantRepository, useClass: MockSecurityAssistantRepository },
     { provide: AlertsRepository, useClass: MockAlertsRepository },
     { provide: DevicesRepository, useClass: DevicesHttpRepository },
