@@ -21,7 +21,7 @@
     height: 0.75rem;
   }
 
-  span { font-family: var(--font-mono); font-size: 0.57rem; font-weight: 700; }
+  span { font-family: var(--font-mono); font-size: var(--font-size-caption); font-weight: 700; }
 
   &:hover {
     color: var(--color-accent);

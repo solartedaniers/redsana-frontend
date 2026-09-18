@@ -43,6 +43,16 @@
 
   --font-sans: 'Plus Jakarta Sans Variable', system-ui, sans-serif;
   --font-mono: 'JetBrains Mono Variable', ui-monospace, monospace;
+
+  // Escala tipográfica compartida. Evita tamaños microscópicos, especialmente
+  // en entradas y controles que el operador debe leer con rapidez.
+  --font-size-caption: 0.78rem;
+  --font-size-body: 0.94rem;
+  --font-size-form-label: 0.8rem;
+  --font-size-form-input: 1rem;
+  --font-size-heading-sm: 1.2rem;
+  --font-size-heading: 1.75rem;
+  --font-size-metric: 2rem;
 }
 
 // Override de la paleta clara. Se declara FUERA del bloque @theme a propósito:

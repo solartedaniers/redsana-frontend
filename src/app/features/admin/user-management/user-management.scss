@@ -33,7 +33,7 @@
   th {
     color: var(--color-text-secondary);
     font-weight: 600;
-    font-size: 0.8rem;
+    font-size: var(--font-size-body);
     text-transform: uppercase;
     letter-spacing: 0.03em;
   }
@@ -51,7 +51,7 @@
   display: inline-block;
   padding: 0.2rem 0.6rem;
   border-radius: 999px;
-  font-size: 0.75rem;
+  font-size: var(--font-size-caption);
   font-weight: 600;
   color: var(--color-status-success);
   background: color-mix(in srgb, var(--color-status-success) 15%, transparent);
@@ -72,7 +72,7 @@
   background: none;
   padding: 0;
   color: var(--color-text-secondary);
-  font-size: 0.85rem;
+  font-size: var(--font-size-body);
   font-weight: 600;
   cursor: pointer;
   transition: color var(--motion-duration-fast) var(--motion-easing-standard);

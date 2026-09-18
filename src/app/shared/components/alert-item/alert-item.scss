@@ -37,11 +37,11 @@
 .message {
   margin: 0;
   color: var(--color-text-primary);
-  font-size: 0.9rem;
+  font-size: var(--font-size-body);
 }
 
 time {
-  font-size: 0.75rem;
+  font-size: var(--font-size-caption);
   color: var(--color-text-secondary);
 }
 

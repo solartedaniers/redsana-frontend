@@ -14,20 +14,20 @@
 }
 
 .label {
-  font-size: 0.8rem;
+  font-size: var(--font-size-body);
   color: var(--color-text-secondary);
   margin: 0 0 0.35rem;
 }
 
 .value {
-  font-size: 1.75rem;
+  font-size: var(--font-size-metric);
   font-weight: 700;
   color: var(--color-text-primary);
   margin: 0;
 }
 
 .unit {
-  font-size: 0.95rem;
+  font-size: var(--font-size-body);
   font-weight: 500;
   color: var(--color-text-secondary);
   margin-left: 0.25rem;
