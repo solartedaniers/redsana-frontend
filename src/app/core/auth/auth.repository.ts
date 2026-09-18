@@ -7,9 +7,9 @@ import {
 } from '../models/user.model';
 
 /**
- * Contrato de acceso a autenticación. Hoy lo resuelve MockAuthRepository;
- * conectar el backend real es escribir una SupabaseAuthRepository que
- * implemente esta misma clase abstracta y cambiar el provider en
+ * Contrato de acceso a autenticación. Lo resuelve SupabaseAuthRepository;
+ * cualquier otra implementación (mock, HTTP propio, etc.) solo necesita
+ * implementar esta misma clase abstracta y cambiar el provider en
  * app.config.ts — ningún componente ni AuthService cambia.
  */
 export abstract class AuthRepository {

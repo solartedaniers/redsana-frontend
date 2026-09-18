@@ -110,7 +110,9 @@
       "invalidCredentials": "Incorrect email or password.",
       "emailTaken": "That email is already registered.",
       "userNotFound": "User not found.",
-      "wrongCurrentPassword": "Current password is incorrect."
+      "wrongCurrentPassword": "Current password is incorrect.",
+      "confirmationRequired": "Check your email to confirm your account before signing in.",
+      "unknown": "Something went wrong. Please try again."
     }
   },
   "user": {

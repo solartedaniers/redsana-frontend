@@ -1,4 +1,4 @@
-import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import {
   ApplicationConfig,
   inject,
@@ -10,7 +10,8 @@ import { provideRouter } from '@angular/router';
 import { routes } from './app.routes';
 import { I18nService } from './core/i18n/i18n.service';
 import { AuthRepository } from './core/auth/auth.repository';
-import { MockAuthRepository } from './core/auth/auth-mock.repository';
+import { SupabaseAuthRepository } from './core/auth/auth-supabase.repository';
+import { authInterceptor } from './core/auth/auth.interceptor';
 import { AuthService } from './core/auth/auth.service';
 import { NetworkMetricsRepository } from './core/repositories/network-metrics.repository';
 import { MockNetworkMetricsRepository } from './core/repositories/network-metrics-mock.repository';
@@ -31,13 +32,13 @@ export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
     provideRouter(routes),
-    provideHttpClient(),
+    provideHttpClient(withInterceptors([authInterceptor])),
     provideAnimationsAsync(),
 
     // Repositorios mock: para conectar el backend real basta con reemplazar
     // el useClass de cada uno por su implementación HTTP/Supabase, sin tocar
     // servicios ni componentes que dependen de la clase abstracta.
-    { provide: AuthRepository, useClass: MockAuthRepository },
+    { provide: AuthRepository, useClass: SupabaseAuthRepository },
     { provide: NetworkMetricsRepository, useClass: MockNetworkMetricsRepository },
     { provide: SecurityAssistantRepository, useClass: MockSecurityAssistantRepository },
     { provide: AlertsRepository, useClass: MockAlertsRepository },

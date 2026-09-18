@@ -110,7 +110,9 @@
       "invalidCredentials": "Correo o contraseña incorrectos.",
       "emailTaken": "Ese correo ya está registrado.",
       "userNotFound": "Usuario no encontrado.",
-      "wrongCurrentPassword": "La contraseña actual es incorrecta."
+      "wrongCurrentPassword": "La contraseña actual es incorrecta.",
+      "confirmationRequired": "Revisa tu correo para confirmar la cuenta antes de iniciar sesión.",
+      "unknown": "Ocurrió un error inesperado. Intenta de nuevo."
     }
   },
   "user": {

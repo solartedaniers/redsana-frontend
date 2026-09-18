@@ -11,6 +11,9 @@
 npm-debug.log
 yarn-error.log
 
+# Credenciales locales (ver environment.example.ts)
+src/environments/environment.ts
+
 # IDEs and editors
 .idea/
 .project
