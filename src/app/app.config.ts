@@ -44,9 +44,9 @@ export const appConfig: ApplicationConfig = {
     provideHttpClient(withInterceptors([authInterceptor])),
     provideAnimationsAsync(),
 
-    // Repositorios mock: para conectar el backend real basta con reemplazar
-    // el useClass de cada uno por su implementación HTTP/Supabase, sin tocar
-    // servicios ni componentes que dependen de la clase abstracta.
+    // Cada dominio depende de su clase abstracta, no de esta implementación
+    // concreta (HTTP/Supabase/Tauri): cambiar de proveedor de datos es
+    // solo tocar el useClass de aquí, sin tocar servicios ni componentes.
     { provide: AuthRepository, useClass: SupabaseAuthRepository },
     { provide: NetworkMetricsRepository, useClass: NetworkMetricsHttpRepository },
     { provide: SecurityAssistantRepository, useClass: SecurityAssistantHttpRepository },
