@@ -37,6 +37,7 @@ interface BackendAssessment {
 export class SecurityAssistantHttpRepository extends SecurityAssistantRepository {
   private readonly http = inject(HttpClient);
   private readonly baseUrl = `${environment.apiBaseUrl}/api/security-assessments`;
+  private readonly chatUrl = `${environment.apiBaseUrl}/api/security-assistant/chat`;
 
   getQuestionnaire(): Observable<SecurityQuestion[]> {
     return of(QUESTIONS);
@@ -54,6 +55,10 @@ export class SecurityAssistantHttpRepository extends SecurityAssistantRepository
     return this.http
       .get<BackendAssessment | null>(`${this.baseUrl}/latest`)
       .pipe(map((assessment) => (assessment ? this.toResult(assessment) : null)));
+  }
+
+  sendChatMessage(message: string): Observable<string> {
+    return this.http.post<{ reply: string }>(this.chatUrl, { message }).pipe(map((response) => response.reply));
   }
 
   private toResult(assessment: BackendAssessment): SecurityAssessmentResult {

@@ -153,6 +153,13 @@
       "recommendationsTitle": "Guía priorizada",
       "allGood": "¡Excelente! No hay recomendaciones pendientes.",
       "lastSubmittedAt": "Última evaluación:",
+      "chat": {
+        "title": "Pregúntale al asistente",
+        "scopeHint": "Solo puedo ayudarte con tu red doméstica, la seguridad de tu router, la calidad de tu conexión y el uso de esta app.",
+        "placeholder": "Escribe tu pregunta...",
+        "send": "Enviar",
+        "errorReply": "No pude comunicarme con el asistente. Intenta de nuevo en unos segundos."
+      },
       "recommendations": {
         "changeDefaultPassword": {
           "title": "Cambia la clave de fábrica de tu router",

@@ -153,6 +153,13 @@
       "recommendationsTitle": "Prioritized guide",
       "allGood": "Great! No pending recommendations.",
       "lastSubmittedAt": "Last assessment:",
+      "chat": {
+        "title": "Ask the assistant",
+        "scopeHint": "I can only help with your home network, your router's security, your connection quality, and how to use this app.",
+        "placeholder": "Type your question...",
+        "send": "Send",
+        "errorReply": "I couldn't reach the assistant. Please try again in a few seconds."
+      },
       "recommendations": {
         "changeDefaultPassword": {
           "title": "Change your router's factory password",

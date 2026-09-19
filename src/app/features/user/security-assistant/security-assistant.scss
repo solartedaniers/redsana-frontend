@@ -120,3 +120,72 @@
 .submitted-at {
   font-size: 0.8rem;
 }
+
+.chat-panel {
+  max-width: 70rem;
+  margin-top: 1rem;
+  padding: 1.25rem;
+
+  h2 {
+    margin: 0 0 0.35rem;
+    font-size: 1.05rem;
+    color: var(--color-text-primary);
+  }
+}
+
+.chat-scope-hint {
+  margin: 0 0 1rem;
+  color: var(--color-text-secondary);
+  font-size: 0.8rem;
+}
+
+.chat-messages {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  max-height: 22rem;
+  overflow-y: auto;
+  margin-bottom: 1rem;
+}
+
+.chat-bubble {
+  align-self: flex-start;
+  max-width: 32rem;
+  padding: 0.65rem 0.9rem;
+  border-radius: 0.65rem;
+  border: 1px solid var(--color-border);
+  background: var(--color-bg-surface-alt);
+  color: var(--color-text-primary);
+  font-size: 0.9rem;
+  line-height: 1.5;
+  white-space: pre-wrap;
+
+  &--user {
+    align-self: flex-end;
+    background: var(--color-accent-muted);
+    border-color: var(--color-accent);
+  }
+}
+
+.chat-input-row {
+  display: flex;
+  gap: 0.6rem;
+
+  input {
+    flex: 1;
+    padding: 0.6rem 0.9rem;
+    border-radius: 0.5rem;
+    border: 1px solid var(--color-border);
+    background: var(--color-bg-surface-alt);
+    color: var(--color-text-primary);
+    font-size: 0.9rem;
+
+    &::placeholder {
+      color: var(--color-text-secondary);
+    }
+  }
+
+  .submit-button {
+    align-self: stretch;
+  }
+}

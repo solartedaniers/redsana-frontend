@@ -22,3 +22,10 @@ export interface SecurityAssessmentResult {
 /** Cifrado WiFi auto-detectado (Módulo 1, get_wifi_encryption); 'unknown' cuando
  * la detección falla o corre fuera de Tauri, no cuenta como pregunta al usuario. */
 export type WifiEncryptionStatus = 'secure' | 'weak' | 'unknown';
+
+export interface ChatMessage {
+  role: 'user' | 'assistant';
+  text: string;
+  /** true cuando `text` es una i18n key (fallo de red) en vez de la respuesta ya traducida por Groq. */
+  isErrorKey?: boolean;
+}

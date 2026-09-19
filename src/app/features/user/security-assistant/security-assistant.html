@@ -75,3 +75,33 @@
     </section>
   </form>
 }
+
+<section class="chat-panel surface-panel">
+  <h2>{{ 'user.securityAssistant.chat.title' | translate }}</h2>
+  <p class="chat-scope-hint">{{ 'user.securityAssistant.chat.scopeHint' | translate }}</p>
+
+  <div class="chat-messages">
+    @for (message of chatMessages(); track $index) {
+      <div class="chat-bubble" [class.chat-bubble--user]="message.role === 'user'">
+        {{ message.isErrorKey ? (message.text | translate) : message.text }}
+      </div>
+    }
+    @if (isSendingChat()) {
+      <div class="chat-bubble">{{ 'common.loading' | translate }}</div>
+    }
+  </div>
+
+  <form class="chat-input-row" (ngSubmit)="sendChatMessage()">
+    <input
+      type="text"
+      [ngModel]="chatDraft()"
+      (ngModelChange)="chatDraft.set($event)"
+      name="chatDraft"
+      [placeholder]="'user.securityAssistant.chat.placeholder' | translate"
+      autocomplete="off"
+    />
+    <button type="submit" class="submit-button" [disabled]="!chatDraft().trim() || isSendingChat()">
+      {{ 'user.securityAssistant.chat.send' | translate }}
+    </button>
+  </form>
+</section>

@@ -3,6 +3,7 @@ import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@a
 import { FormsModule } from '@angular/forms';
 import { SecurityAssistantRepository } from '../../../core/repositories/security-assistant.repository';
 import {
+  ChatMessage,
   SecurityAnswers,
   SecurityAnswerValue,
   SecurityAssessmentResult,
@@ -31,6 +32,10 @@ export class SecurityAssistant {
   protected readonly isSubmitting = signal(false);
   protected readonly isLoadingLatest = signal(true);
   protected readonly wifiEncryptionRaw = signal<string | null>(null);
+
+  protected readonly chatMessages = signal<ChatMessage[]>([]);
+  protected readonly chatDraft = signal('');
+  protected readonly isSendingChat = signal(false);
 
   protected readonly wifiEncryptionStatus = computed(() => evaluateWifiEncryption(this.wifiEncryptionRaw()));
   protected readonly allAnswered = computed(
@@ -63,5 +68,28 @@ export class SecurityAssistant {
   protected restart(): void {
     this.answers.set({});
     this.result.set(null);
+  }
+
+  protected sendChatMessage(): void {
+    const text = this.chatDraft().trim();
+    if (!text || this.isSendingChat()) {
+      return;
+    }
+    this.chatMessages.update((messages) => [...messages, { role: 'user', text }]);
+    this.chatDraft.set('');
+    this.isSendingChat.set(true);
+    this.repository.sendChatMessage(text).subscribe({
+      next: (reply) => {
+        this.chatMessages.update((messages) => [...messages, { role: 'assistant', text: reply }]);
+        this.isSendingChat.set(false);
+      },
+      error: () => {
+        this.chatMessages.update((messages) => [
+          ...messages,
+          { role: 'assistant', text: 'user.securityAssistant.chat.errorReply', isErrorKey: true },
+        ]);
+        this.isSendingChat.set(false);
+      },
+    });
   }
 }
