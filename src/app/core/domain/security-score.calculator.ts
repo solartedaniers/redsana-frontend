@@ -1,63 +1,4 @@
-import {
-  SecurityAnswers,
-  SecurityAssessmentResult,
-  SecurityQuestion,
-  SecurityRecommendation,
-} from '../models/security.model';
-
-// Un backend real probablemente calcule esto server-side, pero se aísla en
-// una función pura para poder testearla sin levantar HTTP ni repositorios.
-const RECOMMENDATIONS_BY_QUESTION: Record<string, SecurityRecommendation> = {
-  'default-password': {
-    id: 'change-default-password',
-    titleKey: 'user.securityAssistant.recommendations.changeDefaultPassword.title',
-    descriptionKey: 'user.securityAssistant.recommendations.changeDefaultPassword.description',
-    priority: 1,
-  },
-  'firmware-updated': {
-    id: 'update-firmware',
-    titleKey: 'user.securityAssistant.recommendations.updateFirmware.title',
-    descriptionKey: 'user.securityAssistant.recommendations.updateFirmware.description',
-    priority: 2,
-  },
-  'wpa3-enabled': {
-    id: 'enable-wpa3',
-    titleKey: 'user.securityAssistant.recommendations.enableWpa3.title',
-    descriptionKey: 'user.securityAssistant.recommendations.enableWpa3.description',
-    priority: 3,
-  },
-  'guest-network': {
-    id: 'enable-guest-network',
-    titleKey: 'user.securityAssistant.recommendations.enableGuestNetwork.title',
-    descriptionKey: 'user.securityAssistant.recommendations.enableGuestNetwork.description',
-    priority: 4,
-  },
-  'remote-management-off': {
-    id: 'disable-remote-management',
-    titleKey: 'user.securityAssistant.recommendations.disableRemoteManagement.title',
-    descriptionKey: 'user.securityAssistant.recommendations.disableRemoteManagement.description',
-    priority: 5,
-  },
-};
-
-export function computeSecurityAssessment(
-  questions: SecurityQuestion[],
-  answers: SecurityAnswers
-): SecurityAssessmentResult {
-  const totalWeight = questions.reduce((sum, question) => sum + question.weight, 0);
-  const earnedWeight = questions.reduce(
-    (sum, question) => sum + (answers[question.id] ? question.weight : 0),
-    0
-  );
-  const score = totalWeight === 0 ? 0 : Math.round((earnedWeight / totalWeight) * 100);
-
-  const recommendations = questions
-    .filter((question) => !answers[question.id] && RECOMMENDATIONS_BY_QUESTION[question.id])
-    .map((question) => RECOMMENDATIONS_BY_QUESTION[question.id])
-    .sort((a, b) => a.priority - b.priority);
-
-  return { score, recommendations };
-}
+import { WifiEncryptionStatus } from '../models/security.model';
 
 export type SecurityScoreBand = 'good' | 'warning' | 'critical';
 
@@ -71,4 +12,18 @@ export function getSecurityScoreBand(score: number): SecurityScoreBand {
     return 'warning';
   }
   return 'critical';
+}
+
+// Mismo criterio que app/domain/security_assessment.py (backend): sin código
+// compartido entre frontend/backend, se duplica el umbral a propósito.
+const STRONG_WIFI_ENCRYPTION_PREFIXES = ['WPA3', 'WPA2'];
+
+/** Solo para mostrar el dato en el cuestionario; el score real (que también
+ * pondera esto) se calcula en el backend a partir de wifiEncryptionRaw. */
+export function evaluateWifiEncryption(raw: string | null): WifiEncryptionStatus {
+  if (!raw) {
+    return 'unknown';
+  }
+  const upper = raw.toUpperCase();
+  return STRONG_WIFI_ENCRYPTION_PREFIXES.some((prefix) => upper.startsWith(prefix)) ? 'secure' : 'weak';
 }

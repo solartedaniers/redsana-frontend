@@ -138,38 +138,61 @@
       "title": "Asistente de seguridad",
       "subtitle": "Responde algunas preguntas para obtener tu puntaje de seguridad",
       "questions": {
-        "defaultPassword": "¿Cambiaste la contraseña por defecto de tu router?",
-        "firmwareUpdated": "¿El firmware de tu router está actualizado?",
-        "wpa3Enabled": "¿Tienes activado el cifrado WPA3 (o al menos WPA2)?",
-        "guestNetwork": "¿Usas una red de invitados separada para visitas?",
-        "remoteManagementOff": "¿Está deshabilitada la administración remota del router?"
+        "defaultPassword": "¿Cambiaste la clave que traía tu router de fábrica por una tuya?",
+        "firmwareUpdated": "¿Actualizaste tu router en los últimos meses, o se actualiza solo?",
+        "guestNetwork": "¿Tienes una segunda red WiFi solo para tus visitas, separada de la tuya?",
+        "remoteManagementOff": "¿Tu router solo se puede configurar estando conectado a tu propio WiFi (y no se puede entrar a cambiarlo desde internet)?"
+      },
+      "wifiEncryption": {
+        "label": "Cifrado de tu WiFi (detectado automáticamente)",
+        "secure": "Seguro",
+        "weak": "Débil",
+        "unknown": "No se pudo detectar"
       },
       "yes": "Sí",
       "no": "No",
+      "unknown": "No sé",
       "submit": "Ver mi puntaje",
       "restart": "Responder de nuevo",
       "recommendationsTitle": "Guía priorizada",
       "allGood": "¡Excelente! No hay recomendaciones pendientes.",
+      "lastSubmittedAt": "Última evaluación:",
       "recommendations": {
         "changeDefaultPassword": {
-          "title": "Cambia la contraseña por defecto",
-          "description": "Las credenciales de fábrica son públicas y es la vía de entrada más fácil para un atacante."
+          "title": "Cambia la clave de fábrica de tu router",
+          "description": "Las claves de fábrica son públicas y son la vía de entrada más fácil para un atacante."
+        },
+        "checkDefaultPassword": {
+          "title": "Ve a revisar la clave de tu router",
+          "description": "Si no recuerdas haberla cambiado, es probable que siga siendo la de fábrica: entra a la configuración de tu router y verifícalo."
         },
         "updateFirmware": {
-          "title": "Actualiza el firmware de tu router",
-          "description": "Los fabricantes corrigen vulnerabilidades conocidas en cada versión de firmware."
+          "title": "Actualiza tu router",
+          "description": "Los fabricantes corrigen fallas de seguridad conocidas en cada actualización."
         },
-        "enableWpa3": {
-          "title": "Activa el cifrado WPA3",
+        "checkFirmware": {
+          "title": "Ve a revisar si tu router está actualizado",
+          "description": "Entra a la configuración de tu router y busca la opción de buscar actualizaciones."
+        },
+        "enableWifiEncryption": {
+          "title": "Activa un cifrado WiFi más fuerte (WPA2 o WPA3)",
           "description": "Un cifrado más fuerte dificulta mucho más interceptar tu tráfico."
         },
         "enableGuestNetwork": {
-          "title": "Configura una red de invitados",
-          "description": "Mantiene los dispositivos de visitas aislados de tus dispositivos de confianza."
+          "title": "Configura una red para tus visitas",
+          "description": "Mantiene los dispositivos de tus visitas separados de los tuyos."
+        },
+        "checkGuestNetwork": {
+          "title": "Ve a revisar si tu router permite una red de invitados",
+          "description": "Muchos routers ya traen esta opción lista para activar, solo hay que buscarla en su configuración."
         },
         "disableRemoteManagement": {
-          "title": "Deshabilita la administración remota",
-          "description": "Evita que tu router pueda configurarse desde fuera de tu red doméstica."
+          "title": "Desactiva la administración remota",
+          "description": "Evita que alguien pueda entrar a configurar tu router desde fuera de tu casa."
+        },
+        "checkRemoteManagement": {
+          "title": "Ve a revisar la configuración remota de tu router",
+          "description": "Busca la opción de administración remota en la configuración de tu router y confirma que esté apagada."
         }
       }
     },

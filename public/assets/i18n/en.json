@@ -138,38 +138,61 @@
       "title": "Security assistant",
       "subtitle": "Answer a few questions to get your home security score",
       "questions": {
-        "defaultPassword": "Have you changed your router's default password?",
-        "firmwareUpdated": "Is your router firmware up to date?",
-        "wpa3Enabled": "Is WPA3 (or at least WPA2) encryption enabled?",
-        "guestNetwork": "Do you use a separate guest network for visitors?",
-        "remoteManagementOff": "Is remote router management disabled?"
+        "defaultPassword": "Did you change the password your router came with for one of your own?",
+        "firmwareUpdated": "Did you update your router in the last few months, or does it update itself?",
+        "guestNetwork": "Do you have a second WiFi network just for guests, separate from yours?",
+        "remoteManagementOff": "Can your router only be configured while connected to your own WiFi (not from the internet)?"
+      },
+      "wifiEncryption": {
+        "label": "Your WiFi encryption (auto-detected)",
+        "secure": "Secure",
+        "weak": "Weak",
+        "unknown": "Could not detect"
       },
       "yes": "Yes",
       "no": "No",
+      "unknown": "I don't know",
       "submit": "See my score",
       "restart": "Answer again",
       "recommendationsTitle": "Prioritized guide",
       "allGood": "Great! No pending recommendations.",
+      "lastSubmittedAt": "Last assessment:",
       "recommendations": {
         "changeDefaultPassword": {
-          "title": "Change the default password",
-          "description": "Default credentials are publicly known and are the easiest way in for an attacker."
+          "title": "Change your router's factory password",
+          "description": "Factory passwords are public and the easiest way in for an attacker."
+        },
+        "checkDefaultPassword": {
+          "title": "Go check your router's password",
+          "description": "If you don't remember changing it, it's probably still the factory one — open your router's settings and check."
         },
         "updateFirmware": {
-          "title": "Update your router firmware",
-          "description": "Manufacturers patch known vulnerabilities in every firmware release."
+          "title": "Update your router",
+          "description": "Manufacturers patch known security flaws in every update."
         },
-        "enableWpa3": {
-          "title": "Enable WPA3 encryption",
+        "checkFirmware": {
+          "title": "Go check if your router is up to date",
+          "description": "Open your router's settings and look for an update check option."
+        },
+        "enableWifiEncryption": {
+          "title": "Turn on stronger WiFi encryption (WPA2 or WPA3)",
           "description": "Stronger encryption makes it far harder to intercept your traffic."
         },
         "enableGuestNetwork": {
-          "title": "Set up a guest network",
-          "description": "Keeps visitor devices isolated from your trusted devices."
+          "title": "Set up a network for your guests",
+          "description": "Keeps visitor devices separate from yours."
+        },
+        "checkGuestNetwork": {
+          "title": "Go check if your router supports a guest network",
+          "description": "Many routers already have this ready to turn on — look for it in the settings."
         },
         "disableRemoteManagement": {
-          "title": "Disable remote management",
-          "description": "Prevents your router from being configured from outside your home network."
+          "title": "Turn off remote management",
+          "description": "Prevents anyone from configuring your router from outside your home."
+        },
+        "checkRemoteManagement": {
+          "title": "Go check your router's remote access setting",
+          "description": "Look for the remote management option in your router's settings and confirm it's off."
         }
       }
     },

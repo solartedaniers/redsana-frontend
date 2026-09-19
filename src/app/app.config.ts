@@ -16,7 +16,7 @@ import { AuthService } from './core/auth/auth.service';
 import { NetworkMetricsRepository } from './core/repositories/network-metrics.repository';
 import { NetworkMetricsHttpRepository } from './core/repositories/network-metrics-http.repository';
 import { SecurityAssistantRepository } from './core/repositories/security-assistant.repository';
-import { MockSecurityAssistantRepository } from './core/repositories/security-assistant-mock.repository';
+import { SecurityAssistantHttpRepository } from './core/repositories/security-assistant-http.repository';
 import { AlertsRepository } from './core/repositories/alerts.repository';
 import { AlertsHttpRepository } from './core/repositories/alerts-http.repository';
 import { DevicesRepository } from './core/repositories/devices.repository';
@@ -30,6 +30,8 @@ import { UsersHttpRepository } from './core/repositories/users-http.repository';
 import { NetworkMeasurementGateway } from './core/network-measurement/network-measurement.gateway';
 import { NetworkMeasurementTauriGateway } from './core/network-measurement/network-measurement-tauri.gateway';
 import { NetworkMeasurementService } from './core/network-measurement/network-measurement.service';
+import { WifiEncryptionGateway } from './core/wifi-encryption/wifi-encryption.gateway';
+import { WifiEncryptionTauriGateway } from './core/wifi-encryption/wifi-encryption-tauri.gateway';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -43,13 +45,14 @@ export const appConfig: ApplicationConfig = {
     // servicios ni componentes que dependen de la clase abstracta.
     { provide: AuthRepository, useClass: SupabaseAuthRepository },
     { provide: NetworkMetricsRepository, useClass: NetworkMetricsHttpRepository },
-    { provide: SecurityAssistantRepository, useClass: MockSecurityAssistantRepository },
+    { provide: SecurityAssistantRepository, useClass: SecurityAssistantHttpRepository },
     { provide: AlertsRepository, useClass: AlertsHttpRepository },
     { provide: DevicesRepository, useClass: DevicesHttpRepository },
     { provide: AdminMetricsRepository, useClass: MockAdminMetricsRepository },
     { provide: NetworkSupervisionRepository, useClass: NetworkSupervisionHttpRepository },
     { provide: UsersRepository, useClass: UsersHttpRepository },
     { provide: NetworkMeasurementGateway, useClass: NetworkMeasurementTauriGateway },
+    { provide: WifiEncryptionGateway, useClass: WifiEncryptionTauriGateway },
 
     // Carga idioma y restaura sesión antes de renderizar: evita parpadeo de
     // claves crudas y evita un salto visual login->dashboard en cada recarga.

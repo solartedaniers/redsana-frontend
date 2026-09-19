@@ -3,9 +3,14 @@
   <span class="status-badge">{{ 'common.networkStatus.good' | translate }}</span>
 </section>
 
-@if (result(); as data) {
+@if (isLoadingLatest()) {
+  <p class="surface-panel loading-state">{{ 'common.loading' | translate }}</p>
+} @else if (result(); as data) {
   <div class="result-panel workspace-grid workspace-grid--aside">
-    <section class="assessment-card surface-panel"><app-score-gauge [score]="data.score" /><p>{{ 'user.securityAssistant.allGood' | translate }}</p></section>
+    <section class="assessment-card surface-panel">
+      <app-score-gauge [score]="data.score" />
+      <p class="submitted-at">{{ 'user.securityAssistant.lastSubmittedAt' | translate }} {{ data.submittedAt | date: 'short' }}</p>
+    </section>
 
     <div class="recommendations surface-panel">
       <h2>{{ 'user.securityAssistant.recommendationsTitle' | translate }}</h2>
@@ -30,23 +35,35 @@
   <form class="questionnaire workspace-grid workspace-grid--aside" (ngSubmit)="submit()">
     <aside class="assessment-card surface-panel"><app-score-gauge [score]="78" /><p>{{ 'user.securityAssistant.subtitle' | translate }}</p></aside>
     <section class="questions-panel surface-panel">
+      <div class="question wifi-encryption-info">
+        <p>{{ 'user.securityAssistant.wifiEncryption.label' | translate }}</p>
+        <span class="status-badge">{{ ('user.securityAssistant.wifiEncryption.' + wifiEncryptionStatus()) | translate }}</span>
+      </div>
+
     @for (question of questions(); track question.id) {
       <div class="question">
         <p>{{ question.textKey | translate }}</p>
         <div class="answer-toggle">
           <button
             type="button"
-            [class.selected]="answers()[question.id] === true"
-            (click)="answer(question.id, true)"
+            [class.selected]="answers()[question.id] === 'yes'"
+            (click)="answer(question.id, 'yes')"
           >
             {{ 'user.securityAssistant.yes' | translate }}
           </button>
           <button
             type="button"
-            [class.selected]="answers()[question.id] === false"
-            (click)="answer(question.id, false)"
+            [class.selected]="answers()[question.id] === 'no'"
+            (click)="answer(question.id, 'no')"
           >
             {{ 'user.securityAssistant.no' | translate }}
+          </button>
+          <button
+            type="button"
+            [class.selected]="answers()[question.id] === 'unknown'"
+            (click)="answer(question.id, 'unknown')"
+          >
+            {{ 'user.securityAssistant.unknown' | translate }}
           </button>
         </div>
       </div>

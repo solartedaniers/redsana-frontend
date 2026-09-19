@@ -99,3 +99,24 @@
   color: var(--color-status-success);
   margin-bottom: 1.5rem;
 }
+
+.wifi-encryption-info {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+
+  p {
+    margin: 0;
+  }
+}
+
+.loading-state {
+  padding: 1.5rem;
+  text-align: center;
+  color: var(--color-text-secondary);
+}
+
+.submitted-at {
+  font-size: 0.8rem;
+}
