@@ -99,6 +99,7 @@
       "currentPassword": "Current password",
       "newPassword": "New password",
       "changePassword": "Update password",
+      "changeAvatar": "Change photo",
       "savedMessage": "Profile updated successfully.",
       "passwordChangedMessage": "Password updated successfully."
     },
@@ -112,6 +113,7 @@
       "userNotFound": "User not found.",
       "wrongCurrentPassword": "Current password is incorrect.",
       "confirmationRequired": "Check your email to confirm your account before signing in.",
+      "avatarUploadFailed": "Could not upload the image. Try a different file.",
       "unknown": "Something went wrong. Please try again."
     }
   },

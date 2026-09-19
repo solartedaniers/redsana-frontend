@@ -4,6 +4,13 @@
     <app-language-toggle />
     <app-theme-toggle />
     @if (auth.currentUser(); as user) {
+      <span class="user-avatar">
+        @if (user.avatarUrl) {
+          <img [src]="user.avatarUrl" [alt]="user.fullName" />
+        } @else {
+          <app-icon name="user" />
+        }
+      </span>
       <span class="user-name">{{ user.fullName }}</span>
     }
     <button

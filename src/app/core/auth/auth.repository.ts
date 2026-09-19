@@ -18,6 +18,7 @@ export abstract class AuthRepository {
   abstract signOut(): Observable<void>;
   abstract requestPasswordReset(email: string): Observable<void>;
   abstract updateProfile(userId: string, payload: ProfileUpdatePayload): Observable<AuthSession>;
+  abstract updateAvatar(userId: string, avatarUrl: string): Observable<AuthSession>;
   abstract changePassword(userId: string, payload: PasswordChangePayload): Observable<void>;
   abstract restoreSession(): Observable<AuthSession | null>;
 }

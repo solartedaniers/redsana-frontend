@@ -17,6 +17,7 @@ interface BackendUser {
   id: string;
   email: string;
   full_name: string | null;
+  avatar_url: string | null;
   role: UserRole;
   is_active: boolean;
 }
@@ -93,6 +94,20 @@ export class SupabaseAuthRepository extends AuthRepository {
     );
   }
 
+  updateAvatar(_userId: string, avatarUrl: string): Observable<AuthSession> {
+    // El archivo ya está subido a Supabase Storage en este punto: aquí solo se
+    // persiste la URL pública resultante, mismo patrón que full_name/email.
+    return this.http.patch<void>(`${environment.apiBaseUrl}/api/me`, { avatar_url: avatarUrl }).pipe(
+      switchMap(() => from(supabaseClient.auth.getSession())),
+      switchMap(({ data }) => {
+        if (!data.session) {
+          return throwError(() => new Error('auth.errors.userNotFound'));
+        }
+        return this.buildSession(data.session.access_token, data.session.expires_at);
+      })
+    );
+  }
+
   changePassword(_userId: string, payload: PasswordChangePayload): Observable<void> {
     return from(supabaseClient.auth.getUser()).pipe(
       switchMap(({ data, error }) => {
@@ -143,6 +158,7 @@ export class SupabaseAuthRepository extends AuthRepository {
       id: backendUser.id,
       email: backendUser.email,
       fullName: backendUser.full_name ?? '',
+      avatarUrl: backendUser.avatar_url,
       role: backendUser.role,
     };
     return {

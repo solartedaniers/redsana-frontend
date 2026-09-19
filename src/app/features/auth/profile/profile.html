@@ -3,6 +3,26 @@
 <div class="profile-grid">
   <section class="profile-section">
     <h2>{{ 'auth.profile.infoTitle' | translate }}</h2>
+
+    <div class="avatar-row">
+      <span class="avatar-preview">
+        @if (auth.currentUser()?.avatarUrl; as avatarUrl) {
+          <img [src]="avatarUrl" [alt]="auth.currentUser()?.fullName ?? ''" />
+        } @else {
+          <app-icon name="user" />
+        }
+      </span>
+      <div class="avatar-controls">
+        <label class="submit-button avatar-upload-button">
+          {{ (isUploadingAvatar() ? 'common.loading' : 'auth.profile.changeAvatar') | translate }}
+          <input type="file" accept="image/*" (change)="onAvatarSelected($event)" [disabled]="isUploadingAvatar()" hidden />
+        </label>
+        @if (avatarErrorKey()) {
+          <p class="form-error">{{ avatarErrorKey() | translate }}</p>
+        }
+      </div>
+    </div>
+
     <form class="auth-form" [formGroup]="profileForm" (ngSubmit)="saveProfile()">
       <label class="field">
         <span>{{ 'auth.register.fullName' | translate }}</span>

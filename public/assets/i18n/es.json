@@ -99,6 +99,7 @@
       "currentPassword": "Contraseña actual",
       "newPassword": "Nueva contraseña",
       "changePassword": "Actualizar contraseña",
+      "changeAvatar": "Cambiar foto",
       "savedMessage": "Perfil actualizado correctamente.",
       "passwordChangedMessage": "Contraseña actualizada correctamente."
     },
@@ -112,6 +113,7 @@
       "userNotFound": "Usuario no encontrado.",
       "wrongCurrentPassword": "La contraseña actual es incorrecta.",
       "confirmationRequired": "Revisa tu correo para confirmar la cuenta antes de iniciar sesión.",
+      "avatarUploadFailed": "No se pudo subir la imagen. Intenta con otro archivo.",
       "unknown": "Ocurrió un error inesperado. Intenta de nuevo."
     }
   },

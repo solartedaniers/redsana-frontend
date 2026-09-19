@@ -34,6 +34,8 @@ import { WifiEncryptionGateway } from './core/wifi-encryption/wifi-encryption.ga
 import { WifiEncryptionTauriGateway } from './core/wifi-encryption/wifi-encryption-tauri.gateway';
 import { LanScanGateway } from './core/lan-scan/lan-scan.gateway';
 import { LanScanTauriGateway } from './core/lan-scan/lan-scan-tauri.gateway';
+import { AvatarStorageGateway } from './core/avatar-storage/avatar-storage.gateway';
+import { SupabaseAvatarStorageGateway } from './core/avatar-storage/avatar-storage-supabase.gateway';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -56,6 +58,7 @@ export const appConfig: ApplicationConfig = {
     { provide: NetworkMeasurementGateway, useClass: NetworkMeasurementTauriGateway },
     { provide: WifiEncryptionGateway, useClass: WifiEncryptionTauriGateway },
     { provide: LanScanGateway, useClass: LanScanTauriGateway },
+    { provide: AvatarStorageGateway, useClass: SupabaseAvatarStorageGateway },
 
     // Carga idioma y restaura sesión antes de renderizar: evita parpadeo de
     // claves crudas y evita un salto visual login->dashboard en cada recarga.

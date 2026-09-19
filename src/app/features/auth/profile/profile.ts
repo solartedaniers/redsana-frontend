@@ -1,26 +1,32 @@
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { AuthService } from '../../../core/auth/auth.service';
+import { AvatarStorageGateway } from '../../../core/avatar-storage/avatar-storage.gateway';
 import { TranslatePipe } from '../../../core/i18n/translate.pipe';
 import { PageHeader } from '../../../shared/components/page-header/page-header';
+import { Icon } from '../../../shared/components/icon/icon';
 import { passwordsMatchValidator } from '../../../core/validators/passwords-match.validator';
 
 const MIN_PASSWORD_LENGTH = 8;
 
 @Component({
   selector: 'app-profile',
-  imports: [ReactiveFormsModule, TranslatePipe, PageHeader],
+  imports: [ReactiveFormsModule, TranslatePipe, PageHeader, Icon],
   templateUrl: './profile.html',
   styleUrl: './profile.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Profile {
   private readonly fb = inject(FormBuilder);
+  private readonly avatarStorage = inject(AvatarStorageGateway);
   protected readonly auth = inject(AuthService);
 
   protected readonly isSavingProfile = signal(false);
   protected readonly profileErrorKey = signal<string | null>(null);
   protected readonly profileSaved = signal(false);
+
+  protected readonly isUploadingAvatar = signal(false);
+  protected readonly avatarErrorKey = signal<string | null>(null);
 
   protected readonly isChangingPassword = signal(false);
   protected readonly passwordErrorKey = signal<string | null>(null);
@@ -56,6 +62,38 @@ export class Profile {
       error: (error: Error) => {
         this.isSavingProfile.set(false);
         this.profileErrorKey.set(error.message);
+      },
+    });
+  }
+
+  protected onAvatarSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    input.value = ''; // permite volver a elegir el mismo archivo si falla
+    if (!file) {
+      return;
+    }
+
+    const userId = this.auth.currentUser()?.id;
+    if (!userId) {
+      return;
+    }
+
+    this.isUploadingAvatar.set(true);
+    this.avatarErrorKey.set(null);
+    this.avatarStorage.uploadAvatar(userId, file).subscribe({
+      next: (avatarUrl) => {
+        this.auth.updateAvatar(avatarUrl).subscribe({
+          next: () => this.isUploadingAvatar.set(false),
+          error: (error: Error) => {
+            this.isUploadingAvatar.set(false);
+            this.avatarErrorKey.set(error.message);
+          },
+        });
+      },
+      error: (error: Error) => {
+        this.isUploadingAvatar.set(false);
+        this.avatarErrorKey.set(error.message);
       },
     });
   }

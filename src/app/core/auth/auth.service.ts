@@ -50,6 +50,12 @@ export class AuthService {
       .pipe(tap((session) => this.session.set(session)));
   }
 
+  updateAvatar(avatarUrl: string): Observable<AuthSession> {
+    return this.repository
+      .updateAvatar(this.requireUserId(), avatarUrl)
+      .pipe(tap((session) => this.session.set(session)));
+  }
+
   changePassword(payload: PasswordChangePayload): Observable<void> {
     return this.repository.changePassword(this.requireUserId(), payload);
   }
