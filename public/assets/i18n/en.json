@@ -158,7 +158,12 @@
         "scopeHint": "I can only help with your home network, your router's security, your connection quality, and how to use this app.",
         "placeholder": "Type your question...",
         "send": "Send",
-        "errorReply": "I couldn't reach the assistant. Please try again in a few seconds."
+        "errorReply": "I couldn't reach the assistant. Please try again in a few seconds.",
+        "newConversation": "New conversation",
+        "history": "Conversation history",
+        "noConversations": "You don't have any conversations yet.",
+        "untitled": "Untitled conversation",
+        "rename": "Rename conversation"
       },
       "recommendations": {
         "changeDefaultPassword": {
@@ -218,12 +223,21 @@
       "scanFindings": "{{count}} device(s) require your attention.",
       "lastSeen": "Last seen",
       "markTrusted": "Mark as trusted",
-      "block": "Block",
+      "block": "Mark as unsafe",
       "trust": {
         "trusted": "Trusted",
         "unknown": "Unknown",
         "blocked": "Blocked"
       },
+      "kind": {
+        "phone": "Phone",
+        "computer": "Computer",
+        "unknown": "Unknown type"
+      },
+      "moreInfo": "More info",
+      "lessInfo": "Hide info",
+      "macAddress": "MAC address",
+      "firstSeen": "First seen",
       "unknownDevice": "Unknown device",
       "online": "Online",
       "offline": "Offline",

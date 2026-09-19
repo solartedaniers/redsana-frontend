@@ -23,21 +23,27 @@
 </div>
 
 <div class="devices-workspace workspace-grid workspace-grid--two">
-  <section class="topology surface-panel"><div class="topology__hub"><app-icon name="devices" /></div>@for (device of devices(); track device.id) { <span class="topology__node" [attr.data-trust]="device.trust"></span> }</section>
+  <section class="topology surface-panel" [class.topology--scanning]="isScanning()"><div class="topology__hub"><app-icon name="devices" /></div>@for (device of devices(); track device.id) { <span class="topology__node" [attr.data-trust]="device.trust"></span> }</section>
   <div class="devices-list surface-panel">
   @for (device of devices(); track device.id) {
     <article class="device-card" [attr.data-trust]="device.trust">
-      <div class="device-info">
-        <p class="device-name">{{ device.name || ('user.devicesMap.unknownDevice' | translate) }}</p>
-        <p class="device-meta">{{ device.macAddress }} · {{ device.ipAddress }}</p>
-        <p class="device-meta">
-          {{ 'user.devicesMap.lastSeen' | translate }}: {{ device.lastSeen | date: 'short' }}
-        </p>
+      <div class="device-card__row">
+        <app-icon class="device-kind-icon" [name]="deviceIcon(device)" />
+        <div class="device-info">
+          <p class="device-name">{{ device.name || ('user.devicesMap.unknownDevice' | translate) }}</p>
+          <p class="device-meta">
+            {{ deviceKindLabelKey(device) | translate }} · {{ device.ipAddress }}
+          </p>
+          <p class="device-meta">
+            {{ 'user.devicesMap.lastSeen' | translate }}: {{ device.lastSeen | date: 'short' }}
+          </p>
+        </div>
+        <span class="presence-badge" [attr.data-online]="device.isOnline">
+          {{ (device.isOnline ? 'user.devicesMap.online' : 'user.devicesMap.offline') | translate }}
+        </span>
+        <span class="trust-badge">{{ 'user.devicesMap.trust.' + device.trust | translate }}</span>
       </div>
-      <span class="presence-badge" [attr.data-online]="device.isOnline">
-        {{ (device.isOnline ? 'user.devicesMap.online' : 'user.devicesMap.offline') | translate }}
-      </span>
-      <span class="trust-badge">{{ 'user.devicesMap.trust.' + device.trust | translate }}</span>
+
       <div class="device-actions">
         @if (device.trust !== 'trusted') {
           <button type="button" (click)="setTrust(device.id, 'trusted')">
@@ -49,7 +55,25 @@
             {{ 'user.devicesMap.block' | translate }}
           </button>
         }
+        <button type="button" class="more-info-toggle" (click)="toggleExpanded(device.id)">
+          {{ (isExpanded(device.id) ? 'user.devicesMap.lessInfo' : 'user.devicesMap.moreInfo') | translate }}
+        </button>
       </div>
+
+      @if (isExpanded(device.id)) {
+        <table class="device-detail-table">
+          <tbody>
+            <tr>
+              <th>{{ 'user.devicesMap.macAddress' | translate }}</th>
+              <td>{{ device.macAddress }}</td>
+            </tr>
+            <tr>
+              <th>{{ 'user.devicesMap.firstSeen' | translate }}</th>
+              <td>{{ device.firstSeen | date: 'short' }}</td>
+            </tr>
+          </tbody>
+        </table>
+      }
     </article>
   }
   </div>

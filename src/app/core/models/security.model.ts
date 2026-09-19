@@ -29,3 +29,10 @@ export interface ChatMessage {
   /** true cuando `text` es una i18n key (fallo de red) en vez de la respuesta ya traducida por Groq. */
   isErrorKey?: boolean;
 }
+
+export interface ChatConversationSummary {
+  id: string;
+  /** null hasta el primer mensaje (el backend autogenera el título); ver historial. */
+  title: string | null;
+  updatedAt: string;
+}

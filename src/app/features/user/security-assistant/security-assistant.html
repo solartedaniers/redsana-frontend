@@ -77,8 +77,71 @@
 }
 
 <section class="chat-panel surface-panel">
-  <h2>{{ 'user.securityAssistant.chat.title' | translate }}</h2>
-  <p class="chat-scope-hint">{{ 'user.securityAssistant.chat.scopeHint' | translate }}</p>
+  <div class="chat-panel__header">
+    <div>
+      <h2>{{ 'user.securityAssistant.chat.title' | translate }}</h2>
+      <p class="chat-scope-hint">{{ 'user.securityAssistant.chat.scopeHint' | translate }}</p>
+    </div>
+    <div class="chat-panel__actions">
+      <button
+        type="button"
+        class="icon-button"
+        (click)="startNewConversation()"
+        [attr.aria-label]="'user.securityAssistant.chat.newConversation' | translate"
+      >
+        <app-icon name="plus" />
+      </button>
+      <button
+        type="button"
+        class="icon-button"
+        (click)="toggleHistory()"
+        [attr.aria-label]="'user.securityAssistant.chat.history' | translate"
+      >
+        <app-icon name="clock" />
+      </button>
+    </div>
+  </div>
+
+  @if (isHistoryOpen()) {
+    <div class="chat-history">
+      @if (conversations().length === 0) {
+        <p class="chat-history__empty">{{ 'user.securityAssistant.chat.noConversations' | translate }}</p>
+      } @else {
+        @for (conversation of conversations(); track conversation.id) {
+          <div
+            class="chat-history__item"
+            [class.chat-history__item--active]="conversation.id === currentConversationId()"
+            (click)="selectConversation(conversation.id)"
+          >
+            @if (renamingConversationId() === conversation.id) {
+              <input
+                type="text"
+                [ngModel]="renameDraft()"
+                (ngModelChange)="renameDraft.set($event)"
+                (click)="$event.stopPropagation()"
+                (keyup.enter)="confirmRename()"
+                (blur)="confirmRename()"
+                name="renameDraft"
+                autocomplete="off"
+              />
+            } @else {
+              <span class="chat-history__title">
+                {{ conversation.title || ('user.securityAssistant.chat.untitled' | translate) }}
+              </span>
+              <button
+                type="button"
+                class="icon-button icon-button--ghost"
+                (click)="startRename(conversation, $event)"
+                [attr.aria-label]="'user.securityAssistant.chat.rename' | translate"
+              >
+                <app-icon name="edit" />
+              </button>
+            }
+          </div>
+        }
+      }
+    </div>
+  }
 
   <div class="chat-messages">
     @for (message of chatMessages(); track $index) {

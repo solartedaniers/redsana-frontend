@@ -126,6 +126,19 @@
   margin-top: 1rem;
   padding: 1.25rem;
 
+  &__header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+
+  &__actions {
+    display: flex;
+    gap: 0.4rem;
+    flex-shrink: 0;
+  }
+
   h2 {
     margin: 0 0 0.35rem;
     font-size: 1.05rem;
@@ -137,6 +150,90 @@
   margin: 0 0 1rem;
   color: var(--color-text-secondary);
   font-size: 0.8rem;
+}
+
+.icon-button {
+  display: grid;
+  place-items: center;
+  width: 2.1rem;
+  height: 2.1rem;
+  border-radius: 0.5rem;
+  border: 1px solid var(--color-border);
+  background: var(--color-bg-surface-alt);
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition:
+    color var(--motion-duration-fast) var(--motion-easing-standard),
+    border-color var(--motion-duration-fast) var(--motion-easing-standard);
+
+  &:hover {
+    color: var(--color-accent);
+    border-color: var(--color-accent);
+  }
+
+  &--ghost {
+    width: 1.8rem;
+    height: 1.8rem;
+    border: none;
+    background: transparent;
+  }
+}
+
+.chat-history {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  max-height: 12rem;
+  overflow-y: auto;
+  margin-bottom: 1rem;
+  padding: 0.6rem;
+  border-radius: 0.5rem;
+  border: 1px solid var(--color-border);
+  background: var(--color-bg-surface-alt);
+
+  &__empty {
+    margin: 0;
+    padding: 0.4rem;
+    color: var(--color-text-secondary);
+    font-size: 0.85rem;
+  }
+
+  &__item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    padding: 0.45rem 0.6rem;
+    border-radius: 0.4rem;
+    cursor: pointer;
+    color: var(--color-text-secondary);
+
+    &:hover {
+      background: var(--color-accent-muted);
+    }
+
+    &--active {
+      color: var(--color-accent);
+      background: var(--color-accent-muted);
+    }
+
+    input {
+      flex: 1;
+      padding: 0.3rem 0.5rem;
+      border-radius: 0.35rem;
+      border: 1px solid var(--color-accent);
+      background: var(--color-bg-surface);
+      color: var(--color-text-primary);
+      font-size: 0.85rem;
+    }
+  }
+
+  &__title {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 0.85rem;
+  }
 }
 
 .chat-messages {

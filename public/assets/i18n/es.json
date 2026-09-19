@@ -158,7 +158,12 @@
         "scopeHint": "Solo puedo ayudarte con tu red doméstica, la seguridad de tu router, la calidad de tu conexión y el uso de esta app.",
         "placeholder": "Escribe tu pregunta...",
         "send": "Enviar",
-        "errorReply": "No pude comunicarme con el asistente. Intenta de nuevo en unos segundos."
+        "errorReply": "No pude comunicarme con el asistente. Intenta de nuevo en unos segundos.",
+        "newConversation": "Nueva conversación",
+        "history": "Historial de conversaciones",
+        "noConversations": "Aún no tienes conversaciones.",
+        "untitled": "Conversación sin título",
+        "rename": "Renombrar conversación"
       },
       "recommendations": {
         "changeDefaultPassword": {
@@ -218,12 +223,21 @@
       "scanFindings": "{{count}} dispositivo(s) requieren tu atención.",
       "lastSeen": "Última vez visto",
       "markTrusted": "Marcar como confiable",
-      "block": "Bloquear",
+      "block": "Marcar como inseguro",
       "trust": {
         "trusted": "Confiable",
         "unknown": "Desconocido",
         "blocked": "Bloqueado"
       },
+      "kind": {
+        "phone": "Celular",
+        "computer": "Computador",
+        "unknown": "Tipo desconocido"
+      },
+      "moreInfo": "Más información",
+      "lessInfo": "Ocultar información",
+      "macAddress": "Dirección MAC",
+      "firstSeen": "Visto por primera vez",
       "unknownDevice": "Dispositivo desconocido",
       "online": "En línea",
       "offline": "Desconectado",

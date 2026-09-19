@@ -3,9 +3,16 @@ import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/cor
 import { DevicesRepository } from '../../../core/repositories/devices.repository';
 import { LanScanGateway } from '../../../core/lan-scan/lan-scan.gateway';
 import { DeviceTrust, NetworkDevice } from '../../../core/models/device.model';
+import { DeviceKind, inferDeviceKind } from '../../../core/domain/device-kind';
 import { PageHeader } from '../../../shared/components/page-header/page-header';
 import { TranslatePipe } from '../../../core/i18n/translate.pipe';
 import { Icon } from '../../../shared/components/icon/icon';
+
+const DEVICE_KIND_ICON: Record<DeviceKind, 'phone' | 'computer' | 'devices'> = {
+  phone: 'phone',
+  computer: 'computer',
+  unknown: 'devices',
+};
 
 @Component({
   selector: 'app-devices-map',
@@ -22,6 +29,7 @@ export class DevicesMap {
   protected readonly isScanning = signal(false);
   protected readonly lastScanFindings = signal<NetworkDevice[] | null>(null);
   protected readonly scanFailed = signal(false);
+  protected readonly expandedDeviceIds = signal<ReadonlySet<string>>(new Set());
 
   constructor() {
     this.repository.getDevices().subscribe((devices) => this.devices.set(devices));
@@ -64,6 +72,30 @@ export class DevicesMap {
       this.devices.update((current) =>
         current.map((device) => (device.id === deviceId ? { ...device, trust } : device))
       );
+    });
+  }
+
+  protected deviceIcon(device: NetworkDevice): 'phone' | 'computer' | 'devices' {
+    return DEVICE_KIND_ICON[inferDeviceKind(device.macAddress)];
+  }
+
+  protected deviceKindLabelKey(device: NetworkDevice): string {
+    return `user.devicesMap.kind.${inferDeviceKind(device.macAddress)}`;
+  }
+
+  protected isExpanded(deviceId: string): boolean {
+    return this.expandedDeviceIds().has(deviceId);
+  }
+
+  protected toggleExpanded(deviceId: string): void {
+    this.expandedDeviceIds.update((current) => {
+      const next = new Set(current);
+      if (next.has(deviceId)) {
+        next.delete(deviceId);
+      } else {
+        next.add(deviceId);
+      }
+      return next;
     });
   }
 }

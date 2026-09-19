@@ -3,6 +3,8 @@ import { Injectable, inject } from '@angular/core';
 import { Observable, map, of } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import {
+  ChatConversationSummary,
+  ChatMessage,
   SecurityAnswers,
   SecurityAnswerValue,
   SecurityAssessmentResult,
@@ -33,11 +35,24 @@ interface BackendAssessment {
   submitted_at: string;
 }
 
+interface BackendConversation {
+  id: string;
+  title: string | null;
+  updated_at: string;
+}
+
+interface BackendChatMessage {
+  id: string;
+  role: 'user' | 'assistant';
+  content: string;
+  created_at: string;
+}
+
 @Injectable()
 export class SecurityAssistantHttpRepository extends SecurityAssistantRepository {
   private readonly http = inject(HttpClient);
   private readonly baseUrl = `${environment.apiBaseUrl}/api/security-assessments`;
-  private readonly chatUrl = `${environment.apiBaseUrl}/api/security-assistant/chat`;
+  private readonly conversationsUrl = `${environment.apiBaseUrl}/api/conversations`;
 
   getQuestionnaire(): Observable<SecurityQuestion[]> {
     return of(QUESTIONS);
@@ -57,8 +72,36 @@ export class SecurityAssistantHttpRepository extends SecurityAssistantRepository
       .pipe(map((assessment) => (assessment ? this.toResult(assessment) : null)));
   }
 
-  sendChatMessage(message: string): Observable<string> {
-    return this.http.post<{ reply: string }>(this.chatUrl, { message }).pipe(map((response) => response.reply));
+  listConversations(): Observable<ChatConversationSummary[]> {
+    return this.http
+      .get<BackendConversation[]>(this.conversationsUrl)
+      .pipe(map((conversations) => conversations.map((c) => this.toConversation(c))));
+  }
+
+  createConversation(): Observable<ChatConversationSummary> {
+    return this.http.post<BackendConversation>(this.conversationsUrl, {}).pipe(map((c) => this.toConversation(c)));
+  }
+
+  renameConversation(conversationId: string, title: string): Observable<ChatConversationSummary> {
+    return this.http
+      .patch<BackendConversation>(`${this.conversationsUrl}/${conversationId}`, { title })
+      .pipe(map((c) => this.toConversation(c)));
+  }
+
+  getMessages(conversationId: string): Observable<ChatMessage[]> {
+    return this.http
+      .get<BackendChatMessage[]>(`${this.conversationsUrl}/${conversationId}/messages`)
+      .pipe(map((messages) => messages.map((m) => ({ role: m.role, text: m.content }))));
+  }
+
+  sendMessage(conversationId: string, message: string): Observable<string> {
+    return this.http
+      .post<{ reply: string }>(`${this.conversationsUrl}/${conversationId}/messages`, { message })
+      .pipe(map((response) => response.reply));
+  }
+
+  private toConversation(conversation: BackendConversation): ChatConversationSummary {
+    return { id: conversation.id, title: conversation.title, updatedAt: conversation.updated_at };
   }
 
   private toResult(assessment: BackendAssessment): SecurityAssessmentResult {
