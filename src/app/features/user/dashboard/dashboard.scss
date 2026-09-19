@@ -20,10 +20,6 @@
   app-history-chart { display: block; padding: 1.25rem; }
 }
 
-.router-summary { padding-bottom: 1rem; }
-.router-summary dl { margin: 0; padding: 1rem; display: grid; gap: .75rem; }
-.router-summary dl div { display: flex; justify-content: space-between; gap: 1rem; font-size: .78rem; }
-.router-summary dt { color: var(--color-text-secondary); }
-.router-summary dd { margin: 0; font-family: var(--font-mono); color: var(--color-text-primary); }
-.router-summary .action-button { display: block; margin: 0 1rem; text-align: center; text-decoration: none; }
+.router-summary { display: grid; place-items: center; padding: 1.5rem; }
+.router-summary .action-button { text-align: center; text-decoration: none; }
 @media (max-width: 64rem) { .metrics-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }

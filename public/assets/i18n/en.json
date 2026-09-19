@@ -126,12 +126,6 @@
       "updated": "Updated",
       "live": "Live telemetry",
       "historyDetail": "Continuous measurement of the link and perimeter latency.",
-      "routerTitle": "Router summary",
-      "gateway": "Gateway",
-      "connected": "Connected devices",
-      "connectedValue": "14 active",
-      "channel": "Wireless channel",
-      "channelValue": "Channel 36 · stable",
       "diagnose": "Run diagnosis"
     },
     "securityAssistant": {
@@ -205,22 +199,6 @@
         "congestionForecast": "Network congestion expected during peak hours tonight.",
         "latencySpikePredicted": "A latency spike is predicted in the next few minutes."
       }
-    },
-    "providerHistory": {
-      "title": "Provider history and comparison",
-      "subtitle": "ISP stability, outage and link-quality evidence",
-      "availability": "Service availability",
-      "latency": "Average latency",
-      "loss": "Packet loss",
-      "cost": "Estimated monthly cost",
-      "chartTitle": "Weekly stability comparison",
-      "chartDetail": "Your network against your provider average.",
-      "verdictTitle": "Who is responsible for the outage?",
-      "verdict": "Evidence points to an external provider incident.",
-      "incidentsTitle": "Weekly log of major outages",
-      "incidentOne": "Confirmed micro-outage during peak time",
-      "incidentTwo": "Recorded latency degradation",
-      "report": "Generate technical report"
     },
     "devicesMap": {
       "title": "Connected devices",

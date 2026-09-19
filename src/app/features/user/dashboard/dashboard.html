@@ -27,8 +27,6 @@
       <app-history-chart [samples]="history()" />
     </section>
     <aside class="router-summary surface-panel">
-      <div class="surface-panel__header"><h2 class="surface-panel__title">{{ 'user.dashboard.routerTitle' | translate }}</h2></div>
-      <dl><div><dt>{{ 'user.dashboard.gateway' | translate }}</dt><dd>192.168.1.1</dd></div><div><dt>{{ 'user.dashboard.connected' | translate }}</dt><dd>{{ 'user.dashboard.connectedValue' | translate }}</dd></div><div><dt>{{ 'user.dashboard.channel' | translate }}</dt><dd>{{ 'user.dashboard.channelValue' | translate }}</dd></div></dl>
       <a class="action-button" routerLink="/user/security-assistant">{{ 'user.dashboard.diagnose' | translate }}</a>
     </aside>
   </div>

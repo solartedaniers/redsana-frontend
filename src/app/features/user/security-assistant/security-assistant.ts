@@ -1,5 +1,6 @@
 import { DatePipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 import { SecurityAssistantRepository } from '../../../core/repositories/security-assistant.repository';
 import {
   SecurityAnswers,
@@ -15,7 +16,7 @@ import { TranslatePipe } from '../../../core/i18n/translate.pipe';
 
 @Component({
   selector: 'app-security-assistant',
-  imports: [PageHeader, ScoreGauge, TranslatePipe, DatePipe],
+  imports: [PageHeader, ScoreGauge, TranslatePipe, DatePipe, FormsModule],
   templateUrl: './security-assistant.html',
   styleUrl: './security-assistant.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

@@ -22,7 +22,7 @@ import { AlertsHttpRepository } from './core/repositories/alerts-http.repository
 import { DevicesRepository } from './core/repositories/devices.repository';
 import { DevicesHttpRepository } from './core/repositories/devices-http.repository';
 import { AdminMetricsRepository } from './core/repositories/admin-metrics.repository';
-import { MockAdminMetricsRepository } from './core/repositories/admin-metrics-mock.repository';
+import { AdminMetricsHttpRepository } from './core/repositories/admin-metrics-http.repository';
 import { NetworkSupervisionRepository } from './core/repositories/network-supervision.repository';
 import { NetworkSupervisionHttpRepository } from './core/repositories/network-supervision-http.repository';
 import { UsersRepository } from './core/repositories/users.repository';
@@ -48,7 +48,7 @@ export const appConfig: ApplicationConfig = {
     { provide: SecurityAssistantRepository, useClass: SecurityAssistantHttpRepository },
     { provide: AlertsRepository, useClass: AlertsHttpRepository },
     { provide: DevicesRepository, useClass: DevicesHttpRepository },
-    { provide: AdminMetricsRepository, useClass: MockAdminMetricsRepository },
+    { provide: AdminMetricsRepository, useClass: AdminMetricsHttpRepository },
     { provide: NetworkSupervisionRepository, useClass: NetworkSupervisionHttpRepository },
     { provide: UsersRepository, useClass: UsersHttpRepository },
     { provide: NetworkMeasurementGateway, useClass: NetworkMeasurementTauriGateway },
