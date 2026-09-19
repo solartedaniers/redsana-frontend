@@ -214,7 +214,11 @@
         "trusted": "Confiable",
         "unknown": "Desconocido",
         "blocked": "Bloqueado"
-      }
+      },
+      "unknownDevice": "Dispositivo desconocido",
+      "online": "En línea",
+      "offline": "Desconectado",
+      "scanError": "No se pudo completar el escaneo. Intenta de nuevo."
     }
   },
   "admin": {

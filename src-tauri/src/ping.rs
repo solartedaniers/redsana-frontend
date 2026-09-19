@@ -57,7 +57,8 @@ pub async fn measure_network_quality(host: Option<String>) -> Result<NetworkQual
 }
 
 /// Crea el cliente ICMP apropiado para la familia de direcciones del host resuelto.
-fn new_client(address: IpAddr) -> Result<Client, String> {
+/// pub(crate): también lo reutiliza lan_scan.rs para el barrido de descubrimiento.
+pub(crate) fn new_client(address: IpAddr) -> Result<Client, String> {
     let config = match address {
         IpAddr::V4(_) => Config::default(),
         IpAddr::V6(_) => Config::builder().kind(ICMP::V6).build(),

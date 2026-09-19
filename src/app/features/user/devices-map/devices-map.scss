@@ -36,6 +36,10 @@
   &.warning {
     color: var(--color-status-warning);
   }
+
+  &.error {
+    color: var(--color-status-danger);
+  }
 }
 
 .devices-list {
@@ -100,6 +104,16 @@
   font-weight: 700;
   text-transform: uppercase;
   color: var(--color-text-secondary);
+}
+
+.presence-badge {
+  font-size: var(--font-size-caption);
+  font-weight: 700;
+  color: var(--color-status-warning);
+
+  &[data-online='true'] {
+    color: var(--color-status-success);
+  }
 }
 
 .device-actions {

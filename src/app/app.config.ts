@@ -32,6 +32,8 @@ import { NetworkMeasurementTauriGateway } from './core/network-measurement/netwo
 import { NetworkMeasurementService } from './core/network-measurement/network-measurement.service';
 import { WifiEncryptionGateway } from './core/wifi-encryption/wifi-encryption.gateway';
 import { WifiEncryptionTauriGateway } from './core/wifi-encryption/wifi-encryption-tauri.gateway';
+import { LanScanGateway } from './core/lan-scan/lan-scan.gateway';
+import { LanScanTauriGateway } from './core/lan-scan/lan-scan-tauri.gateway';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -53,6 +55,7 @@ export const appConfig: ApplicationConfig = {
     { provide: UsersRepository, useClass: UsersHttpRepository },
     { provide: NetworkMeasurementGateway, useClass: NetworkMeasurementTauriGateway },
     { provide: WifiEncryptionGateway, useClass: WifiEncryptionTauriGateway },
+    { provide: LanScanGateway, useClass: LanScanTauriGateway },
 
     // Carga idioma y restaura sesión antes de renderizar: evita parpadeo de
     // claves crudas y evita un salto visual login->dashboard en cada recarga.

@@ -1,3 +1,4 @@
+mod lan_scan;
 mod ping;
 mod wifi;
 
@@ -17,7 +18,8 @@ pub fn run() {
     .invoke_handler(tauri::generate_handler![
       ping::measure_latency,
       ping::measure_network_quality,
-      wifi::get_wifi_encryption
+      wifi::get_wifi_encryption,
+      lan_scan::scan_connected_devices
     ])
     .run(tauri::generate_context!())
     .expect("error while running tauri application");

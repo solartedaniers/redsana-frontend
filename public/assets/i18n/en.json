@@ -214,7 +214,11 @@
         "trusted": "Trusted",
         "unknown": "Unknown",
         "blocked": "Blocked"
-      }
+      },
+      "unknownDevice": "Unknown device",
+      "online": "Online",
+      "offline": "Offline",
+      "scanError": "The scan could not be completed. Try again."
     }
   },
   "admin": {

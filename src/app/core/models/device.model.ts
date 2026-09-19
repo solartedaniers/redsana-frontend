@@ -8,4 +8,11 @@ export interface NetworkDevice {
   trust: DeviceTrust;
   firstSeen: string;
   lastSeen: string;
+  isOnline: boolean;
+}
+
+/** Resultado crudo de un escaneo real de la LAN (Tauri/ARP), antes de sincronizar con el backend. */
+export interface DiscoveredDevice {
+  ip: string;
+  mac: string;
 }
