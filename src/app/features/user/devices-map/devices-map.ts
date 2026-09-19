@@ -42,13 +42,18 @@ export class DevicesMap {
           this.devices.set(devices);
           this.lastScanFindings.set(devices.filter((device) => device.trust !== 'trusted'));
         },
-        error: () => {
+        error: (error) => {
+          // La causa real (ej. fallo de sincronización con el backend) queda en
+          // consola: el signal solo dispara el mensaje genérico de la UI.
+          console.error('[DevicesMap] fallo al sincronizar dispositivos escaneados', error);
           this.isScanning.set(false);
           this.scanFailed.set(true);
         },
       });
-    } catch {
-      // Sin Tauri, sin permisos, ipconfig/arp fallaron, etc.
+    } catch (error) {
+      // Sin Tauri, sin permisos, ipconfig/arp fallaron, etc. El mensaje real
+      // (qué paso exacto falló) viaja en el Err de Rust y aparece aquí.
+      console.error('[DevicesMap] fallo al escanear la LAN', error);
       this.isScanning.set(false);
       this.scanFailed.set(true);
     }

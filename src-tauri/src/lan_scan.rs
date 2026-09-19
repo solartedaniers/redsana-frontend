@@ -85,11 +85,17 @@ fn local_ipv4_and_mask() -> Result<(Ipv4Addr, Ipv4Addr), String> {
         .map_err(|e| format!("no se pudo lanzar ipconfig: {e}"))?;
 
     if !output.status.success() {
-        return Err("ipconfig devolvió un error".to_string());
+        return Err(format!(
+            "ipconfig devolvió un error (código {:?}): {}",
+            output.status.code(),
+            decode_console_output(&output.stderr)
+        ));
     }
 
-    let stdout = String::from_utf8_lossy(&output.stdout);
-    parse_local_ipv4_config(&stdout).ok_or_else(|| "no se encontró una IPv4 local válida".to_string())
+    let stdout = decode_console_output(&output.stdout);
+    parse_local_ipv4_config(&stdout).ok_or_else(|| {
+        format!("no se encontró una IPv4 local válida en la salida de ipconfig:\n{stdout}")
+    })
 }
 
 /// Busca el primer adaptador con una IPv4 real (no APIPA 169.254.x.x) y su
@@ -155,10 +161,64 @@ fn run_arp_a() -> Result<String, String> {
     let output = Command::new(ARP_COMMAND).args(ARP_ARGS).output().map_err(|e| format!("no se pudo lanzar arp: {e}"))?;
 
     if !output.status.success() {
-        return Err("arp -a devolvió un error".to_string());
+        return Err(format!(
+            "arp -a devolvió un error (código {:?}): {}",
+            output.status.code(),
+            decode_console_output(&output.stderr)
+        ));
     }
 
-    Ok(String::from_utf8_lossy(&output.stdout).to_string())
+    Ok(decode_console_output(&output.stdout))
+}
+
+/// Decodifica la salida cruda de un comando de consola de Windows (ipconfig, arp)
+/// usando la página de códigos OEM realmente activa (850, 437, 866... según el
+/// idioma del sistema), en vez de asumir UTF-8. `String::from_utf8_lossy` corrompe
+/// silenciosamente cualquier tilde/ñ (ej. "Dirección") en locales no-inglesas,
+/// lo que rompe el parseo de etiquetas sin dar ningún error visible.
+#[cfg(windows)]
+fn decode_console_output(bytes: &[u8]) -> String {
+    use std::ptr;
+
+    #[link(name = "kernel32")]
+    extern "system" {
+        fn GetOEMCP() -> u32;
+        fn MultiByteToWideChar(
+            code_page: u32,
+            flags: u32,
+            multi_byte_str: *const u8,
+            cbmultibyte: i32,
+            wide_char_str: *mut u16,
+            cchwidechar: i32,
+        ) -> i32;
+    }
+
+    if bytes.is_empty() {
+        return String::new();
+    }
+
+    // ponytail: solo cubre la página de códigos activa al arrancar el proceso;
+    // si el usuario la cambia en pleno vuelo (raro), habría que releer GetOEMCP cada vez.
+    unsafe {
+        let code_page = GetOEMCP();
+        let len = MultiByteToWideChar(code_page, 0, bytes.as_ptr(), bytes.len() as i32, ptr::null_mut(), 0);
+        if len <= 0 {
+            return String::from_utf8_lossy(bytes).into_owned();
+        }
+
+        let mut buffer = vec![0u16; len as usize];
+        let written = MultiByteToWideChar(code_page, 0, bytes.as_ptr(), bytes.len() as i32, buffer.as_mut_ptr(), len);
+        if written <= 0 {
+            return String::from_utf8_lossy(bytes).into_owned();
+        }
+
+        String::from_utf16_lossy(&buffer[..written as usize])
+    }
+}
+
+#[cfg(not(windows))]
+fn decode_console_output(bytes: &[u8]) -> String {
+    String::from_utf8_lossy(bytes).into_owned()
 }
 
 /// Reconoce las líneas de datos de `arp -a` por su FORMA (ip + mac), no por el
@@ -275,5 +335,16 @@ Interface: 192.168.1.23 --- 0xe
         assert!(is_non_host_mac("FF-FF-FF-FF-FF-FF"));
         assert!(is_non_host_mac("01-00-5e-00-00-16"));
         assert!(!is_non_host_mac("aa-bb-cc-dd-ee-ff"));
+    }
+
+    #[test]
+    #[cfg(windows)]
+    fn decode_console_output_handles_oem_codepage_accents() {
+        // Bytes reales que devuelve `ipconfig` en Windows en español (CP850) para
+        // "Dirección IPv4": 0xA2 es 'ó' en CP850, no UTF-8 válido. Antes del fix,
+        // String::from_utf8_lossy lo reemplazaba por U+FFFD y rompía el parseo de
+        // "Dirección IPv4" -> las etiquetas dejaban de matchear silenciosamente.
+        let cp850_bytes = [b'D', b'i', b'r', b'e', b'c', b'c', b'i', 0xA2, b'n'];
+        assert_eq!(decode_console_output(&cp850_bytes), "Direcci\u{f3}n");
     }
 }

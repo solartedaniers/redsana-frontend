@@ -65,3 +65,8 @@ For more information on using the Angular CLI, including detailed command refere
 1. cd backend
 2. venv\Scripts\activate
 3. uvicorn app.main:app --reload
+
+# frontend
+
+1. cd frontend
+2. npx tauri dev
