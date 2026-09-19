@@ -53,9 +53,17 @@
   gap: 1rem;
   padding: 1rem 1.25rem;
   border-radius: 0.65rem;
-  border: 1px solid var(--color-border);
+  border: 1px solid var(--color-card-border);
   border-left-width: 3px;
   background: var(--color-bg-surface);
+  transition:
+    box-shadow var(--motion-duration-base) var(--motion-easing-standard),
+    transform var(--motion-duration-base) var(--motion-easing-standard);
+
+  :root[data-theme='light'] &:hover {
+    box-shadow: var(--shadow-card-hover);
+    transform: translateY(-2px);
+  }
 
   &[data-trust='trusted'] {
     border-left-color: var(--color-status-success);

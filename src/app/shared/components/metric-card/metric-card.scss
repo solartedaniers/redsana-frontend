@@ -1,14 +1,20 @@
 .metric-card {
   padding: 1rem 1.25rem;
   border-radius: 0.75rem;
-  border: 1px solid var(--color-border);
+  border: 1px solid var(--color-card-border);
   background: var(--color-bg-surface);
   transition:
     border-color var(--motion-duration-base) var(--motion-easing-standard),
     transform var(--motion-duration-base) var(--motion-easing-standard);
 
   &:hover {
-    border-color: var(--color-border-strong);
+    border-color: var(--color-card-border);
+  }
+}
+
+:root[data-theme='light'] .metric-card {
+  &:hover {
+    box-shadow: var(--shadow-card-hover);
     transform: translateY(-2px);
   }
 }
