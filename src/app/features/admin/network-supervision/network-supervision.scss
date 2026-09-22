@@ -41,9 +41,27 @@
   color: var(--color-text-secondary);
 }
 
+.score-block {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.1rem;
+}
+
 .score {
   font-weight: 700;
   color: var(--color-accent);
+}
+
+.score-source {
+  font-size: var(--font-size-caption);
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--color-text-secondary);
+
+  &[data-source='real'] {
+    color: var(--color-status-success);
+  }
 }
 
 .view-button {

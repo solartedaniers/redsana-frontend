@@ -263,7 +263,11 @@
       "subtitle": "Monitor the network health of every registered household",
       "lastActivity": "Last activity",
       "viewDashboard": "View dashboard",
-      "detailTitle": "Household dashboard"
+      "detailTitle": "Household dashboard",
+      "scoreSource": {
+        "real": "Real",
+        "estimated": "Estimated"
+      }
     },
     "userManagement": {
       "title": "User management",

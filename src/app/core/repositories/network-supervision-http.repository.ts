@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable, map } from 'rxjs';
 import { environment } from '../../../environments/environment';
-import { MonitoredHousehold } from '../models/admin.model';
+import { MonitoredHousehold, SecurityScoreSource } from '../models/admin.model';
 import { NetworkStatus } from '../models/network.model';
 import { NetworkSupervisionRepository } from './network-supervision.repository';
 
@@ -12,6 +12,7 @@ interface BackendHousehold {
   label: string;
   status: NetworkStatus;
   security_score: number;
+  security_score_source: SecurityScoreSource;
   last_activity: string;
 }
 
@@ -33,6 +34,7 @@ export class NetworkSupervisionHttpRepository extends NetworkSupervisionReposito
       label: household.label,
       status: household.status,
       securityScore: household.security_score,
+      securityScoreSource: household.security_score_source,
       lastActivity: household.last_activity,
     };
   }

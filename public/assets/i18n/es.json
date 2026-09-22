@@ -263,7 +263,11 @@
       "subtitle": "Monitorea la salud de red de cada hogar registrado",
       "lastActivity": "Última actividad",
       "viewDashboard": "Ver panel",
-      "detailTitle": "Panel del hogar"
+      "detailTitle": "Panel del hogar",
+      "scoreSource": {
+        "real": "Real",
+        "estimated": "Estimado"
+      }
     },
     "userManagement": {
       "title": "Gestión de usuarios",

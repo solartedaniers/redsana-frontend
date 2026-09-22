@@ -7,11 +7,14 @@ export interface PlatformMetrics {
   averageSecurityScore: number;
 }
 
+export type SecurityScoreSource = 'real' | 'estimated';
+
 export interface MonitoredHousehold {
   id: string;
   ownerName: string;
   label: string;
   status: NetworkStatus;
   securityScore: number;
+  securityScoreSource: SecurityScoreSource;
   lastActivity: string;
 }

@@ -12,7 +12,12 @@
         </p>
       </div>
       <app-network-status-light [status]="household.status" />
-      <span class="score">{{ household.securityScore }}%</span>
+      <div class="score-block">
+        <span class="score">{{ household.securityScore }}%</span>
+        <span class="score-source" [attr.data-source]="household.securityScoreSource">
+          {{ 'admin.networkSupervision.scoreSource.' + household.securityScoreSource | translate }}
+        </span>
+      </div>
       <a class="view-button" [routerLink]="[household.id]">
         {{ 'admin.networkSupervision.viewDashboard' | translate }}
       </a>

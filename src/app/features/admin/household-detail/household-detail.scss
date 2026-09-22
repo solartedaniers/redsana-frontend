@@ -42,6 +42,24 @@
   font-size: var(--font-size-body);
 }
 
+.score-block {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.score-source {
+  font-size: var(--font-size-caption);
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--color-text-secondary);
+
+  &[data-source='real'] {
+    color: var(--color-status-success);
+  }
+}
+
 .metrics-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));

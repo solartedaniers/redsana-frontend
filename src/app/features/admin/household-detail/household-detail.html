@@ -10,7 +10,12 @@
       <p class="label">{{ home.label }}</p>
     </div>
     <app-network-status-light [status]="home.status" />
-    <app-score-gauge [score]="home.securityScore" />
+    <div class="score-block">
+      <app-score-gauge [score]="home.securityScore" />
+      <span class="score-source" [attr.data-source]="home.securityScoreSource">
+        {{ 'admin.networkSupervision.scoreSource.' + home.securityScoreSource | translate }}
+      </span>
+    </div>
   </div>
 
   @if (snapshot(); as data) {
