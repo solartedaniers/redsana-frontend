@@ -1,6 +1,13 @@
 .dashboard-hero { display: flex; justify-content: space-between; align-items: center; gap: 1rem; padding: 1.25rem; margin-bottom: 1rem; }
 .dashboard-hero .page-header { margin: .7rem 0 0; }
 
+.anomaly-calibrating-banner {
+  margin: 0 0 1.25rem;
+  padding: .85rem 1.25rem;
+  color: var(--color-status-warning);
+  font-size: var(--font-size-body);
+}
+
 .metrics-grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));

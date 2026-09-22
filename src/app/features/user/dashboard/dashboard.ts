@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { NetworkMetricsRepository } from '../../../core/repositories/network-metrics.repository';
-import { NetworkMetricSample, NetworkMetricSnapshot } from '../../../core/models/network.model';
+import { AnomalyDetectionStatus, NetworkMetricSample, NetworkMetricSnapshot } from '../../../core/models/network.model';
 import { PageHeader } from '../../../shared/components/page-header/page-header';
 import { NetworkStatusLight } from '../../../shared/components/network-status-light/network-status-light';
 import { MetricCard } from '../../../shared/components/metric-card/metric-card';
@@ -21,11 +21,15 @@ export class Dashboard {
 
   protected readonly snapshot = signal<NetworkMetricSnapshot | null>(null);
   protected readonly history = signal<NetworkMetricSample[]>([]);
+  protected readonly anomalyStatus = signal<AnomalyDetectionStatus | null>(null);
 
   constructor() {
     // watchSnapshot ya emite un valor inicial y se re-suscribe sola cada
     // pocos segundos; no hace falta gestionar un intervalo aquí.
     this.metricsRepository.watchSnapshot().subscribe((snapshot) => this.snapshot.set(snapshot));
     this.metricsRepository.getHistory().subscribe((history) => this.history.set(history));
+    // Se consulta una sola vez al cargar: el conteo solo importa mientras
+    // calibra, no hace falta refrescarlo en vivo como el snapshot de red.
+    this.metricsRepository.getAnomalyStatus().subscribe((status) => this.anomalyStatus.set(status));
   }
 }

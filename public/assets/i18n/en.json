@@ -129,7 +129,8 @@
       "updated": "Updated",
       "live": "Live telemetry",
       "historyDetail": "Continuous measurement of the link and perimeter latency.",
-      "diagnose": "Run diagnosis"
+      "diagnose": "Run diagnosis",
+      "anomalyCalibrating": "We're learning what's normal for your network ({{collected}}/{{required}} measurements) — anomaly detection will turn on soon."
     },
     "securityAssistant": {
       "title": "Security assistant",
@@ -212,7 +213,10 @@
       "messages": {
         "briefOutage": "Brief connectivity outage detected ({{minutes}} min).",
         "congestionForecast": "Network congestion expected during peak hours tonight.",
-        "latencySpikePredicted": "A latency spike is predicted in the next few minutes."
+        "latencySpikePredicted": "A latency spike is predicted in the next few minutes.",
+        "latencyDegraded": "Your connection is getting slower than usual ({{current}} ms, usually {{typical}} ms).",
+        "connectionUnstable": "Your connection is more unstable than usual ({{current}} ms of variation, usually {{typical}} ms).",
+        "packetsBeingLost": "Your network is losing more data than usual ({{current}}% packet loss, usually {{typical}}%)."
       }
     },
     "devicesMap": {

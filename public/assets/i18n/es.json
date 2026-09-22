@@ -129,7 +129,8 @@
       "updated": "Actualización",
       "live": "Telemetría en vivo",
       "historyDetail": "Medición continua del enlace y de la latencia perimetral.",
-      "diagnose": "Ejecutar diagnóstico"
+      "diagnose": "Ejecutar diagnóstico",
+      "anomalyCalibrating": "Estamos aprendiendo el comportamiento normal de tu red ({{collected}}/{{required}} mediciones) — la detección de anomalías se activará pronto."
     },
     "securityAssistant": {
       "title": "Asistente de seguridad",
@@ -212,7 +213,10 @@
       "messages": {
         "briefOutage": "Se detectó un corte breve de conectividad ({{minutes}} min).",
         "congestionForecast": "Se espera congestión de red esta noche en horas pico.",
-        "latencySpikePredicted": "Se predice un pico de latencia en los próximos minutos."
+        "latencySpikePredicted": "Se predice un pico de latencia en los próximos minutos.",
+        "latencyDegraded": "Tu conexión se está poniendo más lenta de lo normal ({{current}} ms, lo normal es {{typical}} ms).",
+        "connectionUnstable": "Tu conexión está más inestable de lo normal ({{current}} ms de variación, lo normal es {{typical}} ms).",
+        "packetsBeingLost": "Tu red está perdiendo más datos de lo normal ({{current}}% de paquetes perdidos, lo normal es {{typical}}%)."
       }
     },
     "devicesMap": {

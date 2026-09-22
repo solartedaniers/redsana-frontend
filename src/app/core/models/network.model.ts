@@ -19,3 +19,11 @@ export interface NetworkQualityMeasurement {
   jitterMs: number;
   packetLossPercent: number;
 }
+
+/** Estado del módulo de detección de anomalías: mientras no haya suficiente
+ * historial (calibrating), el modelo no evalúa nada, para no dar falsos positivos. */
+export interface AnomalyDetectionStatus {
+  status: 'calibrating' | 'active';
+  samplesCollected: number;
+  samplesRequired: number;
+}

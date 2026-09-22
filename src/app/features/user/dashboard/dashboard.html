@@ -6,6 +6,14 @@
   @if (snapshot(); as data) { <app-network-status-light [status]="data.status" /> }
 </section>
 
+@if (anomalyStatus(); as anomaly) {
+  @if (anomaly.status === 'calibrating') {
+    <p class="anomaly-calibrating-banner surface-panel">
+      {{ 'user.dashboard.anomalyCalibrating' | translate: { collected: anomaly.samplesCollected, required: anomaly.samplesRequired } }}
+    </p>
+  }
+}
+
 @if (snapshot(); as data) {
   <div class="metrics-grid metric-strip">
     <app-metric-card labelKey="user.dashboard.latency" [value]="data.latencyMs" unit="ms" />

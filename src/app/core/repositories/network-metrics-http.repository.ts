@@ -2,7 +2,13 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable, interval, map, startWith, switchMap } from 'rxjs';
 import { environment } from '../../../environments/environment';
-import { NetworkMetricSample, NetworkMetricSnapshot, NetworkQualityMeasurement, NetworkStatus } from '../models/network.model';
+import {
+  AnomalyDetectionStatus,
+  NetworkMetricSample,
+  NetworkMetricSnapshot,
+  NetworkQualityMeasurement,
+  NetworkStatus,
+} from '../models/network.model';
 import { NetworkMetricsRepository } from './network-metrics.repository';
 
 const LIVE_UPDATE_INTERVAL_MS = 4000;
@@ -18,6 +24,12 @@ interface BackendSnapshot {
 interface BackendSample {
   timestamp: string;
   latency_ms: number;
+}
+
+interface BackendAnomalyStatus {
+  status: 'calibrating' | 'active';
+  samples_collected: number;
+  samples_required: number;
 }
 
 @Injectable()
@@ -53,6 +65,18 @@ export class NetworkMetricsHttpRepository extends NetworkMetricsRepository {
       packet_loss_percent: measurement.packetLossPercent,
     };
     return this.http.post<BackendSnapshot>(this.baseUrl, body).pipe(map((snapshot) => this.toSnapshot(snapshot)));
+  }
+
+  getAnomalyStatus(householdId?: string): Observable<AnomalyDetectionStatus> {
+    return this.http
+      .get<BackendAnomalyStatus>(`${this.baseUrl}/anomaly-status`, { params: this.ownerParams(householdId) })
+      .pipe(
+        map((status) => ({
+          status: status.status,
+          samplesCollected: status.samples_collected,
+          samplesRequired: status.samples_required,
+        }))
+      );
   }
 
   // El backend por defecto scopea al usuario autenticado; user_id solo aplica
