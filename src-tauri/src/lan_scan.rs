@@ -15,6 +15,14 @@ const IPCONFIG_COMMAND: &str = "ipconfig";
 const IPV4_ADDRESS_LABELS: [&str; 2] = ["ipv4address", "direcciónipv4"];
 const SUBNET_MASK_LABELS: [&str; 2] = ["subnetmask", "máscaradesubred"];
 
+/// Palabras que delatan un adaptador virtual/túnel (WSL, Hyper-V, Docker, VPN,
+/// loopback) en el encabezado de su sección de `ipconfig`. Estos adaptadores
+/// casi siempre aparecen ANTES del adaptador físico real en la salida (ej.
+/// "vEthernet (WSL)" antes de "Wi-Fi"), y si se toma la primera IPv4 sin
+/// filtrar, el escaneo termina barriendo la subred virtual (172.20.x.x, etc.)
+/// en vez de la red real -- confirmado en vivo en esta misma máquina.
+const VIRTUAL_ADAPTER_MARKERS: [&str; 6] = ["virtual", "vethernet", "vpn", "tunel", "túnel", "loopback"];
+
 /// Comando nativo de Windows para leer la tabla ARP real del sistema.
 const ARP_COMMAND: &str = "arp";
 const ARP_ARGS: [&str; 1] = ["-a"];
@@ -25,9 +33,13 @@ const MULTICAST_MAC_PREFIX: &str = "01-00-5e";
 /// que el SO intente resolver la MAC por ARP (eso ocurre en la capa IP antes
 /// de enviar el paquete, responda o no el destino).
 const ARP_TRIGGER_TIMEOUT: Duration = Duration::from_millis(300);
-/// Límite de IPs a barrer: evita un escaneo desmedido si un adaptador (ej. VPN)
-/// reporta una máscara inusualmente amplia; una LAN doméstica (/24) nunca lo alcanza.
-const MAX_HOSTS_TO_SCAN: usize = 512;
+/// Límite de IPs a barrer: evita un escaneo desmedido si un adaptador reporta
+/// una máscara inusualmente amplia. Una LAN doméstica (/24, 254 hosts) nunca
+/// lo alcanza; 4096 cubre hasta un /20, que ya es una subred plana grande
+/// típica de una red corporativa/de campus. El barrido es concurrente (ver
+/// scan_connected_devices), así que subir este número no multiplica el
+/// tiempo del escaneo, solo su cobertura.
+const MAX_HOSTS_TO_SCAN: usize = 4096;
 
 /// Dispositivo descubierto por ARP: solo IP y MAC, el nombre casi nunca está
 /// disponible por este medio y no debe inventarse (queda a cargo del backend/UI).
@@ -98,13 +110,24 @@ fn local_ipv4_and_mask() -> Result<(Ipv4Addr, Ipv4Addr), String> {
     })
 }
 
-/// Busca el primer adaptador con una IPv4 real (no APIPA 169.254.x.x) y su
-/// máscara asociada. No asume nombre de adaptador ni rango: los deriva del
-/// propio texto de ipconfig.
+/// Busca el primer adaptador FÍSICO (no virtual/túnel) con una IPv4 real (no
+/// APIPA 169.254.x.x) y su máscara asociada. No asume nombre de adaptador ni
+/// rango: los deriva del propio texto de ipconfig, pero descarta secciones
+/// completas cuyo encabezado delate un adaptador virtual (ver VIRTUAL_ADAPTER_MARKERS).
 fn parse_local_ipv4_config(ipconfig_output: &str) -> Option<(Ipv4Addr, Ipv4Addr)> {
     let mut pending_ip: Option<Ipv4Addr> = None;
+    let mut in_virtual_adapter = false;
 
     for line in ipconfig_output.lines() {
+        if is_adapter_header(line) {
+            in_virtual_adapter = is_virtual_adapter_header(line);
+            pending_ip = None; // nueva sección: cualquier IP pendiente era de otro adaptador
+            continue;
+        }
+        if in_virtual_adapter {
+            continue;
+        }
+
         let Some((label, value)) = line.split_once(':') else { continue };
         let label = normalize_label(label);
         let value = value.trim();
@@ -121,6 +144,19 @@ fn parse_local_ipv4_config(ipconfig_output: &str) -> Option<(Ipv4Addr, Ipv4Addr)
     }
 
     None
+}
+
+/// Encabezado de sección de adaptador en `ipconfig`: no tiene sangría y no
+/// trae valor después de los dos puntos (a diferencia de una línea de campo
+/// como "   IPv4 Address. . . : 192.168.1.23"). Detectarlo por forma, no por
+/// palabra ("adapter"/"adaptador"), evita depender del idioma de Windows.
+fn is_adapter_header(line: &str) -> bool {
+    !line.is_empty() && !line.starts_with(char::is_whitespace) && line.trim_end().ends_with(':')
+}
+
+fn is_virtual_adapter_header(line: &str) -> bool {
+    let lower = line.to_lowercase();
+    VIRTUAL_ADAPTER_MARKERS.iter().any(|marker| lower.contains(marker))
 }
 
 fn normalize_label(label: &str) -> String {
@@ -274,6 +310,30 @@ Wireless LAN adapter Wi-Fi:
    Default Gateway . . . . . . . . . : 192.168.1.1
 ";
 
+    // Captura real de esta misma máquina: el adaptador virtual de WSL/Hyper-V
+    // aparece ANTES que el Wi-Fi real y sí tiene una IPv4 válida (no APIPA) --
+    // sin el filtro de adaptador virtual, esto haría que se escaneara
+    // 172.20.240.0/20 en vez de la red real.
+    const IPCONFIG_WITH_VIRTUAL_ADAPTER_FIRST: &str = "\
+Adaptador de Ethernet vEthernet (WSL (Hyper-V firewall)):
+
+   Sufijo DNS específico para la conexión. . :
+   Dirección IPv4. . . . . . . . . . . . . . : 172.20.240.1
+   Máscara de subred . . . . . . . . . . . . : 255.255.240.0
+   Puerta de enlace predeterminada. . . . . :
+
+Adaptador de LAN inalámbrica Conexión de área local* 1:
+
+   Estado de los medios. . . . . . . . . . . : medios desconectados
+
+Adaptador de LAN inalámbrica Wi-Fi:
+
+   Sufijo DNS específico para la conexión. . :
+   Dirección IPv4. . . . . . . . . . . . . . : 192.168.1.41
+   Máscara de subred . . . . . . . . . . . . : 255.255.255.0
+   Puerta de enlace predeterminada. . . . . : 192.168.1.1
+";
+
     const ARP_A_OUTPUT: &str = "\
 Interface: 192.168.1.23 --- 0xe
   Internet Address      Physical Address      Type
@@ -293,6 +353,12 @@ Interface: 192.168.1.23 --- 0xe
     fn parse_local_ipv4_config_supports_english_locale() {
         let expected = ("192.168.1.23".parse().unwrap(), "255.255.255.0".parse().unwrap());
         assert_eq!(parse_local_ipv4_config(IPCONFIG_EN), Some(expected));
+    }
+
+    #[test]
+    fn parse_local_ipv4_config_skips_virtual_adapters_listed_before_the_real_one() {
+        let expected = ("192.168.1.41".parse().unwrap(), "255.255.255.0".parse().unwrap());
+        assert_eq!(parse_local_ipv4_config(IPCONFIG_WITH_VIRTUAL_ADAPTER_FIRST), Some(expected));
     }
 
     #[test]
