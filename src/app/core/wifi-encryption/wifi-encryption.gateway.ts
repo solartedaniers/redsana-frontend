@@ -5,6 +5,9 @@
  * la API del backend).
  */
 export abstract class WifiEncryptionGateway {
+  /** false cuando el entorno (p. ej. navegador) no expone el cifrado; distingue "no se puede" de "falló la detección". */
+  abstract readonly isAvailable: boolean;
+
   /** null cuando la detección falla (sin WiFi, fuera de Tauri, netsh sin el campo esperado). */
   abstract detect(): Promise<string | null>;
 }

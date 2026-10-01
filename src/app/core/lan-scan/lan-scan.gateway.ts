@@ -7,6 +7,9 @@ import { DiscoveredDevice } from '../models/device.model';
  * sistema operativo, no con la API del backend.
  */
 export abstract class LanScanGateway {
+  /** false cuando el entorno (p. ej. navegador) no permite escanear la LAN; scan() rechaza con UnavailableInEnvironmentError. */
+  abstract readonly isAvailable: boolean;
+
   /**
    * A diferencia de WifiEncryptionGateway, un fallo aquí se propaga en vez de
    * resolver a una lista vacía: tratar un escaneo fallido como "no se

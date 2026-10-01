@@ -5,6 +5,8 @@ import { LanScanGateway } from './lan-scan.gateway';
 
 @Injectable()
 export class LanScanTauriGateway extends LanScanGateway {
+  readonly isAvailable = true;
+
   scan(): Promise<DiscoveredDevice[]> {
     return invoke<DiscoveredDevice[]>('scan_connected_devices');
   }
