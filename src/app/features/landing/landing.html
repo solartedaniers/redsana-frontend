@@ -1,0 +1,50 @@
+<div class="auth-split">
+  <aside class="side-panel">
+    <div>
+      <span class="side-panel-eyebrow">
+        <span class="dot"></span>
+        {{ 'landing.panel.eyebrow' | translate }}
+      </span>
+      <h1 class="side-panel-title">{{ 'landing.panel.title' | translate }}</h1>
+      <p class="side-panel-description">{{ 'landing.panel.description' | translate }}</p>
+
+      <div class="side-panel-features">
+        <div class="side-panel-feature">
+          <app-icon name="dashboard" />
+          <div>
+            <strong>{{ 'landing.panel.features.monitoring.title' | translate }}</strong>
+            <span>{{ 'landing.panel.features.monitoring.description' | translate }}</span>
+          </div>
+        </div>
+        <div class="side-panel-feature">
+          <app-icon name="warning" />
+          <div>
+            <strong>{{ 'landing.panel.features.anomalies.title' | translate }}</strong>
+            <span>{{ 'landing.panel.features.anomalies.description' | translate }}</span>
+          </div>
+        </div>
+        <div class="side-panel-feature">
+          <app-icon name="shield" />
+          <div>
+            <strong>{{ 'landing.panel.features.security.title' | translate }}</strong>
+            <span>{{ 'landing.panel.features.security.description' | translate }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <div class="form-panel auth-form">
+    <h2 class="form-title">{{ 'landing.title' | translate }}</h2>
+    <p class="form-subtitle">{{ 'landing.problem' | translate }}</p>
+    <p class="form-subtitle">{{ 'landing.solution' | translate }}</p>
+
+    <p class="credential-notice"><app-icon name="computer" />{{ 'landing.desktopNotice' | translate }}</p>
+
+    <a class="submit-button" routerLink="/auth/login">{{ 'landing.login' | translate }}</a>
+
+    <div class="form-links">
+      <a routerLink="/auth/register">{{ 'landing.register' | translate }}</a>
+    </div>
+  </div>
+</div>

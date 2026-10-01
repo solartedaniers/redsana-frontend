@@ -307,5 +307,32 @@
         "userNotFound": "Usuario no encontrado"
       }
     }
+  },
+  "landing": {
+    "panel": {
+      "eyebrow": "Diagnóstico de red doméstica",
+      "title": "Entiende qué le pasa a tu WiFi",
+      "description": "RedSana vigila tu conexión en segundo plano y te explica en palabras simples qué está fallando, sin conocimientos técnicos.",
+      "features": {
+        "monitoring": {
+          "title": "Mediciones reales",
+          "description": "Latencia, jitter y pérdida de paquetes medidos de verdad cada minuto."
+        },
+        "anomalies": {
+          "title": "Aprende lo normal de tu red",
+          "description": "Detecta degradaciones y cortes comparando con el comportamiento habitual de tu propia conexión."
+        },
+        "security": {
+          "title": "Seguridad guiada",
+          "description": "Un cuestionario sin jerga y un asistente que te dice qué arreglar primero en tu router."
+        }
+      }
+    },
+    "title": "¿Qué es RedSana?",
+    "problem": "Cuando el WiFi falla, casi nadie sabe si el problema es el router, un dispositivo saturando la red o el proveedor de internet.",
+    "solution": "RedSana mide tu red, detecta cuándo se sale de lo normal y te guía para mejorar la seguridad de tu router.",
+    "desktopNotice": "El escaneo de dispositivos y la auditoría del cifrado WiFi requieren la app de escritorio.",
+    "login": "Entrar",
+    "register": "¿No tienes cuenta? Regístrate"
   }
 }

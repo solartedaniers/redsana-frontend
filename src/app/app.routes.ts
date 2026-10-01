@@ -1,8 +1,16 @@
 import { Routes } from '@angular/router';
 import { authGuard } from './core/auth/auth.guard';
 import { roleGuard } from './core/auth/role.guard';
+import { webOnlyGuard } from './core/runtime/web-only.guard';
 
 export const routes: Routes = [
+  {
+    path: '',
+    pathMatch: 'full',
+    canMatch: [webOnlyGuard],
+    loadComponent: () => import('./layouts/auth-layout/auth-layout').then((m) => m.AuthLayout),
+    children: [{ path: '', loadComponent: () => import('./features/landing/landing').then((m) => m.Landing) }],
+  },
   {
     path: 'auth',
     loadComponent: () => import('./layouts/auth-layout/auth-layout').then((m) => m.AuthLayout),

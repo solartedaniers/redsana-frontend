@@ -1,4 +1,5 @@
-import { Injectable, inject } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
+import { Injectable, PLATFORM_ID, inject } from '@angular/core';
 import { EMPTY, catchError, from, interval, startWith, switchMap } from 'rxjs';
 import { NetworkMetricsRepository } from '../repositories/network-metrics.repository';
 import { NetworkMeasurementGateway } from './network-measurement.gateway';
@@ -20,8 +21,15 @@ const MEASUREMENT_INTERVAL_MS = 60000;
 export class NetworkMeasurementService {
   private readonly gateway = inject(NetworkMeasurementGateway);
   private readonly repository = inject(NetworkMetricsRepository);
+  private readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
 
   start(): void {
+    // Al prerenderizar no hay red que medir, y un interval vivo impediría que
+    // el prerender termine (la app nunca quedaría estable).
+    if (!this.isBrowser) {
+      return;
+    }
+
     interval(MEASUREMENT_INTERVAL_MS)
       .pipe(
         startWith(0),

@@ -1,5 +1,6 @@
 import { HttpClient } from '@angular/common/http';
-import { Injectable, inject, signal } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
+import { Injectable, PLATFORM_ID, inject, signal } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
 
 export type AppLanguage = 'en' | 'es';
@@ -17,6 +18,7 @@ const DEFAULT_LANGUAGE: AppLanguage = 'es';
 @Injectable({ providedIn: 'root' })
 export class I18nService {
   private readonly http = inject(HttpClient);
+  private readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
 
   readonly language = signal<AppLanguage>(this.readInitialLanguage());
   private readonly dictionary = signal<Record<string, unknown>>({});
@@ -27,7 +29,9 @@ export class I18nService {
     );
     this.dictionary.set(dict);
     this.language.set(lang);
-    localStorage.setItem(STORAGE_KEY, lang);
+    if (this.isBrowser) {
+      localStorage.setItem(STORAGE_KEY, lang);
+    }
   }
 
   translate(key: string, params?: Record<string, string | number>): string {
@@ -57,6 +61,11 @@ export class I18nService {
   }
 
   private readInitialLanguage(): AppLanguage {
+    // Al prerenderizar la landing (SSG) no hay localStorage ni navigator: se
+    // genera en el idioma por defecto y el navegador aplica la preferencia al arrancar.
+    if (!this.isBrowser) {
+      return DEFAULT_LANGUAGE;
+    }
     const stored = localStorage.getItem(STORAGE_KEY);
     if (SUPPORTED_LANGUAGES.includes(stored as AppLanguage)) {
       return stored as AppLanguage;

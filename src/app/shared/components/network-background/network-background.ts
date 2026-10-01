@@ -1,10 +1,10 @@
 import {
-  AfterViewInit,
   ChangeDetectionStrategy,
   Component,
   ElementRef,
   HostListener,
   OnDestroy,
+  afterNextRender,
   effect,
   inject,
   input,
@@ -39,7 +39,7 @@ interface NodeUserData {
   styleUrl: './network-background.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class NetworkBackground implements AfterViewInit, OnDestroy {
+export class NetworkBackground implements OnDestroy {
   readonly intensity = input<keyof typeof INTENSITY_PRESETS>('hero');
 
   private readonly theme = inject(ThemeService);
@@ -76,13 +76,14 @@ export class NetworkBackground implements AfterViewInit, OnDestroy {
         this.applyThemeColors();
       }
     });
-  }
-
-  ngAfterViewInit(): void {
-    this.buildScene();
-    this.ready = true;
-    this.applyThemeColors();
-    this.animate();
+    // afterNextRender y no ngAfterViewInit: WebGL solo existe en el navegador
+    // y este callback nunca se ejecuta al prerenderizar la landing.
+    afterNextRender(() => {
+      this.buildScene();
+      this.ready = true;
+      this.applyThemeColors();
+      this.animate();
+    });
   }
 
   ngOnDestroy(): void {

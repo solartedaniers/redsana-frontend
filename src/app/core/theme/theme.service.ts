@@ -1,4 +1,5 @@
-import { Injectable, effect, signal } from '@angular/core';
+import { DOCUMENT, isPlatformBrowser } from '@angular/common';
+import { Injectable, PLATFORM_ID, effect, inject, signal } from '@angular/core';
 
 export type ThemeMode = 'light' | 'dark';
 
@@ -6,14 +7,18 @@ const STORAGE_KEY = 'redsana-theme';
 
 @Injectable({ providedIn: 'root' })
 export class ThemeService {
+  private readonly document = inject(DOCUMENT);
+  private readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
   readonly mode = signal<ThemeMode>(this.readInitialMode());
 
   constructor() {
     // El effect aplica el atributo cada vez que `mode` cambia, incluyendo
     // el valor inicial leído de localStorage/preferencia del sistema.
     effect(() => {
-      document.documentElement.setAttribute('data-theme', this.mode());
-      localStorage.setItem(STORAGE_KEY, this.mode());
+      this.document.documentElement.setAttribute('data-theme', this.mode());
+      if (this.isBrowser) {
+        localStorage.setItem(STORAGE_KEY, this.mode());
+      }
     });
   }
 
@@ -26,6 +31,10 @@ export class ThemeService {
   }
 
   private readInitialMode(): ThemeMode {
+    // Prerender (SSG): sin preferencia del usuario disponible, se usa el default de marca.
+    if (!this.isBrowser) {
+      return 'dark';
+    }
     const stored = localStorage.getItem(STORAGE_KEY);
     if (stored === 'light' || stored === 'dark') {
       return stored;
