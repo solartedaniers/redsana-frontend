@@ -1,4 +1,5 @@
-// Copia este archivo a environment.ts (gitignorado) y completa con tus valores reales.
+// Copia este archivo a environment.ts (gitignorado) y completa con tus valores reales,
+// o define las variables de .env.example y `npm run build` lo genera solo.
 export const environment = {
   supabaseUrl: 'https://your-project.supabase.co',
   supabaseAnonKey: 'your-anon-key',
