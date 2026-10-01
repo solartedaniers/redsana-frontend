@@ -1,6 +1,8 @@
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import {
   ApplicationConfig,
+  Provider,
+  Type,
   inject,
   provideAppInitializer,
   provideBrowserGlobalErrorListeners,
@@ -29,13 +31,23 @@ import { UsersRepository } from './core/repositories/users.repository';
 import { UsersHttpRepository } from './core/repositories/users-http.repository';
 import { NetworkMeasurementGateway } from './core/network-measurement/network-measurement.gateway';
 import { NetworkMeasurementTauriGateway } from './core/network-measurement/network-measurement-tauri.gateway';
+import { NetworkMeasurementWebGateway } from './core/network-measurement/network-measurement-web.gateway';
 import { NetworkMeasurementService } from './core/network-measurement/network-measurement.service';
 import { WifiEncryptionGateway } from './core/wifi-encryption/wifi-encryption.gateway';
 import { WifiEncryptionTauriGateway } from './core/wifi-encryption/wifi-encryption-tauri.gateway';
+import { WifiEncryptionWebGateway } from './core/wifi-encryption/wifi-encryption-web.gateway';
 import { LanScanGateway } from './core/lan-scan/lan-scan.gateway';
 import { LanScanTauriGateway } from './core/lan-scan/lan-scan-tauri.gateway';
+import { LanScanWebGateway } from './core/lan-scan/lan-scan-web.gateway';
 import { AvatarStorageGateway } from './core/avatar-storage/avatar-storage.gateway';
 import { SupabaseAvatarStorageGateway } from './core/avatar-storage/avatar-storage-supabase.gateway';
+import { RuntimeEnvironmentService } from './core/runtime/runtime-environment.service';
+
+// Los gateways que hablan con el SO tienen una versión nativa (Tauri) y otra
+// de navegador; se elige aquí una sola vez para que ningún componente sepa cuál usa.
+function provideByRuntime<T>(token: abstract new () => T, desktop: Type<T>, web: Type<T>): Provider {
+  return { provide: token, useFactory: () => new (inject(RuntimeEnvironmentService).isDesktop ? desktop : web)() };
+}
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -55,9 +67,9 @@ export const appConfig: ApplicationConfig = {
     { provide: AdminMetricsRepository, useClass: AdminMetricsHttpRepository },
     { provide: NetworkSupervisionRepository, useClass: NetworkSupervisionHttpRepository },
     { provide: UsersRepository, useClass: UsersHttpRepository },
-    { provide: NetworkMeasurementGateway, useClass: NetworkMeasurementTauriGateway },
-    { provide: WifiEncryptionGateway, useClass: WifiEncryptionTauriGateway },
-    { provide: LanScanGateway, useClass: LanScanTauriGateway },
+    provideByRuntime(NetworkMeasurementGateway, NetworkMeasurementTauriGateway, NetworkMeasurementWebGateway),
+    provideByRuntime(WifiEncryptionGateway, WifiEncryptionTauriGateway, WifiEncryptionWebGateway),
+    provideByRuntime(LanScanGateway, LanScanTauriGateway, LanScanWebGateway),
     { provide: AvatarStorageGateway, useClass: SupabaseAvatarStorageGateway },
 
     // Carga idioma y restaura sesión antes de renderizar: evita parpadeo de
