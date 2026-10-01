@@ -37,7 +37,7 @@
     <section class="questions-panel surface-panel">
       <div class="question wifi-encryption-info">
         <p>{{ 'user.securityAssistant.wifiEncryption.label' | translate }}</p>
-        <span class="status-badge">{{ ('user.securityAssistant.wifiEncryption.' + wifiEncryptionStatus()) | translate }}</span>
+        <span class="status-badge">{{ ('user.securityAssistant.wifiEncryption.' + (isWifiDetectionAvailable ? wifiEncryptionStatus() : 'desktopOnly')) | translate }}</span>
       </div>
 
     @for (question of questions(); track question.id) {

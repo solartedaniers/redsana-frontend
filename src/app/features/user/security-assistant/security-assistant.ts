@@ -34,6 +34,7 @@ export class SecurityAssistant {
   protected readonly isSubmitting = signal(false);
   protected readonly isLoadingLatest = signal(true);
   protected readonly wifiEncryptionRaw = signal<string | null>(null);
+  protected readonly isWifiDetectionAvailable = this.wifiGateway.isAvailable;
 
   protected readonly chatMessages = signal<ChatMessage[]>([]);
   protected readonly chatDraft = signal('');

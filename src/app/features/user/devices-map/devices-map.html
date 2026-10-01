@@ -4,12 +4,14 @@
 </section>
 
 <div class="scan-bar">
-  <button type="button" class="scan-button" (click)="scan()" [disabled]="isScanning()">
+  <button type="button" class="scan-button" (click)="scan()" [disabled]="isScanning() || !isScanAvailable">
     <app-icon name="shield" />
     {{ (isScanning() ? 'user.devicesMap.scanning' : 'user.devicesMap.scan') | translate }}
   </button>
 
-  @if (scanFailed()) {
+  @if (!isScanAvailable) {
+    <p class="scan-result warning">{{ 'user.devicesMap.scanDesktopOnly' | translate }}</p>
+  } @else if (scanFailed()) {
     <p class="scan-result error">{{ 'user.devicesMap.scanError' | translate }}</p>
   } @else if (lastScanFindings(); as findings) {
     @if (findings.length === 0) {

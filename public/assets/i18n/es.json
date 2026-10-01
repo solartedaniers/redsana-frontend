@@ -145,7 +145,8 @@
         "label": "Cifrado de tu WiFi (detectado automáticamente)",
         "secure": "Seguro",
         "weak": "Débil",
-        "unknown": "No se pudo detectar"
+        "unknown": "No se pudo detectar",
+        "desktopOnly": "Requiere la app de escritorio"
       },
       "yes": "Sí",
       "no": "No",
@@ -246,7 +247,8 @@
       "unknownDevice": "Dispositivo desconocido",
       "online": "En línea",
       "offline": "Desconectado",
-      "scanError": "No se pudo completar el escaneo. Intenta de nuevo."
+      "scanError": "No se pudo completar el escaneo. Intenta de nuevo.",
+      "scanDesktopOnly": "El escaneo de dispositivos requiere la app de escritorio de RedSana: los navegadores no permiten ver los equipos conectados a tu red."
     }
   },
   "admin": {

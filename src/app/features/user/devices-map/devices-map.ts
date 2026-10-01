@@ -25,6 +25,7 @@ export class DevicesMap {
   private readonly repository = inject(DevicesRepository);
   private readonly lanScanGateway = inject(LanScanGateway);
 
+  protected readonly isScanAvailable = this.lanScanGateway.isAvailable;
   protected readonly devices = signal<NetworkDevice[]>([]);
   protected readonly isScanning = signal(false);
   protected readonly lastScanFindings = signal<NetworkDevice[] | null>(null);

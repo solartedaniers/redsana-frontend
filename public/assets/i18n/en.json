@@ -145,7 +145,8 @@
         "label": "Your WiFi encryption (auto-detected)",
         "secure": "Secure",
         "weak": "Weak",
-        "unknown": "Could not detect"
+        "unknown": "Could not detect",
+        "desktopOnly": "Requires the desktop app"
       },
       "yes": "Yes",
       "no": "No",
@@ -246,7 +247,8 @@
       "unknownDevice": "Unknown device",
       "online": "Online",
       "offline": "Offline",
-      "scanError": "The scan could not be completed. Try again."
+      "scanError": "The scan could not be completed. Try again.",
+      "scanDesktopOnly": "Device scanning requires the RedSana desktop app: browsers do not allow seeing the devices connected to your network."
     }
   },
   "admin": {
