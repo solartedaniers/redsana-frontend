@@ -5,10 +5,12 @@ import {
   Type,
   inject,
   provideAppInitializer,
+  isDevMode,
   provideBrowserGlobalErrorListeners,
 } from '@angular/core';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import { provideRouter } from '@angular/router';
+import { SwRegistrationOptions, provideServiceWorker } from '@angular/service-worker';
 import { routes } from './app.routes';
 import { I18nService } from './core/i18n/i18n.service';
 import { AuthRepository } from './core/auth/auth.repository';
@@ -78,5 +80,16 @@ export const appConfig: ApplicationConfig = {
     provideAppInitializer(() => inject(AuthService).restoreSession()),
     // start() dispara su propio ciclo periódico en segundo plano; no hay nada que esperar aquí.
     provideAppInitializer(() => inject(NetworkMeasurementService).start()),
+
+    // En Tauri los archivos ya vienen empaquetados en el instalable: un service
+    // worker solo agregaría una caché duplicada que puede servir versiones viejas.
+    provideServiceWorker('ngsw-worker.js'),
+    {
+      provide: SwRegistrationOptions,
+      useFactory: () => ({
+        enabled: !isDevMode() && !inject(RuntimeEnvironmentService).isDesktop,
+        registrationStrategy: 'registerWhenStable:30000',
+      }),
+    },
   ],
 };
