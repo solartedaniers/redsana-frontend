@@ -13,6 +13,10 @@ export interface NetworkMetricSample {
   latencyMs: number;
 }
 
+/** Debe coincidir con MeasurementSource del backend: el detector de anomalías
+ * nunca mezcla fuentes porque la latencia HTTP (web) no es comparable con el ping ICMP (native). */
+export type MeasurementSource = 'native' | 'web';
+
 /** Medición real de calidad de red producida por el comando Tauri measure_network_quality. */
 export interface NetworkQualityMeasurement {
   latencyMs: number;

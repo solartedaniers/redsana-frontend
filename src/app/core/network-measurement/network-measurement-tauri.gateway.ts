@@ -7,6 +7,8 @@ import { NetworkMeasurementGateway } from './network-measurement.gateway';
 // por lo que measure() no necesita mapear nombres de campo.
 @Injectable()
 export class NetworkMeasurementTauriGateway extends NetworkMeasurementGateway {
+  readonly source = 'native';
+
   measure(): Promise<NetworkQualityMeasurement> {
     return invoke<NetworkQualityMeasurement>('measure_network_quality');
   }

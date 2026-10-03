@@ -18,6 +18,7 @@ const SAMPLE_TIMEOUT_MS = 1000;
  */
 @Injectable()
 export class NetworkMeasurementWebGateway extends NetworkMeasurementGateway {
+  readonly source = 'web';
   private readonly probeUrl = `${environment.apiBaseUrl}/api/health`;
 
   async measure(): Promise<NetworkQualityMeasurement> {

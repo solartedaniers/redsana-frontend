@@ -1,4 +1,4 @@
-import { NetworkQualityMeasurement } from '../models/network.model';
+import { MeasurementSource, NetworkQualityMeasurement } from '../models/network.model';
 
 /**
  * Fuente de la medición real de red. Hoy la resuelve el comando Tauri
@@ -7,5 +7,8 @@ import { NetworkQualityMeasurement } from '../models/network.model';
  * esto habla con el sistema operativo, no con la API.
  */
 export abstract class NetworkMeasurementGateway {
+  /** Etiqueta con la que se persiste cada medición de esta implementación. */
+  abstract readonly source: MeasurementSource;
+
   abstract measure(): Promise<NetworkQualityMeasurement>;
 }

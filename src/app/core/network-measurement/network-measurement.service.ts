@@ -40,7 +40,7 @@ export class NetworkMeasurementService {
 
   private runCycle() {
     return from(this.gateway.measure()).pipe(
-      switchMap((measurement) => this.repository.record(measurement)),
+      switchMap((measurement) => this.repository.record(measurement, this.gateway.source)),
       catchError((error) => {
         console.error('No se pudo registrar la medición de red', error);
         return EMPTY;

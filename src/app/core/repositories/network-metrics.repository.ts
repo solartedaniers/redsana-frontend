@@ -1,6 +1,7 @@
 import { Observable } from 'rxjs';
 import {
   AnomalyDetectionStatus,
+  MeasurementSource,
   NetworkMetricSample,
   NetworkMetricSnapshot,
   NetworkQualityMeasurement,
@@ -15,6 +16,6 @@ export abstract class NetworkMetricsRepository {
   abstract watchSnapshot(householdId?: string): Observable<NetworkMetricSnapshot>;
   abstract getHistory(householdId?: string): Observable<NetworkMetricSample[]>;
   /** Persiste una medición real propia del usuario autenticado. */
-  abstract record(measurement: NetworkQualityMeasurement): Observable<NetworkMetricSnapshot>;
+  abstract record(measurement: NetworkQualityMeasurement, source: MeasurementSource): Observable<NetworkMetricSnapshot>;
   abstract getAnomalyStatus(householdId?: string): Observable<AnomalyDetectionStatus>;
 }
