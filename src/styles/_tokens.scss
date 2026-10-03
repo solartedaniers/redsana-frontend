@@ -4,9 +4,7 @@
 //
 // El bloque @theme registra la paleta oscura como valor por defecto y hace que
 // Tailwind genere utilidades a partir de cada variable (bg-accent, text-status-danger, etc).
-// static: Tailwind solo ve la hoja global y podaría las variables que se usan
-// únicamente en el SCSS de los componentes (p. ej. --font-size-metric).
-@theme static {
+@theme {
   --color-bg-app: #07090e;
   --color-bg-surface: #0b0f17;
   --color-bg-surface-alt: #111724;
