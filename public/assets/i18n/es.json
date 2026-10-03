@@ -333,6 +333,8 @@
     "solution": "RedSana mide tu red, detecta cuándo se sale de lo normal y te guía para mejorar la seguridad de tu router.",
     "desktopNotice": "El escaneo de dispositivos y la auditoría del cifrado WiFi requieren la app de escritorio.",
     "login": "Entrar",
-    "register": "¿No tienes cuenta? Regístrate"
+    "register": "¿No tienes cuenta? Regístrate",
+    "download": "Descargar para Windows",
+    "downloadPlatformNotice": "Por ahora el instalador solo está disponible para Windows (64 bits)."
   }
 }

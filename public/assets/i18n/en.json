@@ -333,6 +333,8 @@
     "solution": "RedSana measures your network, detects when it drifts from normal, and guides you to improve your router's security.",
     "desktopNotice": "Device scanning and WiFi encryption auditing require the desktop app.",
     "login": "Sign in",
-    "register": "Don't have an account? Sign up"
+    "register": "Don't have an account? Sign up",
+    "download": "Download for Windows",
+    "downloadPlatformNotice": "For now the installer is only available for Windows (64-bit)."
   }
 }

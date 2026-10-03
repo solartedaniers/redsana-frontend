@@ -41,6 +41,11 @@
 
     <p class="credential-notice"><app-icon name="computer" />{{ 'landing.desktopNotice' | translate }}</p>
 
+    @if (!isDesktop) {
+      <a class="submit-button" [href]="desktopDownloadUrl">{{ 'landing.download' | translate }}</a>
+      <p class="form-subtitle">{{ 'landing.downloadPlatformNotice' | translate }}</p>
+    }
+
     <a class="submit-button" routerLink="/auth/login">{{ 'landing.login' | translate }}</a>
 
     <div class="form-links">
