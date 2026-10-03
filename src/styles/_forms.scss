@@ -136,12 +136,31 @@
 
 // Layout de dos columnas para login/registro: panel informativo + panel de
 // formulario. `.auth-card` detecta esta clase vía :has() para ensancharse.
+// Espaciado vertical de las pantallas de auth: se compacta con la altura de la
+// ventana (no con el ancho) para que quepan sin scroll en laptops y en Tauri.
 .auth-split {
+  --auth-panel-padding: clamp(1rem, 3.6vh, 1.7rem);
+  --auth-stack-gap: clamp(0.45rem, 1.6vh, 0.75rem);
+
   display: grid;
   grid-template-columns: 1fr;
 
+  // Ventanas muy bajas (p. ej. la ventana por defecto de Tauri, 800x600): se
+  // juntan también los campos del formulario; en pantallas normales no cambia nada.
+  @media (max-height: 40rem) {
+    .auth-form {
+      gap: 0.5rem;
+    }
+
+    .field {
+      gap: 0.35rem;
+    }
+  }
+
   @media (min-width: 48rem) {
-    grid-template-columns: 5fr 7fr;
+    // minmax(0, …): sin esto el contenido mínimo de los inputs ensanchaba la
+    // columna del formulario y se salía de la tarjeta (registro recortado).
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
   }
 }
 
@@ -149,7 +168,7 @@
   display: none;
   flex-direction: column;
   justify-content: space-between;
-  padding: 1.7rem;
+  padding: var(--auth-panel-padding);
   border-right: 1px solid var(--color-glass-border);
   background: color-mix(in srgb, var(--color-bg-app) 70%, transparent);
 
@@ -195,8 +214,8 @@
 .side-panel-features {
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
-  margin-top: 1.1rem;
+  gap: var(--auth-stack-gap);
+  margin-top: var(--auth-stack-gap);
 }
 
 .side-panel-feature {
@@ -268,16 +287,22 @@
 }
 
 .form-panel {
-  padding: 1.7rem;
+  padding: var(--auth-panel-padding);
 }
 
 .field-row {
   display: grid;
   grid-template-columns: 1fr;
   gap: 1.1rem;
+  // Si una etiqueta ocupa dos líneas, los inputs siguen alineados entre sí.
+  align-items: end;
 
   @media (min-width: 28rem) {
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+
+  > .field {
+    min-width: 0;
   }
 }
 
