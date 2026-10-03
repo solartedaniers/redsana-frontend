@@ -5,17 +5,23 @@
     <h2>{{ 'auth.profile.infoTitle' | translate }}</h2>
 
     <div class="avatar-row">
-      <span class="avatar-preview">
+      <button
+        type="button"
+        class="avatar-preview"
+        (click)="avatarInput.click()"
+        [disabled]="isUploadingAvatar()"
+        [attr.aria-label]="'auth.profile.changeAvatar' | translate"
+      >
         @if (auth.currentUser()?.avatarUrl; as avatarUrl) {
           <img [src]="avatarUrl" [alt]="auth.currentUser()?.fullName ?? ''" />
         } @else {
           <app-icon name="user" />
         }
-      </span>
+      </button>
       <div class="avatar-controls">
         <label class="submit-button avatar-upload-button">
           {{ (isUploadingAvatar() ? 'common.loading' : 'auth.profile.changeAvatar') | translate }}
-          <input type="file" accept="image/*" (change)="onAvatarSelected($event)" [disabled]="isUploadingAvatar()" hidden />
+          <input #avatarInput type="file" accept="image/*" (change)="onAvatarSelected($event)" [disabled]="isUploadingAvatar()" hidden />
         </label>
         @if (avatarErrorKey()) {
           <p class="form-error">{{ avatarErrorKey() | translate }}</p>

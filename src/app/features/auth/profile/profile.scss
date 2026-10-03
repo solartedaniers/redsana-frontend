@@ -54,6 +54,26 @@
   }
 }
 
+// Segundo punto de entrada al mismo input de "Cambiar foto".
+button.avatar-preview {
+  padding: 0;
+  cursor: pointer;
+  transition: border-color var(--motion-duration-fast) var(--motion-easing-standard);
+
+  &:hover:not(:disabled) {
+    border-color: var(--color-accent);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--color-focus-ring);
+    outline-offset: 2px;
+  }
+
+  &:disabled {
+    cursor: progress;
+  }
+}
+
 .avatar-controls {
   display: flex;
   flex-direction: column;
