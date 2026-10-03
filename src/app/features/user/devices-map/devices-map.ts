@@ -1,5 +1,5 @@
 import { DatePipe } from '@angular/common';
-import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { DevicesRepository } from '../../../core/repositories/devices.repository';
 import { LanScanGateway } from '../../../core/lan-scan/lan-scan.gateway';
 import { DeviceTrust, NetworkDevice } from '../../../core/models/device.model';
@@ -27,6 +27,10 @@ export class DevicesMap {
 
   protected readonly isScanAvailable = this.lanScanGateway.isAvailable;
   protected readonly devices = signal<NetworkDevice[]>([]);
+  // El backend guarda todo el historial del usuario (incluidas otras redes en
+  // las que escaneó alguna vez); la pantalla muestra solo lo que vio el escaneo
+  // más reciente, que es lo que está conectado ahora (is_online lo calcula el backend).
+  protected readonly connectedDevices = computed(() => this.devices().filter((device) => device.isOnline));
   protected readonly isScanning = signal(false);
   protected readonly lastScanFindings = signal<NetworkDevice[] | null>(null);
   protected readonly scanFailed = signal(false);
@@ -34,6 +38,11 @@ export class DevicesMap {
 
   constructor() {
     this.repository.getDevices().subscribe((devices) => this.devices.set(devices));
+    // Donde se puede escanear (escritorio), se escanea al entrar: así la lista
+    // refleja la red actual aunque el último escaneo guardado sea de otra red.
+    if (this.isScanAvailable) {
+      void this.scan();
+    }
   }
 
   protected async scan(): Promise<void> {
@@ -49,7 +58,7 @@ export class DevicesMap {
         next: (devices) => {
           this.isScanning.set(false);
           this.devices.set(devices);
-          this.lastScanFindings.set(devices.filter((device) => device.trust !== 'trusted'));
+          this.lastScanFindings.set(devices.filter((device) => device.isOnline && device.trust !== 'trusted'));
         },
         error: (error) => {
           // La causa real (ej. fallo de sincronización con el backend) queda en

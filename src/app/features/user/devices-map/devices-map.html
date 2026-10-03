@@ -1,6 +1,6 @@
 <section class="devices-hero surface-panel">
   <app-page-header titleKey="user.devicesMap.title" subtitleKey="user.devicesMap.subtitle" />
-  <span class="status-badge">{{ devices().length }}</span>
+  <span class="status-badge">{{ connectedDevices().length }}</span>
 </section>
 
 <div class="scan-bar">
@@ -25,9 +25,9 @@
 </div>
 
 <div class="devices-workspace workspace-grid workspace-grid--two">
-  <section class="topology surface-panel" [class.topology--scanning]="isScanning()"><div class="topology__hub"><app-icon name="devices" /></div>@for (device of devices(); track device.id) { <span class="topology__node" [attr.data-trust]="device.trust"></span> }</section>
+  <section class="topology surface-panel" [class.topology--scanning]="isScanning()"><div class="topology__hub"><app-icon name="devices" /></div>@for (device of connectedDevices(); track device.id) { <span class="topology__node" [attr.data-trust]="device.trust"></span> }</section>
   <div class="devices-list surface-panel">
-  @for (device of devices(); track device.id) {
+  @for (device of connectedDevices(); track device.id) {
     <article class="device-card" [attr.data-trust]="device.trust">
       <div class="device-card__row">
         <app-icon class="device-kind-icon" [name]="deviceIcon(device)" />
