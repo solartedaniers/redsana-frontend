@@ -4,14 +4,16 @@
     <app-language-toggle />
     <app-theme-toggle />
     @if (auth.currentUser(); as user) {
-      <span class="user-avatar">
-        @if (user.avatarUrl) {
-          <img [src]="user.avatarUrl" [alt]="user.fullName" />
-        } @else {
-          <app-icon name="user" />
-        }
-      </span>
-      <span class="user-name">{{ user.fullName }}</span>
+      <a class="user-chip" routerLink="/account/profile" [attr.aria-label]="'auth.profile.title' | translate">
+        <span class="user-avatar">
+          @if (user.avatarUrl) {
+            <img [src]="user.avatarUrl" [alt]="user.fullName" />
+          } @else {
+            <app-icon name="user" />
+          }
+        </span>
+        <span class="user-name">{{ user.fullName }}</span>
+      </a>
     }
     <button
       type="button"
