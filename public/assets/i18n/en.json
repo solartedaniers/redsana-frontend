@@ -70,7 +70,6 @@
         "eyebrow": "New account",
         "title": "Join RedSana",
         "description": "Create your account to start monitoring your home network's health and security in minutes.",
-        "hasAccount": "Already have an account?",
         "features": {
           "monitoring": {
             "title": "Full visibility",
@@ -311,30 +310,26 @@
   "landing": {
     "panel": {
       "eyebrow": "Home network diagnostics",
-      "title": "Understand what is wrong with your WiFi",
-      "description": "RedSana watches your connection in the background and explains in plain words what is failing, no technical knowledge needed.",
+      "title": "Understand what is happening with your WiFi",
+      "description": "RedSana watches your network and tells you, in plain words, what is going on with it.",
       "features": {
         "monitoring": {
           "title": "Real measurements",
-          "description": "Latency, jitter and packet loss actually measured every minute."
+          "description": "Know the real quality of your connection: latency, stability and packet loss, measured every minute."
         },
         "anomalies": {
           "title": "Learns your network's normal",
-          "description": "Detects degradations and outages by comparing with your own connection's usual behavior."
+          "description": "Learns how your own network behaves and alerts you as soon as it degrades or drops."
         },
         "security": {
           "title": "Guided security",
-          "description": "A jargon-free questionnaire and an assistant that tells you what to fix first on your router."
+          "description": "Assesses your router's security and tells you, in order of priority, what to fix first."
         }
       }
     },
-    "title": "What is RedSana?",
-    "problem": "When WiFi fails, almost nobody knows whether the problem is the router, a device saturating the network, or the internet provider.",
-    "solution": "RedSana measures your network, detects when it drifts from normal, and guides you to improve your router's security.",
     "desktopNotice": "Device scanning and WiFi encryption auditing require the desktop app.",
     "login": "Sign in",
     "register": "Don't have an account? Sign up",
-    "download": "Download for Windows",
-    "downloadPlatformNotice": "For now the installer is only available for Windows (64-bit)."
+    "download": "Download for Windows (64-bit)"
   }
 }

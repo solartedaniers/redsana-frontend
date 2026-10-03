@@ -35,15 +35,10 @@
   </aside>
 
   <div class="form-panel auth-form">
-    <h2 class="form-title">{{ 'landing.title' | translate }}</h2>
-    <p class="form-subtitle">{{ 'landing.problem' | translate }}</p>
-    <p class="form-subtitle">{{ 'landing.solution' | translate }}</p>
-
     <p class="credential-notice"><app-icon name="computer" />{{ 'landing.desktopNotice' | translate }}</p>
 
     @if (!isDesktop) {
       <a class="submit-button" [href]="desktopDownloadUrl">{{ 'landing.download' | translate }}</a>
-      <p class="form-subtitle">{{ 'landing.downloadPlatformNotice' | translate }}</p>
     }
 
     <a class="submit-button" routerLink="/auth/login">{{ 'landing.login' | translate }}</a>

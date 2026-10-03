@@ -1,4 +1,17 @@
 // .submit-button está pensado para <button>; como enlace solo le falta esto.
+// La landing no tiene formulario: el panel informativo es el protagonista y
+// toma la columna ancha, así sus textos no se parten en tantas líneas.
+.auth-split {
+  @media (min-width: 48rem) {
+    grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+  }
+}
+
+// Sin el bloque de texto, las acciones se centran verticalmente junto al panel lateral.
+.form-panel {
+  justify-content: center;
+}
+
 a.submit-button {
   text-align: center;
   text-decoration: none;
