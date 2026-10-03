@@ -327,7 +327,7 @@
         }
       }
     },
-    "desktopNotice": "Device scanning and WiFi encryption auditing require the desktop app.",
+    "desktopNotice": "For advanced features like network scanning and WiFi security, download the desktop version.",
     "login": "Sign in",
     "register": "Don't have an account? Sign up",
     "download": "Download for Windows (64-bit)"
