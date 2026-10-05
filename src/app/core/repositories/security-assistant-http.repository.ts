@@ -10,6 +10,7 @@ import {
   SecurityAssessmentResult,
   SecurityQuestion,
   SecurityRecommendation,
+  TechnicalEvidence,
 } from '../models/security.model';
 import { SecurityAssistantRepository } from './security-assistant.repository';
 
@@ -31,6 +32,9 @@ interface BackendRecommendation {
 
 interface BackendAssessment {
   score: number;
+  questionnaire_score: number;
+  technical_score: number | null;
+  is_partial: boolean;
   recommendations: BackendRecommendation[];
   submitted_at: string;
 }
@@ -58,10 +62,15 @@ export class SecurityAssistantHttpRepository extends SecurityAssistantRepository
     return of(QUESTIONS);
   }
 
-  submitAnswers(answers: SecurityAnswers, wifiEncryptionRaw: string | null): Observable<SecurityAssessmentResult> {
-    const body: { answers: Record<string, SecurityAnswerValue>; wifi_encryption_raw: string | null } = {
+  submitAnswers(answers: SecurityAnswers, evidence: TechnicalEvidence): Observable<SecurityAssessmentResult> {
+    const body: {
+      answers: Record<string, SecurityAnswerValue>;
+      wifi_encryption_raw: string | null;
+      router_open_ports: number[] | null;
+    } = {
       answers,
-      wifi_encryption_raw: wifiEncryptionRaw,
+      wifi_encryption_raw: evidence.wifiEncryptionRaw,
+      router_open_ports: evidence.routerOpenPorts,
     };
     return this.http.post<BackendAssessment>(this.baseUrl, body).pipe(map((assessment) => this.toResult(assessment)));
   }
@@ -107,6 +116,9 @@ export class SecurityAssistantHttpRepository extends SecurityAssistantRepository
   private toResult(assessment: BackendAssessment): SecurityAssessmentResult {
     return {
       score: assessment.score,
+      questionnaireScore: assessment.questionnaire_score,
+      technicalScore: assessment.technical_score,
+      isPartial: assessment.is_partial,
       recommendations: assessment.recommendations.map((r) => this.toRecommendation(r)),
       submittedAt: assessment.submitted_at,
     };

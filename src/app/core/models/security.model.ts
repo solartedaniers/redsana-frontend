@@ -15,6 +15,10 @@ export interface SecurityRecommendation {
 
 export interface SecurityAssessmentResult {
   score: number;
+  questionnaireScore: number;
+  /** null cuando no hubo análisis técnico (p. ej. desde la web): el puntaje es parcial. */
+  technicalScore: number | null;
+  isPartial: boolean;
   recommendations: SecurityRecommendation[];
   submittedAt: string;
 }
@@ -35,4 +39,10 @@ export interface ChatConversationSummary {
   /** null hasta el primer mensaje (el backend autogenera el título); ver historial. */
   title: string | null;
   updatedAt: string;
+}
+
+/** Lo que la app midió de la red real; null en un campo = no se pudo medir aquí. */
+export interface TechnicalEvidence {
+  wifiEncryptionRaw: string | null;
+  routerOpenPorts: number[] | null;
 }

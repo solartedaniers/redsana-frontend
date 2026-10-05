@@ -5,11 +5,12 @@ import {
   SecurityAnswers,
   SecurityAssessmentResult,
   SecurityQuestion,
+  TechnicalEvidence,
 } from '../models/security.model';
 
 export abstract class SecurityAssistantRepository {
   abstract getQuestionnaire(): Observable<SecurityQuestion[]>;
-  abstract submitAnswers(answers: SecurityAnswers, wifiEncryptionRaw: string | null): Observable<SecurityAssessmentResult>;
+  abstract submitAnswers(answers: SecurityAnswers, evidence: TechnicalEvidence): Observable<SecurityAssessmentResult>;
   /** null cuando el usuario nunca ha enviado el cuestionario. */
   abstract getLatest(): Observable<SecurityAssessmentResult | null>;
 
