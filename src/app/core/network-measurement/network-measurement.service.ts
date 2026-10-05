@@ -1,6 +1,8 @@
 import { isPlatformBrowser } from '@angular/common';
 import { Injectable, PLATFORM_ID, inject } from '@angular/core';
+import { toObservable } from '@angular/core/rxjs-interop';
 import { EMPTY, catchError, from, interval, startWith, switchMap } from 'rxjs';
+import { AuthService } from '../auth/auth.service';
 import { NetworkMetricsRepository } from '../repositories/network-metrics.repository';
 import { NetworkMeasurementGateway } from './network-measurement.gateway';
 
@@ -22,6 +24,10 @@ export class NetworkMeasurementService {
   private readonly gateway = inject(NetworkMeasurementGateway);
   private readonly repository = inject(NetworkMetricsRepository);
   private readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
+  // Las mediciones se guardan a nombre del usuario: sin sesión no hay a quién
+  // atribuirlas (el backend responde 401) y en la landing pública solo serían
+  // tráfico inútil de cada visitante anónimo.
+  private readonly isAuthenticated$ = toObservable(inject(AuthService).isAuthenticated);
 
   start(): void {
     // Al prerenderizar no hay red que medir, y un interval vivo impediría que
@@ -30,9 +36,12 @@ export class NetworkMeasurementService {
       return;
     }
 
-    interval(MEASUREMENT_INTERVAL_MS)
+    this.isAuthenticated$
       .pipe(
-        startWith(0),
+        // Al iniciar sesión mide de inmediato; al cerrarla, switchMap corta el ciclo.
+        switchMap((isAuthenticated) =>
+          isAuthenticated ? interval(MEASUREMENT_INTERVAL_MS).pipe(startWith(0)) : EMPTY
+        ),
         switchMap(() => this.runCycle())
       )
       .subscribe();
