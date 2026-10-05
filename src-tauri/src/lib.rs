@@ -1,5 +1,7 @@
+mod console_command;
 mod lan_scan;
 mod ping;
+mod router_ports;
 mod wifi;
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
@@ -19,7 +21,8 @@ pub fn run() {
       ping::measure_latency,
       ping::measure_network_quality,
       wifi::get_wifi_encryption,
-      lan_scan::scan_connected_devices
+      lan_scan::scan_connected_devices,
+      router_ports::scan_router_open_ports
     ])
     .run(tauri::generate_context!())
     .expect("error while running tauri application");

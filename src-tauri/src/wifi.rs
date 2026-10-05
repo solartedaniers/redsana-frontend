@@ -1,4 +1,4 @@
-use std::process::Command;
+use crate::console_command::hidden_console_command;
 
 /// Comando y argumentos nativos de Windows para consultar la interfaz WiFi activa.
 const NETSH_COMMAND: &str = "netsh";
@@ -19,7 +19,7 @@ pub async fn get_wifi_encryption() -> Result<String, String> {
 }
 
 fn run_netsh_show_interfaces() -> Result<String, String> {
-    let output = Command::new(NETSH_COMMAND)
+    let output = hidden_console_command(NETSH_COMMAND)
         .args(NETSH_SHOW_INTERFACES_ARGS)
         .output()
         .map_err(|e| format!("no se pudo lanzar netsh: {e}"))?;

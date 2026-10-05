@@ -1,5 +1,5 @@
 use std::net::{IpAddr, Ipv4Addr};
-use std::process::Command;
+use crate::console_command::hidden_console_command;
 use std::time::Duration;
 
 use serde::Serialize;
@@ -92,7 +92,7 @@ pub async fn scan_connected_devices() -> Result<Vec<DiscoveredDevice>, String> {
 }
 
 fn local_ipv4_and_mask() -> Result<(Ipv4Addr, Ipv4Addr), String> {
-    let output = Command::new(IPCONFIG_COMMAND)
+    let output = hidden_console_command(IPCONFIG_COMMAND)
         .output()
         .map_err(|e| format!("no se pudo lanzar ipconfig: {e}"))?;
 
@@ -194,7 +194,7 @@ async fn trigger_arp_resolution(client: &Client, ip: Ipv4Addr, sequence: u16) {
 }
 
 fn run_arp_a() -> Result<String, String> {
-    let output = Command::new(ARP_COMMAND).args(ARP_ARGS).output().map_err(|e| format!("no se pudo lanzar arp: {e}"))?;
+    let output = hidden_console_command(ARP_COMMAND).args(ARP_ARGS).output().map_err(|e| format!("no se pudo lanzar arp: {e}"))?;
 
     if !output.status.success() {
         return Err(format!(
