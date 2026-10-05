@@ -19,6 +19,9 @@ export class SupabaseAvatarStorageGateway extends AvatarStorageGateway {
     ).pipe(
       switchMap(({ error }) => {
         if (error) {
+          // La UI solo muestra el mensaje genérico; la causa real (p. ej. una
+          // política RLS de Storage) queda en consola para poder diagnosticarla.
+          console.error('[AvatarStorage] Supabase Storage rechazó la subida', error);
           return throwError(() => new Error('auth.errors.avatarUploadFailed'));
         }
         const { data } = supabaseClient.storage.from(AVATARS_BUCKET).getPublicUrl(path);
