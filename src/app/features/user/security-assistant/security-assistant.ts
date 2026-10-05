@@ -11,6 +11,7 @@ import {
   SecurityQuestion,
 } from '../../../core/models/security.model';
 import { WifiEncryptionGateway } from '../../../core/wifi-encryption/wifi-encryption.gateway';
+import { SecurityEvidenceCollector } from '../../../core/security-evidence/security-evidence.collector';
 import { evaluateWifiEncryption } from '../../../core/domain/security-score.calculator';
 import { PageHeader } from '../../../shared/components/page-header/page-header';
 import { ScoreGauge } from '../../../shared/components/score-gauge/score-gauge';
@@ -27,6 +28,7 @@ import { Icon } from '../../../shared/components/icon/icon';
 export class SecurityAssistant {
   private readonly repository = inject(SecurityAssistantRepository);
   private readonly wifiGateway = inject(WifiEncryptionGateway);
+  private readonly evidenceCollector = inject(SecurityEvidenceCollector);
 
   protected readonly questions = signal<SecurityQuestion[]>([]);
   protected readonly answers = signal<SecurityAnswers>({});
@@ -66,9 +68,12 @@ export class SecurityAssistant {
     this.answers.update((current) => ({ ...current, [questionId]: value }));
   }
 
-  protected submit(): void {
+  protected async submit(): Promise<void> {
     this.isSubmitting.set(true);
-    this.repository.submitAnswers(this.answers(), this.wifiEncryptionRaw()).subscribe((result) => {
+    // El análisis técnico (cifrado + puertos del router) se mide justo al
+    // enviar, para que el puntaje refleje la red de este momento.
+    const evidence = await this.evidenceCollector.collect();
+    this.repository.submitAnswers(this.answers(), evidence).subscribe((result) => {
       this.isSubmitting.set(false);
       this.result.set(result);
     });

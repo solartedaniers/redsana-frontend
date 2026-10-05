@@ -9,6 +9,15 @@
   <div class="result-panel workspace-grid workspace-grid--aside">
     <section class="assessment-card surface-panel">
       <app-score-gauge [score]="data.score" />
+      @if (data.isPartial) {
+        <span class="status-badge">{{ 'user.securityAssistant.score.partialLabel' | translate }}</span>
+        <p>{{ 'user.securityAssistant.score.partialNotice' | translate }}</p>
+      } @else {
+        <p>
+          {{ 'user.securityAssistant.score.questionnaire' | translate: { score: data.questionnaireScore } }}
+          · {{ 'user.securityAssistant.score.technical' | translate: { score: data.technicalScore ?? 0 } }}
+        </p>
+      }
       <p class="submitted-at">{{ 'user.securityAssistant.lastSubmittedAt' | translate }} {{ data.submittedAt | date: 'short' }}</p>
     </section>
 
