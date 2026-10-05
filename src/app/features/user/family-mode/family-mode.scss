@@ -1,0 +1,10 @@
+.family-hero { padding: 1.25rem; margin-bottom: 1rem; }
+.family-hero .page-header { margin: 0; }
+
+.family-steps ol { display: grid; gap: .85rem; margin: 0; padding: 1rem 1rem 1rem 2.25rem; color: var(--color-text-primary); line-height: 1.6; }
+.family-note,
+.family-dns p { margin: 1rem; color: var(--color-text-secondary); line-height: 1.6; }
+
+.family-dns dl { display: grid; grid-template-columns: auto 1fr; gap: .5rem 1rem; margin: 1rem; }
+.family-dns dt { color: var(--color-text-secondary); }
+.family-dns dd { margin: 0; font-family: var(--font-mono); font-weight: 700; color: var(--color-accent); }

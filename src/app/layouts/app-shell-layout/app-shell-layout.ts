@@ -12,6 +12,7 @@ const USER_NAV_ITEMS: NavItem[] = [
   { labelKey: 'user.securityAssistant.title', route: '/user/security-assistant', icon: 'shield' },
   { labelKey: 'user.alertsCenter.title', route: '/user/alerts', icon: 'bell' },
   { labelKey: 'user.devicesMap.title', route: '/user/devices', icon: 'devices' },
+  { labelKey: 'user.familyMode.title', route: '/user/family-mode', icon: 'home' },
 ];
 
 const ADMIN_NAV_ITEMS: NavItem[] = [

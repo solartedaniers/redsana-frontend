@@ -18,5 +18,9 @@ export const USER_ROUTES: Routes = [
     path: 'devices',
     loadComponent: () => import('./devices-map/devices-map').then((m) => m.DevicesMap),
   },
+  {
+    path: 'family-mode',
+    loadComponent: () => import('./family-mode/family-mode').then((m) => m.FamilyMode),
+  },
   { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
 ];

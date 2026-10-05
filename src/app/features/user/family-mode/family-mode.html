@@ -1,0 +1,32 @@
+<section class="family-hero surface-panel">
+  <app-page-header titleKey="user.familyMode.title" subtitleKey="user.familyMode.subtitle" />
+</section>
+
+<div class="family-layout workspace-grid workspace-grid--two">
+  <section class="family-steps surface-panel">
+    <div class="surface-panel__header">
+      <h2 class="surface-panel__title">{{ 'user.familyMode.stepsTitle' | translate }}</h2>
+    </div>
+    <ol>
+      @for (stepKey of stepKeys; track stepKey) {
+        <li>{{ stepKey | translate: { primary: dns.primary, secondary: dns.secondary } }}</li>
+      }
+    </ol>
+    <p class="family-note">{{ 'user.familyMode.whyManual' | translate }}</p>
+  </section>
+
+  <aside class="family-dns surface-panel">
+    <div class="surface-panel__header">
+      <h2 class="surface-panel__title">{{ 'user.familyMode.dnsTitle' | translate }}</h2>
+    </div>
+    <dl>
+      <dt>{{ 'user.familyMode.primaryDns' | translate }}</dt>
+      <dd>{{ dns.primary }}</dd>
+      <dt>{{ 'user.familyMode.secondaryDns' | translate }}</dt>
+      <dd>{{ dns.secondary }}</dd>
+    </dl>
+    <p>{{ 'user.familyMode.whatItBlocks' | translate }}</p>
+    <p>{{ 'user.familyMode.lockedRouter' | translate }}</p>
+    <p>{{ 'user.familyMode.undo' | translate }}</p>
+  </aside>
+</div>
