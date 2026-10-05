@@ -86,3 +86,9 @@ button.avatar-preview {
   padding: 0.5rem 1rem;
   font-size: var(--font-size-body);
 }
+
+// Correo visible pero no editable: se distingue de los campos que sí se editan.
+.field input[readonly] {
+  color: var(--color-text-secondary);
+  cursor: default;
+}

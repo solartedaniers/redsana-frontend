@@ -34,7 +34,6 @@ export class Profile {
 
   protected readonly profileForm = this.fb.nonNullable.group({
     fullName: [this.auth.currentUser()?.fullName ?? '', [Validators.required]],
-    email: [this.auth.currentUser()?.email ?? '', [Validators.required, Validators.email]],
   });
 
   protected readonly passwordForm = this.fb.nonNullable.group(

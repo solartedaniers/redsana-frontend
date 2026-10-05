@@ -72,7 +72,7 @@ export class SupabaseAuthRepository extends AuthRepository {
 
   updateProfile(_userId: string, payload: ProfileUpdatePayload): Observable<AuthSession> {
     return from(
-      supabaseClient.auth.updateUser({ email: payload.email, data: { full_name: payload.fullName } })
+      supabaseClient.auth.updateUser({ data: { full_name: payload.fullName } })
     ).pipe(
       switchMap(({ error }) => {
         if (error) {
@@ -81,7 +81,6 @@ export class SupabaseAuthRepository extends AuthRepository {
         // Supabase Auth ya quedo actualizado; sincroniza la tabla propia para que no diverja.
         return this.http.patch<void>(`${environment.apiBaseUrl}/api/me`, {
           full_name: payload.fullName,
-          email: payload.email,
         });
       }),
       switchMap(() => from(supabaseClient.auth.getSession())),
@@ -96,7 +95,7 @@ export class SupabaseAuthRepository extends AuthRepository {
 
   updateAvatar(_userId: string, avatarUrl: string): Observable<AuthSession> {
     // El archivo ya está subido a Supabase Storage en este punto: aquí solo se
-    // persiste la URL pública resultante, mismo patrón que full_name/email.
+    // persiste la URL pública resultante, mismo patrón que full_name.
     return this.http.patch<void>(`${environment.apiBaseUrl}/api/me`, { avatar_url: avatarUrl }).pipe(
       switchMap(() => from(supabaseClient.auth.getSession())),
       switchMap(({ data }) => {

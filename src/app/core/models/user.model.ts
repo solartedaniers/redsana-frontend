@@ -20,9 +20,9 @@ export interface RegisterPayload {
   password: string;
 }
 
+/** Sin email: el correo se muestra en el perfil pero no se edita. */
 export interface ProfileUpdatePayload {
   fullName: string;
-  email: string;
 }
 
 export interface PasswordChangePayload {
