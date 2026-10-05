@@ -203,7 +203,33 @@
         "checkRemoteManagement": {
           "title": "Ve a revisar la configuración remota de tu router",
           "description": "Busca la opción de administración remota en la configuración de tu router y confirma que esté apagada."
+        },
+        "closeTelnet": {
+          "title": "Desactiva Telnet en tu router",
+          "description": "Tu router tiene Telnet abierto: es un acceso de administración sin cifrar que los atacantes buscan primero. Desactívalo en la configuración del router."
+        },
+        "closeFtp": {
+          "title": "Desactiva el servidor FTP del router",
+          "description": "El FTP envía usuarios y archivos sin cifrar. Si no compartes archivos desde el router, apágalo."
+        },
+        "closeFileSharing": {
+          "title": "Revisa el uso compartido de archivos del router",
+          "description": "Tu router comparte archivos en la red (SMB). Si no lo usas, desactívalo; si lo usas, protégelo con contraseña."
+        },
+        "closeRemoteProvisioning": {
+          "title": "Pregunta a tu proveedor por la gestión remota (TR-069)",
+          "description": "El router acepta administración remota del proveedor, un servicio muy atacado. Pide a tu proveedor que lo restrinja o actualice el firmware."
+        },
+        "closeSsh": {
+          "title": "Desactiva SSH si no lo usas",
+          "description": "El router tiene una puerta de administración por SSH abierta. Si no la usas, ciérrala."
         }
+      },
+      "score": {
+        "partialLabel": "Parcial · solo cuestionario",
+        "partialNotice": "El 70 % del puntaje sale del análisis técnico de tu red (cifrado WiFi y puertos del router), que solo puede hacer la app de escritorio.",
+        "questionnaire": "Cuestionario: {{score}}/100 (30 %)",
+        "technical": "Análisis técnico: {{score}}/100 (70 %)"
       }
     },
     "alertsCenter": {
@@ -248,6 +274,25 @@
       "offline": "Desconectado",
       "scanError": "No se pudo completar el escaneo. Intenta de nuevo.",
       "scanDesktopOnly": "El escaneo de dispositivos requiere la app de escritorio de RedSana: los navegadores no permiten ver los equipos conectados a tu red."
+    },
+    "familyMode": {
+      "title": "Modo familiar",
+      "subtitle": "Bloquea sitios para adultos y páginas peligrosas en todos los dispositivos de tu casa.",
+      "stepsTitle": "Cómo activarlo en tu router",
+      "steps": {
+        "openPanel": "Abre el navegador y entra al panel de tu router. La dirección suele ser 192.168.0.1 o 192.168.1.1, y casi siempre viene escrita en la etiqueta de abajo del router.",
+        "signIn": "Entra con el usuario y la contraseña de administración del router (también suelen estar en esa etiqueta, si nunca los cambiaste).",
+        "findDns": "Busca la sección que habla de \"Internet\", \"WAN\", \"DHCP\" o \"LAN\": dentro aparece una opción llamada \"DNS\". Si está en \"Automático\", cámbiala a manual.",
+        "setDns": "Escribe {{primary}} como DNS primario y {{secondary}} como DNS secundario.",
+        "save": "Guarda los cambios. Si el router lo pide, reinícialo. En unos minutos, todos los dispositivos conectados quedan protegidos."
+      },
+      "whyManual": "RedSana no hace este cambio por ti a propósito: cada marca de router tiene un panel distinto y hacerlo de forma automática fallaría en la mayoría. Por eso tampoco te pedimos nunca la contraseña de tu router.",
+      "dnsTitle": "Los datos que vas a necesitar",
+      "primaryDns": "DNS primario",
+      "secondaryDns": "DNS secundario",
+      "whatItBlocks": "Son los servidores gratuitos de Cloudflare para familias: filtran contenido para adultos y sitios con malware conocidos. Ningún filtro es perfecto, pero reduce mucho el riesgo.",
+      "lockedRouter": "Si tu router no te deja cambiar el DNS (pasa con algunos routers del proveedor de internet), puedes escribir estos mismos datos en la configuración de red de cada computador o celular.",
+      "undo": "Para desactivarlo, vuelve a dejar el DNS en \"Automático\" y guarda."
     }
   },
   "admin": {

@@ -203,7 +203,33 @@
         "checkRemoteManagement": {
           "title": "Go check your router's remote access setting",
           "description": "Look for the remote management option in your router's settings and confirm it's off."
+        },
+        "closeTelnet": {
+          "title": "Turn off Telnet on your router",
+          "description": "Your router has Telnet open: an unencrypted admin access that attackers look for first. Turn it off in the router settings."
+        },
+        "closeFtp": {
+          "title": "Turn off the router's FTP server",
+          "description": "FTP sends usernames and files unencrypted. If you don't share files from the router, turn it off."
+        },
+        "closeFileSharing": {
+          "title": "Review your router's file sharing",
+          "description": "Your router shares files on the network (SMB). If you don't use it, turn it off; if you do, protect it with a password."
+        },
+        "closeRemoteProvisioning": {
+          "title": "Ask your provider about remote management (TR-069)",
+          "description": "The router accepts remote management from the provider, a heavily attacked service. Ask your provider to restrict it or update the firmware."
+        },
+        "closeSsh": {
+          "title": "Turn off SSH if you don't use it",
+          "description": "The router has an SSH admin door open. If you don't use it, close it."
         }
+      },
+      "score": {
+        "partialLabel": "Partial · questionnaire only",
+        "partialNotice": "70% of the score comes from the technical analysis of your network (WiFi encryption and router ports), which only the desktop app can perform.",
+        "questionnaire": "Questionnaire: {{score}}/100 (30%)",
+        "technical": "Technical analysis: {{score}}/100 (70%)"
       }
     },
     "alertsCenter": {
@@ -248,6 +274,25 @@
       "offline": "Offline",
       "scanError": "The scan could not be completed. Try again.",
       "scanDesktopOnly": "Device scanning requires the RedSana desktop app: browsers do not allow seeing the devices connected to your network."
+    },
+    "familyMode": {
+      "title": "Family mode",
+      "subtitle": "Block adult sites and dangerous pages on every device in your home.",
+      "stepsTitle": "How to turn it on in your router",
+      "steps": {
+        "openPanel": "Open your browser and go to your router's panel. The address is usually 192.168.0.1 or 192.168.1.1, and it's almost always printed on the label under the router.",
+        "signIn": "Sign in with the router's admin username and password (they are usually on that label too, if you never changed them).",
+        "findDns": "Look for the section called \"Internet\", \"WAN\", \"DHCP\" or \"LAN\": inside there's an option called \"DNS\". If it's set to \"Automatic\", switch it to manual.",
+        "setDns": "Type {{primary}} as the primary DNS and {{secondary}} as the secondary DNS.",
+        "save": "Save the changes. If the router asks, restart it. Within a few minutes every connected device is protected."
+      },
+      "whyManual": "RedSana doesn't make this change for you on purpose: every router brand has a different panel and automating it would fail on most of them. That's also why we never ask for your router password.",
+      "dnsTitle": "The details you'll need",
+      "primaryDns": "Primary DNS",
+      "secondaryDns": "Secondary DNS",
+      "whatItBlocks": "These are Cloudflare's free family servers: they filter adult content and known malware sites. No filter is perfect, but it lowers the risk a lot.",
+      "lockedRouter": "If your router doesn't let you change the DNS (some internet-provider routers don't), you can enter these same details in the network settings of each computer or phone.",
+      "undo": "To turn it off, set the DNS back to \"Automatic\" and save."
     }
   },
   "admin": {
