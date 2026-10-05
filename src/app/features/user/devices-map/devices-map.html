@@ -25,7 +25,7 @@
 </div>
 
 <div class="devices-workspace workspace-grid workspace-grid--two">
-  <section class="topology surface-panel" [class.topology--scanning]="isScanning()"><div class="topology__hub"><app-icon name="devices" /></div>@for (device of connectedDevices(); track device.id) { <span class="topology__node" [attr.data-trust]="device.trust"></span> }</section>
+  <section class="topology surface-panel" [class.topology--scanning]="isScanning()" [style.min-height.rem]="topologyHeightRem()"><div class="topology__hub"><app-icon name="devices" /></div>@for (node of topologyNodes(); track node.device.id) { <span class="topology__node" [attr.data-trust]="node.device.trust" [style.transform]="node.transform"></span> }</section>
   <div class="devices-list surface-panel">
   @for (device of connectedDevices(); track device.id) {
     <article class="device-card" [attr.data-trust]="device.trust">

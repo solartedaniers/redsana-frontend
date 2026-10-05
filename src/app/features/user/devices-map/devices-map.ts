@@ -4,9 +4,15 @@ import { DevicesRepository } from '../../../core/repositories/devices.repository
 import { LanScanGateway } from '../../../core/lan-scan/lan-scan.gateway';
 import { DeviceTrust, NetworkDevice } from '../../../core/models/device.model';
 import { DeviceKind, inferDeviceKind } from '../../../core/domain/device-kind';
+import { layoutTopologyNodes } from '../../../core/domain/topology-layout';
 import { PageHeader } from '../../../shared/components/page-header/page-header';
 import { TranslatePipe } from '../../../core/i18n/translate.pipe';
 import { Icon } from '../../../shared/components/icon/icon';
+
+// Alto mínimo del mapa (igual al de .topology en el SCSS) y margen para el
+// halo del punto más externo cuando hay tantos dispositivos que se abren anillos extra.
+const TOPOLOGY_MIN_HEIGHT_REM = 24;
+const TOPOLOGY_EDGE_MARGIN_REM = 1.5;
 
 const DEVICE_KIND_ICON: Record<DeviceKind, 'phone' | 'computer' | 'devices'> = {
   phone: 'phone',
@@ -31,6 +37,22 @@ export class DevicesMap {
   // las que escaneó alguna vez); la pantalla muestra solo lo que vio el escaneo
   // más reciente, que es lo que está conectado ahora (is_online lo calcula el backend).
   protected readonly connectedDevices = computed(() => this.devices().filter((device) => device.isOnline));
+  // Un punto del mapa por dispositivo conectado, cada uno en su propia posición.
+  protected readonly topologyNodes = computed(() => {
+    const devices = this.connectedDevices();
+    const offsets = layoutTopologyNodes(devices.length);
+    return devices.map((device, index) => ({
+      device,
+      transform: `translate(${offsets[index].xRem}rem, ${offsets[index].yRem}rem)`,
+      radiusRem: Math.hypot(offsets[index].xRem, offsets[index].yRem),
+    }));
+  });
+  protected readonly topologyHeightRem = computed(() =>
+    Math.max(
+      TOPOLOGY_MIN_HEIGHT_REM,
+      ...this.topologyNodes().map((node) => 2 * (node.radiusRem + TOPOLOGY_EDGE_MARGIN_REM))
+    )
+  );
   protected readonly isScanning = signal(false);
   protected readonly lastScanFindings = signal<NetworkDevice[] | null>(null);
   protected readonly scanFailed = signal(false);

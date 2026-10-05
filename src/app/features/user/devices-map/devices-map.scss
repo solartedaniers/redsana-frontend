@@ -50,7 +50,7 @@
 .topology--scanning::before { animation: topology-ripple 1.6s ease-out infinite; }
 .topology__hub { position: relative; z-index: 1; display: grid; place-items: center; width: 4rem; height: 4rem; border-radius: 1rem; background: var(--color-accent); color: var(--color-text-inverse); box-shadow: 0 0 2rem var(--color-glow-accent); }
 .topology__node { position: absolute; width: .9rem; height: .9rem; border-radius: 50%; background: var(--color-status-success); box-shadow: 0 0 0 .35rem var(--color-accent-muted); }
-.topology__node:nth-of-type(2) { transform: translate(-6rem, -5rem); }.topology__node:nth-of-type(3) { transform: translate(7rem, -3rem); }.topology__node:nth-of-type(4) { transform: translate(5rem, 6rem); }.topology__node[data-trust='unknown'] { background: var(--color-status-warning); }
+.topology__node[data-trust='unknown'] { background: var(--color-status-warning); }
 
 // Ondas expandiéndose desde el centro: solo deben verse mientras isScanning()
 // es true (topology--scanning), para no dar la impresión de rastreo continuo.
