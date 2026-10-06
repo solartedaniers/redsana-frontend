@@ -129,7 +129,8 @@
       "live": "Telemetría en vivo",
       "historyDetail": "Medición continua del enlace y de la latencia perimetral.",
       "diagnose": "Ejecutar diagnóstico",
-      "anomalyCalibrating": "Estamos aprendiendo el comportamiento normal de tu red ({{collected}}/{{required}} mediciones) — la detección de anomalías se activará pronto."
+      "anomalyCalibrating": "Estamos aprendiendo el comportamiento normal de esta red ({{collected}}/{{required}} mediciones) — la detección de anomalías se activará pronto. Cada red se aprende por separado.",
+      "anomalyUnknownNetwork": "No pudimos identificar la red a la que estás conectado, así que estas mediciones no cuentan para el aprendizaje de ninguna red. Revisa que estés conectado a tu router."
     },
     "securityAssistant": {
       "title": "Asistente de seguridad",
@@ -281,7 +282,11 @@
       "online": "En línea",
       "offline": "Desconectado",
       "scanError": "No se pudo completar el escaneo. Intenta de nuevo.",
-      "scanDesktopOnly": "El escaneo de dispositivos requiere la app de escritorio de RedSana: los navegadores no permiten ver los equipos conectados a tu red."
+      "scanDesktopOnly": "El escaneo de dispositivos requiere la app de escritorio de RedSana: los navegadores no permiten ver los equipos conectados a tu red.",
+      "role": {
+        "gateway": "Router (puerta de enlace)",
+        "this_device": "Este equipo"
+      }
     },
     "familyMode": {
       "title": "Modo familiar",
@@ -302,6 +307,10 @@
       "lockedRouter": "Si tu router no te deja cambiar el DNS (pasa con algunos routers del proveedor de internet), puedes escribir estos mismos datos en la configuración de red de cada computador o celular.",
       "undo": "Para desactivarlo, vuelve a dejar el DNS en \"Automático\" y guarda.",
       "askAssistant": "Pregúntale al asistente"
+    },
+    "download": {
+      "title": "Descargar",
+      "subtitle": "Instala RedSana en tu computador para aprovechar todas sus funciones."
     }
   },
   "admin": {

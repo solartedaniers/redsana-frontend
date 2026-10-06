@@ -129,7 +129,8 @@
       "live": "Live telemetry",
       "historyDetail": "Continuous measurement of the link and perimeter latency.",
       "diagnose": "Run diagnosis",
-      "anomalyCalibrating": "We're learning what's normal for your network ({{collected}}/{{required}} measurements) — anomaly detection will turn on soon."
+      "anomalyCalibrating": "We're learning how this network normally behaves ({{collected}}/{{required}} measurements) — anomaly detection will turn on soon. Each network is learned separately.",
+      "anomalyUnknownNetwork": "We couldn't identify the network you're connected to, so these measurements don't count toward learning any network. Check that you're connected to your router."
     },
     "securityAssistant": {
       "title": "Security assistant",
@@ -281,7 +282,11 @@
       "online": "Online",
       "offline": "Offline",
       "scanError": "The scan could not be completed. Try again.",
-      "scanDesktopOnly": "Device scanning requires the RedSana desktop app: browsers do not allow seeing the devices connected to your network."
+      "scanDesktopOnly": "Device scanning requires the RedSana desktop app: browsers do not allow seeing the devices connected to your network.",
+      "role": {
+        "gateway": "Router (gateway)",
+        "this_device": "This computer"
+      }
     },
     "familyMode": {
       "title": "Family mode",
@@ -302,6 +307,10 @@
       "lockedRouter": "If your router doesn't let you change the DNS (some internet-provider routers don't), you can enter these same details in the network settings of each computer or phone.",
       "undo": "To turn it off, set the DNS back to \"Automatic\" and save.",
       "askAssistant": "Ask the assistant"
+    },
+    "download": {
+      "title": "Download",
+      "subtitle": "Install RedSana on your computer to use all of its features."
     }
   },
   "admin": {

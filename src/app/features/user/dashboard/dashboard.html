@@ -11,6 +11,8 @@
     <p class="anomaly-calibrating-banner surface-panel">
       {{ 'user.dashboard.anomalyCalibrating' | translate: { collected: anomaly.samplesCollected, required: anomaly.samplesRequired } }}
     </p>
+  } @else if (anomaly.status === 'unknown_network') {
+    <p class="anomaly-calibrating-banner surface-panel">{{ 'user.dashboard.anomalyUnknownNetwork' | translate }}</p>
   }
 }
 
