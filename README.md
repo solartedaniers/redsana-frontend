@@ -72,7 +72,7 @@ RedSana usa **dos motores de IA distintos**, cada uno elegido para el problema q
 | **Qué hace** | Analiza las últimas 24 horas de mediciones (latencia, jitter, pérdida de paquetes) y detecta cuándo la conexión se sale de su comportamiento normal |
 | **Por qué este modelo** | Es **no supervisado** (no necesita datos etiquetados de "esto es una falla" — nadie tiene ese historial al empezar), **multivariable** (analiza las 3 métricas en conjunto, no una por una) y **liviano** (entrena en milisegundos sobre pocas filas, ideal para correr por usuario en tiempo real) |
 | **Costo** | 🆓 Gratis — librería open source (`scikit-learn`), corre en el propio backend, sin API externa |
-| **Cómo aprende "lo normal"** | Cada red es distinta (no es igual la latencia a las 3am que a las 8pm) — el modelo se re-entrena con la ventana de las últimas 1440 mediciones (24h) de **cada usuario individualmente**, así que aprende el patrón específico de esa casa, no un promedio genérico |
+| **Cómo aprende "lo normal"** | Cada red es distinta (no es igual la latencia a las 3am que a las 8pm) — el modelo se re-entrena con la ventana de las últimas 1440 mediciones (24h) de **cada usuario individualmente**, así que aprende el patrón específico de esa casa, no un promedio genérico. La app de escritorio empieza a detectar con el día completo (1440); la web, que solo mide con la pestaña abierta, empieza con 720 (12h) y gana precisión al completar el día |
 
 ### 💬 Groq (Llama) — asistente conversacional
 
