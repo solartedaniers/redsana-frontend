@@ -8,11 +8,25 @@
       <h2 class="surface-panel__title">{{ 'user.familyMode.stepsTitle' | translate }}</h2>
     </div>
     <ol>
-      @for (stepKey of stepKeys; track stepKey) {
-        <li>{{ stepKey | translate: { primary: dns.primary, secondary: dns.secondary } }}</li>
+      @for (step of steps(); track step.key; let index = $index) {
+        <li>
+          <span class="step-number" aria-hidden="true">{{ index + 1 }}</span>
+          <p class="step-text">
+            @for (segment of step.segments; track $index) {
+              @if (segment.isValue) {
+                <span class="dns-chip">{{ segment.text }}</span>
+              } @else {
+                {{ segment.text }}
+              }
+            }
+          </p>
+        </li>
       }
     </ol>
-    <p class="family-note">{{ 'user.familyMode.whyManual' | translate }}</p>
+    <div class="family-note" role="note">
+      <app-icon name="shield" />
+      <p>{{ 'user.familyMode.whyManual' | translate }}</p>
+    </div>
     <a class="submit-button family-ask" routerLink="/user/security-assistant" [queryParams]="assistantQueryParams">
       {{ 'user.familyMode.askAssistant' | translate }}
     </a>
@@ -22,14 +36,26 @@
     <div class="surface-panel__header">
       <h2 class="surface-panel__title">{{ 'user.familyMode.dnsTitle' | translate }}</h2>
     </div>
-    <dl>
-      <dt>{{ 'user.familyMode.primaryDns' | translate }}</dt>
-      <dd>{{ dns.primary }}</dd>
-      <dt>{{ 'user.familyMode.secondaryDns' | translate }}</dt>
-      <dd>{{ dns.secondary }}</dd>
+    <dl class="dns-cards">
+      <div class="dns-card">
+        <dt>{{ 'user.familyMode.primaryDns' | translate }}</dt>
+        <dd>{{ dns.primary }}</dd>
+      </div>
+      <div class="dns-card">
+        <dt>{{ 'user.familyMode.secondaryDns' | translate }}</dt>
+        <dd>{{ dns.secondary }}</dd>
+      </div>
     </dl>
-    <p>{{ 'user.familyMode.whatItBlocks' | translate }}</p>
-    <p>{{ 'user.familyMode.lockedRouter' | translate }}</p>
-    <p>{{ 'user.familyMode.undo' | translate }}</p>
+    <p class="dns-lead">{{ 'user.familyMode.whatItBlocks' | translate }}</p>
+    <ul class="dns-tips">
+      <li>
+        <app-icon name="devices" />
+        <span>{{ 'user.familyMode.lockedRouter' | translate }}</span>
+      </li>
+      <li>
+        <app-icon name="edit" />
+        <span>{{ 'user.familyMode.undo' | translate }}</span>
+      </li>
+    </ul>
   </aside>
 </div>
