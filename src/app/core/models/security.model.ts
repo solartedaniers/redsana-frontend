@@ -14,11 +14,16 @@ export interface SecurityRecommendation {
 }
 
 export interface SecurityAssessmentResult {
+  id: string;
   score: number;
   questionnaireScore: number;
   /** null cuando no hubo análisis técnico (p. ej. desde la web): el puntaje es parcial. */
   technicalScore: number | null;
   isPartial: boolean;
+  /** Fecha de la medición técnica usada (null si nunca se midió desde el escritorio). */
+  technicalMeasuredAt: string | null;
+  /** true si la evaluación se envió sin medir (p. ej. desde la web) y reutiliza la última medición del escritorio. */
+  technicalEvidenceReused: boolean;
   recommendations: SecurityRecommendation[];
   submittedAt: string;
 }
@@ -30,12 +35,22 @@ export type WifiEncryptionStatus = 'secure' | 'weak' | 'unknown';
 export interface ChatMessage {
   role: 'user' | 'assistant';
   text: string;
-  /** true cuando `text` es una i18n key (fallo de red) en vez de la respuesta ya traducida por Groq. */
-  isErrorKey?: boolean;
+  /** true cuando `text` es una clave i18n (error, aviso o saludo fijo) y no texto ya redactado por el modelo. */
+  isTranslationKey?: boolean;
+  /** Valores para interpolar en la clave i18n (p. ej. los DNS exactos de la guía). */
+  translationParams?: Record<string, string>;
 }
+
+/** Tema con el que nace una conversación (define el contexto extra del asistente). */
+export type ChatTopic = 'assessment_briefing' | 'family_mode';
+/** Temas que el usuario puede abrir a mano; el resumen de una evaluación lo crea el backend. */
+export type UserStartableChatTopic = 'family_mode';
+/** Query param con el que otra pantalla abre el asistente en un tema (p. ej. modo familiar). */
+export const CHAT_TOPIC_QUERY_PARAM = 'topic';
 
 export interface ChatConversationSummary {
   id: string;
+  topic: ChatTopic | null;
   /** null hasta el primer mensaje (el backend autogenera el título); ver historial. */
   title: string | null;
   updatedAt: string;
@@ -45,4 +60,16 @@ export interface ChatConversationSummary {
 export interface TechnicalEvidence {
   wifiEncryptionRaw: string | null;
   routerOpenPorts: number[] | null;
+}
+
+/** reply null = el mensaje no se procesó; noticeKey = aviso fijo que reemplaza o acompaña la respuesta. */
+export interface ChatReply {
+  reply: string | null;
+  noticeKey: string | null;
+  noticeParams: Record<string, string> | null;
+}
+
+export interface ChatBriefing {
+  conversation: ChatConversationSummary;
+  messages: ChatMessage[];
 }

@@ -81,3 +81,11 @@
     border-color: var(--color-accent);
   }
 }
+
+// Fecha de una medición técnica reutilizada: dato secundario, discreto.
+.score-date {
+  font-size: var(--font-size-caption);
+  color: var(--color-text-secondary);
+  text-align: right;
+  max-width: 12rem;
+}

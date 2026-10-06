@@ -13,6 +13,8 @@ interface BackendHousehold {
   status: NetworkStatus;
   security_score: number;
   security_score_source: SecurityScoreSource;
+  security_score_is_partial: boolean;
+  security_technical_measured_at: string | null;
   last_activity: string;
 }
 
@@ -35,6 +37,8 @@ export class NetworkSupervisionHttpRepository extends NetworkSupervisionReposito
       status: household.status,
       securityScore: household.security_score,
       securityScoreSource: household.security_score_source,
+      securityScoreIsPartial: household.security_score_is_partial,
+      securityTechnicalMeasuredAt: household.security_technical_measured_at,
       lastActivity: household.last_activity,
     };
   }

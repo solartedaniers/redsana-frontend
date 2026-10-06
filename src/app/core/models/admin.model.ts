@@ -16,5 +16,8 @@ export interface MonitoredHousehold {
   status: NetworkStatus;
   securityScore: number;
   securityScoreSource: SecurityScoreSource;
+  securityScoreIsPartial: boolean;
+  /** Solo si el puntaje reutiliza una medición técnica anterior del escritorio. */
+  securityTechnicalMeasuredAt: string | null;
   lastActivity: string;
 }

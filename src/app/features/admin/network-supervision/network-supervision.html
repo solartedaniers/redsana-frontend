@@ -14,9 +14,17 @@
       <app-network-status-light [status]="household.status" />
       <div class="score-block">
         <span class="score">{{ household.securityScore }}%</span>
+        @if (household.securityScoreIsPartial) {
+          <span class="status-badge">{{ 'user.securityAssistant.score.partialLabel' | translate }}</span>
+        }
         <span class="score-source" [attr.data-source]="household.securityScoreSource">
           {{ 'admin.networkSupervision.scoreSource.' + household.securityScoreSource | translate }}
         </span>
+        @if (household.securityTechnicalMeasuredAt) {
+          <span class="score-date">
+            {{ 'admin.networkSupervision.technicalMeasuredAt' | translate: { date: (household.securityTechnicalMeasuredAt | date: 'shortDate') ?? '' } }}
+          </span>
+        }
       </div>
       <a class="view-button" [routerLink]="[household.id]">
         {{ 'admin.networkSupervision.viewDashboard' | translate }}
