@@ -6,7 +6,7 @@ import { NetworkDevice } from '../../../core/models/device.model';
 import { DevicesRepository } from '../../../core/repositories/devices.repository';
 import { DevicesMap } from './devices-map';
 
-function device(index: number, isOnline: boolean): NetworkDevice {
+function device(index: number, isOnline: boolean, networkRole: NetworkDevice['networkRole'] = 'other'): NetworkDevice {
   return {
     id: `device-${index}`,
     name: '',
@@ -16,6 +16,7 @@ function device(index: number, isOnline: boolean): NetworkDevice {
     firstSeen: '2026-10-01T00:00:00Z',
     lastSeen: '2026-10-01T00:00:00Z',
     isOnline,
+    networkRole,
   };
 }
 
@@ -75,5 +76,21 @@ describe('DevicesMap trust marking', () => {
     expect(repository.setTrust).toHaveBeenCalledExactlyOnceWith('device-1', 'trusted');
     expect(lanScan.scan).not.toHaveBeenCalled();
     expect(repository.syncDiscoveredDevices).not.toHaveBeenCalled();
+  });
+});
+
+describe('DevicesMap connected count', () => {
+  // Caso real: router + celular en la tabla ARP + este PC. Antes se mostraba 1
+  // (solo el router: el PC no se contaba y el celular a veces no respondía).
+  it('cuenta este equipo y los demás, pero no el router, que es el hub del mapa', async () => {
+    const devices = [device(1, true, 'gateway'), device(100, true, 'other'), device(103, true, 'this_device')];
+
+    const element = await renderWith(devices);
+
+    expect(element.querySelector('.devices-hero .status-badge')?.textContent?.trim()).toBe('2');
+    expect(element.querySelectorAll('.topology__node')).toHaveLength(2);
+    // El router sigue apareciendo en la lista, marcado como tal.
+    expect(element.querySelectorAll('.device-card')).toHaveLength(3);
+    expect(element.querySelector('.device-card .status-badge')?.textContent?.trim()).toBe('user.devicesMap.role.gateway');
   });
 });

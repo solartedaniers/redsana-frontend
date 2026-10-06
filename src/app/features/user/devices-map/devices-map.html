@@ -1,6 +1,6 @@
 <section class="devices-hero surface-panel">
   <app-page-header titleKey="user.devicesMap.title" subtitleKey="user.devicesMap.subtitle" />
-  <span class="status-badge">{{ connectedDevices().length }}</span>
+  <span class="status-badge">{{ networkMembers().length }}</span>
 </section>
 
 <div class="scan-bar">
@@ -35,6 +35,9 @@
           <p class="device-name">{{ device.name || ('user.devicesMap.unknownDevice' | translate) }}</p>
           <p class="device-meta">
             {{ deviceKindLabelKey(device) | translate }} · {{ device.ipAddress }}
+            @if (device.networkRole === 'gateway' || device.networkRole === 'this_device') {
+              <span class="status-badge">{{ 'user.devicesMap.role.' + device.networkRole | translate }}</span>
+            }
           </p>
           <p class="device-meta">
             {{ 'user.devicesMap.lastSeen' | translate }}: {{ device.lastSeen | date: 'short' }}

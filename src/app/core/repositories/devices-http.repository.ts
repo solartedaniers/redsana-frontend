@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable, map } from 'rxjs';
 import { environment } from '../../../environments/environment';
-import { DeviceTrust, DiscoveredDevice, NetworkDevice } from '../models/device.model';
+import { DeviceNetworkRole, DeviceTrust, DiscoveredDevice, NetworkDevice } from '../models/device.model';
 import { DevicesRepository } from './devices.repository';
 
 interface BackendDevice {
@@ -14,6 +14,7 @@ interface BackendDevice {
   first_seen: string;
   last_seen: string;
   is_online: boolean;
+  network_role: DeviceNetworkRole | null;
 }
 
 @Injectable()
@@ -26,7 +27,7 @@ export class DevicesHttpRepository extends DevicesRepository {
   }
 
   syncDiscoveredDevices(devices: DiscoveredDevice[]): Observable<NetworkDevice[]> {
-    const payload = { devices: devices.map((device) => ({ mac_address: device.mac, ip_address: device.ip })) };
+    const payload = { devices: devices.map((device) => ({ mac_address: device.mac, ip_address: device.ip, role: device.role })) };
     return this.http
       .post<BackendDevice[]>(`${this.baseUrl}/sync`, payload)
       .pipe(map((result) => result.map(this.toNetworkDevice)));
@@ -46,6 +47,7 @@ export class DevicesHttpRepository extends DevicesRepository {
       firstSeen: device.first_seen,
       lastSeen: device.last_seen,
       isOnline: device.is_online,
+      networkRole: device.network_role,
     };
   }
 }

@@ -2,7 +2,7 @@ import { DatePipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { DevicesRepository } from '../../../core/repositories/devices.repository';
 import { LanScanGateway } from '../../../core/lan-scan/lan-scan.gateway';
-import { DeviceTrust, NetworkDevice } from '../../../core/models/device.model';
+import { DeviceNetworkRole, DeviceTrust, NetworkDevice } from '../../../core/models/device.model';
 import { DeviceKind, inferDeviceKind } from '../../../core/domain/device-kind';
 import { layoutTopologyNodes } from '../../../core/domain/topology-layout';
 import { PageHeader } from '../../../shared/components/page-header/page-header';
@@ -13,6 +13,9 @@ import { Icon } from '../../../shared/components/icon/icon';
 // halo del punto más externo cuando hay tantos dispositivos que se abren anillos extra.
 const TOPOLOGY_MIN_HEIGHT_REM = 24;
 const TOPOLOGY_EDGE_MARGIN_REM = 1.5;
+
+// Router primero y luego este equipo: los dos que el usuario reconoce enseguida.
+const ROLE_ORDER: Record<DeviceNetworkRole, number> = { gateway: 0, this_device: 1, other: 2 };
 
 const DEVICE_KIND_ICON: Record<DeviceKind, 'phone' | 'computer' | 'devices'> = {
   phone: 'phone',
@@ -36,10 +39,19 @@ export class DevicesMap {
   // El backend guarda todo el historial del usuario (incluidas otras redes en
   // las que escaneó alguna vez); la pantalla muestra solo lo que vio el escaneo
   // más reciente, que es lo que está conectado ahora (is_online lo calcula el backend).
-  protected readonly connectedDevices = computed(() => this.devices().filter((device) => device.isOnline));
+  protected readonly connectedDevices = computed(() =>
+    this.devices()
+      .filter((device) => device.isOnline)
+      .sort((a, b) => ROLE_ORDER[a.networkRole ?? 'other'] - ROLE_ORDER[b.networkRole ?? 'other'])
+  );
+  // El router es la red misma (el hub del mapa), no un dispositivo conectado a
+  // ella: se lista aparte pero no cuenta. Este equipo sí cuenta.
+  protected readonly networkMembers = computed(() =>
+    this.connectedDevices().filter((device) => device.networkRole !== 'gateway')
+  );
   // Un punto del mapa por dispositivo conectado, cada uno en su propia posición.
   protected readonly topologyNodes = computed(() => {
-    const devices = this.connectedDevices();
+    const devices = this.networkMembers();
     const offsets = layoutTopologyNodes(devices.length);
     return devices.map((device, index) => ({
       device,
@@ -80,7 +92,10 @@ export class DevicesMap {
         next: (devices) => {
           this.isScanning.set(false);
           this.devices.set(devices);
-          this.lastScanFindings.set(devices.filter((device) => device.isOnline && device.trust !== 'trusted'));
+          // El router y este equipo no son "intrusos" posibles: solo se revisan los demás.
+          this.lastScanFindings.set(
+            devices.filter((device) => device.isOnline && device.networkRole === 'other' && device.trust !== 'trusted')
+          );
         },
         error: (error) => {
           // La causa real (ej. fallo de sincronización con el backend) queda en
