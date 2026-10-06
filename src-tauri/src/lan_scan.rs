@@ -9,11 +9,16 @@ use tokio::task::JoinSet;
 use crate::ping::new_client;
 
 /// Comando nativo de Windows para leer la configuración IP de las interfaces activas.
+/// "/all" agrega la dirección física (MAC) del adaptador, necesaria para contar
+/// a este mismo equipo entre los dispositivos de la red.
 const IPCONFIG_COMMAND: &str = "ipconfig";
+const IPCONFIG_ARGS: [&str; 1] = ["/all"];
 /// Etiquetas de campo (normalizadas: sin espacios/puntos, en minúsculas) para la
 /// IPv4 y la máscara de subred, según el idioma de Windows.
 const IPV4_ADDRESS_LABELS: [&str; 2] = ["ipv4address", "direcciónipv4"];
 const SUBNET_MASK_LABELS: [&str; 2] = ["subnetmask", "máscaradesubred"];
+const PHYSICAL_ADDRESS_LABELS: [&str; 2] = ["physicaladdress", "direcciónfísica"];
+const DEFAULT_GATEWAY_LABELS: [&str; 2] = ["defaultgateway", "puertadeenlacepredeterminada"];
 
 /// Palabras que delatan un adaptador virtual/túnel (WSL, Hyper-V, Docker, VPN,
 /// loopback) en el encabezado de su sección de `ipconfig`. Estos adaptadores
@@ -40,13 +45,41 @@ const ARP_TRIGGER_TIMEOUT: Duration = Duration::from_millis(300);
 /// scan_connected_devices), así que subir este número no multiplica el
 /// tiempo del escaneo, solo su cobertura.
 const MAX_HOSTS_TO_SCAN: usize = 4096;
+/// Espera tras cada pasada del barrido. Un celular en ahorro de energía solo
+/// atiende la radio en sus ventanas de despertar (cientos de ms a ~1s), así que
+/// contesta el ARP tarde: con una sola pasada y lectura inmediata de la tabla
+/// ARP quedaba fuera (confirmado en vivo: un escaneo vio solo el router y los
+/// siguientes vieron también el celular).
+const SWEEP_SETTLE_DELAY: Duration = Duration::from_millis(1000);
+const SWEEP_PASSES: usize = 2;
+
+/// Papel del dispositivo en la red: el router (puerta de enlace) es la red
+/// misma y este equipo no aparece en su propia tabla ARP; ambos se marcan para
+/// que la interfaz no los confunda con "otros dispositivos conectados".
+#[derive(Serialize, Clone, Copy, Debug, PartialEq)]
+#[serde(rename_all = "snake_case")]
+pub enum DeviceRole {
+    ThisDevice,
+    Gateway,
+    Other,
+}
 
 /// Dispositivo descubierto por ARP: solo IP y MAC, el nombre casi nunca está
 /// disponible por este medio y no debe inventarse (queda a cargo del backend/UI).
-#[derive(Serialize, Clone)]
+#[derive(Serialize, Clone, Debug)]
 pub struct DiscoveredDevice {
     pub ip: String,
     pub mac: String,
+    pub role: DeviceRole,
+}
+
+/// Configuración del adaptador físico activo, leída de `ipconfig /all`.
+#[derive(Debug, PartialEq)]
+struct LocalInterface {
+    ip: Ipv4Addr,
+    mask: Ipv4Addr,
+    gateway: Option<Ipv4Addr>,
+    mac: Option<String>,
 }
 
 /// Descubre los dispositivos realmente conectados a la LAN local: determina
@@ -54,45 +87,94 @@ pub struct DiscoveredDevice {
 /// lee la tabla ARP resultante.
 #[tauri::command]
 pub async fn scan_connected_devices() -> Result<Vec<DiscoveredDevice>, String> {
-    let (local_ip, mask) = tokio::task::spawn_blocking(local_ipv4_and_mask)
+    let interface = tokio::task::spawn_blocking(local_interface)
         .await
         .map_err(|e| format!("no se pudo determinar la subred local: {e}"))??;
 
-    let targets = hosts_in_subnet(local_ip, mask, local_ip);
-    let client = new_client(IpAddr::V4(local_ip))?;
+    let targets = hosts_in_subnet(interface.ip, interface.mask, interface.ip);
+    let client = new_client(IpAddr::V4(interface.ip))?;
 
-    let mut sweep = JoinSet::new();
-    for (sequence, ip) in targets.into_iter().enumerate() {
-        let client = client.clone();
-        sweep.spawn(async move { trigger_arp_resolution(&client, ip, sequence as u16).await });
+    for _ in 0..SWEEP_PASSES {
+        sweep_subnet(&client, &targets).await;
+        tokio::time::sleep(SWEEP_SETTLE_DELAY).await;
     }
-    // Los pings corren en paralelo: el barrido completo tarda ~ARP_TRIGGER_TIMEOUT,
-    // no ARP_TRIGGER_TIMEOUT * cantidad_de_hosts. Ignoramos éxito/fallo individual.
-    while sweep.join_next().await.is_some() {}
 
     let arp_output = tokio::task::spawn_blocking(run_arp_a)
         .await
         .map_err(|e| format!("no se pudo ejecutar arp: {e}"))??;
 
-    let network = u32::from(local_ip) & u32::from(mask);
-    let broadcast = network | !u32::from(mask);
+    Ok(classify_devices(&interface, parse_arp_table(&arp_output)))
+}
 
-    let devices = parse_arp_table(&arp_output)
+/// Los pings corren en paralelo: una pasada tarda ~ARP_TRIGGER_TIMEOUT, no
+/// ARP_TRIGGER_TIMEOUT * cantidad_de_hosts. El resultado de cada ping no importa.
+async fn sweep_subnet(client: &Client, targets: &[Ipv4Addr]) {
+    let mut sweep = JoinSet::new();
+    for (sequence, ip) in targets.iter().copied().enumerate() {
+        let client = client.clone();
+        sweep.spawn(async move { trigger_arp_resolution(&client, ip, sequence as u16).await });
+    }
+    while sweep.join_next().await.is_some() {}
+}
+
+/// MAC de la puerta de enlace de la red actual: identifica la red (cada router
+/// tiene la suya) para que la detección de anomalías aprenda cada red por
+/// separado. Sale cruda solo hacia el frontend de este mismo equipo, que la
+/// convierte en hash antes de enviarla. None si no hay red o no se pudo resolver.
+#[tauri::command]
+pub async fn current_gateway_mac() -> Result<Option<String>, String> {
+    let interface = match tokio::task::spawn_blocking(local_interface).await {
+        Ok(Ok(interface)) => interface,
+        _ => return Ok(None), // sin adaptador con IPv4: no hay red que identificar
+    };
+    let Some(gateway) = interface.gateway else { return Ok(None) };
+
+    if let Some(mac) = gateway_mac_from_arp(gateway).await? {
+        return Ok(Some(mac));
+    }
+    // Entrada ARP vencida: un ping al router la vuelve a llenar.
+    let client = new_client(IpAddr::V4(interface.ip))?;
+    trigger_arp_resolution(&client, gateway, 0).await;
+    gateway_mac_from_arp(gateway).await
+}
+
+async fn gateway_mac_from_arp(gateway: Ipv4Addr) -> Result<Option<String>, String> {
+    let arp_output = tokio::task::spawn_blocking(run_arp_a)
+        .await
+        .map_err(|e| format!("no se pudo ejecutar arp: {e}"))??;
+    Ok(find_mac_for_ip(&parse_arp_table(&arp_output), gateway))
+}
+
+fn find_mac_for_ip(neighbors: &[DiscoveredDevice], ip: Ipv4Addr) -> Option<String> {
+    let ip = ip.to_string();
+    neighbors.iter().find(|device| device.ip == ip).map(|device| device.mac.clone())
+}
+
+/// Deja solo los vecinos de la subred propia, marca el router y agrega este
+/// mismo equipo (que nunca está en su propia tabla ARP).
+fn classify_devices(interface: &LocalInterface, neighbors: Vec<DiscoveredDevice>) -> Vec<DiscoveredDevice> {
+    let network = u32::from(interface.ip) & u32::from(interface.mask);
+    let broadcast = network | !u32::from(interface.mask);
+
+    let mut devices: Vec<DiscoveredDevice> = neighbors
         .into_iter()
-        .filter(|device| {
-            device
-                .ip
-                .parse::<Ipv4Addr>()
-                .map(|ip| ip != local_ip && u32::from(ip) > network && u32::from(ip) < broadcast)
-                .unwrap_or(false)
+        .filter_map(|device| {
+            let ip = device.ip.parse::<Ipv4Addr>().ok()?;
+            let in_subnet = ip != interface.ip && u32::from(ip) > network && u32::from(ip) < broadcast;
+            let role = if Some(ip) == interface.gateway { DeviceRole::Gateway } else { DeviceRole::Other };
+            in_subnet.then_some(DiscoveredDevice { role, ..device })
         })
         .collect();
 
-    Ok(devices)
+    if let Some(mac) = &interface.mac {
+        devices.push(DiscoveredDevice { ip: interface.ip.to_string(), mac: mac.clone(), role: DeviceRole::ThisDevice });
+    }
+    devices
 }
 
-fn local_ipv4_and_mask() -> Result<(Ipv4Addr, Ipv4Addr), String> {
+fn local_interface() -> Result<LocalInterface, String> {
     let output = hidden_console_command(IPCONFIG_COMMAND)
+        .args(IPCONFIG_ARGS)
         .output()
         .map_err(|e| format!("no se pudo lanzar ipconfig: {e}"))?;
 
@@ -105,45 +187,77 @@ fn local_ipv4_and_mask() -> Result<(Ipv4Addr, Ipv4Addr), String> {
     }
 
     let stdout = decode_console_output(&output.stdout);
-    parse_local_ipv4_config(&stdout).ok_or_else(|| {
+    parse_local_interface(&stdout).ok_or_else(|| {
         format!("no se encontró una IPv4 local válida en la salida de ipconfig:\n{stdout}")
     })
 }
 
 /// Busca el primer adaptador FÍSICO (no virtual/túnel) con una IPv4 real (no
-/// APIPA 169.254.x.x) y su máscara asociada. No asume nombre de adaptador ni
-/// rango: los deriva del propio texto de ipconfig, pero descarta secciones
-/// completas cuyo encabezado delate un adaptador virtual (ver VIRTUAL_ADAPTER_MARKERS).
-fn parse_local_ipv4_config(ipconfig_output: &str) -> Option<(Ipv4Addr, Ipv4Addr)> {
-    let mut pending_ip: Option<Ipv4Addr> = None;
+/// APIPA 169.254.x.x) y su máscara asociada, junto con su MAC y su puerta de
+/// enlace. No asume nombre de adaptador ni rango: los deriva del propio texto
+/// de ipconfig, pero descarta secciones completas cuyo encabezado delate un
+/// adaptador virtual (ver VIRTUAL_ADAPTER_MARKERS).
+fn parse_local_interface(ipconfig_output: &str) -> Option<LocalInterface> {
+    let mut section = SectionFields::default();
     let mut in_virtual_adapter = false;
 
     for line in ipconfig_output.lines() {
         if is_adapter_header(line) {
+            if let Some(found) = section.into_interface() {
+                return Some(found);
+            }
+            section = SectionFields::default();
             in_virtual_adapter = is_virtual_adapter_header(line);
-            pending_ip = None; // nueva sección: cualquier IP pendiente era de otro adaptador
             continue;
         }
         if in_virtual_adapter {
             continue;
         }
 
+        // "Puerta de enlace" puede traer varios valores en líneas siguientes
+        // sin etiqueta (primero la IPv6 y debajo la IPv4): son un solo token.
+        let token = line.trim();
+        if section.awaiting_gateway && !token.is_empty() && !token.contains(char::is_whitespace) {
+            if let Ok(gateway) = token.parse::<Ipv4Addr>() {
+                section.gateway.get_or_insert(gateway);
+            }
+            continue;
+        }
+
         let Some((label, value)) = line.split_once(':') else { continue };
         let label = normalize_label(label);
         let value = value.trim();
+        section.awaiting_gateway = DEFAULT_GATEWAY_LABELS.contains(&label.as_str());
 
         if IPV4_ADDRESS_LABELS.contains(&label.as_str()) {
             // ipconfig a veces agrega "(Preferido)"/"(Preferred)" pegado al valor.
             let ip_text = value.split('(').next().unwrap_or(value).trim();
-            pending_ip = ip_text.parse::<Ipv4Addr>().ok().filter(|ip| !is_link_local(*ip));
+            section.ip = ip_text.parse::<Ipv4Addr>().ok().filter(|ip| !is_link_local(*ip));
         } else if SUBNET_MASK_LABELS.contains(&label.as_str()) {
-            if let (Some(ip), Ok(mask)) = (pending_ip, value.parse::<Ipv4Addr>()) {
-                return Some((ip, mask));
-            }
+            section.mask = value.parse::<Ipv4Addr>().ok();
+        } else if PHYSICAL_ADDRESS_LABELS.contains(&label.as_str()) && is_mac_shaped(value) {
+            section.mac = Some(value.to_lowercase());
+        } else if section.awaiting_gateway {
+            section.gateway = value.parse::<Ipv4Addr>().ok();
         }
     }
 
-    None
+    section.into_interface()
+}
+
+#[derive(Default)]
+struct SectionFields {
+    ip: Option<Ipv4Addr>,
+    mask: Option<Ipv4Addr>,
+    gateway: Option<Ipv4Addr>,
+    mac: Option<String>,
+    awaiting_gateway: bool,
+}
+
+impl SectionFields {
+    fn into_interface(self) -> Option<LocalInterface> {
+        Some(LocalInterface { ip: self.ip?, mask: self.mask?, gateway: self.gateway, mac: self.mac })
+    }
 }
 
 /// Encabezado de sección de adaptador en `ipconfig`: no tiene sangría y no
@@ -272,7 +386,7 @@ fn parse_arp_table(arp_output: &str) -> Vec<DiscoveredDevice> {
                 return None;
             }
 
-            Some(DiscoveredDevice { ip: ip.to_string(), mac: mac.to_lowercase() })
+            Some(DiscoveredDevice { ip: ip.to_string(), mac: mac.to_lowercase(), role: DeviceRole::Other })
         })
         .collect()
 }
@@ -343,28 +457,113 @@ Interface: 192.168.1.23 --- 0xe
   224.0.0.22              01-00-5e-00-00-16     static
 ";
 
-    #[test]
-    fn parse_local_ipv4_config_supports_spanish_locale() {
-        let expected = ("192.168.1.23".parse().unwrap(), "255.255.255.0".parse().unwrap());
-        assert_eq!(parse_local_ipv4_config(IPCONFIG_ES), Some(expected));
+    fn ip(text: &str) -> Ipv4Addr {
+        text.parse().unwrap()
     }
 
     #[test]
-    fn parse_local_ipv4_config_supports_english_locale() {
-        let expected = ("192.168.1.23".parse().unwrap(), "255.255.255.0".parse().unwrap());
-        assert_eq!(parse_local_ipv4_config(IPCONFIG_EN), Some(expected));
+    fn parse_local_interface_supports_spanish_locale() {
+        let interface = parse_local_interface(IPCONFIG_ES).unwrap();
+        assert_eq!((interface.ip, interface.mask, interface.gateway), (ip("192.168.1.23"), ip("255.255.255.0"), Some(ip("192.168.1.1"))));
     }
 
     #[test]
-    fn parse_local_ipv4_config_skips_virtual_adapters_listed_before_the_real_one() {
-        let expected = ("192.168.1.41".parse().unwrap(), "255.255.255.0".parse().unwrap());
-        assert_eq!(parse_local_ipv4_config(IPCONFIG_WITH_VIRTUAL_ADAPTER_FIRST), Some(expected));
+    fn parse_local_interface_supports_english_locale() {
+        let interface = parse_local_interface(IPCONFIG_EN).unwrap();
+        assert_eq!((interface.ip, interface.mask, interface.gateway), (ip("192.168.1.23"), ip("255.255.255.0"), Some(ip("192.168.1.1"))));
     }
 
     #[test]
-    fn parse_local_ipv4_config_skips_apipa_addresses() {
+    fn parse_local_interface_skips_virtual_adapters_listed_before_the_real_one() {
+        let interface = parse_local_interface(IPCONFIG_WITH_VIRTUAL_ADAPTER_FIRST).unwrap();
+        assert_eq!((interface.ip, interface.gateway), (ip("192.168.1.41"), Some(ip("192.168.1.1"))));
+    }
+
+    #[test]
+    fn parse_local_interface_skips_apipa_addresses() {
         let output = "IPv4 Address. . . : 169.254.1.5\nSubnet Mask . . . : 255.255.0.0\n";
-        assert_eq!(parse_local_ipv4_config(output), None);
+        assert_eq!(parse_local_interface(output), None);
+    }
+
+    // Captura real (ipconfig /all, español) de esta máquina, recortada.
+    const IPCONFIG_ALL_ES: &str = "\
+Adaptador de LAN inalámbrica Wi-Fi:
+
+   Descripción . . . . . . . . . . . . . . . : Intel(R) Wi-Fi 6 AX200 160MHz
+   Dirección física. . . . . . . . . . . . . : 8C-C6-81-16-00-85
+   Vínculo: dirección IPv6 local. . . : fe80::70c1:23b3:b526:2f32%15(Preferido)
+   Dirección IPv4. . . . . . . . . . . . . . : 192.168.0.103(Preferido)
+   Máscara de subred . . . . . . . . . . . . : 255.255.255.0
+   Puerta de enlace predeterminada . . . . . : 192.168.0.1
+   Servidor DHCP . . . . . . . . . . . . . . : 192.168.0.1
+";
+
+    #[test]
+    fn parse_local_interface_reads_the_adapter_mac_from_ipconfig_all() {
+        let interface = parse_local_interface(IPCONFIG_ALL_ES).unwrap();
+        assert_eq!(interface.mac.as_deref(), Some("8c-c6-81-16-00-85"));
+        assert_eq!(interface.gateway, Some(ip("192.168.0.1")));
+    }
+
+    #[test]
+    fn parse_local_interface_takes_the_ipv4_gateway_when_ipv6_is_listed_first() {
+        let output = "\
+Wireless LAN adapter Wi-Fi:
+
+   Physical Address. . . . . . . . . : 8C-C6-81-16-00-85
+   IPv4 Address. . . . . . . . . . . : 10.0.0.20(Preferred)
+   Subnet Mask . . . . . . . . . . . : 255.255.255.0
+   Default Gateway . . . . . . . . . : fe80::1%15
+                                       10.0.0.1
+   DHCP Server . . . . . . . . . . . : 10.0.0.1
+";
+        assert_eq!(parse_local_interface(output).unwrap().gateway, Some(ip("10.0.0.1")));
+    }
+
+    fn device(ip: &str, mac: &str) -> DiscoveredDevice {
+        DiscoveredDevice { ip: ip.to_string(), mac: mac.to_string(), role: DeviceRole::Other }
+    }
+
+    // El caso real que mostraba "1 dispositivo": router + celular en la tabla ARP,
+    // y este PC (que nunca aparece en su propia tabla ARP) quedaba sin contar.
+    #[test]
+    fn classify_devices_marks_the_router_and_adds_this_computer() {
+        let interface = LocalInterface {
+            ip: ip("192.168.0.103"),
+            mask: ip("255.255.255.0"),
+            gateway: Some(ip("192.168.0.1")),
+            mac: Some("8c-c6-81-16-00-85".to_string()),
+        };
+        let neighbors = vec![
+            device("192.168.0.1", "3c-6a-d2-c8-5a-ec"),
+            device("192.168.0.100", "82-dc-10-19-ea-cf"),
+            device("172.20.240.5", "00-15-5d-00-00-01"), // otra interfaz (WSL): fuera de la subred
+        ];
+
+        let devices = classify_devices(&interface, neighbors);
+        let roles: Vec<(&str, DeviceRole)> = devices.iter().map(|d| (d.ip.as_str(), d.role)).collect();
+
+        assert_eq!(
+            roles,
+            vec![
+                ("192.168.0.1", DeviceRole::Gateway),
+                ("192.168.0.100", DeviceRole::Other),
+                ("192.168.0.103", DeviceRole::ThisDevice),
+            ]
+        );
+    }
+
+    #[test]
+    fn find_mac_for_ip_returns_the_gateway_entry_only() {
+        let neighbors = parse_arp_table(ARP_A_OUTPUT);
+        assert_eq!(find_mac_for_ip(&neighbors, ip("192.168.1.1")), Some("18-56-80-3b-2c-11".to_string()));
+        assert_eq!(find_mac_for_ip(&neighbors, ip("192.168.1.99")), None);
+    }
+
+    #[test]
+    fn device_roles_serialize_as_the_backend_expects() {
+        assert_eq!(serde_json::to_string(&DeviceRole::ThisDevice).unwrap(), "\"this_device\"");
+        assert_eq!(serde_json::to_string(&DeviceRole::Gateway).unwrap(), "\"gateway\"");
     }
 
     #[test]

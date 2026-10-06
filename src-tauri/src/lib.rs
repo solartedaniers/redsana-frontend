@@ -22,6 +22,7 @@ pub fn run() {
       ping::measure_network_quality,
       wifi::get_wifi_encryption,
       lan_scan::scan_connected_devices,
+      lan_scan::current_gateway_mac,
       router_ports::scan_router_open_ports
     ])
     .run(tauri::generate_context!())
