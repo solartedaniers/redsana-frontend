@@ -13,9 +13,9 @@
         <span class="status-badge">{{ 'user.securityAssistant.score.partialLabel' | translate }}</span>
         <p>{{ 'user.securityAssistant.score.partialNotice' | translate }}</p>
       } @else {
-        <p>
-          {{ 'user.securityAssistant.score.questionnaire' | translate: { score: data.questionnaireScore } }}
-          · {{ 'user.securityAssistant.score.technical' | translate: { score: data.technicalScore ?? 0 } }}
+        <p class="score-breakdown">
+          <span>{{ 'user.securityAssistant.score.questionnaire' | translate: { score: data.questionnaireScore } }}</span>
+          · <span>{{ 'user.securityAssistant.score.technical' | translate: { score: data.technicalScore ?? 0 } }}</span>
         </p>
         @if (data.technicalEvidenceReused) {
           <p>{{ 'user.securityAssistant.score.reusedTechnicalAnalysis' | translate: { date: (data.technicalMeasuredAt | date: 'shortDate') ?? '' } }}</p>

@@ -8,6 +8,13 @@
 .assessment-card p { margin: 0; color: var(--color-text-secondary); font-size: .85rem; line-height: 1.55; }
 .questions-panel { padding: 1rem; }
 
+// El desglose "Cuestionario … · Análisis técnico …" mide ~22rem: la columna del
+// puntaje se ensancha lo justo para que quepa en un renglón en escritorio.
+// Cada parte nunca se corta por dentro; en pantallas angostas se parte en el "·".
+.result-panel { grid-template-columns: minmax(25rem, .55fr) minmax(0, 1.45fr); }
+.score-breakdown span { white-space: nowrap; }
+@media (max-width: 64rem) { .result-panel { grid-template-columns: 1fr; } }
+
 .question {
   padding: 1.1rem 1.25rem;
   border-radius: 0.65rem;
