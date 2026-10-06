@@ -1,5 +1,9 @@
 import { Observable } from 'rxjs';
+import { AppLanguage } from '../i18n/i18n.service';
 import {
+  ChatBriefing,
+  ChatReply,
+  UserStartableChatTopic,
   ChatConversationSummary,
   ChatMessage,
   SecurityAnswers,
@@ -16,8 +20,10 @@ export abstract class SecurityAssistantRepository {
 
   /** Historial de conversaciones del chat, ordenado por actividad reciente. */
   abstract listConversations(): Observable<ChatConversationSummary[]>;
-  abstract createConversation(): Observable<ChatConversationSummary>;
+  abstract createConversation(topic?: UserStartableChatTopic): Observable<ChatConversationSummary>;
   abstract renameConversation(conversationId: string, title: string): Observable<ChatConversationSummary>;
   abstract getMessages(conversationId: string): Observable<ChatMessage[]>;
-  abstract sendMessage(conversationId: string, message: string): Observable<string>;
+  abstract sendMessage(conversationId: string, message: string): Observable<ChatReply>;
+  /** Primer mensaje del asistente tras una evaluación; idempotente (uno por evaluación). */
+  abstract startAssessmentBriefing(assessmentId: string, language: AppLanguage): Observable<ChatBriefing>;
 }

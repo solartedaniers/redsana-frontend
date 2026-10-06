@@ -1,8 +1,10 @@
 import { DatePipe } from '@angular/common';
-import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, ElementRef, computed, inject, signal, viewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { ActivatedRoute, Router } from '@angular/router';
 import { SecurityAssistantRepository } from '../../../core/repositories/security-assistant.repository';
 import {
+  CHAT_TOPIC_QUERY_PARAM,
   ChatConversationSummary,
   ChatMessage,
   SecurityAnswers,
@@ -16,6 +18,7 @@ import { evaluateWifiEncryption } from '../../../core/domain/security-score.calc
 import { PageHeader } from '../../../shared/components/page-header/page-header';
 import { ScoreGauge } from '../../../shared/components/score-gauge/score-gauge';
 import { TranslatePipe } from '../../../core/i18n/translate.pipe';
+import { I18nService } from '../../../core/i18n/i18n.service';
 import { Icon } from '../../../shared/components/icon/icon';
 
 @Component({
@@ -29,6 +32,10 @@ export class SecurityAssistant {
   private readonly repository = inject(SecurityAssistantRepository);
   private readonly wifiGateway = inject(WifiEncryptionGateway);
   private readonly evidenceCollector = inject(SecurityEvidenceCollector);
+  private readonly i18n = inject(I18nService);
+  private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
+  private readonly chatPanel = viewChild<ElementRef<HTMLElement>>('chatPanel');
 
   protected readonly questions = signal<SecurityQuestion[]>([]);
   protected readonly answers = signal<SecurityAnswers>({});
@@ -61,7 +68,12 @@ export class SecurityAssistant {
       this.result.set(latest);
       this.isLoadingLatest.set(false);
     });
-    this.loadConversations(true);
+    // Otra pantalla (p. ej. Modo familiar) puede abrir el asistente en un tema.
+    const startsFamilyMode = this.route.snapshot.queryParamMap.get(CHAT_TOPIC_QUERY_PARAM) === 'family_mode';
+    this.loadConversations(!startsFamilyMode);
+    if (startsFamilyMode) {
+      this.startFamilyModeConversation();
+    }
   }
 
   protected answer(questionId: string, value: SecurityAnswerValue): void {
@@ -76,6 +88,35 @@ export class SecurityAssistant {
     this.repository.submitAnswers(this.answers(), evidence).subscribe((result) => {
       this.isSubmitting.set(false);
       this.result.set(result);
+      this.startAssessmentBriefing(result.id);
+    });
+  }
+
+  /** El asistente abre la conversación con el resumen de esta evaluación (una sola vez por evaluación). */
+  private startAssessmentBriefing(assessmentId: string): void {
+    this.isSendingChat.set(true);
+    this.repository.startAssessmentBriefing(assessmentId, this.i18n.language()).subscribe({
+      next: ({ conversation, messages }) => {
+        this.conversations.update((list) => [conversation, ...list.filter((c) => c.id !== conversation.id)]);
+        this.currentConversationId.set(conversation.id);
+        this.chatMessages.set(messages);
+        this.isSendingChat.set(false);
+      },
+      // Sin resumen no se muestra nada inventado: el chat queda disponible como siempre.
+      error: () => this.isSendingChat.set(false),
+    });
+  }
+
+  private startFamilyModeConversation(): void {
+    this.repository.createConversation('family_mode').subscribe((conversation) => {
+      this.conversations.update((list) => [conversation, ...list]);
+      this.currentConversationId.set(conversation.id);
+      this.chatMessages.set([
+        { role: 'assistant', text: 'user.securityAssistant.chat.familyModeIntro', isTranslationKey: true },
+      ]);
+      // Sin el query param, recargar la página no abre otra conversación igual.
+      void this.router.navigate([], { relativeTo: this.route, queryParams: {}, replaceUrl: true });
+      this.chatPanel()?.nativeElement.scrollIntoView({ behavior: 'smooth' });
     });
   }
 
@@ -147,8 +188,18 @@ export class SecurityAssistant {
     this.chatMessages.update((messages) => [...messages, { role: 'user', text }]);
     this.isSendingChat.set(true);
     this.repository.sendMessage(conversationId, text).subscribe({
-      next: (reply) => {
-        this.chatMessages.update((messages) => [...messages, { role: 'assistant', text: reply }]);
+      next: ({ reply, noticeKey, noticeParams }) => {
+        const notice: ChatMessage[] = noticeKey
+          ? [{ role: 'assistant', text: noticeKey, isTranslationKey: true, translationParams: noticeParams ?? undefined }]
+          : [];
+        if (reply === null) {
+          // El mensaje no se guardó (p. ej. traía una contraseña): se quita de la
+          // pantalla y en su lugar se muestra el aviso.
+          this.chatMessages.update((messages) => [...messages.slice(0, -1), ...notice]);
+          this.isSendingChat.set(false);
+          return;
+        }
+        this.chatMessages.update((messages) => [...messages, { role: 'assistant', text: reply }, ...notice]);
         this.isSendingChat.set(false);
         // Refresca título autogenerado (primer mensaje) y orden por actividad reciente.
         this.loadConversations(false);
@@ -156,7 +207,7 @@ export class SecurityAssistant {
       error: () => {
         this.chatMessages.update((messages) => [
           ...messages,
-          { role: 'assistant', text: 'user.securityAssistant.chat.errorReply', isErrorKey: true },
+          { role: 'assistant', text: 'user.securityAssistant.chat.errorReply', isTranslationKey: true },
         ]);
         this.isSendingChat.set(false);
       },

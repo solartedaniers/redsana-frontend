@@ -2,8 +2,13 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable, map, of } from 'rxjs';
 import { environment } from '../../../environments/environment';
+import { AppLanguage } from '../i18n/i18n.service';
 import {
+  ChatBriefing,
   ChatConversationSummary,
+  ChatReply,
+  ChatTopic,
+  UserStartableChatTopic,
   ChatMessage,
   SecurityAnswers,
   SecurityAnswerValue,
@@ -31,10 +36,13 @@ interface BackendRecommendation {
 }
 
 interface BackendAssessment {
+  id: string;
   score: number;
   questionnaire_score: number;
   technical_score: number | null;
   is_partial: boolean;
+  technical_measured_at: string | null;
+  technical_evidence_reused: boolean;
   recommendations: BackendRecommendation[];
   submitted_at: string;
 }
@@ -42,6 +50,7 @@ interface BackendAssessment {
 interface BackendConversation {
   id: string;
   title: string | null;
+  topic: ChatTopic | null;
   updated_at: string;
 }
 
@@ -87,8 +96,10 @@ export class SecurityAssistantHttpRepository extends SecurityAssistantRepository
       .pipe(map((conversations) => conversations.map((c) => this.toConversation(c))));
   }
 
-  createConversation(): Observable<ChatConversationSummary> {
-    return this.http.post<BackendConversation>(this.conversationsUrl, {}).pipe(map((c) => this.toConversation(c)));
+  createConversation(topic?: UserStartableChatTopic): Observable<ChatConversationSummary> {
+    return this.http
+      .post<BackendConversation>(this.conversationsUrl, { topic: topic ?? null })
+      .pipe(map((c) => this.toConversation(c)));
   }
 
   renameConversation(conversationId: string, title: string): Observable<ChatConversationSummary> {
@@ -100,25 +111,57 @@ export class SecurityAssistantHttpRepository extends SecurityAssistantRepository
   getMessages(conversationId: string): Observable<ChatMessage[]> {
     return this.http
       .get<BackendChatMessage[]>(`${this.conversationsUrl}/${conversationId}/messages`)
-      .pipe(map((messages) => messages.map((m) => ({ role: m.role, text: m.content }))));
+      .pipe(map((messages) => messages.map((m) => this.toMessage(m))));
   }
 
-  sendMessage(conversationId: string, message: string): Observable<string> {
+  sendMessage(conversationId: string, message: string): Observable<ChatReply> {
     return this.http
-      .post<{ reply: string }>(`${this.conversationsUrl}/${conversationId}/messages`, { message })
-      .pipe(map((response) => response.reply));
+      .post<{ reply: string | null; notice_key: string | null; notice_params: Record<string, string> | null }>(`${this.conversationsUrl}/${conversationId}/messages`, {
+        message,
+        utc_offset_minutes: new Date().getTimezoneOffset(),
+      })
+      .pipe(
+        map((response) => ({
+          reply: response.reply,
+          noticeKey: response.notice_key,
+          noticeParams: response.notice_params,
+        }))
+      );
+  }
+
+  startAssessmentBriefing(assessmentId: string, language: AppLanguage): Observable<ChatBriefing> {
+    return this.http
+      .post<{ conversation: BackendConversation; messages: BackendChatMessage[] }>(`${this.conversationsUrl}/briefings`, {
+        assessment_id: assessmentId,
+        language,
+        // Para que el asistente escriba las fechas en la hora local del usuario.
+        utc_offset_minutes: new Date().getTimezoneOffset(),
+      })
+      .pipe(
+        map((briefing) => ({
+          conversation: this.toConversation(briefing.conversation),
+          messages: briefing.messages.map((m) => this.toMessage(m)),
+        }))
+      );
   }
 
   private toConversation(conversation: BackendConversation): ChatConversationSummary {
-    return { id: conversation.id, title: conversation.title, updatedAt: conversation.updated_at };
+    return { id: conversation.id, title: conversation.title, topic: conversation.topic, updatedAt: conversation.updated_at };
+  }
+
+  private toMessage(message: BackendChatMessage): ChatMessage {
+    return { role: message.role, text: message.content };
   }
 
   private toResult(assessment: BackendAssessment): SecurityAssessmentResult {
     return {
+      id: assessment.id,
       score: assessment.score,
       questionnaireScore: assessment.questionnaire_score,
       technicalScore: assessment.technical_score,
       isPartial: assessment.is_partial,
+      technicalMeasuredAt: assessment.technical_measured_at,
+      technicalEvidenceReused: assessment.technical_evidence_reused,
       recommendations: assessment.recommendations.map((r) => this.toRecommendation(r)),
       submittedAt: assessment.submitted_at,
     };

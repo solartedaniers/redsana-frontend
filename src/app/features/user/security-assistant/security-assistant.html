@@ -17,6 +17,9 @@
           {{ 'user.securityAssistant.score.questionnaire' | translate: { score: data.questionnaireScore } }}
           · {{ 'user.securityAssistant.score.technical' | translate: { score: data.technicalScore ?? 0 } }}
         </p>
+        @if (data.technicalEvidenceReused) {
+          <p>{{ 'user.securityAssistant.score.reusedTechnicalAnalysis' | translate: { date: (data.technicalMeasuredAt | date: 'shortDate') ?? '' } }}</p>
+        }
       }
       <p class="submitted-at">{{ 'user.securityAssistant.lastSubmittedAt' | translate }} {{ data.submittedAt | date: 'short' }}</p>
     </section>
@@ -85,7 +88,7 @@
   </form>
 }
 
-<section class="chat-panel surface-panel">
+<section #chatPanel class="chat-panel surface-panel">
   <div class="chat-panel__header">
     <div>
       <h2>{{ 'user.securityAssistant.chat.title' | translate }}</h2>
@@ -135,7 +138,11 @@
               />
             } @else {
               <span class="chat-history__title">
-                {{ conversation.title || ('user.securityAssistant.chat.untitled' | translate) }}
+                {{
+                  conversation.title ||
+                    ((conversation.topic ? 'user.securityAssistant.chat.topics.' + conversation.topic : 'user.securityAssistant.chat.untitled')
+                      | translate)
+                }}
               </span>
               <button
                 type="button"
@@ -155,7 +162,7 @@
   <div class="chat-messages">
     @for (message of chatMessages(); track $index) {
       <div class="chat-bubble" [class.chat-bubble--user]="message.role === 'user'">
-        {{ message.isErrorKey ? (message.text | translate) : message.text }}
+        {{ message.isTranslationKey ? (message.text | translate: message.translationParams) : message.text }}
       </div>
     }
     @if (isSendingChat()) {
