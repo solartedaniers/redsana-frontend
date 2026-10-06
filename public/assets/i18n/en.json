@@ -165,7 +165,14 @@
         "history": "Conversation history",
         "noConversations": "You don't have any conversations yet.",
         "untitled": "Untitled conversation",
-        "rename": "Rename conversation"
+        "rename": "Rename conversation",
+        "passwordWarning": "Don't share passwords in the chat, not even with me: that message was not saved or sent. If you need help, tell me where you are in your router's panel and I'll guide you so you type it there yourself.",
+        "familyModeIntro": "I'll help you turn on family mode step by step. What brand is your router (for example TP-Link, Huawei or ZTE)? That way I can tell you exactly where the DNS option is. I will never ask for your router password.",
+        "topics": {
+          "assessment_briefing": "Your assessment summary",
+          "family_mode": "Family mode"
+        },
+        "familyDnsCheck": "Check the DNS before saving: they must be exactly {{primary}} (primary) and {{secondary}} (secondary), the same as in the Family mode guide. If you type others, you could lose internet access."
       },
       "recommendations": {
         "changeDefaultPassword": {
@@ -229,7 +236,8 @@
         "partialLabel": "Partial · questionnaire only",
         "partialNotice": "70% of the score comes from the technical analysis of your network (WiFi encryption and router ports), which only the desktop app can perform.",
         "questionnaire": "Questionnaire: {{score}}/100 (30%)",
-        "technical": "Technical analysis: {{score}}/100 (70%)"
+        "technical": "Technical analysis: {{score}}/100 (70%)",
+        "reusedTechnicalAnalysis": "Technical analysis from {{date}}, done from the desktop app."
       }
     },
     "alertsCenter": {
@@ -292,7 +300,8 @@
       "secondaryDns": "Secondary DNS",
       "whatItBlocks": "These are Cloudflare's free family servers: they filter adult content and known malware sites. No filter is perfect, but it lowers the risk a lot.",
       "lockedRouter": "If your router doesn't let you change the DNS (some internet-provider routers don't), you can enter these same details in the network settings of each computer or phone.",
-      "undo": "To turn it off, set the DNS back to \"Automatic\" and save."
+      "undo": "To turn it off, set the DNS back to \"Automatic\" and save.",
+      "askAssistant": "Ask the assistant"
     }
   },
   "admin": {
@@ -313,7 +322,8 @@
       "scoreSource": {
         "real": "Real",
         "estimated": "Estimated"
-      }
+      },
+      "technicalMeasuredAt": "Technical analysis from {{date}}"
     },
     "userManagement": {
       "title": "User management",

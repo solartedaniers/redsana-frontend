@@ -165,7 +165,14 @@
         "history": "Historial de conversaciones",
         "noConversations": "Aún no tienes conversaciones.",
         "untitled": "Conversación sin título",
-        "rename": "Renombrar conversación"
+        "rename": "Renombrar conversación",
+        "passwordWarning": "No compartas contraseñas en el chat, tampoco conmigo: ese mensaje no se guardó ni se envió. Si necesitas ayuda, dime dónde estás en el panel de tu router y te guío para que la escribas tú allí.",
+        "familyModeIntro": "Te ayudo a activar el modo familiar paso a paso. ¿De qué marca es tu router (por ejemplo TP-Link, Huawei o ZTE)? Así te digo exactamente dónde está la opción de DNS. Nunca te voy a pedir la contraseña del router.",
+        "topics": {
+          "assessment_briefing": "Resumen de tu evaluación",
+          "family_mode": "Modo familiar"
+        },
+        "familyDnsCheck": "Revisa los DNS antes de guardarlos: deben ser exactamente {{primary}} (primario) y {{secondary}} (secundario), los mismos de la guía de Modo familiar. Si escribes otros, podrías quedarte sin internet."
       },
       "recommendations": {
         "changeDefaultPassword": {
@@ -229,7 +236,8 @@
         "partialLabel": "Parcial · solo cuestionario",
         "partialNotice": "El 70 % del puntaje sale del análisis técnico de tu red (cifrado WiFi y puertos del router), que solo puede hacer la app de escritorio.",
         "questionnaire": "Cuestionario: {{score}}/100 (30 %)",
-        "technical": "Análisis técnico: {{score}}/100 (70 %)"
+        "technical": "Análisis técnico: {{score}}/100 (70 %)",
+        "reusedTechnicalAnalysis": "Análisis técnico del {{date}}, hecho desde la app de escritorio."
       }
     },
     "alertsCenter": {
@@ -292,7 +300,8 @@
       "secondaryDns": "DNS secundario",
       "whatItBlocks": "Son los servidores gratuitos de Cloudflare para familias: filtran contenido para adultos y sitios con malware conocidos. Ningún filtro es perfecto, pero reduce mucho el riesgo.",
       "lockedRouter": "Si tu router no te deja cambiar el DNS (pasa con algunos routers del proveedor de internet), puedes escribir estos mismos datos en la configuración de red de cada computador o celular.",
-      "undo": "Para desactivarlo, vuelve a dejar el DNS en \"Automático\" y guarda."
+      "undo": "Para desactivarlo, vuelve a dejar el DNS en \"Automático\" y guarda.",
+      "askAssistant": "Pregúntale al asistente"
     }
   },
   "admin": {
@@ -313,7 +322,8 @@
       "scoreSource": {
         "real": "Real",
         "estimated": "Estimado"
-      }
+      },
+      "technicalMeasuredAt": "Análisis técnico del {{date}}"
     },
     "userManagement": {
       "title": "Gestión de usuarios",
