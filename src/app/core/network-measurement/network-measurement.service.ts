@@ -5,6 +5,7 @@ import { EMPTY, catchError, from, interval, startWith, switchMap } from 'rxjs';
 import { AuthService } from '../auth/auth.service';
 import { NetworkMetricsRepository } from '../repositories/network-metrics.repository';
 import { NetworkMeasurementGateway } from './network-measurement.gateway';
+import { NetworkIdentityGateway } from '../network-identity/network-identity.gateway';
 
 /** Frecuencia de la medición real de red en segundo plano. */
 const MEASUREMENT_INTERVAL_MS = 60000;
@@ -23,6 +24,7 @@ const MEASUREMENT_INTERVAL_MS = 60000;
 export class NetworkMeasurementService {
   private readonly gateway = inject(NetworkMeasurementGateway);
   private readonly repository = inject(NetworkMetricsRepository);
+  private readonly networkIdentity = inject(NetworkIdentityGateway);
   private readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
   // Las mediciones se guardan a nombre del usuario: sin sesión no hay a quién
   // atribuirlas (el backend responde 401) y en la landing pública solo serían
@@ -48,8 +50,10 @@ export class NetworkMeasurementService {
   }
 
   private runCycle() {
-    return from(this.gateway.measure()).pipe(
-      switchMap((measurement) => this.repository.record(measurement, this.gateway.source)),
+    // La red se identifica en cada ciclo: si el equipo cambió de red, la
+    // medición se cuenta para la red nueva (cada una calibra por separado).
+    return from(Promise.all([this.gateway.measure(), this.networkIdentity.currentNetworkFingerprint()])).pipe(
+      switchMap(([measurement, fingerprint]) => this.repository.record(measurement, this.gateway.source, fingerprint)),
       catchError((error) => {
         console.error('No se pudo registrar la medición de red', error);
         return EMPTY;

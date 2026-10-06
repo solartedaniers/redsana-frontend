@@ -42,6 +42,9 @@ import { LanScanGateway } from './core/lan-scan/lan-scan.gateway';
 import { LanScanTauriGateway } from './core/lan-scan/lan-scan-tauri.gateway';
 import { LanScanWebGateway } from './core/lan-scan/lan-scan-web.gateway';
 import { RouterPortScanGateway } from './core/router-port-scan/router-port-scan.gateway';
+import { NetworkIdentityGateway } from './core/network-identity/network-identity.gateway';
+import { NetworkIdentityTauriGateway } from './core/network-identity/network-identity-tauri.gateway';
+import { NetworkIdentityWebGateway } from './core/network-identity/network-identity-web.gateway';
 import { RouterPortScanTauriGateway } from './core/router-port-scan/router-port-scan-tauri.gateway';
 import { RouterPortScanWebGateway } from './core/router-port-scan/router-port-scan-web.gateway';
 import { AvatarStorageGateway } from './core/avatar-storage/avatar-storage.gateway';
@@ -76,6 +79,7 @@ export const appConfig: ApplicationConfig = {
     provideByRuntime(WifiEncryptionGateway, WifiEncryptionTauriGateway, WifiEncryptionWebGateway),
     provideByRuntime(LanScanGateway, LanScanTauriGateway, LanScanWebGateway),
     provideByRuntime(RouterPortScanGateway, RouterPortScanTauriGateway, RouterPortScanWebGateway),
+    provideByRuntime(NetworkIdentityGateway, NetworkIdentityTauriGateway, NetworkIdentityWebGateway),
     { provide: AvatarStorageGateway, useClass: SupabaseAvatarStorageGateway },
 
     // Carga idioma y restaura sesión antes de renderizar: evita parpadeo de

@@ -27,7 +27,8 @@ export interface NetworkQualityMeasurement {
 /** Estado del módulo de detección de anomalías: mientras no haya suficiente
  * historial (calibrating), el modelo no evalúa nada, para no dar falsos positivos. */
 export interface AnomalyDetectionStatus {
-  status: 'calibrating' | 'active';
+  /** unknown_network: la última medición no tiene red identificada (no se calibra ni se evalúa). */
+  status: 'calibrating' | 'active' | 'unknown_network';
   samplesCollected: number;
   samplesRequired: number;
 }

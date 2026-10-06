@@ -28,7 +28,7 @@ interface BackendSample {
 }
 
 interface BackendAnomalyStatus {
-  status: 'calibrating' | 'active';
+  status: 'calibrating' | 'active' | 'unknown_network';
   samples_collected: number;
   samples_required: number;
 }
@@ -59,12 +59,17 @@ export class NetworkMetricsHttpRepository extends NetworkMetricsRepository {
       .pipe(map((samples) => samples.map((sample) => this.toSample(sample))));
   }
 
-  record(measurement: NetworkQualityMeasurement, source: MeasurementSource): Observable<NetworkMetricSnapshot> {
+  record(
+    measurement: NetworkQualityMeasurement,
+    source: MeasurementSource,
+    networkFingerprint: string | null
+  ): Observable<NetworkMetricSnapshot> {
     const body = {
       latency_ms: measurement.latencyMs,
       jitter_ms: measurement.jitterMs,
       packet_loss_percent: measurement.packetLossPercent,
       source,
+      network_fingerprint: networkFingerprint,
     };
     return this.http.post<BackendSnapshot>(this.baseUrl, body).pipe(map((snapshot) => this.toSnapshot(snapshot)));
   }
