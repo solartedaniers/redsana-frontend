@@ -1,0 +1,17 @@
+.download-hero { padding: 1.25rem; margin-bottom: 1rem; }
+.download-hero .page-header { margin: 0; }
+
+.download-card {
+  display: grid;
+  justify-items: center;
+  gap: 1rem;
+  max-width: 32rem;
+  padding: 2rem 1.5rem;
+  text-align: center;
+
+  // El svg vive dentro de <app-icon> (encapsulado): se agranda solo en esta tarjeta.
+  app-icon { color: var(--color-accent); }
+  app-icon ::ng-deep .icon { width: 2.5rem; height: 2.5rem; }
+  p { margin: 0; color: var(--color-text-secondary); line-height: 1.6; }
+  app-desktop-download-button { width: 100%; }
+}

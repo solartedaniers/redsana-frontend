@@ -1,0 +1,8 @@
+:host { display: contents; }
+
+// .submit-button está pensado para <button>; como enlace solo le falta esto.
+a.submit-button {
+  display: block;
+  text-align: center;
+  text-decoration: none;
+}
