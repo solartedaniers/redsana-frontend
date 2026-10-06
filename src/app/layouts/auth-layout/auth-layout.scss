@@ -29,7 +29,9 @@
   align-items: center;
 }
 
-.brand-cluster { gap: 0.45rem; }
+// La marca lleva a la pantalla de inicio (en escritorio "/" redirige al login).
+.brand-cluster { gap: 0.45rem; text-decoration: none; border-radius: 0.3rem; }
+.brand-cluster:focus-visible { outline: 2px solid var(--color-focus-ring); outline-offset: 2px; }
 
 .brand-mark {
   display: grid;

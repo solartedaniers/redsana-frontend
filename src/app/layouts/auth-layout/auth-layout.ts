@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { RouterLink, RouterOutlet } from '@angular/router';
 import { TranslatePipe } from '../../core/i18n/translate.pipe';
 import { ThemeToggle } from '../../shared/components/theme-toggle/theme-toggle';
 import { LanguageToggle } from '../../shared/components/language-toggle/language-toggle';
@@ -12,7 +12,7 @@ import { routeTransitionAnimation } from '../../core/animations/route-transition
 // al navegar entre login/registro/recuperación.
 @Component({
   selector: 'app-auth-layout',
-  imports: [RouterOutlet, TranslatePipe, ThemeToggle, LanguageToggle, NetworkBackground],
+  imports: [RouterLink, RouterOutlet, TranslatePipe, ThemeToggle, LanguageToggle, NetworkBackground],
   templateUrl: './auth-layout.html',
   styleUrl: './auth-layout.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
