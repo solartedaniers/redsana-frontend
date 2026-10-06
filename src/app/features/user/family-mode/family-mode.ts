@@ -1,5 +1,7 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { RouterLink } from '@angular/router';
 import { FAMILY_DNS } from '../../../core/domain/family-dns';
+import { CHAT_TOPIC_QUERY_PARAM, UserStartableChatTopic } from '../../../core/models/security.model';
 import { TranslatePipe } from '../../../core/i18n/translate.pipe';
 import { PageHeader } from '../../../shared/components/page-header/page-header';
 
@@ -17,7 +19,7 @@ const STEP_KEYS = [
 // del router: el usuario hace el cambio en el panel de su propio router.
 @Component({
   selector: 'app-family-mode',
-  imports: [TranslatePipe, PageHeader],
+  imports: [RouterLink, TranslatePipe, PageHeader],
   templateUrl: './family-mode.html',
   styleUrl: './family-mode.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -25,4 +27,9 @@ const STEP_KEYS = [
 export class FamilyMode {
   protected readonly dns = FAMILY_DNS;
   protected readonly stepKeys = STEP_KEYS;
+  // El asistente recibe los DNS y estos mismos pasos como contexto; la guía
+  // fija de esta pantalla se queda como respaldo.
+  protected readonly assistantQueryParams: Record<string, UserStartableChatTopic> = {
+    [CHAT_TOPIC_QUERY_PARAM]: 'family_mode',
+  };
 }

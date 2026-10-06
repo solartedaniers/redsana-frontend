@@ -13,6 +13,9 @@
       }
     </ol>
     <p class="family-note">{{ 'user.familyMode.whyManual' | translate }}</p>
+    <a class="submit-button family-ask" routerLink="/user/security-assistant" [queryParams]="assistantQueryParams">
+      {{ 'user.familyMode.askAssistant' | translate }}
+    </a>
   </section>
 
   <aside class="family-dns surface-panel">

@@ -8,3 +8,6 @@
 .family-dns dl { display: grid; grid-template-columns: auto 1fr; gap: .5rem 1rem; margin: 1rem; }
 .family-dns dt { color: var(--color-text-secondary); }
 .family-dns dd { margin: 0; font-family: var(--font-mono); font-weight: 700; color: var(--color-accent); }
+
+// .submit-button está pensado para <button>; como enlace solo le falta esto.
+.family-ask { display: block; margin: 0 1rem 1rem; text-align: center; text-decoration: none; }
