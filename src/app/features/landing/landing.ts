@@ -1,18 +1,14 @@
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { environment } from '../../../environments/environment';
 import { TranslatePipe } from '../../core/i18n/translate.pipe';
-import { RuntimeEnvironmentService } from '../../core/runtime/runtime-environment.service';
+import { DesktopDownloadButton } from '../../shared/components/desktop-download-button/desktop-download-button';
 import { Icon } from '../../shared/components/icon/icon';
 
 @Component({
   selector: 'app-landing',
-  imports: [RouterLink, TranslatePipe, Icon],
+  imports: [RouterLink, TranslatePipe, Icon, DesktopDownloadButton],
   templateUrl: './landing.html',
   styleUrl: './landing.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class Landing {
-  protected readonly isDesktop = inject(RuntimeEnvironmentService).isDesktop;
-  protected readonly desktopDownloadUrl = environment.desktopDownloadUrl;
-}
+export class Landing {}

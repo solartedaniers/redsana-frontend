@@ -6,6 +6,7 @@ import { SidebarNav } from '../../shared/components/sidebar-nav/sidebar-nav';
 import { NavItem } from '../../shared/components/sidebar-nav/nav-item.model';
 import { TopBar } from '../../shared/components/top-bar/top-bar';
 import { NetworkBackground } from '../../shared/components/network-background/network-background';
+import { RuntimeEnvironmentService } from '../../core/runtime/runtime-environment.service';
 
 const USER_NAV_ITEMS: NavItem[] = [
   { labelKey: 'user.dashboard.title', route: '/user/dashboard', icon: 'dashboard' },
@@ -20,6 +21,8 @@ const ADMIN_NAV_ITEMS: NavItem[] = [
   { labelKey: 'admin.networkSupervision.title', route: '/admin/network-supervision', icon: 'home' },
   { labelKey: 'admin.userManagement.title', route: '/admin/users', icon: 'users' },
 ];
+
+const DOWNLOAD_NAV_ITEM: NavItem = { labelKey: 'user.download.title', route: '/user/download', icon: 'download' };
 
 const PROFILE_NAV_ITEM: NavItem = {
   labelKey: 'auth.profile.title',
@@ -40,10 +43,15 @@ const PROFILE_NAV_ITEM: NavItem = {
 export class AppShellLayout {
   private readonly auth = inject(AuthService);
   private readonly router = inject(Router);
+  private readonly isDesktop = inject(RuntimeEnvironmentService).isDesktop;
 
   protected readonly navItems = computed<NavItem[]>(() => {
-    const roleItems = this.auth.role() === 'admin' ? ADMIN_NAV_ITEMS : USER_NAV_ITEMS;
-    return [...roleItems, PROFILE_NAV_ITEM];
+    if (this.auth.role() === 'admin') {
+      return [...ADMIN_NAV_ITEMS, PROFILE_NAV_ITEM];
+    }
+    // "Descargar" solo en la web: en el escritorio la app ya está instalada.
+    const downloadItems = this.isDesktop ? [] : [DOWNLOAD_NAV_ITEM];
+    return [...USER_NAV_ITEMS, ...downloadItems, PROFILE_NAV_ITEM];
   });
 
   protected onSignOut(): void {
