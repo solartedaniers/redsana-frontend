@@ -1,5 +1,13 @@
+// Ward overview: the average security score is the protagonist reading.
 .metrics-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
-  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(min(12rem, 100%), 1fr));
+  gap: var(--space-5);
+}
+
+.metrics-grid__hero { grid-column: 1 / -1; }
+
+@media (min-width: 64rem) {
+  .metrics-grid { grid-template-columns: minmax(0, 2fr) repeat(3, minmax(0, 1fr)); }
+  .metrics-grid__hero { grid-column: auto; }
 }
