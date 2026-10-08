@@ -1,141 +1,208 @@
-// Fuente única de verdad para todos los colores de RedSana.
-// Ningún componente ni hoja de estilos individual debe declarar un color propio:
-// siempre se consume una de estas custom properties vía var(--color-*).
+// Single source of truth for RedSana's visual language: "Clinical Chart".
+// Light = printed ECG chart paper stamped with fluorescent ink.
+// Dark  = "Phosphor Ward": the same chart on an oscilloscope screen.
 //
-// El bloque @theme registra la paleta oscura como valor por defecto y hace que
-// Tailwind genere utilidades a partir de cada variable (bg-accent, text-status-danger, etc).
-@theme {
-  --color-bg-app: #07090e;
-  --color-bg-surface: #0b0f17;
-  --color-bg-surface-alt: #111724;
+// No component declares its own color, font, size, radius or shadow: every
+// stylesheet consumes these custom properties. Status colors carry meaning
+// everywhere: healthy = green/lime, warning = amber, critical = red/coral.
+//
+// `@theme static` registers the LIGHT palette as the default and makes Tailwind
+// emit every variable (not only the ones used by utilities), because most of
+// them are consumed from plain SCSS. The dark palette overrides it below.
+@theme static {
+  // ---- Paper & ink ------------------------------------------------------
+  --color-bg-app: #f3eee3;
+  --color-bg-surface: #fffdf8;
+  --color-bg-surface-alt: #eae3d3;
+  --color-ink: #15110e;
 
-  --color-border: #1f2937;
-  --color-border-strong: #374151;
-  --color-card-border: #d97706;
-  --shadow-card-hover: none;
+  --color-border: rgb(21 17 14 / 18%);
+  --color-border-strong: #15110e;
+  --color-card-border: #15110e;
 
-  --color-text-primary: #f3f4f6;
-  --color-text-secondary: #9ca3af;
-  --color-text-inverse: #0b1220;
+  --color-text-primary: #15110e;
+  --color-text-secondary: #4a4239;
+  --color-text-inverse: #fffdf8;
 
-  --color-accent: #f59e0b;
-  --color-accent-hover: #fbbf24;
-  --color-accent-muted: rgb(245 158 11 / 15%);
+  // ---- Brand ink (electric violet) --------------------------------------
+  --color-accent: #5a2bff;
+  --color-accent-hover: #4317d9;
+  --color-focus-ring: #5a2bff;
 
-  --color-status-success: #22c55e;
-  --color-status-warning: #eab308;
-  --color-status-danger: #ef4444;
-  --color-status-neutral: #6b7280;
+  // ---- Status: text-safe tones (AA on paper and on surface) -------------
+  --color-status-success: #1d7a3a;
+  --color-status-warning: #9a5b00;
+  --color-status-danger: #c22a12;
+  --color-status-neutral: #5e574e;
 
-  --color-focus-ring: rgb(245 158 11 / 50%);
+  // ---- Status: fluorescent fills (stickers, blocks, aura) ---------------
+  // Text on top of a fill always uses --color-on-fill.
+  --color-fill-healthy: #c4f23a;
+  --color-fill-warning: #ffb21f;
+  --color-fill-critical: #ff5436;
+  --color-fill-brand: #5a2bff;
+  --color-fill-neutral: #e0d8c6;
+  --color-on-fill: #15110e;
+  --color-on-fill-brand: #fffdf8;
 
-  // Card "glass" protagonista (card grande de auth, score-gauge destacado):
-  // fondo translúcido + borde + sombra con resplandor ámbar.
-  --color-glass-bg: rgb(11 15 23 / 82%);
-  --color-glass-border: rgb(245 158 11 / 22%);
-  --shadow-glass:
-    0 10px 40px -10px rgb(0 0 0 / 70%),
-    0 0 35px -5px rgb(245 158 11 / 25%);
+  // ---- Chart paper texture ----------------------------------------------
+  --color-grid-minor: rgb(226 120 108 / 10%);
+  --color-grid-major: rgb(226 120 108 / 20%);
+  --texture-grain-opacity: 0.07;
+  --grid-minor-size: 0.5rem;
+  --grid-major-size: 2.5rem;
+  // ECG chart paper: minor and major squares, drawn with gradients (no image).
+  --texture-chart-grid:
+    linear-gradient(var(--color-grid-major) 1px, transparent 1px) 0 0 / var(--grid-major-size) var(--grid-major-size),
+    linear-gradient(90deg, var(--color-grid-major) 1px, transparent 1px) 0 0 / var(--grid-major-size) var(--grid-major-size),
+    linear-gradient(var(--color-grid-minor) 1px, transparent 1px) 0 0 / var(--grid-minor-size) var(--grid-minor-size),
+    linear-gradient(90deg, var(--color-grid-minor) 1px, transparent 1px) 0 0 / var(--grid-minor-size) var(--grid-minor-size);
+  // Paper grain: a tiny SVG turbulence tile, rasterized once by the browser.
+  --texture-grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  // Oscilloscope scanlines (dark only; transparent in light).
+  --color-scanline: transparent;
+  --scanline-gap: 3px;
 
-  // Glass "de trabajo": sidebar, top-bar y tarjetas del shell (más liviano
-  // que --color-glass-bg, que queda reservado a paneles protagonistas).
-  --color-surface-glass: rgb(17 23 36 / 70%);
-  --shadow-elevated: 0 12px 30px -14px rgb(0 0 0 / 55%);
-  --color-glow-accent: rgb(245 158 11 / 45%);
+  // ---- Legacy surface aliases (kept so every screen adopts the concept) --
+  --color-surface-glass: #fffdf8;
+  --color-glass-bg: #fffdf8;
+  --color-glass-border: #15110e;
+  --shadow-elevated: var(--shadow-hard);
+  --shadow-glass: var(--shadow-hard-lg);
+  --shadow-card-hover: var(--shadow-hard-lg);
 
+  // ---- Shape language ---------------------------------------------------
+  --border-width-ink: 2.5px;
+  --border-width-hairline: 1px;
+  --radius-sm: 0.375rem;
+  --radius-md: 0.625rem;
+  --radius-lg: 1rem;
+  --radius-pill: 999px;
+  --shadow-offset: 0.375rem;
+  --shadow-offset-lg: 0.625rem;
+  --color-shadow: #15110e;
+  --shadow-hard: var(--shadow-offset) var(--shadow-offset) 0 var(--color-shadow);
+  --shadow-hard-lg: var(--shadow-offset-lg) var(--shadow-offset-lg) 0 var(--color-shadow);
+  --shadow-hard-pressed: 0 0 0 var(--color-shadow);
+  --sticker-tilt: -2deg;
+  --sticker-tilt-alt: 1.5deg;
+  --focus-ring-width: 3px;
+  --focus-ring-offset: 2px;
+  --touch-target-min: 2.75rem;
+
+  // ---- Spacing scale ----------------------------------------------------
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.5rem;
+  --space-6: 2rem;
+  --space-7: 3rem;
+  --space-8: 4.5rem;
+
+  // ---- Typography -------------------------------------------------------
+  // Display: Bricolage Grotesque (wght + wdth + opsz axes) for huge titles.
+  // Body: Plus Jakarta Sans. Numbers: JetBrains Mono with tabular figures.
+  --font-display: 'Bricolage Grotesque Variable', 'Plus Jakarta Sans Variable', system-ui, sans-serif;
   --font-sans: 'Plus Jakarta Sans Variable', system-ui, sans-serif;
   --font-mono: 'JetBrains Mono Variable', ui-monospace, monospace;
+  --font-display-weight: 800;
+  --font-display-stretch: 80%;
+  --font-display-tracking: -0.035em;
+  --font-label-tracking: 0.08em;
 
-  // Escala tipográfica compartida. Evita tamaños microscópicos, especialmente
-  // en entradas y controles que el operador debe leer con rapidez.
-  --font-size-caption: 0.78rem;
-  --font-size-body: 0.94rem;
-  --font-size-form-label: 0.8rem;
+  --font-size-caption: 0.8rem;
+  --font-size-body: 0.97rem;
+  --font-size-form-label: 0.78rem;
   --font-size-form-input: 1rem;
-  --font-size-heading-sm: 1.2rem;
-  --font-size-heading: 1.75rem;
+  --font-size-heading-sm: 1.3rem;
+  --font-size-heading: clamp(1.9rem, 1.3rem + 2.4vw, 3.1rem);
+  --font-size-display: clamp(2.6rem, 1.5rem + 5vw, 6rem);
+  // Side-panel titles that share the sheet with a form.
+  --font-size-hero: clamp(2.2rem, 1.4rem + 2.6vw, 3.9rem);
   --font-size-metric: 2rem;
+  --font-size-metric-xl: clamp(2.6rem, 1.7rem + 3.4vw, 4.75rem);
+  --line-height-tight: 0.95;
+  --line-height-body: 1.55;
 }
 
-// Override de la paleta clara. Se declara FUERA del bloque @theme a propósito:
-// Tailwind mete el @theme dentro de su @layer interno, y las capas sin nombre
-// (esta regla) siempre ganan sobre cualquier capa nombrada sin importar el
-// orden — así el atributo [data-theme] puede pisar los valores por defecto
-// en tiempo de ejecución sin pelear con la cascada de capas de Tailwind.
+// Tokens derived with color-mix() stay outside @theme: Tailwind would inline
+// the referenced color, and they must recompute when the theme changes.
+:root {
+  --color-accent-muted: color-mix(in srgb, var(--color-accent) 14%, transparent);
+  --color-glow-accent: color-mix(in srgb, var(--color-accent) 30%, transparent);
+
+  // Brand block (side panels, hero): violet ink slab with paper text.
+  --color-hero-bg: var(--color-fill-brand);
+  --color-hero-text: var(--color-on-fill-brand);
+  --color-hero-muted: color-mix(in srgb, var(--color-on-fill-brand) 84%, var(--color-fill-brand));
+  --color-hero-rule: color-mix(in srgb, var(--color-on-fill-brand) 35%, transparent);
+}
+
+// Dark palette, "Phosphor Ward". Declared outside @theme on purpose: Tailwind
+// puts @theme inside its own layer, and unlayered rules always win over layered
+// ones, so the [data-theme] attribute can override the defaults at runtime.
+// Derived tokens (color-mix, shadows) are declared on the same :root element,
+// so they recompute from these values automatically.
 :root[data-theme='light'] {
   color-scheme: light;
-  --color-bg-app: #f5f6f8;
-  --color-bg-surface: #ffffff;
-  --color-bg-surface-alt: #eef0f4;
-
-  --color-border: #dbe0e6;
-  --color-border-strong: #b9c0ca;
-  --color-card-border: #d97706;
-  --shadow-card-hover: 0 1rem 2.25rem -1rem var(--color-glow-accent);
-
-  --color-text-primary: #10151d;
-  --color-text-secondary: #545b66;
-  --color-text-inverse: #ffffff;
-
-  --color-accent: #d97706;
-  --color-accent-hover: #b45309;
-  --color-accent-muted: rgb(217 119 6 / 12%);
-
-  --color-status-success: #16a34a;
-  --color-status-warning: #ca8a04;
-  --color-status-danger: #dc2626;
-  --color-status-neutral: #6b7280;
-
-  --color-focus-ring: rgb(245 158 11 / 35%);
-
-  // En claro el glass pierde el resplandor ámbar: solo un fondo casi
-  // opaco y una sombra neutra, igual que en la referencia de diseño.
-  --color-glass-bg: rgb(255 255 255 / 95%);
-  --color-glass-border: rgb(219 224 230 / 90%);
-  --shadow-glass:
-    0 25px 50px -12px rgb(148 163 184 / 30%),
-    0 4px 12px -4px rgb(148 163 184 / 20%);
-
-  --color-surface-glass: rgb(255 255 255 / 75%);
-  --shadow-elevated: 0 12px 28px -16px rgb(16 21 29 / 14%);
-  --color-glow-accent: rgb(217 119 6 / 30%);
 }
 
-// El tema oscuro se declara de forma explícita, igual que el claro. Así el
-// cambio desde un tema claro ya activo no depende de los valores iniciales
-// registrados por Tailwind y cada superficie vuelve siempre a ser oscura.
 :root[data-theme='dark'] {
   color-scheme: dark;
-  --color-bg-app: #07090e;
-  --color-bg-surface: #0b0f17;
-  --color-bg-surface-alt: #111724;
 
-  --color-border: #1f2937;
-  --color-border-strong: #374151;
-  --color-card-border: #f59e0b;
-  --shadow-card-hover: none;
+  --color-bg-app: #07090a;
+  --color-bg-surface: #0d1112;
+  --color-bg-surface-alt: #141a1b;
+  --color-ink: #e6f2ea;
 
-  --color-text-primary: #f3f4f6;
-  --color-text-secondary: #9ca3af;
-  --color-text-inverse: #0b1220;
+  --color-border: rgb(110 160 135 / 22%);
+  --color-border-strong: #4c6b5e;
+  --color-card-border: #4c6b5e;
 
-  --color-accent: #f59e0b;
-  --color-accent-hover: #fbbf24;
-  --color-accent-muted: rgb(245 158 11 / 15%);
+  --color-text-primary: #e6f2ea;
+  --color-text-secondary: #9db0a6;
+  --color-text-inverse: #07090a;
 
-  --color-status-success: #22c55e;
-  --color-status-warning: #eab308;
-  --color-status-danger: #ef4444;
-  --color-status-neutral: #6b7280;
+  --color-accent: #9d80ff;
+  --color-accent-hover: #b8a3ff;
+  --color-focus-ring: #b8a3ff;
 
-  --color-focus-ring: rgb(245 158 11 / 50%);
-  --color-glass-bg: rgb(11 15 23 / 82%);
-  --color-glass-border: rgb(245 158 11 / 22%);
-  --shadow-glass:
-    0 10px 40px -10px rgb(0 0 0 / 70%),
-    0 0 35px -5px rgb(245 158 11 / 25%);
+  --color-status-success: #3dff8e;
+  --color-status-warning: #ffc44d;
+  --color-status-danger: #ff4f5e;
+  --color-status-neutral: #8a9b93;
 
-  --color-surface-glass: rgb(17 23 36 / 70%);
-  --shadow-elevated: 0 12px 30px -14px rgb(0 0 0 / 55%);
-  --color-glow-accent: rgb(245 158 11 / 45%);
+  --color-fill-healthy: #3dff8e;
+  --color-fill-warning: #ffc44d;
+  --color-fill-critical: #ff4f5e;
+  --color-fill-brand: #9d80ff;
+  --color-fill-neutral: #24302c;
+  --color-on-fill: #07090a;
+  --color-on-fill-brand: #07090a;
+
+  --color-grid-minor: rgb(61 255 142 / 4%);
+  --color-grid-major: rgb(61 255 142 / 9%);
+  --texture-grain-opacity: 0.05;
+  --color-scanline: rgb(0 0 0 / 18%);
+
+  --color-surface-glass: #0d1112;
+  --color-glass-bg: #0d1112;
+  --color-glass-border: #4c6b5e;
+
+  // Brand block on the oscilloscope: dark violet-tinted glass, phosphor text.
+  --color-hero-bg: color-mix(in srgb, var(--color-accent) 12%, var(--color-bg-surface));
+  --color-hero-text: var(--color-text-primary);
+  --color-hero-muted: var(--color-text-secondary);
+  --color-hero-rule: var(--color-border);
+
+  // In the dark the hard shadow becomes a displaced neon glow.
+  --border-width-ink: 1.5px;
+  --color-shadow: color-mix(in srgb, var(--color-accent) 55%, transparent);
+  --shadow-hard:
+    var(--shadow-offset) var(--shadow-offset) 0 var(--color-shadow),
+    0 0 1.5rem -0.5rem var(--color-glow-accent);
+  --shadow-hard-lg:
+    var(--shadow-offset-lg) var(--shadow-offset-lg) 0 var(--color-shadow),
+    0 0 2.5rem -0.5rem var(--color-glow-accent);
 }
