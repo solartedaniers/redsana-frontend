@@ -13,11 +13,12 @@ import { SecurityAssistantRepository } from '../../../../core/repositories/secur
 import { SecurityEvidenceCollector } from '../../../../core/security-evidence/security-evidence.collector';
 import { WifiEncryptionGateway } from '../../../../core/wifi-encryption/wifi-encryption.gateway';
 import { ScoreGauge } from '../../../../shared/components/score-gauge/score-gauge';
+import { PrescriptionList } from '../prescription-list/prescription-list';
 
 /** Cuestionario de seguridad y su resultado; avisa con (assessed) cuando hay una evaluación nueva. */
 @Component({
   selector: 'app-security-assessment-panel',
-  imports: [ScoreGauge, TranslatePipe, DatePipe, FormsModule],
+  imports: [ScoreGauge, PrescriptionList, TranslatePipe, DatePipe, FormsModule],
   templateUrl: './security-assessment-panel.html',
   styleUrl: './security-assessment-panel.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
