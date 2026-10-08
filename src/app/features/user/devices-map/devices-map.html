@@ -32,61 +32,7 @@
   <section class="topology surface-panel" [class.topology--scanning]="isScanning()" [style.min-height.rem]="topologyHeightRem()"><div class="topology__hub"><app-icon name="devices" /></div>@for (node of topologyNodes(); track node.device.id) { <span class="topology__node" [attr.data-trust]="node.device.trust" [style.transform]="node.transform"></span> }@if (mapShownCount() < networkMembers().length) { <p class="surface-panel__copy topology__limit">{{ 'user.devicesMap.mapLimited' | translate: { shown: mapShownCount(), total: networkMembers().length } }}</p> }</section>
   <div class="devices-list surface-panel">
   @for (device of visibleDevices(); track device.id) {
-    <article class="device-card" [attr.data-trust]="device.trust">
-      <div class="device-card__row">
-        <app-icon class="device-kind-icon" [name]="deviceIcon(device)" />
-        <div class="device-info">
-          <p class="device-name">{{ device.name || ('user.devicesMap.unknownDevice' | translate) }}</p>
-          @if (device.networkRole === 'gateway' || device.networkRole === 'this_device') {
-            <span class="status-badge device-role">{{ 'user.devicesMap.role.' + device.networkRole | translate }}</span>
-          }
-          <p class="device-meta">{{ deviceKindLabelKey(device) | translate }} · {{ device.ipAddress }}</p>
-          <p class="device-meta">
-            {{ 'user.devicesMap.lastSeen' | translate }}: {{ device.lastSeen | date: 'short' }}
-          </p>
-        </div>
-        <span class="presence-badge" [attr.data-online]="device.isOnline">
-          {{ (device.isOnline ? 'user.devicesMap.online' : 'user.devicesMap.offline') | translate }}
-        </span>
-        <span class="trust-badge">{{ 'user.devicesMap.trust.' + device.trust | translate }}</span>
-      </div>
-
-      <div class="device-actions">
-        @if (device.trust !== 'trusted') {
-          <button type="button" (click)="setTrust(device.id, 'trusted')">
-            {{ 'user.devicesMap.markTrusted' | translate }}
-          </button>
-        }
-        @if (device.trust !== 'blocked') {
-          <button type="button" class="danger" (click)="setTrust(device.id, 'blocked')">
-            {{ 'user.devicesMap.block' | translate }}
-          </button>
-        }
-        @if (device.trust !== 'unknown') {
-          <button type="button" (click)="setTrust(device.id, 'unknown')">
-            {{ 'user.devicesMap.clearTrust' | translate }}
-          </button>
-        }
-        <button type="button" class="more-info-toggle" (click)="toggleExpanded(device.id)">
-          {{ (isExpanded(device.id) ? 'user.devicesMap.lessInfo' : 'user.devicesMap.moreInfo') | translate }}
-        </button>
-      </div>
-
-      @if (isExpanded(device.id)) {
-        <table class="device-detail-table">
-          <tbody>
-            <tr>
-              <th>{{ 'user.devicesMap.macAddress' | translate }}</th>
-              <td>{{ device.macAddress }}</td>
-            </tr>
-            <tr>
-              <th>{{ 'user.devicesMap.firstSeen' | translate }}</th>
-              <td>{{ device.firstSeen | date: 'short' }}</td>
-            </tr>
-          </tbody>
-        </table>
-      }
-    </article>
+    <app-device-card [device]="device" (trustChange)="setTrust(device.id, $event)" />
   }
   @if (hiddenDeviceCount() > 0) {
     <button type="button" class="subtle-button show-more-button" (click)="showMoreDevices()">

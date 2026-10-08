@@ -1,13 +1,12 @@
-import { DatePipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { DevicesRepository } from '../../../core/repositories/devices.repository';
 import { LanScanGateway } from '../../../core/lan-scan/lan-scan.gateway';
 import { DeviceNetworkRole, DeviceTrust, NetworkDevice } from '../../../core/models/device.model';
-import { DeviceKind, inferDeviceKind } from '../../../core/domain/device-kind';
 import { layoutTopologyNodes } from '../../../core/domain/topology-layout';
 import { PageHeader } from '../../../shared/components/page-header/page-header';
 import { TranslatePipe } from '../../../core/i18n/translate.pipe';
 import { Icon } from '../../../shared/components/icon/icon';
+import { DeviceCard } from './device-card/device-card';
 
 // Alto mínimo del mapa (igual al de .topology en el SCSS) y margen para el
 // halo del punto más externo cuando hay tantos dispositivos que se abren anillos extra.
@@ -22,15 +21,9 @@ const MAX_TOPOLOGY_NODES = 70;
 // Router primero y luego este equipo: los dos que el usuario reconoce enseguida.
 const ROLE_ORDER: Record<DeviceNetworkRole, number> = { gateway: 0, this_device: 1, other: 2 };
 
-const DEVICE_KIND_ICON: Record<DeviceKind, 'phone' | 'computer' | 'devices'> = {
-  phone: 'phone',
-  computer: 'computer',
-  unknown: 'devices',
-};
-
 @Component({
   selector: 'app-devices-map',
-  imports: [DatePipe, PageHeader, TranslatePipe, Icon],
+  imports: [PageHeader, TranslatePipe, Icon, DeviceCard],
   templateUrl: './devices-map.html',
   styleUrl: './devices-map.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -77,7 +70,6 @@ export class DevicesMap {
   protected readonly isScanning = signal(false);
   protected readonly lastScanFindings = signal<NetworkDevice[] | null>(null);
   protected readonly scanFailed = signal(false);
-  protected readonly expandedDeviceIds = signal<ReadonlySet<string>>(new Set());
 
   constructor() {
     this.repository.getDevices().subscribe((devices) => this.devices.set(devices));
@@ -132,30 +124,6 @@ export class DevicesMap {
       this.devices.update((current) =>
         current.map((device) => (device.id === deviceId ? { ...device, trust } : device))
       );
-    });
-  }
-
-  protected deviceIcon(device: NetworkDevice): 'phone' | 'computer' | 'devices' {
-    return DEVICE_KIND_ICON[inferDeviceKind(device.macAddress)];
-  }
-
-  protected deviceKindLabelKey(device: NetworkDevice): string {
-    return `user.devicesMap.kind.${inferDeviceKind(device.macAddress)}`;
-  }
-
-  protected isExpanded(deviceId: string): boolean {
-    return this.expandedDeviceIds().has(deviceId);
-  }
-
-  protected toggleExpanded(deviceId: string): void {
-    this.expandedDeviceIds.update((current) => {
-      const next = new Set(current);
-      if (next.has(deviceId)) {
-        next.delete(deviceId);
-      } else {
-        next.add(deviceId);
-      }
-      return next;
     });
   }
 }
