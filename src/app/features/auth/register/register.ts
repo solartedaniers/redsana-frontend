@@ -6,12 +6,13 @@ import { TranslatePipe } from '../../../core/i18n/translate.pipe';
 import { passwordsMatchValidator } from '../../../core/validators/passwords-match.validator';
 import { MIN_PASSWORD_LENGTH } from '../../../core/auth/password-policy';
 import { Icon } from '../../../shared/components/icon/icon';
+import { PulseLine } from '../../../shared/components/pulse-line/pulse-line';
 import { APP_PATHS } from '../../../core/routing/app-paths';
 
 
 @Component({
   selector: 'app-register',
-  imports: [ReactiveFormsModule, RouterLink, TranslatePipe, Icon],
+  imports: [ReactiveFormsModule, RouterLink, TranslatePipe, Icon, PulseLine],
   templateUrl: './register.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
