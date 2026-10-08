@@ -9,6 +9,12 @@ import { NetworkIdentityGateway } from '../network-identity/network-identity.gat
 
 /** Frecuencia de la medición real de red en segundo plano. */
 const MEASUREMENT_INTERVAL_MS = 60000;
+/**
+ * Candado compartido entre pestañas del mismo origen (Web Locks API): sin él,
+ * cada pestaña abierta guardaba su propia medición por minuto y N pestañas
+ * sesgaban la calibración de anomalías de esa red.
+ */
+const MEASUREMENT_LOCK_NAME = 'redsana-network-measurement';
 
 /**
  * Dispara la medición del gateway activo (Rust en escritorio, fetch
@@ -38,6 +44,22 @@ export class NetworkMeasurementService {
       return;
     }
 
+    // Solo mide la pestaña que tiene el candado; el resto espera en cola y
+    // toma el relevo sola si esa pestaña se cierra. Sin Web Locks (navegador
+    // viejo) se mide igual que antes, una vez por pestaña.
+    const locks = globalThis.navigator?.locks;
+    if (!locks) {
+      this.measureWhileAuthenticated();
+      return;
+    }
+    void locks.request(MEASUREMENT_LOCK_NAME, () => {
+      this.measureWhileAuthenticated();
+      // Promesa que nunca se resuelve: el candado se conserva mientras viva la pestaña.
+      return new Promise<never>(() => undefined);
+    });
+  }
+
+  private measureWhileAuthenticated(): void {
     this.isAuthenticated$
       .pipe(
         // Al iniciar sesión mide de inmediato; al cerrarla, switchMap corta el ciclo.
