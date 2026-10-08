@@ -45,6 +45,20 @@
   --color-on-fill: #15110e;
   --color-on-fill-brand: #fffdf8;
 
+  // ---- Icon tones: one token per icon (>= 3:1 on paper and on the lime tab) --
+  --color-icon-dashboard: #5a2bff;
+  --color-icon-shield: #1d7a3a;
+  --color-icon-bell: #b45309;
+  --color-icon-devices: #1d4ed8;
+  --color-icon-home: #be185d;
+  --color-icon-users: #0f766e;
+  --color-icon-user: #c22a12;
+  --color-icon-download: #0e7490;
+  --color-icon-warning: #9a5b00;
+  --color-icon-computer: #4338ca;
+  --color-icon-mail: #1d4ed8;
+  --color-icon-lock: #5a2bff;
+
   // ---- Chart paper texture ----------------------------------------------
   --color-grid-minor: rgb(226 120 108 / 10%);
   --color-grid-major: rgb(226 120 108 / 20%);
@@ -180,6 +194,20 @@
   --color-fill-neutral: #24302c;
   --color-on-fill: #07090a;
   --color-on-fill-brand: #07090a;
+
+  // Icon tones on the oscilloscope (>= 3:1 on dark surfaces).
+  --color-icon-dashboard: #b8a3ff;
+  --color-icon-shield: #3dff8e;
+  --color-icon-bell: #ffc44d;
+  --color-icon-devices: #6ab0ff;
+  --color-icon-home: #ff7ac6;
+  --color-icon-users: #2ee6d0;
+  --color-icon-user: #ff8a7a;
+  --color-icon-download: #5fd4f0;
+  --color-icon-warning: #ffc44d;
+  --color-icon-computer: #9aa2ff;
+  --color-icon-mail: #6ab0ff;
+  --color-icon-lock: #b8a3ff;
 
   --color-grid-minor: rgb(61 255 142 / 4%);
   --color-grid-major: rgb(61 255 142 / 9%);
