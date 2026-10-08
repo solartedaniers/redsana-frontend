@@ -37,3 +37,7 @@
     transform: scale(0.92);
   }
 }
+
+@media (pointer: coarse) {
+  .theme-toggle { height: 2.75rem; padding: 0 0.75rem; }
+}

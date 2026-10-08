@@ -2,7 +2,7 @@
   <app-network-background />
 
   <header class="auth-header">
-    <a class="brand-cluster" routerLink="/">
+    <a class="brand-cluster" [routerLink]="paths.root">
       <span class="brand-mark" aria-hidden="true"><span></span></span>
       <span class="brand">{{ 'common.appName' | translate }}</span>
     </a>

@@ -1,10 +1,11 @@
-import { ChangeDetectionStrategy, Component, inject, output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, input, output } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { AuthService } from '../../../core/auth/auth.service';
 import { TranslatePipe } from '../../../core/i18n/translate.pipe';
 import { ThemeToggle } from '../theme-toggle/theme-toggle';
 import { LanguageToggle } from '../language-toggle/language-toggle';
 import { Icon } from '../icon/icon';
+import { APP_PATHS } from '../../../core/routing/app-paths';
 
 @Component({
   selector: 'app-top-bar',
@@ -14,6 +15,10 @@ import { Icon } from '../icon/icon';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TopBar {
+  protected readonly paths = APP_PATHS;
   protected readonly auth = inject(AuthService);
   readonly signOut = output<void>();
+  /** Abre/cierra el menú lateral; el botón solo se ve en pantallas angostas (ver app-shell-layout.scss). */
+  readonly menuToggle = output<void>();
+  readonly isMenuOpen = input(false);
 }

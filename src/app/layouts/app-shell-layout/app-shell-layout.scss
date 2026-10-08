@@ -31,8 +31,35 @@
   background: color-mix(in srgb, var(--color-bg-app) 72%, transparent);
 }
 
+// En pantallas angostas el menú no desaparece: pasa a ser un cajón que se abre
+// con el botón de la barra superior (antes quedaba oculto y no había forma de
+// navegar entre secciones en el celular).
 @media (max-width: 52rem) {
   .app-shell { grid-template-columns: 1fr; }
-  .sidebar { display: none; }
+  .sidebar {
+    position: fixed;
+    inset-block: 0;
+    inset-inline-start: 0;
+    z-index: 3; // encima del fondo del cajón (2)
+    width: min(15rem, 85vw);
+    overflow-y: auto;
+    transform: translateX(-100%);
+    visibility: hidden;
+    transition:
+      transform var(--motion-duration-base) var(--motion-easing-standard),
+      visibility var(--motion-duration-base);
+  }
+  .app-shell--nav-open .sidebar { transform: none; visibility: visible; }
   .shell-content { padding: 1rem; }
+}
+
+.nav-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 2;
+  border: 0;
+  background: color-mix(in srgb, var(--color-bg-app) 60%, transparent);
+  cursor: pointer;
+
+  @media (min-width: 52.0625rem) { display: none; }
 }

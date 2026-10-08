@@ -1,10 +1,22 @@
 <header class="top-bar">
-  <span class="brand">{{ 'common.appName' | translate }}</span>
+  <div class="brand-group">
+    <button
+      type="button"
+      class="menu-button"
+      (click)="menuToggle.emit()"
+      [attr.aria-expanded]="isMenuOpen()"
+      aria-controls="app-sidebar"
+      [attr.aria-label]="'common.menu' | translate"
+    >
+      <app-icon name="menu" />
+    </button>
+    <span class="brand">{{ 'common.appName' | translate }}</span>
+  </div>
   <div class="actions">
     <app-language-toggle />
     <app-theme-toggle />
     @if (auth.currentUser(); as user) {
-      <a class="user-chip" routerLink="/account/profile" [attr.aria-label]="'auth.profile.title' | translate">
+      <a class="user-chip" [routerLink]="paths.profile" [attr.aria-label]="'auth.profile.title' | translate">
         <span class="user-avatar">
           @if (user.avatarUrl) {
             <img [src]="user.avatarUrl" [alt]="user.fullName" />

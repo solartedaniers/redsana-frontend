@@ -5,6 +5,7 @@ import { ThemeToggle } from '../../shared/components/theme-toggle/theme-toggle';
 import { LanguageToggle } from '../../shared/components/language-toggle/language-toggle';
 import { NetworkBackground } from '../../shared/components/network-background/network-background';
 import { routeTransitionAnimation } from '../../core/animations/route-transition.animation';
+import { APP_PATHS } from '../../core/routing/app-paths';
 
 // Envuelve las pantallas de auth en una tarjeta centrada sobre un fondo 3D
 // compartido: sin sidebar/topbar porque todavía no hay sesión ni rol que
@@ -18,4 +19,6 @@ import { routeTransitionAnimation } from '../../core/animations/route-transition
   changeDetection: ChangeDetectionStrategy.OnPush,
   animations: [routeTransitionAnimation],
 })
-export class AuthLayout {}
+export class AuthLayout {
+  protected readonly paths = APP_PATHS;
+}

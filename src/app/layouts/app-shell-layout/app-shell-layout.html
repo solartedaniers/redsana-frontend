@@ -1,10 +1,13 @@
-<div class="app-shell">
+<div class="app-shell" [class.app-shell--nav-open]="isNavOpen()" (keydown.escape)="closeNav()">
   <app-network-background />
-  <aside class="sidebar">
+  <aside id="app-sidebar" class="sidebar">
     <app-sidebar-nav [items]="navItems()" />
   </aside>
+  @if (isNavOpen()) {
+    <button type="button" class="nav-backdrop" (click)="closeNav()" [attr.aria-label]="'common.closeMenu' | translate"></button>
+  }
   <div class="shell-main">
-    <app-top-bar (signOut)="onSignOut()" />
+    <app-top-bar (signOut)="onSignOut()" (menuToggle)="toggleNav()" [isMenuOpen]="isNavOpen()" />
     <main class="shell-content" [@routeTransition]="true">
       <router-outlet />
     </main>

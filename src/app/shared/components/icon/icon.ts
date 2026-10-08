@@ -21,7 +21,8 @@ export type IconName =
   | 'edit'
   | 'phone'
   | 'computer'
-  | 'download';
+  | 'download'
+  | 'menu';
 
 // Set fijo de iconos en un solo componente: evita repetir SVGs en sidebar,
 // top-bar y alertas, y mantiene el estilo (stroke, grosor) consistente.

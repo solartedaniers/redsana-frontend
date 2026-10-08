@@ -1,32 +1,36 @@
-import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
-import { Router, RouterOutlet } from '@angular/router';
+import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
+import { filter } from 'rxjs';
 import { AuthService } from '../../core/auth/auth.service';
 import { routeTransitionAnimation } from '../../core/animations/route-transition.animation';
 import { SidebarNav } from '../../shared/components/sidebar-nav/sidebar-nav';
 import { NavItem } from '../../shared/components/sidebar-nav/nav-item.model';
 import { TopBar } from '../../shared/components/top-bar/top-bar';
+import { TranslatePipe } from '../../core/i18n/translate.pipe';
 import { NetworkBackground } from '../../shared/components/network-background/network-background';
 import { RuntimeEnvironmentService } from '../../core/runtime/runtime-environment.service';
+import { APP_PATHS } from '../../core/routing/app-paths';
 
 const USER_NAV_ITEMS: NavItem[] = [
-  { labelKey: 'user.dashboard.title', route: '/user/dashboard', icon: 'dashboard' },
-  { labelKey: 'user.securityAssistant.title', route: '/user/security-assistant', icon: 'shield' },
-  { labelKey: 'user.alertsCenter.title', route: '/user/alerts', icon: 'bell' },
-  { labelKey: 'user.devicesMap.title', route: '/user/devices', icon: 'devices' },
-  { labelKey: 'user.familyMode.title', route: '/user/family-mode', icon: 'home' },
+  { labelKey: 'user.dashboard.title', route: APP_PATHS.userDashboard, icon: 'dashboard' },
+  { labelKey: 'user.securityAssistant.title', route: APP_PATHS.securityAssistant, icon: 'shield' },
+  { labelKey: 'user.alertsCenter.title', route: APP_PATHS.alerts, icon: 'bell' },
+  { labelKey: 'user.devicesMap.title', route: APP_PATHS.devices, icon: 'devices' },
+  { labelKey: 'user.familyMode.title', route: APP_PATHS.familyMode, icon: 'home' },
 ];
 
 const ADMIN_NAV_ITEMS: NavItem[] = [
-  { labelKey: 'admin.dashboard.title', route: '/admin/dashboard', icon: 'dashboard' },
-  { labelKey: 'admin.networkSupervision.title', route: '/admin/network-supervision', icon: 'home' },
-  { labelKey: 'admin.userManagement.title', route: '/admin/users', icon: 'users' },
+  { labelKey: 'admin.dashboard.title', route: APP_PATHS.adminDashboard, icon: 'dashboard' },
+  { labelKey: 'admin.networkSupervision.title', route: APP_PATHS.networkSupervision, icon: 'home' },
+  { labelKey: 'admin.userManagement.title', route: APP_PATHS.adminUsers, icon: 'users' },
 ];
 
-const DOWNLOAD_NAV_ITEM: NavItem = { labelKey: 'user.download.title', route: '/user/download', icon: 'download' };
+const DOWNLOAD_NAV_ITEM: NavItem = { labelKey: 'user.download.title', route: APP_PATHS.download, icon: 'download' };
 
 const PROFILE_NAV_ITEM: NavItem = {
   labelKey: 'auth.profile.title',
-  route: '/account/profile',
+  route: APP_PATHS.profile,
   icon: 'user',
 };
 
@@ -34,7 +38,7 @@ const PROFILE_NAV_ITEM: NavItem = {
 // ambos roles es qué items de navegación se muestran, no la estructura.
 @Component({
   selector: 'app-shell-layout',
-  imports: [RouterOutlet, SidebarNav, TopBar, NetworkBackground],
+  imports: [RouterOutlet, SidebarNav, TopBar, NetworkBackground, TranslatePipe],
   templateUrl: './app-shell-layout.html',
   styleUrl: './app-shell-layout.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -54,7 +58,25 @@ export class AppShellLayout {
     return [...USER_NAV_ITEMS, ...downloadItems, PROFILE_NAV_ITEM];
   });
 
+  /** Menú lateral como cajón en pantallas angostas; en escritorio siempre está visible y esto no tiene efecto. */
+  protected readonly isNavOpen = signal(false);
+
+  constructor() {
+    // Al elegir una sección el cajón se cierra solo, para ver la pantalla elegida.
+    this.router.events
+      .pipe(filter((event) => event instanceof NavigationEnd), takeUntilDestroyed())
+      .subscribe(() => this.isNavOpen.set(false));
+  }
+
+  protected toggleNav(): void {
+    this.isNavOpen.update((open) => !open);
+  }
+
+  protected closeNav(): void {
+    this.isNavOpen.set(false);
+  }
+
   protected onSignOut(): void {
-    this.auth.signOut().subscribe(() => this.router.navigateByUrl('/auth/login'));
+    this.auth.signOut().subscribe(() => this.router.navigateByUrl(APP_PATHS.login));
   }
 }
