@@ -4,9 +4,10 @@ import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../../core/auth/auth.service';
 import { TranslatePipe } from '../../../core/i18n/translate.pipe';
 import { passwordsMatchValidator } from '../../../core/validators/passwords-match.validator';
+import { MIN_PASSWORD_LENGTH } from '../../../core/auth/password-policy';
 import { Icon } from '../../../shared/components/icon/icon';
+import { APP_PATHS } from '../../../core/routing/app-paths';
 
-const MIN_PASSWORD_LENGTH = 8;
 
 @Component({
   selector: 'app-register',
@@ -15,6 +16,7 @@ const MIN_PASSWORD_LENGTH = 8;
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Register {
+  protected readonly paths = APP_PATHS;
   private readonly fb = inject(FormBuilder);
   private readonly auth = inject(AuthService);
   private readonly router = inject(Router);
@@ -45,7 +47,7 @@ export class Register {
     this.auth.signUp({ fullName, email, password }).subscribe({
       next: () => {
         this.isSubmitting.set(false);
-        this.router.navigateByUrl('/user/dashboard');
+        this.router.navigateByUrl(APP_PATHS.userDashboard);
       },
       error: (error: Error) => {
         this.isSubmitting.set(false);

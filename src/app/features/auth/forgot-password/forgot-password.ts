@@ -3,6 +3,7 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { AuthService } from '../../../core/auth/auth.service';
 import { TranslatePipe } from '../../../core/i18n/translate.pipe';
+import { APP_PATHS } from '../../../core/routing/app-paths';
 
 @Component({
   selector: 'app-forgot-password',
@@ -11,6 +12,7 @@ import { TranslatePipe } from '../../../core/i18n/translate.pipe';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ForgotPassword {
+  protected readonly paths = APP_PATHS;
   private readonly fb = inject(FormBuilder);
   private readonly auth = inject(AuthService);
 

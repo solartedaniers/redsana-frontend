@@ -61,7 +61,7 @@
       <label class="field has-icon">
         <div class="field-label-row">
           <span>{{ 'auth.login.password' | translate }}</span>
-          <a class="field-hint-link" routerLink="/auth/forgot-password">
+          <a class="field-hint-link" [routerLink]="paths.forgotPassword">
             {{ 'auth.login.forgotPasswordLink' | translate }}
           </a>
         </div>
@@ -95,7 +95,7 @@
       </button>
 
       <div class="form-links">
-        <a routerLink="/auth/register">{{ 'auth.login.registerLink' | translate }}</a>
+        <a [routerLink]="paths.register">{{ 'auth.login.registerLink' | translate }}</a>
       </div>
     </form>
   </div>

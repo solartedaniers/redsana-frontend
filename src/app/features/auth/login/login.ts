@@ -4,6 +4,7 @@ import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../../core/auth/auth.service';
 import { TranslatePipe } from '../../../core/i18n/translate.pipe';
 import { Icon } from '../../../shared/components/icon/icon';
+import { APP_PATHS } from '../../../core/routing/app-paths';
 
 @Component({
   selector: 'app-login',
@@ -12,6 +13,7 @@ import { Icon } from '../../../shared/components/icon/icon';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Login {
+  protected readonly paths = APP_PATHS;
   private readonly fb = inject(FormBuilder);
   private readonly auth = inject(AuthService);
   private readonly router = inject(Router);
@@ -36,7 +38,7 @@ export class Login {
     this.auth.signIn(email, password).subscribe({
       next: (session) => {
         this.isSubmitting.set(false);
-        this.router.navigateByUrl(session.user.role === 'admin' ? '/admin/dashboard' : '/user/dashboard');
+        this.router.navigateByUrl(session.user.role === 'admin' ? APP_PATHS.adminDashboard : APP_PATHS.userDashboard);
       },
       error: (error: Error) => {
         this.isSubmitting.set(false);
