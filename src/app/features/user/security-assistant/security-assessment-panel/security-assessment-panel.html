@@ -1,0 +1,84 @@
+@if (isLoadingLatest()) {
+  <p class="surface-panel loading-state">{{ 'common.loading' | translate }}</p>
+} @else if (result(); as data) {
+  <div class="result-panel workspace-grid workspace-grid--aside">
+    <section class="assessment-card surface-panel">
+      <app-score-gauge [score]="data.score" />
+      @if (data.isPartial) {
+        <span class="status-badge">{{ 'user.securityAssistant.score.partialLabel' | translate }}</span>
+        <p>{{ 'user.securityAssistant.score.partialNotice' | translate }}</p>
+      } @else {
+        <p class="score-breakdown">
+          <span>{{ 'user.securityAssistant.score.questionnaire' | translate: { score: data.questionnaireScore } }}</span>
+          · <span>{{ 'user.securityAssistant.score.technical' | translate: { score: data.technicalScore ?? 0 } }}</span>
+        </p>
+        @if (data.technicalEvidenceReused) {
+          <p>{{ 'user.securityAssistant.score.reusedTechnicalAnalysis' | translate: { date: (data.technicalMeasuredAt | date: 'shortDate') ?? '' } }}</p>
+        }
+      }
+      <p class="submitted-at">{{ 'user.securityAssistant.lastSubmittedAt' | translate }} {{ data.submittedAt | date: 'short' }}</p>
+    </section>
+
+    <div class="recommendations surface-panel">
+      <h2>{{ 'user.securityAssistant.recommendationsTitle' | translate }}</h2>
+      @if (data.recommendations.length === 0) {
+        <p class="all-good">{{ 'user.securityAssistant.allGood' | translate }}</p>
+      } @else {
+        <ol>
+          @for (recommendation of data.recommendations; track recommendation.id) {
+            <li>
+              <strong>{{ recommendation.titleKey | translate }}</strong>
+              <p>{{ recommendation.descriptionKey | translate }}</p>
+            </li>
+          }
+        </ol>
+      }
+      <button type="button" class="submit-button" (click)="restart()">
+        {{ 'user.securityAssistant.restart' | translate }}
+      </button>
+    </div>
+  </div>
+} @else {
+  <form class="questionnaire workspace-grid workspace-grid--aside" (ngSubmit)="submit()">
+    <aside class="assessment-card surface-panel"><p>{{ 'user.securityAssistant.subtitle' | translate }}</p></aside>
+    <section class="questions-panel surface-panel">
+      <div class="question wifi-encryption-info">
+        <p>{{ 'user.securityAssistant.wifiEncryption.label' | translate }}</p>
+        <span class="status-badge">{{ ('user.securityAssistant.wifiEncryption.' + (isWifiDetectionAvailable ? wifiEncryptionStatus() : 'desktopOnly')) | translate }}</span>
+      </div>
+
+    @for (question of questions(); track question.id) {
+      <div class="question">
+        <p>{{ question.textKey | translate }}</p>
+        <div class="answer-toggle">
+          <button
+            type="button"
+            [class.selected]="answers()[question.id] === 'yes'"
+            (click)="answer(question.id, 'yes')"
+          >
+            {{ 'user.securityAssistant.yes' | translate }}
+          </button>
+          <button
+            type="button"
+            [class.selected]="answers()[question.id] === 'no'"
+            (click)="answer(question.id, 'no')"
+          >
+            {{ 'user.securityAssistant.no' | translate }}
+          </button>
+          <button
+            type="button"
+            [class.selected]="answers()[question.id] === 'unknown'"
+            (click)="answer(question.id, 'unknown')"
+          >
+            {{ 'user.securityAssistant.unknown' | translate }}
+          </button>
+        </div>
+      </div>
+    }
+
+    <button type="submit" class="submit-button" [disabled]="!allAnswered() || isSubmitting()">
+      {{ (isSubmitting() ? 'common.loading' : 'user.securityAssistant.submit') | translate }}
+    </button>
+    </section>
+  </form>
+}

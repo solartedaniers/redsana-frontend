@@ -1,0 +1,96 @@
+<section class="chat-panel surface-panel">
+  <div class="chat-panel__header">
+    <div>
+      <h2>{{ 'user.securityAssistant.chat.title' | translate }}</h2>
+      <p class="chat-scope-hint">{{ 'user.securityAssistant.chat.scopeHint' | translate }}</p>
+    </div>
+    <div class="chat-panel__actions">
+      <button
+        type="button"
+        class="icon-button"
+        (click)="startNewConversation()"
+        [attr.aria-label]="'user.securityAssistant.chat.newConversation' | translate"
+      >
+        <app-icon name="plus" />
+      </button>
+      <button
+        type="button"
+        class="icon-button"
+        (click)="toggleHistory()"
+        [attr.aria-label]="'user.securityAssistant.chat.history' | translate"
+      >
+        <app-icon name="clock" />
+      </button>
+    </div>
+  </div>
+
+  @if (isHistoryOpen()) {
+    <div class="chat-history">
+      @if (session.conversations().length === 0) {
+        <p class="chat-history__empty">{{ 'user.securityAssistant.chat.noConversations' | translate }}</p>
+      } @else {
+        @for (conversation of session.conversations(); track conversation.id) {
+          <div
+            class="chat-history__item"
+            [class.chat-history__item--active]="conversation.id === session.currentConversationId()"
+            (click)="selectConversation(conversation.id)"
+          >
+            @if (renamingConversationId() === conversation.id) {
+              <input
+                type="text"
+                [ngModel]="renameDraft()"
+                (ngModelChange)="renameDraft.set($event)"
+                (click)="$event.stopPropagation()"
+                (keyup.enter)="confirmRename()"
+                (blur)="confirmRename()"
+                name="renameDraft"
+                autocomplete="off"
+              />
+            } @else {
+              <span class="chat-history__title">
+                {{
+                  conversation.title ||
+                    ((conversation.topic ? 'user.securityAssistant.chat.topics.' + conversation.topic : 'user.securityAssistant.chat.untitled')
+                      | translate)
+                }}
+              </span>
+              <button
+                type="button"
+                class="icon-button icon-button--ghost"
+                (click)="startRename(conversation, $event)"
+                [attr.aria-label]="'user.securityAssistant.chat.rename' | translate"
+              >
+                <app-icon name="edit" />
+              </button>
+            }
+          </div>
+        }
+      }
+    </div>
+  }
+
+  <div class="chat-messages">
+    @for (message of session.messages(); track $index) {
+      <div class="chat-bubble" [class.chat-bubble--user]="message.role === 'user'">
+        {{ message.isTranslationKey ? (message.text | translate: message.translationParams) : message.text }}
+      </div>
+    }
+    @if (session.isSending()) {
+      <div class="chat-bubble">{{ 'common.loading' | translate }}</div>
+    }
+  </div>
+
+  <form class="chat-input-row" (ngSubmit)="send()">
+    <input
+      type="text"
+      [ngModel]="draft()"
+      (ngModelChange)="draft.set($event)"
+      name="draft"
+      [placeholder]="'user.securityAssistant.chat.placeholder' | translate"
+      autocomplete="off"
+    />
+    <button type="submit" class="submit-button" [disabled]="!draft().trim() || session.isSending()">
+      {{ 'user.securityAssistant.chat.send' | translate }}
+    </button>
+  </form>
+</section>

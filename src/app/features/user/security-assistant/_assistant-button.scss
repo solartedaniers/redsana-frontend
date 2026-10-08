@@ -1,0 +1,19 @@
+// Botón principal del asistente: más compacto que el .submit-button global
+// (el de los formularios de auth). Compartido por el panel de evaluación y el de chat.
+@mixin assistant-submit-button {
+  .submit-button {
+    align-self: flex-start;
+    padding: 0.65rem 1.5rem;
+    border-radius: 0.5rem;
+    border: none;
+    background: var(--color-accent);
+    color: var(--color-text-inverse);
+    font-weight: 700;
+    cursor: pointer;
+
+    &:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+  }
+}
