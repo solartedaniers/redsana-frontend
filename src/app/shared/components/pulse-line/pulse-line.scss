@@ -1,0 +1,49 @@
+:host {
+  position: relative;
+  display: block;
+  height: 3.75rem;
+  overflow: hidden;
+  // Container units let the playhead cross exactly the trace width.
+  container-type: inline-size;
+  color: var(--pulse-color, var(--color-fill-healthy));
+}
+
+svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.baseline {
+  stroke: currentColor;
+  stroke-width: 1;
+  stroke-dasharray: 2 6;
+  opacity: 0.45;
+  vector-effect: non-scaling-stroke;
+}
+
+.trace {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.5;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+}
+
+// Phosphor dot sweeping left to right; with reduced motion it rests at the end.
+.playhead {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 0.6rem;
+  background: radial-gradient(circle, currentColor 0 35%, transparent 70%);
+  animation: pulse-sweep calc(var(--motion-heartbeat) * 3) linear infinite;
+}
+
+@keyframes pulse-sweep {
+  from { transform: translateX(-1rem); opacity: 0; }
+  10% { opacity: 1; }
+  90% { opacity: 1; }
+  to { transform: translateX(100cqw); opacity: 0; }
+}
