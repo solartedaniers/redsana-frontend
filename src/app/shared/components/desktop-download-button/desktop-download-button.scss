@@ -1,3 +1,16 @@
 :host {
   display: contents;
 }
+
+// Resolving the installer: the button stays put but reads as busy.
+.submit-button.is-busy {
+  cursor: progress;
+  opacity: 0.75;
+}
+
+.download-notice {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: var(--font-size-caption);
+  color: var(--color-text-secondary);
+}

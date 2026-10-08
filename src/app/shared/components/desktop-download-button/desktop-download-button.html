@@ -1,3 +1,17 @@
 @if (!isDesktop) {
-  <a class="submit-button" [href]="downloadUrl">{{ 'landing.download' | translate }}</a>
+  <a
+    class="submit-button"
+    [href]="fallbackUrl"
+    (click)="download($event)"
+    [class.is-busy]="isResolving()"
+    [attr.aria-busy]="isResolving()"
+    [attr.aria-disabled]="isResolving()"
+  >
+    {{ (isResolving() ? 'landing.downloadPreparing' : 'landing.download') | translate }}
+  </a>
+  <p class="download-notice" role="status">
+    @if (noticeKey(); as key) {
+      {{ key | translate }}
+    }
+  </p>
 }
