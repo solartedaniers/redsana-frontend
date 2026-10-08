@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
 
 export type IconName =
   | 'dashboard'
@@ -32,7 +32,12 @@ export type IconName =
   templateUrl: './icon.html',
   styleUrl: './icon.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  // Every icon exposes its own color token as --icon-tone; each context
+  // decides whether to paint with it (color: var(--icon-tone)) or keep currentColor.
+  host: { '[style.--icon-tone]': 'tone()' },
 })
 export class Icon {
   readonly name = input.required<IconName>();
+
+  protected readonly tone = computed(() => `var(--color-icon-${this.name()}, currentColor)`);
 }
