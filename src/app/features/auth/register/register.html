@@ -109,6 +109,8 @@
         </label>
       </div>
 
+      <app-password-strength-meter [password]="form.controls.password.value" />
+
       @if (errorKey()) {
         <p class="form-error">{{ errorKey() | translate }}</p>
       }

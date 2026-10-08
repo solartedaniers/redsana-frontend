@@ -7,12 +7,13 @@ import { passwordsMatchValidator } from '../../../core/validators/passwords-matc
 import { MIN_PASSWORD_LENGTH } from '../../../core/auth/password-policy';
 import { Icon } from '../../../shared/components/icon/icon';
 import { PulseLine } from '../../../shared/components/pulse-line/pulse-line';
+import { PasswordStrengthMeter } from '../../../shared/components/password-strength-meter/password-strength-meter';
 import { APP_PATHS } from '../../../core/routing/app-paths';
 
 
 @Component({
   selector: 'app-register',
-  imports: [ReactiveFormsModule, RouterLink, TranslatePipe, Icon, PulseLine],
+  imports: [ReactiveFormsModule, RouterLink, TranslatePipe, Icon, PulseLine, PasswordStrengthMeter],
   templateUrl: './register.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
