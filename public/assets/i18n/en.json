@@ -52,9 +52,6 @@
       "submit": "Sign in",
       "forgotPasswordLink": "Forgot your password?",
       "registerLink": "Don't have an account? Sign up",
-      "encryptionStatus": "Encryption strength",
-      "encryptionLevel": "OPTIMAL",
-      "credentialNotice": "Credentials are encrypted in memory.",
       "panel": {
         "eyebrow": "Home network monitoring",
         "title": "Your network, under control",
@@ -143,6 +140,16 @@
       "confirmationRequired": "Check your email to confirm your account before signing in.",
       "avatarUploadFailed": "Could not upload the image. Try a different file.",
       "unknown": "Something went wrong. Please try again."
+    },
+    "passwordStrength": {
+      "label": "Password strength",
+      "levels": {
+        "empty": "No password yet",
+        "weak": "Weak",
+        "fair": "Fair",
+        "good": "Good",
+        "strong": "Optimal"
+      }
     }
   },
   "user": {

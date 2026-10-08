@@ -52,9 +52,6 @@
       "submit": "Entrar",
       "forgotPasswordLink": "¿Olvidaste tu contraseña?",
       "registerLink": "¿No tienes cuenta? Regístrate",
-      "encryptionStatus": "Fortaleza de cifrado",
-      "encryptionLevel": "ÓPTIMA",
-      "credentialNotice": "Las credenciales se cifran en memoria.",
       "panel": {
         "eyebrow": "Monitoreo de red doméstica",
         "title": "Tu red, bajo control",
@@ -143,6 +140,16 @@
       "confirmationRequired": "Revisa tu correo para confirmar la cuenta antes de iniciar sesión.",
       "avatarUploadFailed": "No se pudo subir la imagen. Intenta con otro archivo.",
       "unknown": "Ocurrió un error inesperado. Intenta de nuevo."
+    },
+    "passwordStrength": {
+      "label": "Fortaleza de la contraseña",
+      "levels": {
+        "empty": "Sin contraseña todavía",
+        "weak": "Débil",
+        "fair": "Media",
+        "good": "Buena",
+        "strong": "Óptima"
+      }
     }
   },
   "user": {
