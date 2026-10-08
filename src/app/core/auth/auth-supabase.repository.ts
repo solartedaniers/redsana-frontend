@@ -12,6 +12,7 @@ import {
 } from '../models/user.model';
 import { AuthRepository } from './auth.repository';
 import { supabaseClient } from './supabase-client';
+import { APP_PATHS } from '../routing/app-paths';
 
 interface BackendUser {
   id: string;
@@ -65,9 +66,20 @@ export class SupabaseAuthRepository extends AuthRepository {
   requestPasswordReset(email: string): Observable<void> {
     return from(
       supabaseClient.auth.resetPasswordForEmail(email, {
-        redirectTo: `${window.location.origin}/auth/login`,
+        redirectTo: `${window.location.origin}${APP_PATHS.resetPassword}`,
       })
     ).pipe(map(() => undefined));
+  }
+
+  hasRecoverySession(): Observable<boolean> {
+    // getSession espera a que supabase-js termine de leer el token del enlace (detectSessionInUrl).
+    return from(supabaseClient.auth.getSession()).pipe(map(({ data }) => data.session !== null));
+  }
+
+  resetPassword(newPassword: string): Observable<void> {
+    return from(supabaseClient.auth.updateUser({ password: newPassword })).pipe(
+      switchMap(({ error }) => (error ? throwError(() => new Error(this.mapAuthError(error.message))) : of(undefined)))
+    );
   }
 
   updateProfile(_userId: string, payload: ProfileUpdatePayload): Observable<AuthSession> {

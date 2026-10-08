@@ -17,6 +17,10 @@ export abstract class AuthRepository {
   abstract signUp(payload: RegisterPayload): Observable<AuthSession>;
   abstract signOut(): Observable<void>;
   abstract requestPasswordReset(email: string): Observable<void>;
+  /** true si se llegó desde el enlace del correo de recuperación con una sesión válida. */
+  abstract hasRecoverySession(): Observable<boolean>;
+  /** Fija la nueva contraseña usando la sesión de recuperación (no pide la actual). */
+  abstract resetPassword(newPassword: string): Observable<void>;
   abstract updateProfile(userId: string, payload: ProfileUpdatePayload): Observable<AuthSession>;
   abstract updateAvatar(userId: string, avatarUrl: string): Observable<AuthSession>;
   abstract changePassword(userId: string, payload: PasswordChangePayload): Observable<void>;

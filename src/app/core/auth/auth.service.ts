@@ -1,5 +1,5 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
-import { Observable, tap } from 'rxjs';
+import { Observable, switchMap, tap } from 'rxjs';
 import { AuthRepository } from './auth.repository';
 import {
   AuthSession,
@@ -41,6 +41,15 @@ export class AuthService {
 
   requestPasswordReset(email: string): Observable<void> {
     return this.repository.requestPasswordReset(email);
+  }
+
+  hasRecoverySession(): Observable<boolean> {
+    return this.repository.hasRecoverySession();
+  }
+
+  /** Tras fijar la contraseña se cierra la sesión de recuperación: el usuario entra con la nueva. */
+  resetPassword(newPassword: string): Observable<void> {
+    return this.repository.resetPassword(newPassword).pipe(switchMap(() => this.signOut()));
   }
 
   updateProfile(payload: ProfileUpdatePayload): Observable<AuthSession> {
