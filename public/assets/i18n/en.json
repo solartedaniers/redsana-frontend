@@ -267,7 +267,13 @@
         "questionnaire": "Questionnaire: {{score}}/100 (30%)",
         "technical": "Technical analysis: {{score}}/100 (70%)",
         "reusedTechnicalAnalysis": "Technical analysis from {{date}}, done from the desktop app."
-      }
+      },
+      "urgency": {
+        "high": "Urgent",
+        "medium": "Soon",
+        "low": "When you can"
+      },
+      "rxMark": "Rx"
     },
     "alertsCenter": {
       "title": "Alerts center",
@@ -281,6 +287,16 @@
         "connectionUnstable": "Your connection is more unstable than usual ({{current}} ms of variation, usually {{typical}} ms).",
         "packetsBeingLost": "Your network is losing more data than usual ({{current}}% packet loss, usually {{typical}}%).",
         "untrustedDeviceOnline": "A device you marked as unsafe is connected to your network ({{ip}}). RedSana cannot block it: if you don't recognize it, change the WiFi password or block it from your router."
+      },
+      "timelineTitle": "Timeline",
+      "summaryTitle": "Alerts summary",
+      "empty": "No alerts recorded. Your network has given no scares.",
+      "pending": "{{count}} not reviewed",
+      "stripLegend": "Each mark is an alert at its real time, oldest to newest. Tall marks are still not reviewed.",
+      "severity": {
+        "critical": "Critical",
+        "warning": "Warnings",
+        "info": "Info"
       }
     },
     "devicesMap": {
@@ -340,7 +356,9 @@
       "whatItBlocks": "These are Cloudflare's free family servers: they filter adult content and known malware sites. No filter is perfect, but it lowers the risk a lot.",
       "lockedRouter": "If your router doesn't let you change the DNS (some internet-provider routers don't), you can enter these same details in the network settings of each computer or phone.",
       "undo": "To turn it off, set the DNS back to \"Automatic\" and save.",
-      "askAssistant": "Ask the assistant"
+      "askAssistant": "Ask the assistant",
+      "copyDns": "Copy DNS {{value}}",
+      "copied": "{{value}} copied"
     },
     "download": {
       "title": "Download",

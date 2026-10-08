@@ -267,7 +267,13 @@
         "questionnaire": "Cuestionario: {{score}}/100 (30 %)",
         "technical": "Análisis técnico: {{score}}/100 (70 %)",
         "reusedTechnicalAnalysis": "Análisis técnico del {{date}}, hecho desde la app de escritorio."
-      }
+      },
+      "urgency": {
+        "high": "Urgente",
+        "medium": "Pronto",
+        "low": "Cuando puedas"
+      },
+      "rxMark": "Rx"
     },
     "alertsCenter": {
       "title": "Centro de alertas",
@@ -281,6 +287,16 @@
         "connectionUnstable": "Tu conexión está más inestable de lo normal ({{current}} ms de variación, lo normal es {{typical}} ms).",
         "packetsBeingLost": "Tu red está perdiendo más datos de lo normal ({{current}}% de paquetes perdidos, lo normal es {{typical}}%).",
         "untrustedDeviceOnline": "Un equipo que marcaste como inseguro está conectado a tu red ({{ip}}). RedSana no puede bloquearlo: si no lo reconoces, cambia la clave del WiFi o bloquéalo desde tu router."
+      },
+      "timelineTitle": "Línea de tiempo",
+      "summaryTitle": "Resumen de alertas",
+      "empty": "No hay alertas registradas. Tu red no ha dado sustos.",
+      "pending": "{{count}} sin revisar",
+      "stripLegend": "Cada marca es una alerta en su hora real, de la más antigua a la más reciente. Las altas siguen sin revisar.",
+      "severity": {
+        "critical": "Críticas",
+        "warning": "Avisos",
+        "info": "Informativas"
       }
     },
     "devicesMap": {
@@ -340,7 +356,9 @@
       "whatItBlocks": "Son los servidores gratuitos de Cloudflare para familias: filtran contenido para adultos y sitios con malware conocidos. Ningún filtro es perfecto, pero reduce mucho el riesgo.",
       "lockedRouter": "Si tu router no te deja cambiar el DNS (pasa con algunos routers del proveedor de internet), puedes escribir estos mismos datos en la configuración de red de cada computador o celular.",
       "undo": "Para desactivarlo, vuelve a dejar el DNS en \"Automático\" y guarda.",
-      "askAssistant": "Pregúntale al asistente"
+      "askAssistant": "Pregúntale al asistente",
+      "copyDns": "Copiar DNS {{value}}",
+      "copied": "{{value}} copiado"
     },
     "download": {
       "title": "Descargar",
