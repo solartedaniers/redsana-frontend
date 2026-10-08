@@ -1,11 +1,11 @@
-<section class="devices-hero surface-panel">
+<section class="devices-hero">
   <app-page-header titleKey="user.devicesMap.title" subtitleKey="user.devicesMap.subtitle" />
   <!-- Si el último escaneo falló, la lista guardada puede ser vieja o parcial: no se da un número. -->
   <span class="status-badge">{{ scanFailed() ? ('user.devicesMap.countUnavailable' | translate) : networkMembers().length }}</span>
 </section>
 
 <div class="scan-bar">
-  <button type="button" class="scan-button" (click)="scan()" [disabled]="isScanning() || !isScanAvailable">
+  <button type="button" class="action-button scan-button" (click)="scan()" [disabled]="isScanning() || !isScanAvailable">
     <app-icon name="shield" />
     {{ (isScanning() ? 'user.devicesMap.scanning' : 'user.devicesMap.scan') | translate }}
   </button>
@@ -29,7 +29,23 @@
 <p class="surface-panel__copy trust-note">{{ 'user.devicesMap.trustNote' | translate }}</p>
 
 <div class="devices-workspace workspace-grid workspace-grid--two">
-  <section class="topology surface-panel" [class.topology--scanning]="isScanning()" [style.min-height.rem]="topologyHeightRem()"><div class="topology__hub"><app-icon name="devices" /></div>@for (node of topologyNodes(); track node.device.id) { <span class="topology__node" [attr.data-trust]="node.device.trust" [style.transform]="node.transform"></span> }@if (mapShownCount() < networkMembers().length) { <p class="surface-panel__copy topology__limit">{{ 'user.devicesMap.mapLimited' | translate: { shown: mapShownCount(), total: networkMembers().length } }}</p> }</section>
+  <section class="radar surface-panel">
+    <div class="topology" [class.topology--scanning]="isScanning()" [style.min-height.rem]="topologyHeightRem()">
+      <span class="topology__sweep" aria-hidden="true"></span>
+      <div class="topology__hub" [attr.aria-label]="'user.devicesMap.role.gateway' | translate" role="img"><app-icon name="home" /></div>
+      @for (node of topologyNodes(); track node.device.id) {
+        <span class="topology__node" [attr.data-trust]="node.device.trust" [style.transform]="node.transform"></span>
+      }
+      @if (mapShownCount() < networkMembers().length) {
+        <p class="surface-panel__copy topology__limit">{{ 'user.devicesMap.mapLimited' | translate: { shown: mapShownCount(), total: networkMembers().length } }}</p>
+      }
+    </div>
+    <ul class="radar__legend">
+      @for (item of trustCounts(); track item.trust) {
+        <li [attr.data-trust]="item.trust"><i aria-hidden="true"></i>{{ 'user.devicesMap.trust.' + item.trust | translate }} <strong>{{ item.count }}</strong></li>
+      }
+    </ul>
+  </section>
   <div class="devices-list surface-panel">
   @for (device of visibleDevices(); track device.id) {
     <app-device-card [device]="device" (trustChange)="setTrust(device.id, $event)" />

@@ -14,22 +14,22 @@
     <span class="presence-badge" [attr.data-online]="device().isOnline">
       {{ (device().isOnline ? 'user.devicesMap.online' : 'user.devicesMap.offline') | translate }}
     </span>
-    <span class="trust-badge">{{ 'user.devicesMap.trust.' + device().trust | translate }}</span>
+    <span class="trust-badge sticker" [attr.data-tone]="trustTone()">{{ 'user.devicesMap.trust.' + device().trust | translate }}</span>
   </div>
 
   <div class="device-actions">
     @if (device().trust !== 'trusted') {
-      <button type="button" (click)="trustChange.emit('trusted')">
+      <button type="button" class="trust-action trust-action--trust" (click)="trustChange.emit('trusted')">
         {{ 'user.devicesMap.markTrusted' | translate }}
       </button>
     }
     @if (device().trust !== 'blocked') {
-      <button type="button" class="danger" (click)="trustChange.emit('blocked')">
+      <button type="button" class="trust-action trust-action--block" (click)="trustChange.emit('blocked')">
         {{ 'user.devicesMap.block' | translate }}
       </button>
     }
     @if (device().trust !== 'unknown') {
-      <button type="button" (click)="trustChange.emit('unknown')">
+      <button type="button" class="trust-action" (click)="trustChange.emit('unknown')">
         {{ 'user.devicesMap.clearTrust' | translate }}
       </button>
     }

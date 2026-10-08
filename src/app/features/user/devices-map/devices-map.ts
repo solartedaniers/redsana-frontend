@@ -18,6 +18,8 @@ const TOPOLOGY_EDGE_MARGIN_REM = 1.5;
 const DEVICES_PAGE_SIZE = 50;
 const MAX_TOPOLOGY_NODES = 70;
 
+const TRUST_LEVELS: readonly DeviceTrust[] = ['trusted', 'unknown', 'blocked'];
+
 // Router primero y luego este equipo: los dos que el usuario reconoce enseguida.
 const ROLE_ORDER: Record<DeviceNetworkRole, number> = { gateway: 0, this_device: 1, other: 2 };
 
@@ -50,6 +52,10 @@ export class DevicesMap {
   protected readonly visibleCount = signal(DEVICES_PAGE_SIZE);
   protected readonly visibleDevices = computed(() => this.connectedDevices().slice(0, this.visibleCount()));
   protected readonly hiddenDeviceCount = computed(() => Math.max(0, this.connectedDevices().length - this.visibleCount()));
+  /** Real count per trust level for the radar legend (same members as the counter). */
+  protected readonly trustCounts = computed(() =>
+    TRUST_LEVELS.map((trust) => ({ trust, count: this.networkMembers().filter((device) => device.trust === trust).length }))
+  );
   protected readonly mapShownCount = computed(() => Math.min(this.networkMembers().length, MAX_TOPOLOGY_NODES));
   // Un punto del mapa por dispositivo conectado (hasta MAX_TOPOLOGY_NODES), cada uno en su propia posición.
   protected readonly topologyNodes = computed(() => {

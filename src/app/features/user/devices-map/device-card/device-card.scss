@@ -1,133 +1,96 @@
 :host { display: block; }
 
+// Device as a patient tag: kind icon block, big name, mono IP; trust is a
+// sticker and the folder edge takes the trust color.
 .device-card {
+  --severity-fill: var(--color-fill-healthy);
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
-  padding: 1rem 1.25rem;
-  border-radius: 0.65rem;
-  border: 1px solid var(--color-card-border);
-  border-left-width: 3px;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  border: var(--border-width-ink) solid var(--color-card-border);
+  border-top: var(--space-2) solid var(--severity-fill);
+  border-radius: var(--radius-sm);
   background: var(--color-bg-surface);
-  transition:
-    box-shadow var(--motion-duration-base) var(--motion-easing-standard),
-    transform var(--motion-duration-base) var(--motion-easing-standard);
 
-  :root[data-theme='light'] &:hover {
-    box-shadow: var(--shadow-card-hover);
-    transform: translateY(-2px);
-  }
-
-  &[data-trust='trusted'] {
-    border-left-color: var(--color-status-success);
-  }
-
-  &[data-trust='unknown'] {
-    border-left-color: var(--color-status-warning);
-  }
-
-  &[data-trust='blocked'] {
-    border-left-color: var(--color-status-danger);
-  }
+  &[data-trust='unknown'] { --severity-fill: var(--color-fill-warning); }
+  &[data-trust='blocked'] { --severity-fill: var(--color-fill-critical); }
 }
 
 .device-card__row {
   display: flex;
   flex-wrap: wrap;
-  align-items: center;
-  gap: .5rem 1rem;
+  align-items: flex-start;
+  gap: var(--space-2) var(--space-4);
 }
 
-// El papel (router / este equipo) va en su propia línea y nunca se parte:
-// dentro de la línea de la IP se apretaba en varias líneas en tarjetas angostas.
-.device-role { margin-top: .3rem; white-space: nowrap; }
+// The role (router / this device) sits on its own line; it only wraps when the
+// card is narrower than the sticker (phones), instead of overflowing it.
+.device-role { max-width: 100%; margin-top: var(--space-2); white-space: normal; }
 
 .device-kind-icon {
   flex-shrink: 0;
-  width: 1.4rem;
-  height: 1.4rem;
-  color: var(--color-text-secondary);
+  width: 1.5rem;
+  height: 1.5rem;
+  padding: var(--space-2);
+  box-sizing: content-box;
+  border: var(--border-width-ink) solid var(--color-ink);
+  border-radius: var(--radius-sm);
+  background: var(--severity-fill);
+  color: var(--color-on-fill);
 }
 
-.device-info {
-  // Base de 12rem: si no cabe junto a las etiquetas, estas bajan a otra línea
-  // en vez de aplastar el nombre y la IP.
-  flex: 1 1 12rem;
-  min-width: 0;
-}
+// 12rem basis: badges drop to another line instead of squeezing name and IP.
+.device-info { flex: 1 1 12rem; min-width: 0; }
 
 .device-name {
   margin: 0;
-  color: var(--color-text-primary);
-  font-weight: 600;
+  font-family: var(--font-display);
+  font-size: var(--font-size-heading-sm);
+  font-weight: var(--font-display-weight);
+  font-stretch: var(--font-display-stretch);
+  line-height: var(--line-height-tight);
+  overflow-wrap: anywhere;
 }
 
-.device-meta {
-  margin: 0.2rem 0 0;
-  color: var(--color-text-secondary);
-  font-size: var(--font-size-body);
-}
-
-.trust-badge, .presence-badge {
-  font-size: var(--font-size-caption);
-  font-weight: 700;
-}
-
-.trust-badge {
-  text-transform: uppercase;
-  color: var(--color-text-secondary);
-}
+.device-meta { margin: var(--space-1) 0 0; font: 500 var(--font-size-caption) var(--font-mono); color: var(--color-text-secondary); }
 
 .presence-badge {
+  font: 700 var(--font-size-caption) var(--font-mono);
   color: var(--color-status-warning);
 
-  &[data-online='true'] {
-    color: var(--color-status-success);
-  }
+  &[data-online='true'] { color: var(--color-status-success); }
 }
 
-.device-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
+.device-actions { display: flex; flex-wrap: wrap; gap: var(--space-2); }
 
-  button {
-    padding: 0.4rem 0.75rem;
-    border-radius: 0.4rem;
-    border: 1px solid var(--color-border);
-    background: transparent;
-    color: var(--color-text-secondary);
-    font-size: var(--font-size-body);
-    cursor: pointer;
-    transition:
-      color var(--motion-duration-fast) var(--motion-easing-standard),
-      border-color var(--motion-duration-fast) var(--motion-easing-standard);
+.trust-action,
+.more-info-toggle {
+  min-height: 2.25rem;
+  padding: 0 var(--space-3);
+  border: var(--border-width-ink) solid var(--color-card-border);
+  border-radius: var(--radius-pill);
+  background: var(--color-bg-surface);
+  color: var(--color-text-primary);
+  font: 700 var(--font-size-caption) var(--font-display);
+  cursor: pointer;
+  transition: transform var(--motion-duration-fast) var(--motion-easing-spring);
 
-    &:hover {
-      color: var(--color-accent);
-      border-color: var(--color-accent);
-    }
+  &:active { transform: scale(0.95); }
+}
 
-    &.danger:hover {
-      color: var(--color-status-danger);
-      border-color: var(--color-status-danger);
-    }
-  }
+.trust-action--trust { background: var(--color-fill-healthy); color: var(--color-on-fill); }
+.trust-action--block { background: var(--color-fill-critical); color: var(--color-on-fill); }
+.more-info-toggle { margin-left: auto; border-style: dashed; }
+
+@media (pointer: coarse) {
+  .trust-action, .more-info-toggle { min-height: var(--touch-target-min); }
 }
 
 .device-detail-table {
   border-collapse: collapse;
-  font-size: var(--font-size-body);
+  font: 500 var(--font-size-caption) var(--font-mono);
 
-  th {
-    text-align: left;
-    padding: 0.3rem 0.75rem 0.3rem 0;
-    color: var(--color-text-secondary);
-    font-weight: 600;
-  }
-
-  td {
-    padding: 0.3rem 0;
-    color: var(--color-text-primary);
-  }
+  th { padding: var(--space-1) var(--space-3) var(--space-1) 0; text-align: left; color: var(--color-text-secondary); }
+  td { padding: var(--space-1) 0; }
 }

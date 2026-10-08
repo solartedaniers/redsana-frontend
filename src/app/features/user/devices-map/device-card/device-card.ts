@@ -11,6 +11,12 @@ const DEVICE_KIND_ICON: Record<DeviceKind, 'phone' | 'computer' | 'devices'> = {
   unknown: 'devices',
 };
 
+const TRUST_TONE: Record<DeviceTrust, 'healthy' | 'warning' | 'critical'> = {
+  trusted: 'healthy',
+  unknown: 'warning',
+  blocked: 'critical',
+};
+
 /** Tarjeta de un dispositivo de la lista: muestra sus datos y pide cambios de confianza al mapa, que los guarda. */
 @Component({
   selector: 'app-device-card',
@@ -26,5 +32,6 @@ export class DeviceCard {
   /** "Más info" es estado de vista de esta tarjeta, no del mapa. */
   protected readonly isExpanded = signal(false);
   protected readonly kindIcon = computed(() => DEVICE_KIND_ICON[inferDeviceKind(this.device().macAddress)]);
+  protected readonly trustTone = computed(() => TRUST_TONE[this.device().trust]);
   protected readonly kindLabelKey = computed(() => `user.devicesMap.kind.${inferDeviceKind(this.device().macAddress)}`);
 }
