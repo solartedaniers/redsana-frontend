@@ -6,8 +6,8 @@ import { TranslatePipe } from '../../../core/i18n/translate.pipe';
 import { PageHeader } from '../../../shared/components/page-header/page-header';
 import { Icon } from '../../../shared/components/icon/icon';
 import { passwordsMatchValidator } from '../../../core/validators/passwords-match.validator';
+import { MIN_PASSWORD_LENGTH } from '../../../core/auth/password-policy';
 
-const MIN_PASSWORD_LENGTH = 8;
 
 @Component({
   selector: 'app-profile',

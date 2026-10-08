@@ -1,6 +1,6 @@
 .profile-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(20rem, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(20rem, 100%), 1fr)); // min(): en 320 px la tarjeta de 20rem se salía
   gap: 1.5rem;
 }
 
