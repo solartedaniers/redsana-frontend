@@ -1,0 +1,19 @@
+// Flota sobre cualquier layout (auth o shell) sin desplazar el contenido.
+.update-banner {
+  position: fixed;
+  inset-inline: 1rem;
+  bottom: 1rem;
+  z-index: 2; // encima de los layouts (z-index 1)
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: .75rem;
+  max-width: 32rem;
+  margin-inline: auto;
+  padding: .85rem 1rem;
+}
+
+.update-banner .action-button {
+  min-height: 2.75rem;
+}

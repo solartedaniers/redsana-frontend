@@ -1,0 +1,6 @@
+@if (appUpdate.isUpdateReady()) {
+  <div class="update-banner surface-panel" role="status">
+    <span>{{ 'appUpdate.message' | translate }}</span>
+    <button type="button" class="action-button" (click)="appUpdate.applyUpdate()">{{ 'appUpdate.reload' | translate }}</button>
+  </div>
+}
