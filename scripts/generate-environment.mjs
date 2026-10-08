@@ -9,6 +9,7 @@ const VARIABLES = {
   supabaseAnonKey: 'SUPABASE_ANON_KEY',
   apiBaseUrl: 'API_BASE_URL',
   desktopDownloadUrl: 'DESKTOP_DOWNLOAD_URL',
+  webAppUrl: 'WEB_APP_URL',
 };
 
 // frontend/.env sirve para builds locales (tauri build); en Vercel no existe y

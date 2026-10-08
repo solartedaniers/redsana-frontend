@@ -5,4 +5,5 @@ export const environment = {
   supabaseAnonKey: 'your-anon-key',
   apiBaseUrl: 'http://localhost:8000',
   desktopDownloadUrl: 'https://github.com/solartedaniers/RedSana/releases/latest',
+  webAppUrl: 'https://red-sana.vercel.app',
 };

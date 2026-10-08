@@ -13,6 +13,7 @@ import {
 import { AuthRepository } from './auth.repository';
 import { supabaseClient } from './supabase-client';
 import { APP_PATHS } from '../routing/app-paths';
+import { RuntimeEnvironmentService } from '../runtime/runtime-environment.service';
 
 interface BackendUser {
   id: string;
@@ -26,6 +27,7 @@ interface BackendUser {
 @Injectable()
 export class SupabaseAuthRepository extends AuthRepository {
   private readonly http = inject(HttpClient);
+  private readonly isDesktop = inject(RuntimeEnvironmentService).isDesktop;
 
   signIn(email: string, password: string): Observable<AuthSession> {
     return from(supabaseClient.auth.signInWithPassword({ email, password })).pipe(
@@ -66,7 +68,7 @@ export class SupabaseAuthRepository extends AuthRepository {
   requestPasswordReset(email: string): Observable<void> {
     return from(
       supabaseClient.auth.resetPasswordForEmail(email, {
-        redirectTo: `${window.location.origin}${APP_PATHS.resetPassword}`,
+        redirectTo: `${this.recoveryOrigin()}${APP_PATHS.resetPassword}`,
       })
     ).pipe(map(() => undefined));
   }
@@ -156,6 +158,14 @@ export class SupabaseAuthRepository extends AuthRepository {
         return this.buildSession(data.session.access_token, data.session.expires_at);
       })
     );
+  }
+
+  /**
+   * El enlace del correo se abre en el navegador: en Tauri el origen de la app
+   * (tauri.localhost) no existe fuera de ella, así que se usa la web pública.
+   */
+  private recoveryOrigin(): string {
+    return this.isDesktop ? environment.webAppUrl : window.location.origin;
   }
 
   private buildSession(accessToken: string, expiresAt: number | undefined): Observable<AuthSession> {
