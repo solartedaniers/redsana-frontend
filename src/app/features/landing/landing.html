@@ -8,6 +8,7 @@
       <h1 class="side-panel-title">{{ 'landing.panel.title' | translate }}</h1>
       <p class="side-panel-description">{{ 'landing.panel.description' | translate }}</p>
 
+      <p class="side-panel-eyebrow side-panel-features-label">{{ 'landing.hero.stepsLabel' | translate }}</p>
       <div class="side-panel-features">
         <div class="side-panel-feature">
           <app-icon name="dashboard" />
@@ -32,14 +33,16 @@
         </div>
       </div>
     </div>
+    <app-pulse-line />
   </aside>
 
   <div class="form-panel auth-form">
+    <p class="landing-kicker">{{ 'landing.hero.kicker' | translate }}</p>
     <p class="credential-notice"><app-icon name="computer" />{{ 'landing.desktopNotice' | translate }}</p>
 
     <app-desktop-download-button />
 
-    <a class="submit-button" [routerLink]="paths.login">{{ 'landing.login' | translate }}</a>
+    <a class="subtle-button" [routerLink]="paths.login">{{ 'landing.login' | translate }}</a>
 
     <div class="form-links">
       <a [routerLink]="paths.register">{{ 'landing.register' | translate }}</a>

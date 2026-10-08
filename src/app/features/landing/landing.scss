@@ -1,18 +1,55 @@
-// .submit-button está pensado para <button>; como enlace solo le falta esto.
-// La landing no tiene formulario: el panel informativo es el protagonista y
-// toma la columna ancha, así sus textos no se parten en tantas líneas.
+// The landing has no form: the brand block is the hero and takes the wide
+// column; the actions column opens with a huge kicker.
 .auth-split {
   @media (min-width: 48rem) {
     grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
   }
 }
 
-// Sin el bloque de texto, las acciones se centran verticalmente junto al panel lateral.
+// Unlike login/register, the hero stays visible on phones (stacked on top).
+.side-panel {
+  display: flex;
+
+  @media (max-width: 47.99rem) {
+    border-right: 0;
+    border-bottom: var(--border-width-ink) solid var(--color-card-border);
+    border-radius: calc(var(--radius-lg) - var(--border-width-ink)) calc(var(--radius-lg) - var(--border-width-ink)) 0 0;
+  }
+}
+
+.side-panel-title {
+  font-size: var(--font-size-display);
+}
+
+.side-panel-features-label {
+  margin: var(--space-5) 0 0;
+}
+
 .form-panel {
   justify-content: center;
 }
 
-a.submit-button {
-  text-align: center;
-  text-decoration: none;
+.landing-kicker {
+  margin: 0 0 var(--space-2);
+  font-family: var(--font-display);
+  font-size: var(--font-size-heading);
+  font-weight: var(--font-display-weight);
+  font-stretch: var(--font-display-stretch);
+  letter-spacing: var(--font-display-tracking);
+  line-height: var(--line-height-tight);
+  text-wrap: balance;
+  color: var(--color-text-primary);
+
+  // A highlighter stroke in "healthy" ink under the kicker.
+  background: linear-gradient(transparent 62%, var(--color-fill-healthy) 62% 92%, transparent 92%);
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+  justify-self: start;
+  width: fit-content;
+}
+
+:root[data-theme='dark'] .landing-kicker {
+  background: none;
+  color: var(--color-status-success);
+  text-shadow: 0 0 1.25rem var(--color-status-success);
 }
