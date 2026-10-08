@@ -4,11 +4,12 @@ import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../../core/auth/auth.service';
 import { TranslatePipe } from '../../../core/i18n/translate.pipe';
 import { Icon } from '../../../shared/components/icon/icon';
+import { PulseLine } from '../../../shared/components/pulse-line/pulse-line';
 import { APP_PATHS } from '../../../core/routing/app-paths';
 
 @Component({
   selector: 'app-login',
-  imports: [ReactiveFormsModule, RouterLink, TranslatePipe, Icon],
+  imports: [ReactiveFormsModule, RouterLink, TranslatePipe, Icon, PulseLine],
   templateUrl: './login.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
