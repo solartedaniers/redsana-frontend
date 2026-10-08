@@ -1,17 +1,30 @@
-.download-hero { padding: 1.25rem; margin-bottom: 1rem; }
+.download-hero { margin-bottom: var(--space-5); }
 .download-hero .page-header { margin: 0; }
 
+// A referral slip: violet brand block with the computer stamp and one action.
 .download-card {
   display: grid;
-  justify-items: center;
-  gap: 1rem;
-  max-width: 32rem;
-  padding: 2rem 1.5rem;
-  text-align: center;
+  justify-items: start;
+  gap: var(--space-4);
+  max-width: 36rem;
+  padding: var(--space-6);
+  background: var(--color-hero-bg);
+  color: var(--color-hero-text);
+  box-shadow: var(--shadow-hard-lg);
+  transform: rotate(calc(var(--sticker-tilt) / 2));
 
-  // El svg vive dentro de <app-icon> (encapsulado): se agranda solo en esta tarjeta.
-  app-icon { color: var(--color-accent); }
+  app-icon {
+    padding: var(--space-3);
+    border: var(--border-width-ink) solid var(--color-ink);
+    border-radius: var(--radius-md);
+    background: var(--color-fill-healthy);
+    color: var(--color-on-fill);
+  }
+
+  // The svg lives inside <app-icon> (encapsulated): enlarged only on this card.
   app-icon ::ng-deep .icon { width: 2.5rem; height: 2.5rem; }
-  p { margin: 0; color: var(--color-text-secondary); line-height: 1.6; }
-  app-desktop-download-button { width: 100%; }
+  p { margin: 0; font-family: var(--font-display); font-size: var(--font-size-heading-sm); font-weight: var(--font-display-weight); line-height: 1.2; }
 }
+
+// On the brand block the primary action flips to lime so it stays visible.
+.download-card ::ng-deep .submit-button { background: var(--color-fill-healthy); color: var(--color-on-fill); }
