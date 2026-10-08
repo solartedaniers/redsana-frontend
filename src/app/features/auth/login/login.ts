@@ -5,11 +5,12 @@ import { AuthService } from '../../../core/auth/auth.service';
 import { TranslatePipe } from '../../../core/i18n/translate.pipe';
 import { Icon } from '../../../shared/components/icon/icon';
 import { PulseLine } from '../../../shared/components/pulse-line/pulse-line';
+import { PasswordStrengthMeter } from '../../../shared/components/password-strength-meter/password-strength-meter';
 import { APP_PATHS } from '../../../core/routing/app-paths';
 
 @Component({
   selector: 'app-login',
-  imports: [ReactiveFormsModule, RouterLink, TranslatePipe, Icon, PulseLine],
+  imports: [ReactiveFormsModule, RouterLink, TranslatePipe, Icon, PulseLine, PasswordStrengthMeter],
   templateUrl: './login.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

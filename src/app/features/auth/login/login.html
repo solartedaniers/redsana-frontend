@@ -51,21 +51,8 @@
         }
       </label>
 
-      <div class="encryption-status" aria-live="polite">
-        <span>{{ 'auth.login.encryptionStatus' | translate }}</span>
-        <span class="encryption-meter" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
-        <strong>{{ 'auth.login.encryptionLevel' | translate }}</strong>
-      </div>
-
-      <p class="credential-notice"><app-icon name="shield" />{{ 'auth.login.credentialNotice' | translate }}</p>
-
       <label class="field has-icon">
-        <div class="field-label-row">
-          <span>{{ 'auth.login.password' | translate }}</span>
-          <a class="field-hint-link" [routerLink]="paths.forgotPassword">
-            {{ 'auth.login.forgotPasswordLink' | translate }}
-          </a>
-        </div>
+        <span>{{ 'auth.login.password' | translate }}</span>
         <div class="input-wrap">
           <app-icon name="lock" />
           <input
@@ -86,6 +73,12 @@
           <small class="field-error">{{ 'auth.errors.required' | translate }}</small>
         }
       </label>
+
+      <app-password-strength-meter [password]="form.controls.password.value" />
+
+      <a class="field-hint-link forgot-link" [routerLink]="paths.forgotPassword">
+        {{ 'auth.login.forgotPasswordLink' | translate }}
+      </a>
 
       @if (errorKey()) {
         <p class="form-error">{{ errorKey() | translate }}</p>
