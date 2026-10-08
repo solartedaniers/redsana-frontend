@@ -27,3 +27,22 @@ export function evaluateWifiEncryption(raw: string | null): WifiEncryptionStatus
   const upper = raw.toUpperCase();
   return STRONG_WIFI_ENCRYPTION_PREFIXES.some((prefix) => upper.startsWith(prefix)) ? 'secure' : 'weak';
 }
+
+// Intentional mirror of QUESTIONNAIRE_WEIGHT_PERCENT / TECHNICAL_WEIGHT_PERCENT
+// in backend/app/services/network_security_score_service.py.
+export const SECURITY_SCORE_WEIGHTS = {
+  questionnaire: 30,
+  technical: 70,
+} as const;
+
+export type RecommendationUrgency = 'high' | 'medium' | 'low';
+
+// Backend priorities go from 1 (most urgent) to 5; this only groups them for display.
+const URGENCY_MAX_PRIORITY: Record<Exclude<RecommendationUrgency, 'low'>, number> = { high: 2, medium: 3 };
+
+export function getRecommendationUrgency(priority: number): RecommendationUrgency {
+  if (priority <= URGENCY_MAX_PRIORITY.high) {
+    return 'high';
+  }
+  return priority <= URGENCY_MAX_PRIORITY.medium ? 'medium' : 'low';
+}
