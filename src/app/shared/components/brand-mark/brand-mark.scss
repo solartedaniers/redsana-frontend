@@ -1,0 +1,25 @@
+:host {
+  display: inline-grid;
+  place-items: center;
+  width: 1.9rem;
+  height: 1.9rem;
+  flex-shrink: 0;
+  border: var(--border-width-ink) solid var(--color-ink);
+  border-radius: var(--radius-sm);
+  background: var(--color-fill-brand);
+  box-shadow: calc(var(--shadow-offset) / 2) calc(var(--shadow-offset) / 2) 0 var(--color-shadow);
+  transform: rotate(var(--sticker-tilt));
+}
+
+svg {
+  width: 80%;
+  height: 80%;
+}
+
+.trace {
+  fill: none;
+  stroke: var(--color-fill-healthy);
+  stroke-width: 2.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
