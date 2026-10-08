@@ -1,4 +1,4 @@
-.dashboard-hero { display: flex; justify-content: space-between; align-items: center; gap: 1rem; padding: 1.25rem; margin-bottom: 1rem; }
+.dashboard-hero { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 1rem; padding: 1.25rem; margin-bottom: 1rem; }
 .dashboard-hero .page-header { margin: .7rem 0 0; }
 
 .anomaly-calibrating-banner {
@@ -30,3 +30,4 @@
 .router-summary { display: grid; place-items: center; padding: 1.5rem; }
 .router-summary .action-button { text-align: center; text-decoration: none; }
 @media (max-width: 64rem) { .metrics-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 28rem) { .metrics-grid { grid-template-columns: 1fr; } }

@@ -1,4 +1,5 @@
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { NetworkMetricsRepository } from '../../../core/repositories/network-metrics.repository';
 import { AnomalyDetectionStatus, NetworkMetricSample, NetworkMetricSnapshot } from '../../../core/models/network.model';
 import { PageHeader } from '../../../shared/components/page-header/page-header';
@@ -8,6 +9,7 @@ import { HistoryChart } from '../../../shared/components/history-chart/history-c
 import { TranslatePipe } from '../../../core/i18n/translate.pipe';
 import { DatePipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
+import { APP_PATHS } from '../../../core/routing/app-paths';
 
 @Component({
   selector: 'app-dashboard',
@@ -17,6 +19,7 @@ import { RouterLink } from '@angular/router';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Dashboard {
+  protected readonly paths = APP_PATHS;
   private readonly metricsRepository = inject(NetworkMetricsRepository);
 
   protected readonly snapshot = signal<NetworkMetricSnapshot | null>(null);
@@ -26,7 +29,11 @@ export class Dashboard {
   constructor() {
     // watchSnapshot ya emite un valor inicial y se re-suscribe sola cada
     // pocos segundos; no hace falta gestionar un intervalo aquí.
-    this.metricsRepository.watchSnapshot().subscribe((snapshot) => this.snapshot.set(snapshot));
+    // takeUntilDestroyed: sin esto cada visita al panel dejaba otro sondeo de 4 s vivo para siempre.
+    this.metricsRepository
+      .watchSnapshot()
+      .pipe(takeUntilDestroyed())
+      .subscribe((snapshot) => this.snapshot.set(snapshot));
     this.metricsRepository.getHistory().subscribe((history) => this.history.set(history));
     // Se consulta una sola vez al cargar: el conteo solo importa mientras
     // calibra, no hace falta refrescarlo en vivo como el snapshot de red.

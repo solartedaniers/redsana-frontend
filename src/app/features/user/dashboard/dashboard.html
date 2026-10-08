@@ -37,7 +37,7 @@
       <app-history-chart [samples]="history()" />
     </section>
     <aside class="router-summary surface-panel">
-      <a class="action-button" routerLink="/user/security-assistant">{{ 'user.dashboard.diagnose' | translate }}</a>
+      <a class="action-button" [routerLink]="paths.securityAssistant">{{ 'user.dashboard.diagnose' | translate }}</a>
     </aside>
   </div>
 }
