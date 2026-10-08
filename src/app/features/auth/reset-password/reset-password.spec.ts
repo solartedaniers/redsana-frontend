@@ -40,10 +40,10 @@ describe('ResetPassword', () => {
     const resetPassword = vi.fn(() => of(undefined));
     const { element, detect } = await render({ hasRecoverySession: () => of(true), resetPassword });
 
-    fill(element, 'nueva-clave-segura', 'nueva-clave-segura');
+    fill(element, 'Nueva-Clave-2026', 'Nueva-Clave-2026');
     await detect();
 
-    expect(resetPassword).toHaveBeenCalledExactlyOnceWith('nueva-clave-segura');
+    expect(resetPassword).toHaveBeenCalledExactlyOnceWith('Nueva-Clave-2026');
     expect(element.querySelector('.form-success')?.textContent?.trim()).toBe('auth.resetPassword.successMessage');
   });
 
@@ -53,7 +53,10 @@ describe('ResetPassword', () => {
 
     fill(element, 'corta', 'corta');
     await detect();
-    fill(element, 'nueva-clave-segura', 'otra-clave-segura');
+    fill(element, 'Nueva-Clave-2026', 'Otra-Clave-2026');
+    await detect();
+    // Long enough but missing uppercase, digit and symbol: the strength rule blocks it.
+    fill(element, 'nueva-clave-segura', 'nueva-clave-segura');
     await detect();
 
     expect(resetPassword).not.toHaveBeenCalled();
@@ -65,7 +68,7 @@ describe('ResetPassword', () => {
       resetPassword: () => throwError(() => new Error('auth.errors.unknown')),
     });
 
-    fill(element, 'nueva-clave-segura', 'nueva-clave-segura');
+    fill(element, 'Nueva-Clave-2026', 'Nueva-Clave-2026');
     await detect();
 
     expect(element.querySelector('.form-error')?.textContent?.trim()).toBe('auth.errors.unknown');
