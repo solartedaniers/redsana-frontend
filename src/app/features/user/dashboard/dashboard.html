@@ -1,43 +1,50 @@
-<section class="dashboard-hero surface-panel">
-  <div>
+<section class="dashboard-hero">
+  <div class="dashboard-hero__heading">
     <app-network-status-badge [status]="snapshot()?.status ?? null" />
     <app-page-header titleKey="user.dashboard.title" subtitleKey="user.dashboard.subtitle" />
   </div>
-  @if (snapshot(); as data) { <app-network-status-light [status]="data.status" /> }
+  <div class="dashboard-hero__actions">
+    @if (snapshot(); as data) { <app-network-status-light [status]="data.status" /> }
+    <a class="action-button" [routerLink]="paths.securityAssistant">{{ 'user.dashboard.diagnose' | translate }}</a>
+  </div>
 </section>
 
 @if (anomalyStatus(); as anomaly) {
   @if (anomaly.status === 'calibrating') {
-    <p class="anomaly-calibrating-banner surface-panel">
+    <p class="anomaly-calibrating-banner">
       {{ 'user.dashboard.anomalyCalibrating' | translate: { collected: anomaly.samplesCollected, required: anomaly.samplesRequired } }}
     </p>
   } @else if (anomaly.status === 'unknown_network') {
-    <p class="anomaly-calibrating-banner surface-panel">{{ 'user.dashboard.anomalyUnknownNetwork' | translate }}</p>
+    <p class="anomaly-calibrating-banner">{{ 'user.dashboard.anomalyUnknownNetwork' | translate }}</p>
   }
 }
 
 @if (snapshot(); as data) {
-  <div class="metrics-grid metric-strip">
-    <app-metric-card labelKey="user.dashboard.latency" [value]="data.latencyMs" unit="ms" />
-    <app-metric-card labelKey="user.dashboard.jitter" [value]="data.jitterMs" unit="ms" />
-    <app-metric-card labelKey="user.dashboard.packetLoss" [value]="data.packetLossPercent" unit="%" />
-    <article class="metric-tile surface-panel">
+  <div class="vitals">
+    <app-metric-card class="vitals__latency" variant="hero" labelKey="user.dashboard.latency" [value]="data.latencyMs" unit="ms" />
+    <app-metric-card class="vitals__jitter" labelKey="user.dashboard.jitter" [value]="data.jitterMs" unit="ms" />
+    <app-metric-card class="vitals__loss" labelKey="user.dashboard.packetLoss" [value]="data.packetLossPercent" unit="%" />
+    <article class="vitals__updated">
       <p class="metric-tile__label">{{ 'user.dashboard.updated' | translate }}</p>
-      <p class="metric-tile__value">{{ data.updatedAt | date: 'shortTime' }}</p>
+      <p class="metric-tile__value">
+        <time [attr.datetime]="data.updatedAt">{{ data.updatedAt | date: 'shortTime' }}</time>
+      </p>
       <p class="metric-tile__detail">{{ 'user.dashboard.live' | translate }}</p>
     </article>
   </div>
 
-  <div class="workspace-grid workspace-grid--two">
-    <section class="history-section surface-panel">
-      <div class="surface-panel__header">
-        <h2 class="surface-panel__title">{{ 'user.dashboard.historyTitle' | translate }}</h2>
-        <p class="surface-panel__copy">{{ 'user.dashboard.historyDetail' | translate }}</p>
-      </div>
-      <app-history-chart [samples]="history()" />
-    </section>
-    <aside class="router-summary surface-panel">
-      <a class="action-button" [routerLink]="paths.securityAssistant">{{ 'user.dashboard.diagnose' | translate }}</a>
-    </aside>
+  <section class="history-section surface-panel">
+    <div class="surface-panel__header">
+      <h2 class="surface-panel__title">{{ 'user.dashboard.historyTitle' | translate }}</h2>
+      <p class="surface-panel__copy">{{ 'user.dashboard.historyDetail' | translate }}</p>
+    </div>
+    <app-history-chart [samples]="history()" />
+  </section>
+} @else {
+  <div class="vitals" aria-busy="true">
+    <span class="visually-hidden">{{ 'common.loading' | translate }}</span>
+    <div class="skeleton vitals__latency"></div>
+    <div class="skeleton vitals__jitter"></div>
+    <div class="skeleton vitals__loss"></div>
   </div>
 }

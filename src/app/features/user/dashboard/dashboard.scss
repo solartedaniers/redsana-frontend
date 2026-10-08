@@ -1,33 +1,83 @@
-.dashboard-hero { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 1rem; padding: 1.25rem; margin-bottom: 1rem; }
-.dashboard-hero .page-header { margin: .7rem 0 0; }
+// Ambient aura: the edges of the screen take the tint of the REAL network
+// status (nothing when there is no measurement yet).
+:host { display: block; }
 
+:host([data-severity])::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background: radial-gradient(ellipse at top right, color-mix(in srgb, var(--severity-fill) 22%, transparent), transparent 60%);
+}
+
+.dashboard-hero {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: var(--space-4) var(--space-5);
+  margin-bottom: var(--space-5);
+}
+
+.dashboard-hero__heading app-network-status-badge { display: inline-block; margin-bottom: var(--space-3); }
+.dashboard-hero .page-header { margin: 0; }
+
+.dashboard-hero__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+// A taped note: the calibration notice is pinned to the chart, slightly tilted.
 .anomaly-calibrating-banner {
-  margin: 0 0 1.25rem;
-  padding: .85rem 1.25rem;
-  color: var(--color-status-warning);
+  max-width: 62ch;
+  margin: 0 0 var(--space-6);
+  padding: var(--space-3) var(--space-4);
+  border: var(--border-width-ink) solid var(--color-ink);
+  border-radius: var(--radius-sm);
+  background: var(--color-fill-warning);
+  color: var(--color-on-fill);
   font-size: var(--font-size-body);
+  box-shadow: var(--shadow-hard);
+  transform: rotate(calc(var(--sticker-tilt) / 2));
 }
 
-.metrics-grid {
+// Vital signs: latency is the protagonist; the rest are secondary readings.
+.vitals {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 1rem;
-  margin-bottom: 1.75rem;
+  grid-template-columns: minmax(0, 2fr) repeat(2, minmax(0, 1fr));
+  grid-template-areas:
+    'latency jitter loss'
+    'latency updated updated';
+  gap: var(--space-5);
+  margin-bottom: var(--space-6);
 }
 
-.history-section {
-  overflow: hidden;
+.vitals__latency { grid-area: latency; }
+.vitals__jitter { grid-area: jitter; }
+.vitals__loss { grid-area: loss; }
 
-  h2 {
-    margin: 0;
-    font-size: 1.05rem;
-    color: var(--color-text-primary);
+.vitals__updated {
+  grid-area: updated;
+  align-self: center;
+  justify-self: start;
+  padding: var(--space-3) var(--space-5);
+  border: var(--border-width-ink) dashed var(--color-card-border);
+  border-radius: var(--radius-sm);
+  transform: rotate(var(--sticker-tilt-alt));
+}
+
+.history-section app-history-chart { padding: var(--space-5); }
+
+@media (max-width: 64rem) {
+  .vitals {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-areas: 'latency latency' 'jitter loss' 'updated updated';
   }
-
-  app-history-chart { display: block; padding: 1.25rem; }
 }
 
-.router-summary { display: grid; place-items: center; padding: 1.5rem; }
-.router-summary .action-button { text-align: center; text-decoration: none; }
-@media (max-width: 64rem) { .metrics-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
-@media (max-width: 28rem) { .metrics-grid { grid-template-columns: 1fr; } }
+@media (max-width: 28rem) {
+  .vitals { grid-template-areas: 'latency latency' 'jitter jitter' 'loss loss' 'updated updated'; }
+}
