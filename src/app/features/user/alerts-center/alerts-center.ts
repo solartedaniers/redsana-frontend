@@ -1,4 +1,5 @@
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { AlertsRepository } from '../../../core/repositories/alerts.repository';
 import { NetworkAlert } from '../../../core/models/alert.model';
 import { PageHeader } from '../../../shared/components/page-header/page-header';
@@ -23,9 +24,11 @@ export class AlertsCenter {
     this.repository.getAlerts().subscribe((alerts) => this.alerts.set(alerts));
     // Cada alerta predictiva nueva se antepone a la lista para que el
     // stagger de entrada sea visible sin recargar la pantalla.
-    this.repository.watchNewAlerts().subscribe((alert) => {
-      this.alerts.update((current) => [alert, ...current]);
-    });
+    // takeUntilDestroyed: el sondeo vive solo mientras la pantalla está abierta.
+    this.repository
+      .watchNewAlerts()
+      .pipe(takeUntilDestroyed())
+      .subscribe((alert) => this.alerts.update((current) => [alert, ...current]));
   }
 
   protected onAcknowledge(alertId: string): void {
