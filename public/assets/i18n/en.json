@@ -18,6 +18,21 @@
       "warning": "Network degraded",
       "critical": "Network critical",
       "unknown": "Status unknown"
+    },
+    "brandTagline": "Home network clinic",
+    "chartSticker": "Clinical chart",
+    "latencyChart": {
+      "label": "Network latency electrocardiogram",
+      "empty": "There are no measurements to draw the trace yet.",
+      "summary": "{{count}} answered measurements: minimum {{min}} ms, average {{avg}} ms, maximum {{max}} ms.",
+      "cut": "No reply",
+      "hint": "Hover or use ← → to read each measurement",
+      "legend": {
+        "healthy": "Healthy · < {{warning}} ms",
+        "warning": "Warning · {{warning}}–{{critical}} ms",
+        "critical": "Critical · ≥ {{critical}} ms",
+        "cut": "Outage"
+      }
     }
   },
   "theme": {
@@ -413,6 +428,10 @@
     "desktopNotice": "For advanced features like network scanning and WiFi security, download the desktop version.",
     "login": "Sign in",
     "register": "Don't have an account? Sign up",
-    "download": "Download for Windows (64-bit)"
+    "download": "Download for Windows (64-bit)",
+    "hero": {
+      "kicker": "Heal your network",
+      "stepsLabel": "How it works"
+    }
   }
 }

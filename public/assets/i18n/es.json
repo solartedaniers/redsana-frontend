@@ -18,6 +18,21 @@
       "warning": "Red degradada",
       "critical": "Red crítica",
       "unknown": "Estado desconocido"
+    },
+    "brandTagline": "Clínica de redes domésticas",
+    "chartSticker": "Hoja clínica",
+    "latencyChart": {
+      "label": "Electrocardiograma de latencia de la red",
+      "empty": "Aún no hay mediciones para dibujar el trazo.",
+      "summary": "{{count}} mediciones con respuesta: mínimo {{min}} ms, promedio {{avg}} ms, máximo {{max}} ms.",
+      "cut": "Sin respuesta",
+      "hint": "Pasa el cursor o usa ← → para leer cada medición",
+      "legend": {
+        "healthy": "Sana · < {{warning}} ms",
+        "warning": "Alerta · {{warning}}–{{critical}} ms",
+        "critical": "Crítica · ≥ {{critical}} ms",
+        "cut": "Corte"
+      }
     }
   },
   "theme": {
@@ -413,6 +428,10 @@
     "desktopNotice": "Para funciones avanzadas como el escaneo de tu red y la seguridad de tu WiFi, descarga la versión de escritorio.",
     "login": "Iniciar sesión",
     "register": "¿No tienes cuenta? Regístrate",
-    "download": "Descargar para Windows (64 bits)"
+    "download": "Descargar para Windows (64 bits)",
+    "hero": {
+      "kicker": "Sana tu red",
+      "stepsLabel": "Cómo funciona"
+    }
   }
 }
