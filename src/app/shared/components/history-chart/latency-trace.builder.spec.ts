@@ -23,6 +23,14 @@ describe('LatencyTraceBuilder', () => {
     expect(trace.criticalY).toBeNull();
   });
 
+  it('con una red degradada todo el tiempo solo marca los picos más altos', () => {
+    const zigzag = Array.from({ length: 40 }, (_, i) => sample(i % 2 === 0 ? 200 + i : 160, i));
+    const trace = builder.build(zigzag);
+
+    expect(trace.markers.length).toBe(HISTORY_CHART_CONFIG.maxPeakMarkers);
+    expect(trace.markers.map((point) => point.latencyMs)).toContain(238);
+  });
+
   it('reduce historiales largos sin perder el pico ni el corte', () => {
     const long = Array.from({ length: 1000 }, (_, i) => sample(i === 500 ? 400 : i === 900 ? 0 : 20, i));
     const trace = builder.build(long);

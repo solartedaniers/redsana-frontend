@@ -67,7 +67,7 @@ export class LatencyTraceBuilder {
       path: points.map((point, index) => `${index === 0 ? 'M' : 'L'}${round(point.x)} ${round(point.y)}`).join(''),
       warningY: this.thresholdY(LATENCY_THRESHOLDS_MS.warning, yMax, toY),
       criticalY: this.thresholdY(LATENCY_THRESHOLDS_MS.critical, yMax, toY),
-      markers: points.filter((point, index) => this.isMarker(points, index)),
+      markers: this.markers(points),
       heatmap: this.heatmap(samples),
       stats: answered.length === 0 ? null : {
         min: answered.reduce((min, latency) => Math.min(min, latency), Infinity),
@@ -82,12 +82,18 @@ export class LatencyTraceBuilder {
     return threshold > yMax ? null : toY(threshold);
   }
 
-  private isMarker(points: readonly TracePoint[], index: number): boolean {
+  // Every outage, plus the highest local peaks that crossed a threshold.
+  private markers(points: readonly TracePoint[]): TracePoint[] {
+    const peaks = points
+      .filter((point, index) => this.isThresholdPeak(points, index))
+      .sort((a, b) => b.latencyMs - a.latencyMs)
+      .slice(0, HISTORY_CHART_CONFIG.maxPeakMarkers);
+    return points.filter((point) => point.severity === 'cut' || peaks.includes(point));
+  }
+
+  private isThresholdPeak(points: readonly TracePoint[], index: number): boolean {
     const point = points[index];
-    if (point.severity === 'cut') {
-      return true;
-    }
-    if (point.severity === 'healthy') {
+    if (point.severity === 'cut' || point.severity === 'healthy') {
       return false;
     }
     const previous = points[index - 1]?.latencyMs ?? -Infinity;

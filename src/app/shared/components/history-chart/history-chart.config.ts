@@ -8,4 +8,7 @@ export const HISTORY_CHART_CONFIG = {
   // light on phones and in WebView2 no matter how many samples exist.
   maxTracePoints: 240,
   heatmapCells: 48,
+  // Only the highest threshold peaks get a marker (outages always do), so a
+  // network that is degraded all day does not turn into a wall of dots.
+  maxPeakMarkers: 3,
 } as const;
