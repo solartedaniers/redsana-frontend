@@ -1,22 +1,46 @@
-// Fuente única de verdad para duraciones y curvas de easing en CSS puro
-// (transiciones de tema, hover/focus). El espejo en TypeScript para
-// @angular/animations vive en core/animations/motion.constants.ts —
-// los valores deben mantenerse iguales en ambos archivos.
+// Single source of truth for durations and easing curves in plain CSS. The
+// TypeScript mirror for @angular/animations lives in
+// core/animations/motion.constants.ts; shared values must stay equal in both.
 :root {
   --motion-duration-fast: 120ms;
   --motion-duration-base: 200ms;
   --motion-duration-slow: 320ms;
+  // Number rolls (odometer) and other value changes.
+  --motion-duration-count: 700ms;
 
   --motion-easing-standard: cubic-bezier(0.4, 0, 0.2, 1);
   --motion-easing-decelerate: cubic-bezier(0, 0, 0.2, 1);
   --motion-easing-accelerate: cubic-bezier(0.4, 0, 1, 1);
+  // Slight overshoot for stickers and presses: playful, never bouncy.
+  --motion-easing-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  // The "heartbeat": one rhythm shared by status lights, the ECG playhead and
+  // the device radar sweep, so the whole screen beats in sync.
+  --motion-heartbeat: 1.4s;
+  --motion-sweep: 6s;
+
+  // Hover lift and press distance of ink buttons and panels.
+  --motion-lift: -2px;
 }
 
-// Transición discreta de colores al cambiar de tema: evita el salto brusco
-// pedido en los requisitos sin animar layout (solo color/background/border).
+// Discrete color transition when switching themes: avoids an abrupt flash
+// without animating layout (color/background/border/shadow only).
 body,
 [data-theme] * {
   transition-property: background-color, border-color, color, box-shadow;
   transition-duration: var(--motion-duration-base);
   transition-timing-function: var(--motion-easing-standard);
+}
+
+// Reduced motion: every animation collapses to its final, static frame. Each
+// animated piece is designed so that its resting frame is still meaningful.
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
