@@ -139,7 +139,8 @@
       "wrongCurrentPassword": "Current password is incorrect.",
       "confirmationRequired": "Check your email to confirm your account before signing in.",
       "avatarUploadFailed": "Could not upload the image. Try a different file.",
-      "unknown": "Something went wrong. Please try again."
+      "unknown": "Something went wrong. Please try again.",
+      "passwordNotStrong": "The password does not meet every requirement in the list yet."
     },
     "passwordStrength": {
       "label": "Password strength",
@@ -149,6 +150,15 @@
         "fair": "Fair",
         "good": "Good",
         "strong": "Optimal"
+      },
+      "met": "Met:",
+      "pending": "Pending:",
+      "criteria": {
+        "minLength": "At least {{min}} characters",
+        "lowercase": "One lowercase letter",
+        "uppercase": "One uppercase letter",
+        "digit": "One number",
+        "symbol": "One symbol"
       }
     }
   },
@@ -457,6 +467,8 @@
     "hero": {
       "kicker": "Heal your network",
       "stepsLabel": "How it works"
-    }
+    },
+    "downloadPreparing": "Preparing the download…",
+    "downloadFallback": "We could not start the direct download; we opened the release page so you can get the installer there."
   }
 }
