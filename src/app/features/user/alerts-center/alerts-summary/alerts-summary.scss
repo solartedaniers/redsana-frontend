@@ -1,0 +1,46 @@
+:host { display: grid; gap: var(--space-4); padding: var(--space-5); }
+
+.tally {
+  display: grid;
+  // Cells move to a new row instead of breaking a label mid-word.
+  grid-template-columns: repeat(auto-fit, minmax(7.5rem, 1fr));
+  gap: var(--space-3);
+  margin: 0;
+}
+
+.tally__cell {
+  padding: var(--space-3);
+  border: var(--border-width-ink) solid var(--color-card-border);
+  border-top: var(--space-2) solid var(--severity-fill);
+  border-radius: var(--radius-sm);
+
+  min-width: 0;
+
+  dt { font: 700 var(--font-size-caption) var(--font-mono); text-transform: uppercase; color: var(--color-text-secondary); }
+  dd { margin: var(--space-1) 0 0; font: 800 var(--font-size-heading) var(--font-mono); font-variant-numeric: tabular-nums; line-height: 1; }
+}
+
+.pending { margin: 0; font-family: var(--font-display); font-size: var(--font-size-heading-sm); font-weight: var(--font-display-weight); }
+
+// Each alert is a tick at its real time; pending ones stand taller.
+.strip {
+  position: relative;
+  height: 3rem;
+  border: var(--border-width-ink) solid var(--color-card-border);
+  border-radius: var(--radius-sm);
+  background: var(--texture-chart-grid), var(--color-bg-surface);
+}
+
+.strip__tick {
+  position: absolute;
+  bottom: 0;
+  width: 0.35rem;
+  height: 80%;
+  translate: -50% 0;
+  border: var(--border-width-hairline) solid var(--color-ink);
+  background: var(--severity-fill);
+}
+
+.strip__tick--seen { height: 40%; opacity: 0.6; }
+
+.strip__legend { margin: 0; font: 600 var(--font-size-caption) var(--font-mono); color: var(--color-text-secondary); }

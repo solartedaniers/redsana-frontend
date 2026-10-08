@@ -1,0 +1,19 @@
+<dl class="tally">
+  @for (item of counts(); track item.severity) {
+    <div class="tally__cell" [attr.data-severity]="item.severity">
+      <dt>{{ 'user.alertsCenter.severity.' + item.severity | translate }}</dt>
+      <dd>{{ item.count }}</dd>
+    </div>
+  }
+</dl>
+
+<p class="pending">{{ 'user.alertsCenter.pending' | translate: { count: pending() } }}</p>
+
+@if (alerts().length > 1) {
+  <div class="strip" aria-hidden="true">
+    @for (tick of ticks(); track tick.id) {
+      <span class="strip__tick" [attr.data-severity]="tick.severity" [class.strip__tick--seen]="tick.acknowledged" [style.left]="tick.left"></span>
+    }
+  </div>
+  <p class="strip__legend">{{ 'user.alertsCenter.stripLegend' | translate }}</p>
+}

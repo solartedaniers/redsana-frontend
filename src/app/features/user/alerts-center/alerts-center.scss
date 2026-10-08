@@ -1,10 +1,52 @@
-.alerts-list {
-  overflow: hidden;
-}
-.alerts-hero { display: flex; justify-content: space-between; align-items: center; gap: 1rem; padding: 1.25rem; margin-bottom: 1rem; }
+.alerts-hero { margin-bottom: var(--space-5); }
 .alerts-hero .page-header { margin: 0; }
-.alerts-list__content { display: grid; gap: .75rem; padding: 1rem; }
-.prediction-panel { min-height: 15rem; }
-.prediction-panel p { margin: 1rem; color: var(--color-text-secondary); line-height: 1.6; }
-.prediction-signal { height: 5rem; margin: 1rem; border-radius: .7rem; background: repeating-linear-gradient(90deg, var(--color-accent-muted) 0 .5rem, transparent .5rem 1rem); border: 1px solid var(--color-border); animation: signal-shift var(--motion-duration-slow) linear infinite; }
-@keyframes signal-shift { to { background-position-x: 2rem; } }
+
+.alerts-layout { align-items: start; }
+
+.alerts-empty {
+  margin: 0;
+  padding: var(--space-6) var(--space-5);
+  font-family: var(--font-mono);
+  color: var(--color-text-secondary);
+}
+
+// A vertical ECG spine: every alert hangs from it on a node of its severity.
+.timeline {
+  position: relative;
+  display: grid;
+  gap: var(--space-3);
+  margin: 0;
+  padding: var(--space-5) var(--space-5) var(--space-5) calc(var(--space-7) + var(--space-2));
+  list-style: none;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: var(--space-5);
+    bottom: var(--space-5);
+    left: var(--space-6);
+    width: var(--border-width-ink);
+    background: var(--color-card-border);
+  }
+}
+
+.timeline__entry {
+  position: relative;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: var(--space-4);
+    // Centered on the spine: spine offset minus the list indent minus half a node.
+    left: calc(var(--space-6) - var(--space-7) - var(--space-2) - 0.55rem);
+    width: 1.1rem;
+    height: 1.1rem;
+    border: var(--border-width-ink) solid var(--color-ink);
+    border-radius: 50%;
+    background: var(--severity-fill);
+  }
+}
+
+.summary-panel { position: sticky; top: var(--space-5); }
+
+@media (max-width: 64rem) { .summary-panel { position: static; order: -1; } }

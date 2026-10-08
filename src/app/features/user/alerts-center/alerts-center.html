@@ -1,20 +1,24 @@
-<section class="alerts-hero surface-panel">
+<section class="alerts-hero">
   <app-page-header titleKey="user.alertsCenter.title" subtitleKey="user.alertsCenter.subtitle" />
-  <span class="status-badge">IA</span>
 </section>
 
 <div class="alerts-layout workspace-grid workspace-grid--two">
   <section class="alerts-list surface-panel" [@listStagger]="alerts().length">
-    <div class="surface-panel__header"><h2 class="surface-panel__title">{{ 'user.alertsCenter.title' | translate }}</h2></div>
-    <div class="alerts-list__content">
-      @for (alert of alerts(); track alert.id) {
-        <app-alert-item [alert]="alert" (acknowledge)="onAcknowledge($event)" />
-      }
-    </div>
+    <div class="surface-panel__header"><h2 class="surface-panel__title">{{ 'user.alertsCenter.timelineTitle' | translate }}</h2></div>
+    @if (alerts().length === 0) {
+      <p class="alerts-empty">{{ 'user.alertsCenter.empty' | translate }}</p>
+    } @else {
+      <ol class="timeline">
+        @for (alert of alerts(); track alert.id) {
+          <li class="timeline__entry" [attr.data-severity]="alert.severity">
+            <app-alert-item [alert]="alert" (acknowledge)="onAcknowledge($event)" />
+          </li>
+        }
+      </ol>
+    }
   </section>
-  <aside class="prediction-panel surface-panel">
-    <div class="surface-panel__header"><h2 class="surface-panel__title">{{ 'user.alertsCenter.subtitle' | translate }}</h2></div>
-    <div class="prediction-signal"></div>
-    <p>{{ 'user.alertsCenter.messages.congestionForecast' | translate }}</p>
+  <aside class="summary-panel surface-panel">
+    <div class="surface-panel__header"><h2 class="surface-panel__title">{{ 'user.alertsCenter.summaryTitle' | translate }}</h2></div>
+    <app-alerts-summary [alerts]="alerts()" />
   </aside>
 </div>

@@ -6,10 +6,11 @@ import { PageHeader } from '../../../shared/components/page-header/page-header';
 import { AlertItem } from '../../../shared/components/alert-item/alert-item';
 import { TranslatePipe } from '../../../core/i18n/translate.pipe';
 import { listStaggerAnimation } from '../../../core/animations/list-stagger.animation';
+import { AlertsSummary } from './alerts-summary/alerts-summary';
 
 @Component({
   selector: 'app-alerts-center',
-  imports: [PageHeader, AlertItem, TranslatePipe],
+  imports: [PageHeader, AlertItem, AlertsSummary, TranslatePipe],
   templateUrl: './alerts-center.html',
   styleUrl: './alerts-center.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

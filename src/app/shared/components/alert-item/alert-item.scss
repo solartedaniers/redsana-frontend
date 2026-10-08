@@ -1,80 +1,40 @@
+// One alert as a chart entry: severity strip, message, mono timestamp and a
+// round "seen" stamp. Acknowledged entries fade like an archived note.
 .alert-item {
   display: flex;
   align-items: flex-start;
-  gap: 0.75rem;
-  padding: 0.85rem 1rem;
-  border-radius: 0.65rem;
-  border: 1px solid var(--color-card-border);
-  border-left-width: 3px;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  border: var(--border-width-ink) solid var(--color-card-border);
+  border-left: var(--space-2) solid var(--severity-fill);
+  border-radius: var(--radius-sm);
   background: var(--color-bg-surface);
-  color: var(--color-status-neutral);
-  transition:
-    box-shadow var(--motion-duration-base) var(--motion-easing-standard),
-    transform var(--motion-duration-base) var(--motion-easing-standard);
-
-  :root[data-theme='light'] &:hover {
-    box-shadow: var(--shadow-card-hover);
-    transform: translateY(-2px);
-  }
+  color: var(--severity-ink);
+  box-shadow: calc(var(--shadow-offset) / 2) calc(var(--shadow-offset) / 2) 0 var(--color-shadow);
 
   &.acknowledged {
     opacity: 0.6;
-  }
-
-  &[data-severity='info'] {
-    border-left-color: var(--color-accent);
-    color: var(--color-accent);
-  }
-
-  &[data-severity='warning'] {
-    border-left-color: var(--color-status-warning);
-    color: var(--color-status-warning);
-  }
-
-  &[data-severity='critical'] {
-    border-left-color: var(--color-status-danger);
-    color: var(--color-status-danger);
+    box-shadow: none;
   }
 }
 
-.content {
-  flex: 1;
-  min-width: 0;
-}
+.content { flex: 1; min-width: 0; }
 
-.message {
-  margin: 0;
-  color: var(--color-text-primary);
-  font-size: var(--font-size-body);
-}
+.message { margin: 0; color: var(--color-text-primary); font-size: var(--font-size-body); font-weight: 600; }
 
-time {
-  font-size: var(--font-size-caption);
-  color: var(--color-text-secondary);
-}
+time { font: 600 var(--font-size-caption) var(--font-mono); color: var(--color-text-secondary); }
 
 .ack-button {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 1.9rem;
-  height: 1.9rem;
-  border-radius: 9999px;
-  border: 1px solid var(--color-border);
-  background: transparent;
-  color: inherit;
+  display: inline-grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: var(--touch-target-min);
+  height: var(--touch-target-min);
+  border: var(--border-width-ink) solid var(--color-card-border);
+  border-radius: 50%;
+  background: var(--color-bg-surface);
+  color: var(--color-text-primary);
   cursor: pointer;
-  transition:
-    background-color var(--motion-duration-fast) var(--motion-easing-standard),
-    color var(--motion-duration-fast) var(--motion-easing-standard);
 
-  &:hover {
-    background: var(--color-accent-muted);
-    color: var(--color-accent);
-  }
-
-  &:focus-visible {
-    outline: 2px solid var(--color-focus-ring);
-    outline-offset: 2px;
-  }
+  &:hover { background: var(--color-fill-healthy); color: var(--color-on-fill); }
 }
