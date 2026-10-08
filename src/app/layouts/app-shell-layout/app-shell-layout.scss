@@ -1,18 +1,24 @@
+// The shell sits directly on the chart paper of <body>: no 3D background here
+// (it only exists on the public screens).
 .app-shell {
   min-height: 100dvh;
   display: grid;
-  grid-template-columns: 15rem 1fr;
-  background: var(--color-bg-app);
+  grid-template-columns: 16rem minmax(0, 1fr);
   position: relative;
   isolation: isolate;
 }
 
+// Chart index column: a paper strip stuck to the left edge.
 .sidebar {
-  position: relative;
+  position: sticky;
+  top: 0;
   z-index: 1;
-  border-right: 1px solid var(--color-border);
+  height: 100dvh;
+  box-sizing: border-box;
+  overflow-y: auto;
+  padding: var(--space-5) var(--space-4) var(--space-5) var(--space-3);
+  border-right: var(--border-width-ink) solid var(--color-card-border);
   background: var(--color-bg-surface);
-  padding: 1.5rem 0.75rem;
 }
 
 .shell-main {
@@ -25,32 +31,31 @@
 
 .shell-content {
   flex: 1;
-  padding: 1.75rem;
   position: relative;
-  overflow-y: auto;
-  background: color-mix(in srgb, var(--color-bg-app) 72%, transparent);
+  padding: var(--space-6) clamp(var(--space-4), 3vw, var(--space-7)) var(--space-7);
 }
 
-// En pantallas angostas el menú no desaparece: pasa a ser un cajón que se abre
-// con el botón de la barra superior (antes quedaba oculto y no había forma de
-// navegar entre secciones en el celular).
+// Narrow screens: the menu does not disappear, it becomes a drawer opened from
+// the top bar button.
 @media (max-width: 52rem) {
-  .app-shell { grid-template-columns: 1fr; }
+  .app-shell { grid-template-columns: minmax(0, 1fr); }
+
   .sidebar {
     position: fixed;
     inset-block: 0;
     inset-inline-start: 0;
-    z-index: 3; // encima del fondo del cajón (2)
-    width: min(15rem, 85vw);
-    overflow-y: auto;
-    transform: translateX(-100%);
+    z-index: 3; // above the drawer backdrop (2)
+    width: min(16rem, 85vw);
+    box-shadow: var(--shadow-hard-lg);
+    transform: translateX(calc(-100% - var(--shadow-offset-lg)));
     visibility: hidden;
     transition:
-      transform var(--motion-duration-base) var(--motion-easing-standard),
+      transform var(--motion-duration-base) var(--motion-easing-spring),
       visibility var(--motion-duration-base);
   }
+
   .app-shell--nav-open .sidebar { transform: none; visibility: visible; }
-  .shell-content { padding: 1rem; }
+  .shell-content { padding: var(--space-5) var(--space-4) var(--space-6); }
 }
 
 .nav-backdrop {
@@ -58,7 +63,7 @@
   inset: 0;
   z-index: 2;
   border: 0;
-  background: color-mix(in srgb, var(--color-bg-app) 60%, transparent);
+  background: color-mix(in srgb, var(--color-ink) 35%, transparent);
   cursor: pointer;
 
   @media (min-width: 52.0625rem) { display: none; }

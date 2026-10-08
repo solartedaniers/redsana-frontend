@@ -2,21 +2,29 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0.9rem 1.5rem;
-  border-bottom: 1px solid var(--color-border);
+  gap: var(--space-4);
+  min-height: 3.5rem;
+  padding: var(--space-2) var(--space-5);
+  border-bottom: var(--border-width-ink) solid var(--color-card-border);
   background: var(--color-bg-surface);
 }
 
 .brand {
-  font-weight: 700;
-  letter-spacing: 0.02em;
-  color: var(--color-accent);
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-3);
+  font-family: var(--font-display);
+  font-size: var(--font-size-heading-sm);
+  font-weight: var(--font-display-weight);
+  font-stretch: var(--font-display-stretch);
+  letter-spacing: var(--font-display-tracking);
+  color: var(--color-text-primary);
 }
 
 .actions {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  gap: var(--space-3);
 }
 
 .user-chip {
@@ -42,7 +50,8 @@
 
 .user-name {
   font-size: var(--font-size-body);
-  color: var(--color-text-secondary);
+  font-weight: 700;
+  color: var(--color-text-primary);
 }
 
 .user-avatar {
@@ -52,10 +61,10 @@
   width: 2.25rem;
   height: 2.25rem;
   overflow: hidden;
-  border-radius: 9999px;
-  border: 1px solid var(--color-border);
-  background: var(--color-bg-surface-alt);
-  color: var(--color-text-secondary);
+  border-radius: 50%;
+  border: var(--border-width-ink) solid var(--color-card-border);
+  background: var(--color-fill-neutral);
+  color: var(--color-on-fill);
 
   img {
     width: 100%;
@@ -70,18 +79,16 @@
   justify-content: center;
   width: 2.25rem;
   height: 2.25rem;
-  border-radius: 9999px;
-  border: 1px solid var(--color-border);
-  background: var(--color-bg-surface-alt);
-  color: var(--color-text-secondary);
+  border-radius: 50%;
+  border: var(--border-width-ink) solid var(--color-card-border);
+  background: var(--color-bg-surface);
+  color: var(--color-text-primary);
   cursor: pointer;
-  transition:
-    color var(--motion-duration-fast) var(--motion-easing-standard),
-    border-color var(--motion-duration-fast) var(--motion-easing-standard);
+  transition: background-color var(--motion-duration-fast) var(--motion-easing-standard);
 
   &:hover {
-    color: var(--color-status-danger);
-    border-color: var(--color-status-danger);
+    background: var(--color-fill-critical);
+    color: var(--color-on-fill);
   }
 
   &:focus-visible {
@@ -105,20 +112,25 @@
   justify-content: center;
   width: 2.75rem;
   height: 2.75rem;
-  border-radius: 0.5rem;
-  border: 1px solid var(--color-border);
-  background: var(--color-bg-surface-alt);
-  color: var(--color-text-primary);
+  border-radius: var(--radius-sm);
+  border: var(--border-width-ink) solid var(--color-card-border);
+  background: var(--color-fill-healthy);
+  color: var(--color-on-fill);
   cursor: pointer;
+  box-shadow: calc(var(--shadow-offset) / 2) calc(var(--shadow-offset) / 2) 0 var(--color-shadow);
 }
 
 @media (max-width: 52rem) {
-  .top-bar { padding: 0.6rem 1rem; gap: 0.5rem; }
+  .top-bar { padding: var(--space-2) var(--space-3); gap: var(--space-2); }
   .menu-button { display: inline-flex; }
   .logout-button, .user-avatar { width: 2.75rem; height: 2.75rem; }
 }
 
 // En celulares el nombre no cabe junto a idioma, tema y salir: queda el avatar.
+@media (max-width: 30rem) {
+  .brand-name { display: none; }
+}
+
 @media (max-width: 36rem) {
   .user-name { display: none; }
   .actions { gap: 0.4rem; }

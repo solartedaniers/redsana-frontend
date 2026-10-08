@@ -8,7 +8,6 @@ import { SidebarNav } from '../../shared/components/sidebar-nav/sidebar-nav';
 import { NavItem } from '../../shared/components/sidebar-nav/nav-item.model';
 import { TopBar } from '../../shared/components/top-bar/top-bar';
 import { TranslatePipe } from '../../core/i18n/translate.pipe';
-import { NetworkBackground } from '../../shared/components/network-background/network-background';
 import { RuntimeEnvironmentService } from '../../core/runtime/runtime-environment.service';
 import { APP_PATHS } from '../../core/routing/app-paths';
 
@@ -38,7 +37,7 @@ const PROFILE_NAV_ITEM: NavItem = {
 // ambos roles es qué items de navegación se muestran, no la estructura.
 @Component({
   selector: 'app-shell-layout',
-  imports: [RouterOutlet, SidebarNav, TopBar, NetworkBackground, TranslatePipe],
+  imports: [RouterOutlet, SidebarNav, TopBar, TranslatePipe],
   templateUrl: './app-shell-layout.html',
   styleUrl: './app-shell-layout.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
