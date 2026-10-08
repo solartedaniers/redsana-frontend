@@ -1,84 +1,69 @@
 .back-link {
-  display: inline-block;
-  margin-bottom: 1.25rem;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: var(--touch-target-min);
+  margin-bottom: var(--space-4);
+  font: 700 var(--font-size-caption) var(--font-mono);
+  letter-spacing: var(--font-label-tracking);
+  text-transform: uppercase;
   color: var(--color-text-secondary);
   text-decoration: none;
-  font-size: var(--font-size-body);
 
-  &:hover {
-    color: var(--color-accent);
-  }
+  &:hover { color: var(--color-text-primary); }
 }
 
+// The household's chart header: patient, current vital light and the dial.
 .household-summary {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
-  gap: 2rem;
-  padding: 1.5rem;
-  border-radius: 0.75rem;
-  border: 1px solid var(--color-card-border);
+  gap: var(--space-5);
+  margin-bottom: var(--space-6);
+  padding: var(--space-5);
+  border: var(--border-width-ink) solid var(--color-card-border);
+  border-top: var(--space-3) solid var(--color-fill-brand);
+  border-radius: var(--radius-md);
   background: var(--color-bg-surface);
-  margin-bottom: 1.75rem;
-  transition:
-    box-shadow var(--motion-duration-base) var(--motion-easing-standard),
-    transform var(--motion-duration-base) var(--motion-easing-standard);
-}
+  box-shadow: var(--shadow-hard);
 
-:root[data-theme='light'] .household-summary:hover,
-:root[data-theme='light'] .history-section:hover {
-  box-shadow: var(--shadow-card-hover);
-  transform: translateY(-2px);
+  > div:first-child { flex: 1 1 14rem; }
 }
 
 .owner {
   margin: 0;
-  font-weight: 700;
-  color: var(--color-text-primary);
+  font-family: var(--font-display);
+  font-size: var(--font-size-heading);
+  font-weight: var(--font-display-weight);
+  font-stretch: var(--font-display-stretch);
+  line-height: var(--line-height-tight);
 }
 
-.label {
-  margin: 0.25rem 0 0;
-  color: var(--color-text-secondary);
-  font-size: var(--font-size-body);
-}
+.label { margin: var(--space-2) 0 0; font: 500 var(--font-size-caption) var(--font-mono); color: var(--color-text-secondary); }
 
-.score-block {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.35rem;
-}
+.score-block { display: grid; justify-items: center; gap: var(--space-2); min-width: min(16rem, 100%); }
 
 .score-source {
-  font-size: var(--font-size-caption);
-  font-weight: 700;
+  font: 700 var(--font-size-caption) var(--font-mono);
   text-transform: uppercase;
   color: var(--color-text-secondary);
 
-  &[data-source='real'] {
-    color: var(--color-status-success);
-  }
+  &[data-source='real'] { color: var(--color-status-success); }
 }
 
 .metrics-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
-  gap: 1rem;
-  margin-bottom: 1.75rem;
+  grid-template-columns: repeat(auto-fit, minmax(min(12rem, 100%), 1fr));
+  gap: var(--space-5);
+  margin-bottom: var(--space-6);
 }
 
 .history-section {
-  padding: 1.5rem;
-  border-radius: 0.75rem;
-  border: 1px solid var(--color-card-border);
+  padding: var(--space-5);
+  border: var(--border-width-ink) solid var(--color-card-border);
+  border-radius: var(--radius-md);
   background: var(--color-bg-surface);
-  transition:
-    box-shadow var(--motion-duration-base) var(--motion-easing-standard),
-    transform var(--motion-duration-base) var(--motion-easing-standard);
+  box-shadow: var(--shadow-hard);
 
-  h2 {
-    margin: 0 0 1rem;
-    font-size: 1.05rem;
-    color: var(--color-text-primary);
-  }
+  h2 { margin: 0 0 var(--space-4); font-size: var(--font-size-heading-sm); }
 }

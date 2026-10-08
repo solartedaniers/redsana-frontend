@@ -1,6 +1,6 @@
 @if (household(); as home) {
   <app-page-header [titleKey]="'admin.networkSupervision.detailTitle'" />
-  <a class="back-link" [routerLink]="paths.networkSupervision">
+  <a class="back-link" [routerLink]="paths.networkSupervision"><span aria-hidden="true">←</span>
     {{ 'common.back' | translate }}
   </a>
 
