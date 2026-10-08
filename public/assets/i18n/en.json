@@ -1,5 +1,11 @@
 {
+  "appUpdate": {
+    "message": "A new version of RedSana is available.",
+    "reload": "Update"
+  },
   "common": {
+    "menu": "Open menu",
+    "closeMenu": "Close menu",
     "appName": "RedSana",
     "save": "Save",
     "cancel": "Cancel",
@@ -85,6 +91,13 @@
           }
         }
       }
+    },
+    "resetPassword": {
+      "title": "New password",
+      "submit": "Save password",
+      "successMessage": "Your password was updated. You can now sign in with it.",
+      "invalidLink": "The recovery link has expired or was already used.",
+      "requestNewLink": "Request a new link"
     },
     "forgotPassword": {
       "title": "Reset password",
@@ -251,7 +264,8 @@
         "latencySpikePredicted": "A latency spike is predicted in the next few minutes.",
         "latencyDegraded": "Your connection is getting slower than usual ({{current}} ms, usually {{typical}} ms).",
         "connectionUnstable": "Your connection is more unstable than usual ({{current}} ms of variation, usually {{typical}} ms).",
-        "packetsBeingLost": "Your network is losing more data than usual ({{current}}% packet loss, usually {{typical}}%)."
+        "packetsBeingLost": "Your network is losing more data than usual ({{current}}% packet loss, usually {{typical}}%).",
+        "untrustedDeviceOnline": "A device you marked as unsafe is connected to your network ({{ip}}). RedSana cannot block it: if you don't recognize it, change the WiFi password or block it from your router."
       }
     },
     "devicesMap": {
@@ -263,11 +277,15 @@
       "scanFindings": "{{count}} device(s) require your attention.",
       "lastSeen": "Last seen",
       "markTrusted": "Mark as trusted",
+      "clearTrust": "Clear mark",
+      "showMore": "Show more ({{count}} left)",
+      "mapLimited": "The map shows {{shown}} of {{total}} devices; the list includes all of them.",
+      "trustNote": "Trusted and unsafe marks are just for you: RedSana cannot block devices on your router. To remove someone from your network, change the WiFi password or block them from your router's panel.",
       "block": "Mark as unsafe",
       "trust": {
         "trusted": "Trusted",
         "unknown": "Unknown",
-        "blocked": "Blocked"
+        "blocked": "Unsafe"
       },
       "kind": {
         "phone": "Phone",
@@ -282,6 +300,7 @@
       "online": "Online",
       "offline": "Offline",
       "scanError": "The scan could not be completed. Try again.",
+      "countUnavailable": "—",
       "scanDesktopOnly": "Device scanning requires the RedSana desktop app: browsers do not allow seeing the devices connected to your network.",
       "role": {
         "gateway": "Router (gateway)",
