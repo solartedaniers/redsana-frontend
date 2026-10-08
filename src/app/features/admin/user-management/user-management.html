@@ -1,6 +1,6 @@
 <app-page-header titleKey="admin.userManagement.title" subtitleKey="admin.userManagement.subtitle" />
 
-<button type="button" class="new-user-button" (click)="openCreateDialog()">
+<button type="button" class="action-button new-user-button" (click)="openCreateDialog()">
   {{ 'admin.userManagement.newUser' | translate }}
 </button>
 
@@ -22,7 +22,7 @@
         <td>{{ user.email }}</td>
         <td>{{ 'admin.userManagement.role.' + user.role | translate }}</td>
         <td>
-          <span class="status-badge" [class.suspended]="user.status === 'suspended'">
+          <span class="status-badge sticker" [class.suspended]="user.status === 'suspended'" [attr.data-tone]="user.status === 'suspended' ? 'critical' : 'healthy'">
             {{ 'admin.userManagement.status.' + user.status | translate }}
           </span>
         </td>

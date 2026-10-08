@@ -1,123 +1,81 @@
-.new-user-button {
-  padding: 0.6rem 1.25rem;
-  margin-bottom: 1.25rem;
-  border: none;
-  border-radius: 0.5rem;
-  background: var(--color-accent);
-  color: var(--color-text-inverse);
-  font-weight: 600;
-  cursor: pointer;
-  transition: opacity var(--motion-duration-fast) var(--motion-easing-standard);
+.new-user-button { margin-bottom: var(--space-5); }
 
-  &:hover {
-    opacity: 0.9;
-  }
+// Patient register: an ink-ruled ledger with a solid header band. Five columns
+// do not fit on a phone, so the table scrolls inside this box.
+.table-scroll {
+  overflow-x: auto;
+  border: var(--border-width-ink) solid var(--color-card-border);
+  border-radius: var(--radius-md);
+  background: var(--color-bg-surface);
+  box-shadow: var(--shadow-hard);
 }
 
 .users-table {
   width: 100%;
   border-collapse: collapse;
-  background: var(--color-bg-surface);
-  border: 1px solid var(--color-card-border);
-  border-radius: 0.75rem;
-  overflow: hidden;
-  transition:
-    box-shadow var(--motion-duration-base) var(--motion-easing-standard),
-    transform var(--motion-duration-base) var(--motion-easing-standard);
 
   th,
   td {
-    padding: 0.75rem 1rem;
+    padding: var(--space-3) var(--space-4);
+    border-bottom: var(--border-width-hairline) solid var(--color-border);
     text-align: left;
-    border-bottom: 1px solid var(--color-border);
-    font-size: 0.9rem;
+    white-space: nowrap;
   }
 
   th {
-    color: var(--color-text-secondary);
-    font-weight: 600;
-    font-size: var(--font-size-body);
+    background: var(--color-bg-surface-alt);
+    border-bottom: var(--border-width-ink) solid var(--color-card-border);
+    font: 800 var(--font-size-caption) var(--font-mono);
+    letter-spacing: var(--font-label-tracking);
     text-transform: uppercase;
-    letter-spacing: 0.03em;
   }
 
-  td {
-    color: var(--color-text-primary);
-  }
-
-  tr:last-child td {
-    border-bottom: none;
-  }
+  td:first-child { font-family: var(--font-display); font-weight: 700; }
+  td:nth-child(2) { font: 500 var(--font-size-caption) var(--font-mono); }
+  tr:last-child td { border-bottom: none; }
 }
 
-:root[data-theme='light'] .users-table th {
-  color: var(--color-text-primary);
-  font-weight: 700;
-}
+// Status sticker without tilt so table rows stay aligned.
+.status-badge { transform: none; }
 
-:root[data-theme='light'] .users-table:hover {
-  box-shadow: var(--shadow-card-hover);
-  transform: translateY(-2px);
-}
-
-.status-badge {
-  display: inline-block;
-  padding: 0.2rem 0.6rem;
-  border-radius: 999px;
-  font-size: var(--font-size-caption);
-  font-weight: 600;
-  color: var(--color-status-success);
-  background: color-mix(in srgb, var(--color-status-success) 15%, transparent);
-
-  &.suspended {
-    color: var(--color-status-danger);
-    background: color-mix(in srgb, var(--color-status-danger) 15%, transparent);
-  }
-}
-
-.actions-cell {
-  display: flex;
-  gap: 0.75rem;
-}
+.actions-cell { display: flex; gap: var(--space-2); }
 
 .link-button {
-  border: none;
-  background: none;
-  padding: 0;
-  color: var(--color-text-secondary);
-  font-size: var(--font-size-body);
-  font-weight: 600;
+  min-height: 2.25rem;
+  padding: 0 var(--space-3);
+  border: var(--border-width-ink) solid var(--color-card-border);
+  border-radius: var(--radius-pill);
+  background: var(--color-bg-surface);
+  color: var(--color-text-primary);
+  font: 700 var(--font-size-caption) var(--font-display);
   cursor: pointer;
-  transition: color var(--motion-duration-fast) var(--motion-easing-standard);
 
-  &:hover {
-    color: var(--color-accent);
-  }
-
-  &.danger:hover {
-    color: var(--color-status-danger);
-  }
+  &:hover { background: var(--color-fill-healthy); color: var(--color-on-fill); }
+  &.danger:hover { background: var(--color-fill-critical); }
 }
 
 .user-dialog {
-  border: 1px solid var(--color-border);
-  border-radius: 0.75rem;
+  min-width: min(26rem, calc(100vw - 2rem)); // never wider than a phone screen
+  padding: var(--space-6);
+  border: var(--border-width-ink) solid var(--color-card-border);
+  border-radius: var(--radius-lg);
   background: var(--color-bg-surface);
-  padding: 2rem;
-  min-width: min(24rem, calc(100vw - 2rem)); // en celulares no se sale de la pantalla
+  color: var(--color-text-primary);
+  box-shadow: var(--shadow-hard-lg);
 
-  &::backdrop {
-    background: color-mix(in srgb, var(--color-bg-app) 60%, transparent);
+  &::backdrop { background: color-mix(in srgb, var(--color-ink) 45%, transparent); }
+
+  select {
+    min-height: var(--touch-target-min);
+    padding: 0 var(--space-3);
+    border: var(--border-width-ink) solid var(--color-card-border);
+    border-radius: var(--radius-sm);
+    background: var(--color-bg-surface);
+    color: var(--color-text-primary);
+    font: 500 var(--font-size-form-input) var(--font-mono);
   }
 }
 
-.dialog-actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 1rem;
-  margin-top: 0.5rem;
-}
+.dialog-actions { display: flex; justify-content: flex-end; gap: var(--space-3); margin-top: var(--space-3); }
 
-// Seis columnas no caben en un celular: la tabla se desplaza dentro de su
-// contenedor en vez de ensanchar toda la página.
-.table-scroll { overflow-x: auto; }
+@media (pointer: coarse) { .link-button { min-height: var(--touch-target-min); } }
