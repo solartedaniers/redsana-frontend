@@ -1,5 +1,5 @@
 export type AlertSeverity = 'info' | 'warning' | 'critical';
-export type AlertType = 'outage' | 'prediction';
+export type AlertType = 'outage' | 'prediction' | 'untrusted_device';
 
 export interface NetworkAlert {
   id: string;

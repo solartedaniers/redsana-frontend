@@ -1,11 +1,15 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
-import { Observable, from, interval, map, mergeMap, switchMap, tap } from 'rxjs';
+import { EMPTY, Observable, catchError, from, interval, map, mergeMap, switchMap, tap } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { NetworkAlert } from '../models/alert.model';
 import { AlertsRepository } from './alerts.repository';
 
 const NEW_ALERTS_POLL_INTERVAL_MS = 10000;
+// Alertas guardadas antes de que el backend usara la ruta completa del
+// diccionario: sin el prefijo se mostraba la clave cruda en vez del texto.
+const LEGACY_ALERT_KEY_PREFIX = 'alertsCenter.';
+const ALERT_KEY_NAMESPACE = 'user.';
 
 interface BackendAlert {
   id: string;
@@ -31,7 +35,8 @@ export class AlertsHttpRepository extends AlertsRepository {
     // avanza al timestamp de la ultima alerta vista, para no repetir ni perder alertas.
     let since = new Date().toISOString();
     return interval(NEW_ALERTS_POLL_INTERVAL_MS).pipe(
-      switchMap(() => this.http.get<BackendAlert[]>(`${this.baseUrl}/new`, { params: { since } })),
+      // Si un sondeo falla, el cursor no avanza: el siguiente vuelve a pedir desde el mismo "since" y no se pierde nada.
+      switchMap(() => this.http.get<BackendAlert[]>(`${this.baseUrl}/new`, { params: { since } }).pipe(catchError(() => EMPTY))),
       tap((alerts) => {
         if (alerts.length > 0) {
           since = alerts[alerts.length - 1].timestamp;
@@ -50,7 +55,9 @@ export class AlertsHttpRepository extends AlertsRepository {
       id: alert.id,
       type: alert.type,
       severity: alert.severity,
-      messageKey: alert.message_key,
+      messageKey: alert.message_key.startsWith(LEGACY_ALERT_KEY_PREFIX)
+        ? `${ALERT_KEY_NAMESPACE}${alert.message_key}`
+        : alert.message_key,
       messageParams: alert.message_params,
       timestamp: alert.timestamp,
       acknowledged: alert.acknowledged,
