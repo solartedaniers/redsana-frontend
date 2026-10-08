@@ -1,6 +1,6 @@
 <section class="dashboard-hero surface-panel">
   <div>
-    <span class="status-badge">{{ 'common.networkStatus.good' | translate }}</span>
+    <app-network-status-badge [status]="snapshot()?.status ?? null" />
     <app-page-header titleKey="user.dashboard.title" subtitleKey="user.dashboard.subtitle" />
   </div>
   @if (snapshot(); as data) { <app-network-status-light [status]="data.status" /> }

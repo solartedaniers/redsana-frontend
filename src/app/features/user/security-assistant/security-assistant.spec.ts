@@ -2,12 +2,13 @@ import { provideHttpClient } from '@angular/common/http';
 import { TestBed } from '@angular/core/testing';
 import { ActivatedRoute, convertToParamMap, provideRouter } from '@angular/router';
 import { NEVER, of } from 'rxjs';
+import { NetworkMetricsRepository } from '../../../core/repositories/network-metrics.repository';
 import { SecurityAssistantRepository } from '../../../core/repositories/security-assistant.repository';
 import { SecurityEvidenceCollector } from '../../../core/security-evidence/security-evidence.collector';
 import { WifiEncryptionGateway } from '../../../core/wifi-encryption/wifi-encryption.gateway';
 import { SecurityAssistant } from './security-assistant';
 
-function render(queryParams: Record<string, string> = {}) {
+function render(queryParams: Record<string, string> = {}, networkStatus: 'good' | 'warning' = 'warning') {
   const repository = {
     getQuestionnaire: () => of([]),
     getLatest: () => of(null),
@@ -22,6 +23,7 @@ function render(queryParams: Record<string, string> = {}) {
       provideRouter([]),
       { provide: ActivatedRoute, useValue: { snapshot: { queryParamMap: convertToParamMap(queryParams) } } },
       { provide: SecurityAssistantRepository, useValue: repository },
+      { provide: NetworkMetricsRepository, useValue: { getSnapshot: () => of({ status: networkStatus }) } },
       { provide: WifiEncryptionGateway, useValue: { isAvailable: false, detect: () => Promise.resolve(null) } },
       { provide: SecurityEvidenceCollector, useValue: { collect: () => Promise.resolve({}) } },
     ],
@@ -52,5 +54,13 @@ describe('SecurityAssistant', () => {
     fixture.debugElement.query((el) => el.name === 'app-security-assessment-panel').triggerEventHandler('assessed', 'a1');
 
     expect(repository.startAssessmentBriefing).toHaveBeenCalledWith('a1', expect.any(String));
+  });
+});
+
+describe('SecurityAssistant badge de red', () => {
+  it('muestra el estado de la última medición, no "Red saludable" fijo', () => {
+    const { element } = render({}, 'warning');
+
+    expect(element.querySelector('.assistant-hero .status-badge')?.textContent?.trim()).toBe('common.networkStatus.warning');
   });
 });

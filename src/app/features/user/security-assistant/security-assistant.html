@@ -1,6 +1,6 @@
 <section class="assistant-hero surface-panel">
   <app-page-header titleKey="user.securityAssistant.title" subtitleKey="user.securityAssistant.subtitle" />
-  <span class="status-badge">{{ 'common.networkStatus.good' | translate }}</span>
+  <app-network-status-badge [status]="networkStatus()" />
 </section>
 
 <app-security-assessment-panel (assessed)="onAssessed($event)" />

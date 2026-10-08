@@ -4,6 +4,7 @@ import { NetworkMetricsRepository } from '../../../core/repositories/network-met
 import { AnomalyDetectionStatus, NetworkMetricSample, NetworkMetricSnapshot } from '../../../core/models/network.model';
 import { PageHeader } from '../../../shared/components/page-header/page-header';
 import { NetworkStatusLight } from '../../../shared/components/network-status-light/network-status-light';
+import { NetworkStatusBadge } from '../../../shared/components/network-status-badge/network-status-badge';
 import { MetricCard } from '../../../shared/components/metric-card/metric-card';
 import { HistoryChart } from '../../../shared/components/history-chart/history-chart';
 import { TranslatePipe } from '../../../core/i18n/translate.pipe';
@@ -13,7 +14,7 @@ import { APP_PATHS } from '../../../core/routing/app-paths';
 
 @Component({
   selector: 'app-dashboard',
-  imports: [PageHeader, NetworkStatusLight, MetricCard, HistoryChart, TranslatePipe, DatePipe, RouterLink],
+  imports: [PageHeader, NetworkStatusLight, NetworkStatusBadge, MetricCard, HistoryChart, TranslatePipe, DatePipe, RouterLink],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
