@@ -3,9 +3,10 @@
 
   <header class="auth-header">
     <a class="brand-cluster" [routerLink]="paths.root">
-      <span class="brand-mark" aria-hidden="true"><span></span></span>
+      <app-brand-mark />
       <span class="brand">{{ 'common.appName' | translate }}</span>
     </a>
+    <span class="brand-tagline">{{ 'common.brandTagline' | translate }}</span>
     <div class="header-actions">
       <app-language-toggle />
       <app-theme-toggle />
@@ -14,10 +15,10 @@
 
   <main class="auth-main">
     <div class="auth-card">
+      <span class="auth-card__sticker sticker" data-tone="healthy" aria-hidden="true">{{ 'common.chartSticker' | translate }}</span>
       <div [@routeTransition]="true">
         <router-outlet />
       </div>
     </div>
   </main>
-
 </div>

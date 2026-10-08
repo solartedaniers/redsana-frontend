@@ -1,10 +1,9 @@
 .auth-layout {
-  // Alto fijo (no min-height): si algo no cabe, desplaza solo .auth-main y no
-  // toda la página con el header incluido.
+  // Fixed height (not min-height): if something does not fit, only .auth-main
+  // scrolls, never the whole page with the header.
   height: 100dvh;
   display: flex;
   flex-direction: column;
-  background: var(--color-bg-app);
   position: relative;
   overflow: hidden;
 }
@@ -14,96 +13,91 @@
   z-index: 1;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  min-height: 3.2rem;
-  padding: 0 0.75rem;
-  border-bottom: 1px solid var(--color-border);
-  background: var(--color-surface-glass);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  gap: var(--space-4);
+  min-height: 3.5rem;
+  padding: 0 var(--space-4);
+  border-bottom: var(--border-width-ink) solid var(--color-card-border);
+  background: var(--color-bg-surface);
 }
 
-.brand-cluster,
-.header-actions {
+.brand-cluster {
   display: flex;
   align-items: center;
-}
-
-// La marca lleva a la pantalla de inicio (en escritorio "/" redirige al login).
-.brand-cluster { gap: 0.45rem; text-decoration: none; border-radius: 0.3rem; }
-.brand-cluster:focus-visible { outline: 2px solid var(--color-focus-ring); outline-offset: 2px; }
-
-.brand-mark {
-  display: grid;
-  width: 1.35rem;
-  height: 1.35rem;
-  place-items: center;
-  border-radius: 0.2rem;
-  background: var(--color-text-primary);
-}
-.brand-mark span {
-  width: 0.38rem;
-  height: 0.38rem;
-  border-radius: 50%;
-  background: var(--color-accent);
-  box-shadow: 0 0 0 0.18rem var(--color-accent-muted);
+  gap: var(--space-3);
+  border-radius: var(--radius-sm);
+  text-decoration: none;
 }
 
 .brand {
-  font-size: var(--font-size-body);
-  font-weight: 800;
-  letter-spacing: -0.01em;
+  font-family: var(--font-display);
+  font-size: var(--font-size-heading-sm);
+  font-weight: var(--font-display-weight);
+  font-stretch: var(--font-display-stretch);
+  letter-spacing: var(--font-display-tracking);
   color: var(--color-text-primary);
+}
+
+.brand-tagline {
+  display: none;
+  padding-left: var(--space-4);
+  border-left: var(--border-width-hairline) solid var(--color-border);
+  font-family: var(--font-mono);
+  font-size: var(--font-size-caption);
+  font-weight: 700;
+  letter-spacing: var(--font-label-tracking);
+  text-transform: uppercase;
+  color: var(--color-text-secondary);
+
+  @media (min-width: 48rem) { display: block; }
 }
 
 .header-actions {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: var(--space-2);
+  margin-left: auto;
 }
-
 
 .auth-main {
   position: relative;
   z-index: 1;
   flex: 1;
   display: flex;
-  // safe: si la tarjeta no cabe, se alinea arriba en vez de recortar su parte superior.
+  // safe: if the card does not fit, align it to the top instead of clipping it.
   align-items: safe center;
   justify-content: center;
-  padding: 1rem;
+  padding: var(--space-6) var(--space-4) var(--space-5);
   overflow-y: auto;
 }
 
+// The chart sheet: ink outline, hard offset shadow, a sticker on its corner.
 .auth-card {
+  position: relative;
   width: 100%;
-  max-width: 27rem;
-  padding: 2.5rem;
-  border-radius: 1rem;
-  border: 1px solid var(--color-card-border);
-  background: var(--color-glass-bg);
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
-  box-shadow: var(--shadow-glass);
-  transition:
-    box-shadow var(--motion-duration-base) var(--motion-easing-standard),
-    max-width var(--motion-duration-base) var(--motion-easing-standard),
-    transform var(--motion-duration-base) var(--motion-easing-standard);
+  max-width: 28rem;
+  box-sizing: border-box;
+  padding: var(--space-6);
+  border: var(--border-width-ink) solid var(--color-card-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-bg-surface);
+  box-shadow: var(--shadow-hard-lg);
 
-  // El panel lateral (login/registro) necesita más ancho para dos columnas;
-  // las demás pantallas de auth se quedan en el ancho angosto de siempre.
+  // Landing/login/register carry a side panel and need two columns.
   &:has(.auth-split) {
-    max-width: 50rem;
+    max-width: 58rem;
     padding: 0;
-    overflow: hidden;
   }
+
+  @media (max-width: 30rem) { padding: var(--space-5); }
 }
 
-:root[data-theme='light'] .auth-card:not(:has(.auth-split)):hover {
-  box-shadow: var(--shadow-card-hover);
-  transform: translateY(-2px);
+.auth-card__sticker {
+  position: absolute;
+  z-index: 2;
+  top: calc(var(--space-4) * -1);
+  right: var(--space-5);
 }
 
 @media (max-width: 44rem) {
-  .auth-card:has(.auth-split) { max-width: 27rem; }
+  .auth-card:has(.auth-split) { max-width: 28rem; }
 }
