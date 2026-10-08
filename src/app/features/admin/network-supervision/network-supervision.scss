@@ -1,91 +1,64 @@
+// Ward rounds: one row per household, with the security score as a big
+// reading on a strip of its band color.
 .households-list {
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-  max-width: 50rem;
+  display: grid;
+  gap: var(--space-4);
+  max-width: 64rem;
 }
 
 .household-card {
-  display: flex;
+  --severity-fill: var(--color-fill-critical);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto auto;
   align-items: center;
-  gap: 1.5rem;
-  padding: 1rem 1.25rem;
-  border-radius: 0.65rem;
-  border: 1px solid var(--color-card-border);
+  gap: var(--space-4) var(--space-5);
+  padding: var(--space-4) var(--space-5);
+  border: var(--border-width-ink) solid var(--color-card-border);
+  border-left: var(--space-3) solid var(--severity-fill);
+  border-radius: var(--radius-sm);
   background: var(--color-bg-surface);
-  transition:
-    box-shadow var(--motion-duration-base) var(--motion-easing-standard),
-    transform var(--motion-duration-base) var(--motion-easing-standard);
+  box-shadow: var(--shadow-hard);
+
+  &[data-band='good'] { --severity-fill: var(--color-fill-healthy); }
+  &[data-band='warning'] { --severity-fill: var(--color-fill-warning); }
 }
 
-:root[data-theme='light'] .household-card:hover {
-  box-shadow: var(--shadow-card-hover);
-  transform: translateY(-2px);
-}
-
-.household-info {
-  flex: 1;
-  min-width: 0;
-}
+.household-info { min-width: 0; }
 
 .owner {
   margin: 0;
-  font-weight: 600;
-  color: var(--color-text-primary);
+  font-family: var(--font-display);
+  font-size: var(--font-size-heading-sm);
+  font-weight: var(--font-display-weight);
+  font-stretch: var(--font-display-stretch);
 }
 
 .label,
-.meta {
-  margin: 0.2rem 0 0;
-  font-size: var(--font-size-body);
-  color: var(--color-text-secondary);
-}
+.meta { margin: var(--space-1) 0 0; font: 500 var(--font-size-caption) var(--font-mono); color: var(--color-text-secondary); overflow-wrap: anywhere; }
 
-.score-block {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 0.1rem;
-}
+.score-block { display: grid; justify-items: end; gap: var(--space-1); }
 
-.score {
-  font-weight: 700;
-  color: var(--color-accent);
-}
+.score { font: 800 var(--font-size-heading) var(--font-mono); font-variant-numeric: tabular-nums; line-height: 1; }
 
 .score-source {
-  font-size: var(--font-size-caption);
-  font-weight: 700;
+  font: 700 var(--font-size-caption) var(--font-mono);
   text-transform: uppercase;
   color: var(--color-text-secondary);
 
-  &[data-source='real'] {
-    color: var(--color-status-success);
-  }
+  &[data-source='real'] { color: var(--color-status-success); }
 }
 
-.view-button {
-  padding: 0.45rem 0.9rem;
-  border-radius: 0.5rem;
-  border: 1px solid var(--color-border);
-  color: var(--color-text-secondary);
-  text-decoration: none;
-  font-size: var(--font-size-body);
-  font-weight: 600;
-  transition:
-    color var(--motion-duration-fast) var(--motion-easing-standard),
-    border-color var(--motion-duration-fast) var(--motion-easing-standard);
+// Date of a reused technical measurement: secondary, discreet.
+.score-date { max-width: 12rem; font-size: var(--font-size-caption); color: var(--color-text-secondary); text-align: right; }
 
-  &:hover {
-    color: var(--color-accent);
-    border-color: var(--color-accent);
-  }
+@media (max-width: 48rem) {
+  .household-card { grid-template-columns: minmax(0, 1fr) auto; }
+  .view-button { grid-column: 1 / -1; justify-self: start; }
 }
 
-// Fecha de una medición técnica reutilizada: dato secundario, discreto.
-.score-date {
-  font-size: var(--font-size-caption);
-  color: var(--color-text-secondary);
-  text-align: right;
-  max-width: 12rem;
+@media (max-width: 30rem) {
+  .household-card { grid-template-columns: minmax(0, 1fr); justify-items: start; }
+  .score-block { justify-items: start; }
+  .score-block .status-badge { max-width: 100%; white-space: normal; }
+  .score-date { text-align: left; }
 }

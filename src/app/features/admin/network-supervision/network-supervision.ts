@@ -6,6 +6,7 @@ import { MonitoredHousehold } from '../../../core/models/admin.model';
 import { PageHeader } from '../../../shared/components/page-header/page-header';
 import { NetworkStatusLight } from '../../../shared/components/network-status-light/network-status-light';
 import { TranslatePipe } from '../../../core/i18n/translate.pipe';
+import { SecurityScoreBand, getSecurityScoreBand } from '../../../core/domain/security-score.calculator';
 
 @Component({
   selector: 'app-network-supervision',
@@ -21,5 +22,9 @@ export class NetworkSupervision {
 
   constructor() {
     this.repository.getHouseholds().subscribe((households) => this.households.set(households));
+  }
+
+  protected bandOf(score: number): SecurityScoreBand {
+    return getSecurityScoreBand(score);
   }
 }
