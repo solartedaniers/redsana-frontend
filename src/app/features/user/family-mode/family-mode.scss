@@ -1,105 +1,111 @@
-.family-hero { padding: 1.25rem; margin-bottom: 1rem; }
+.family-hero { margin-bottom: var(--space-5); }
 .family-hero .page-header { margin: 0; }
 
-// Los tokens tipográficos viven en @theme y hoy no se resuelven en el build:
-// se pasa su mismo valor como respaldo para que la jerarquía no dependa de eso.
+.family-layout { align-items: start; }
 
-// ---- Pasos: círculo numerado con el acento + texto alineado al centro del círculo
-.family-steps ol { display: grid; gap: 0; margin: 0; padding: .5rem 1.1rem; list-style: none; }
+// ---- Steps as recipe cards: big numeral, tilted alternately like pinned notes.
+.family-steps ol {
+  display: grid;
+  gap: var(--space-4);
+  margin: 0;
+  padding: var(--space-5);
+  list-style: none;
+}
 
 .family-steps li {
   display: grid;
-  grid-template-columns: 2rem minmax(0, 1fr);
-  gap: .9rem;
-  align-items: start;
-  padding: .9rem 0;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: var(--space-4);
+  align-items: center;
+  padding: var(--space-3) var(--space-4);
+  border: var(--border-width-ink) solid var(--color-card-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-bg-surface);
+  box-shadow: calc(var(--shadow-offset) / 2) calc(var(--shadow-offset) / 2) 0 var(--color-shadow);
+  transform: rotate(calc(var(--sticker-tilt) / 4));
 
-  & + li { border-top: 1px solid var(--color-border); }
+  &:nth-child(even) { transform: rotate(calc(var(--sticker-tilt-alt) / 3)); }
 }
 
 .step-number {
   display: grid;
   place-items: center;
-  width: 2rem;
-  height: 2rem;
-  border-radius: 999px;
-  border: 1px solid var(--color-accent);
-  background: var(--color-accent-muted);
-  color: var(--color-accent);
-  font-family: var(--font-mono);
-  font-weight: 800;
+  width: 2.75rem;
+  height: 2.75rem;
+  border: var(--border-width-ink) solid var(--color-ink);
+  border-radius: 50%;
+  background: var(--color-fill-healthy);
+  color: var(--color-on-fill);
+  font: 800 var(--font-size-heading-sm) var(--font-mono);
 }
 
-// padding-top centra la primera línea con el círculo (2rem de alto).
-.step-text { margin: 0; padding-top: .2rem; color: var(--color-text-primary); line-height: 1.6; }
+.step-text { margin: 0; font-weight: 500; }
 
 .dns-chip {
   display: inline-block;
-  padding: .05rem .5rem;
-  border-radius: .4rem;
-  border: 1px solid var(--color-accent);
-  background: var(--color-accent-muted);
-  color: var(--color-accent);
-  font-family: var(--font-mono);
-  font-weight: 800;
+  padding: 0 var(--space-2);
+  border: var(--border-width-ink) solid var(--color-ink);
+  border-radius: var(--radius-pill);
+  background: var(--color-fill-brand);
+  color: var(--color-on-fill-brand);
+  font: 800 var(--font-size-body) var(--font-mono);
   white-space: nowrap;
 }
 
-// ---- Aviso informativo
 .family-note {
   display: grid;
   grid-template-columns: auto minmax(0, 1fr);
-  gap: .75rem;
-  margin: .25rem 1.1rem 1rem;
-  padding: .85rem 1rem;
-  border-radius: .7rem;
-  border: 1px solid var(--color-border);
-  background: var(--color-bg-surface-alt);
+  gap: var(--space-3);
+  margin: 0 var(--space-5) var(--space-5);
+  padding: var(--space-3) var(--space-4);
+  border: var(--border-width-ink) dashed var(--color-card-border);
+  border-radius: var(--radius-sm);
 
-  app-icon { color: var(--color-accent); }
-  p { margin: 0; color: var(--color-text-secondary); font-size: var(--font-size-body, .94rem); line-height: 1.6; }
+  p { margin: 0; color: var(--color-text-secondary); }
 }
 
-// .submit-button está pensado para <button>; como enlace solo le falta esto.
-.family-ask { display: block; margin: 0 1.1rem 1.1rem; text-align: center; text-decoration: none; }
+.family-ask { margin: 0 var(--space-5) var(--space-5); }
 
-// ---- Panel derecho: DNS grandes y textos jerarquizados
-.dns-cards { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .75rem; margin: 1.1rem; }
+// ---- DNS as giant copyable pills
+.dns-cards { display: grid; gap: var(--space-4); margin: var(--space-5); }
 
 .dns-card {
   display: grid;
-  gap: .3rem;
-  padding: .9rem 1rem;
-  border-radius: .7rem;
-  border: 1px solid var(--color-accent);
-  background: var(--color-accent-muted);
+  gap: var(--space-2);
 
-  dt {
-    color: var(--color-text-secondary);
-    font-size: var(--font-size-caption, .78rem);
-    font-weight: 700;
-    letter-spacing: .06em;
-    text-transform: uppercase;
-  }
-
-  dd { margin: 0; color: var(--color-accent); font-family: var(--font-mono); font-size: var(--font-size-heading, 1.75rem); font-weight: 800; }
+  dt { font: 700 var(--font-size-caption) var(--font-mono); letter-spacing: var(--font-label-tracking); text-transform: uppercase; color: var(--color-text-secondary); }
+  dd { margin: 0; }
 }
 
-.dns-lead { margin: 0 1.1rem 1rem; color: var(--color-text-primary); line-height: 1.6; }
+.dns-pill {
+  width: 100%;
+  min-height: var(--touch-target-min);
+  padding: var(--space-3) var(--space-5);
+  border: var(--border-width-ink) solid var(--color-ink);
+  border-radius: var(--radius-pill);
+  background: var(--color-fill-brand);
+  color: var(--color-on-fill-brand);
+  font: 800 var(--font-size-heading) var(--font-mono);
+  letter-spacing: -0.02em;
+  cursor: copy;
+  box-shadow: var(--shadow-hard);
+  transition: transform var(--motion-duration-fast) var(--motion-easing-spring), box-shadow var(--motion-duration-fast);
+
+  &:active { transform: translate(var(--shadow-offset), var(--shadow-offset)); box-shadow: var(--shadow-hard-pressed); }
+}
+
+.dns-copied { min-height: 2rem; margin: 0 var(--space-5); }
+
+.dns-lead { margin: 0 var(--space-5) var(--space-4); font-weight: 600; }
 
 .dns-tips {
   display: grid;
-  gap: .75rem;
-  margin: 0 1.1rem 1.1rem;
-  padding: 1rem 0 0;
+  gap: var(--space-3);
+  margin: 0 var(--space-5) var(--space-5);
+  padding: var(--space-4) 0 0;
+  border-top: var(--border-width-ink) solid var(--color-card-border);
   list-style: none;
-  border-top: 1px solid var(--color-border);
 
-  li { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: .65rem; align-items: start; }
-  app-icon { color: var(--color-text-secondary); }
-  span { color: var(--color-text-secondary); font-size: var(--font-size-body, .94rem); line-height: 1.6; }
-}
-
-@media (max-width: 30rem) {
-  .dns-cards { grid-template-columns: 1fr; }
+  li { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: var(--space-3); }
+  span { color: var(--color-text-secondary); }
 }

@@ -1,4 +1,4 @@
-<section class="family-hero surface-panel">
+<section class="family-hero">
   <app-page-header titleKey="user.familyMode.title" subtitleKey="user.familyMode.subtitle" />
 </section>
 
@@ -27,7 +27,7 @@
       <app-icon name="shield" />
       <p>{{ 'user.familyMode.whyManual' | translate }}</p>
     </div>
-    <a class="submit-button family-ask" [routerLink]="paths.securityAssistant" [queryParams]="assistantQueryParams">
+    <a class="action-button family-ask" [routerLink]="paths.securityAssistant" [queryParams]="assistantQueryParams">
       {{ 'user.familyMode.askAssistant' | translate }}
     </a>
   </section>
@@ -37,15 +37,18 @@
       <h2 class="surface-panel__title">{{ 'user.familyMode.dnsTitle' | translate }}</h2>
     </div>
     <dl class="dns-cards">
-      <div class="dns-card">
-        <dt>{{ 'user.familyMode.primaryDns' | translate }}</dt>
-        <dd>{{ dns.primary }}</dd>
-      </div>
-      <div class="dns-card">
-        <dt>{{ 'user.familyMode.secondaryDns' | translate }}</dt>
-        <dd>{{ dns.secondary }}</dd>
-      </div>
+      @for (entry of dnsEntries; track entry.labelKey) {
+        <div class="dns-card">
+          <dt>{{ entry.labelKey | translate }}</dt>
+          <dd><button type="button" class="dns-pill" (click)="copy(entry.value)" [attr.aria-label]="'user.familyMode.copyDns' | translate: { value: entry.value }">{{ entry.value }}</button></dd>
+        </div>
+      }
     </dl>
+    <p class="dns-copied" role="status">
+      @if (copiedValue(); as value) {
+        <span class="sticker" data-tone="healthy">{{ 'user.familyMode.copied' | translate: { value: value } }}</span>
+      }
+    </p>
     <p class="dns-lead">{{ 'user.familyMode.whatItBlocks' | translate }}</p>
     <ul class="dns-tips">
       <li>
