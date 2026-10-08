@@ -1,94 +1,59 @@
 .profile-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(20rem, 100%), 1fr)); // min(): en 320 px la tarjeta de 20rem se salía
-  gap: 1.5rem;
+  grid-template-columns: repeat(auto-fit, minmax(min(20rem, 100%), 1fr)); // min(): at 320 px a 20rem card overflowed
+  gap: var(--space-5);
+  align-items: start;
 }
 
 .profile-section {
-  padding: 1.5rem;
-  border-radius: 0.75rem;
-  border: 1px solid var(--color-card-border);
+  padding: var(--space-5);
+  border: var(--border-width-ink) solid var(--color-card-border);
+  border-radius: var(--radius-md);
   background: var(--color-bg-surface);
-  transition:
-    box-shadow var(--motion-duration-base) var(--motion-easing-standard),
-    transform var(--motion-duration-base) var(--motion-easing-standard);
+  box-shadow: var(--shadow-hard);
 
-  h2 {
-    margin: 0 0 1.25rem;
-    font-size: var(--font-size-heading-sm);
-    color: var(--color-text-primary);
-  }
+  h2 { margin: 0 0 var(--space-4); font-size: var(--font-size-heading-sm); }
 }
 
-:root[data-theme='light'] .profile-section:hover {
-  box-shadow: var(--shadow-card-hover);
-  transform: translateY(-2px);
-}
+// The personal data reads as a patient ID card: lime band across the top.
+.profile-section--id { border-top: var(--space-3) solid var(--color-fill-healthy); }
 
 .avatar-row {
   display: flex;
   align-items: center;
-  gap: 1rem;
-  margin-bottom: 1.25rem;
+  gap: var(--space-4);
+  margin-bottom: var(--space-5);
 }
 
-// Mismo lenguaje visual que .logout-button del top-bar: círculo con borde
-// tenue sobre el fondo alterno, solo que a mayor escala.
 .avatar-preview {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 4rem;
-  height: 4rem;
+  display: inline-grid;
+  place-items: center;
+  width: 4.5rem;
+  height: 4.5rem;
   flex-shrink: 0;
   overflow: hidden;
-  border-radius: 9999px;
-  border: 1px solid var(--color-border);
-  background: var(--color-bg-surface-alt);
-  color: var(--color-text-secondary);
+  border: var(--border-width-ink) solid var(--color-ink);
+  border-radius: var(--radius-md);
+  background: var(--color-fill-neutral);
+  color: var(--color-on-fill);
+  transform: rotate(var(--sticker-tilt));
 
-  img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
+  img { width: 100%; height: 100%; object-fit: cover; }
+
+  // The svg lives inside <app-icon> (encapsulated): enlarged only here.
+  app-icon ::ng-deep .icon { width: 2rem; height: 2rem; }
 }
 
-// Segundo punto de entrada al mismo input de "Cambiar foto".
+// Second entry point to the same "change photo" input.
 button.avatar-preview {
   padding: 0;
   cursor: pointer;
-  transition: border-color var(--motion-duration-fast) var(--motion-easing-standard);
 
-  &:hover:not(:disabled) {
-    border-color: var(--color-accent);
-  }
-
-  &:focus-visible {
-    outline: 2px solid var(--color-focus-ring);
-    outline-offset: 2px;
-  }
-
-  &:disabled {
-    cursor: progress;
-  }
+  &:disabled { cursor: progress; }
 }
 
-.avatar-controls {
-  display: flex;
-  flex-direction: column;
-  gap: 0.4rem;
-}
+.avatar-controls { display: flex; flex-direction: column; gap: var(--space-2); }
+.avatar-upload-button { width: fit-content; }
 
-.avatar-upload-button {
-  display: inline-flex;
-  width: fit-content;
-  padding: 0.5rem 1rem;
-  font-size: var(--font-size-body);
-}
-
-// Correo visible pero no editable: se distingue de los campos que sí se editan.
-.field input[readonly] {
-  color: var(--color-text-secondary);
-  cursor: default;
-}
+// Visible but not editable: dashed, so it reads differently from editable fields.
+.field input[readonly] { border-style: dashed; color: var(--color-text-secondary); cursor: default; }

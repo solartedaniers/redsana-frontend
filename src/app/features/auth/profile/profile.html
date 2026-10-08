@@ -1,7 +1,7 @@
 <app-page-header titleKey="auth.profile.title" />
 
 <div class="profile-grid">
-  <section class="profile-section">
+  <section class="profile-section profile-section--id">
     <h2>{{ 'auth.profile.infoTitle' | translate }}</h2>
 
     <div class="avatar-row">
@@ -19,7 +19,7 @@
         }
       </button>
       <div class="avatar-controls">
-        <label class="submit-button avatar-upload-button">
+        <label class="subtle-button avatar-upload-button">
           {{ (isUploadingAvatar() ? 'common.loading' : 'auth.profile.changeAvatar') | translate }}
           <input #avatarInput type="file" accept="image/*" (change)="onAvatarSelected($event)" [disabled]="isUploadingAvatar()" hidden />
         </label>
