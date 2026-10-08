@@ -1,7 +1,7 @@
 <article class="metric-card">
   <p class="label">{{ labelKey() | translate }}</p>
   <p class="value">
-    {{ displayValue() }}
+    <app-metric-value [value]="displayValue()" />
     @if (unit()) {
       <span class="unit">{{ unit() }}</span>
     }

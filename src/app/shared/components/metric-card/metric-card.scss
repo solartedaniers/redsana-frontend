@@ -1,40 +1,62 @@
+// A single vital-sign reading: mono label on top, giant tabular number below.
 .metric-card {
-  padding: 1rem 1.25rem;
-  border-radius: 0.75rem;
-  border: 1px solid var(--color-card-border);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: var(--space-3);
+  height: 100%;
+  box-sizing: border-box;
+  padding: var(--space-4) var(--space-5);
+  border: var(--border-width-ink) solid var(--color-card-border);
+  border-radius: var(--radius-md);
   background: var(--color-bg-surface);
-  transition:
-    border-color var(--motion-duration-base) var(--motion-easing-standard),
-    transform var(--motion-duration-base) var(--motion-easing-standard);
-
-  &:hover {
-    border-color: var(--color-card-border);
-  }
-}
-
-:root[data-theme='light'] .metric-card {
-  &:hover {
-    box-shadow: var(--shadow-card-hover);
-    transform: translateY(-2px);
-  }
+  box-shadow: var(--shadow-hard);
 }
 
 .label {
-  font-size: var(--font-size-body);
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: var(--font-size-caption);
+  font-weight: 700;
+  letter-spacing: var(--font-label-tracking);
+  text-transform: uppercase;
   color: var(--color-text-secondary);
-  margin: 0 0 0.35rem;
 }
 
 .value {
-  font-size: var(--font-size-metric);
-  font-weight: 700;
-  color: var(--color-text-primary);
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-2);
   margin: 0;
+  font-family: var(--font-mono);
+  font-size: var(--font-size-metric-xl);
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  line-height: 1;
+  color: var(--color-text-primary);
 }
 
 .unit {
+  font-family: var(--font-mono);
   font-size: var(--font-size-body);
-  font-weight: 500;
+  font-weight: 700;
+  letter-spacing: 0;
   color: var(--color-text-secondary);
-  margin-left: 0.25rem;
+}
+
+:host { display: block; }
+
+:host([data-variant='hero']) {
+  .metric-card {
+    background: var(--color-hero-bg);
+    box-shadow: var(--shadow-hard-lg);
+  }
+
+  .label,
+  .unit { color: var(--color-hero-muted); }
+
+  .value {
+    font-size: calc(var(--font-size-metric-xl) * 1.45);
+    color: var(--color-hero-text);
+  }
 }

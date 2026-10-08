@@ -1,0 +1,30 @@
+:host {
+  display: inline-flex;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+
+.odometer-cell {
+  position: relative;
+  display: inline-block;
+  height: 1em;
+  overflow: hidden;
+}
+
+// Keeps the cell exactly one tabular digit wide; the strip draws the glyph.
+.odometer-char {
+  color: transparent;
+}
+
+// Decorative 0-9 strip; the empty alt text keeps it out of the a11y tree.
+.odometer-cell::after {
+  content: '0\A 1\A 2\A 3\A 4\A 5\A 6\A 7\A 8\A 9' / '';
+  position: absolute;
+  inset-inline: 0;
+  top: 0;
+  white-space: pre;
+  text-align: center;
+  color: currentColor;
+  transform: translateY(calc(var(--odometer-digit) * -1em));
+  transition: transform var(--motion-duration-count) var(--motion-easing-spring);
+}
