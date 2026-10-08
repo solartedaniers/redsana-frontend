@@ -4,6 +4,7 @@ import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../../core/auth/auth.service';
 import { TranslatePipe } from '../../../core/i18n/translate.pipe';
 import { passwordsMatchValidator } from '../../../core/validators/passwords-match.validator';
+import { STRONG_PASSWORD_ERROR, strongPasswordValidator } from '../../../core/validators/strong-password.validator';
 import { MIN_PASSWORD_LENGTH } from '../../../core/auth/password-policy';
 import { Icon } from '../../../shared/components/icon/icon';
 import { PulseLine } from '../../../shared/components/pulse-line/pulse-line';
@@ -23,6 +24,7 @@ export class Register {
   private readonly auth = inject(AuthService);
   private readonly router = inject(Router);
 
+  protected readonly strongPasswordError = STRONG_PASSWORD_ERROR;
   protected readonly isSubmitting = signal(false);
   protected readonly errorKey = signal<string | null>(null);
   protected readonly showPassword = signal(false);
@@ -32,7 +34,7 @@ export class Register {
     {
       fullName: ['', [Validators.required]],
       email: ['', [Validators.required, Validators.email]],
-      password: ['', [Validators.required, Validators.minLength(MIN_PASSWORD_LENGTH)]],
+      password: ['', [Validators.required, Validators.minLength(MIN_PASSWORD_LENGTH), strongPasswordValidator()]],
       confirmPassword: ['', [Validators.required]],
     },
     { validators: passwordsMatchValidator('password', 'confirmPassword') }

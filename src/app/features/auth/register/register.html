@@ -80,8 +80,10 @@
               <app-icon [name]="showPassword() ? 'eye-off' : 'eye'" />
             </button>
           </div>
-          @if (form.controls.password.invalid && form.controls.password.touched) {
+          @if (form.controls.password.touched && form.controls.password.hasError('minlength')) {
             <small class="field-error">{{ 'auth.errors.passwordTooShort' | translate }}</small>
+          } @else if (form.controls.password.touched && form.controls.password.hasError(strongPasswordError)) {
+            <small class="field-error">{{ 'auth.errors.passwordNotStrong' | translate }}</small>
           }
         </label>
 
@@ -109,7 +111,7 @@
         </label>
       </div>
 
-      <app-password-strength-meter [password]="form.controls.password.value" />
+      <app-password-strength-meter [password]="form.controls.password.value" [showRequirements]="true" />
 
       @if (errorKey()) {
         <p class="form-error">{{ errorKey() | translate }}</p>
