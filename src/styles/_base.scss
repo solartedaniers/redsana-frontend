@@ -1,0 +1,94 @@
+// Global element defaults: the paper, the ink and the type. Components only
+// describe their own content on top of this.
+body {
+  margin: 0;
+  padding: 0;
+  min-height: 100dvh;
+  color: var(--color-text-primary);
+  font-family: var(--font-sans);
+  font-size: var(--font-size-body);
+  line-height: var(--line-height-body);
+  background: var(--texture-chart-grid), var(--color-bg-app);
+  -webkit-font-smoothing: antialiased;
+}
+
+// Grain and scanlines live on a fixed pseudo-layer: painted once, never
+// repainted on scroll, and invisible to pointer events.
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  pointer-events: none;
+  background:
+    repeating-linear-gradient(
+      to bottom,
+      transparent 0 var(--scanline-gap),
+      var(--color-scanline) var(--scanline-gap) calc(var(--scanline-gap) + 1px)
+    ),
+    var(--texture-grain);
+  opacity: var(--texture-grain-opacity);
+}
+
+:root[data-theme='dark'] body::after {
+  opacity: 1;
+  background: repeating-linear-gradient(
+    to bottom,
+    transparent 0 var(--scanline-gap),
+    var(--color-scanline) var(--scanline-gap) calc(var(--scanline-gap) + 1px)
+  );
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--font-display);
+  font-weight: var(--font-display-weight);
+  font-stretch: var(--font-display-stretch);
+  letter-spacing: var(--font-display-tracking);
+  line-height: var(--line-height-tight);
+  text-wrap: balance;
+}
+
+p {
+  text-wrap: pretty;
+}
+
+::selection {
+  background: var(--color-fill-brand);
+  color: var(--color-on-fill-brand);
+}
+
+// One visible focus style for every interactive element, in both themes.
+:focus-visible {
+  outline: var(--focus-ring-width) solid var(--color-focus-ring);
+  outline-offset: var(--focus-ring-offset);
+}
+
+// Every number reads in fixed-width figures so values never jitter.
+.tabular,
+time,
+data {
+  font-variant-numeric: tabular-nums;
+}
+
+// Visually hidden but still read by assistive technology.
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+// Touch screens: every control reaches a 44 px target without changing its look.
+@media (pointer: coarse) {
+  button,
+  [role='button'],
+  .action-button,
+  .subtle-button,
+  .submit-button {
+    min-height: var(--touch-target-min);
+  }
+}
