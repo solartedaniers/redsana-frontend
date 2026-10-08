@@ -139,7 +139,8 @@
       "wrongCurrentPassword": "La contraseña actual es incorrecta.",
       "confirmationRequired": "Revisa tu correo para confirmar la cuenta antes de iniciar sesión.",
       "avatarUploadFailed": "No se pudo subir la imagen. Intenta con otro archivo.",
-      "unknown": "Ocurrió un error inesperado. Intenta de nuevo."
+      "unknown": "Ocurrió un error inesperado. Intenta de nuevo.",
+      "passwordNotStrong": "La contraseña aún no cumple todos los requisitos de la lista."
     },
     "passwordStrength": {
       "label": "Fortaleza de la contraseña",
@@ -149,6 +150,15 @@
         "fair": "Media",
         "good": "Buena",
         "strong": "Óptima"
+      },
+      "met": "Cumplido:",
+      "pending": "Pendiente:",
+      "criteria": {
+        "minLength": "Al menos {{min}} caracteres",
+        "lowercase": "Una minúscula",
+        "uppercase": "Una mayúscula",
+        "digit": "Un número",
+        "symbol": "Un símbolo"
       }
     }
   },
@@ -457,6 +467,8 @@
     "hero": {
       "kicker": "Sana tu red",
       "stepsLabel": "Cómo funciona"
-    }
+    },
+    "downloadPreparing": "Preparando la descarga…",
+    "downloadFallback": "No pudimos iniciar la descarga directa; te abrimos la página de la versión para que descargues el instalador desde allí."
   }
 }
