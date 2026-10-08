@@ -2,42 +2,46 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 0.3rem;
-  min-width: 3.35rem;
-  height: 1.65rem;
-  padding: 0 0.45rem;
-  border-radius: 0.35rem;
-  border: 1px solid var(--color-border);
-  background: var(--color-bg-surface-alt);
-  color: var(--color-text-secondary);
+  gap: var(--space-2);
+  height: 2rem;
+  padding: 0 var(--space-3);
+  border: var(--border-width-ink) solid var(--color-card-border);
+  border-radius: var(--radius-pill);
+  background: var(--color-bg-surface);
+  color: var(--color-text-primary);
   cursor: pointer;
+  box-shadow: calc(var(--shadow-offset) / 2) calc(var(--shadow-offset) / 2) 0 var(--color-shadow);
   transition:
-    color var(--motion-duration-fast) var(--motion-easing-standard),
-    border-color var(--motion-duration-fast) var(--motion-easing-standard),
-    transform var(--motion-duration-fast) var(--motion-easing-standard);
+    transform var(--motion-duration-fast) var(--motion-easing-spring),
+    box-shadow var(--motion-duration-fast) var(--motion-easing-standard);
 
   svg {
-    width: 0.75rem;
-    height: 0.75rem;
+    width: 0.9rem;
+    height: 0.9rem;
   }
 
-  span { font-family: var(--font-mono); font-size: var(--font-size-caption); font-weight: 700; }
-
-  &:hover {
-    color: var(--color-accent);
-    border-color: var(--color-accent);
-  }
-
-  &:focus-visible {
-    outline: 2px solid var(--color-focus-ring);
-    outline-offset: 2px;
+  span {
+    font-family: var(--font-mono);
+    font-size: var(--font-size-caption);
+    font-weight: 700;
+    letter-spacing: var(--font-label-tracking);
+    text-transform: uppercase;
   }
 
   &:active {
-    transform: scale(0.92);
+    transform: translate(calc(var(--shadow-offset) / 2), calc(var(--shadow-offset) / 2));
+    box-shadow: var(--shadow-hard-pressed);
   }
 }
 
+// Phones: icon only, so the header never wraps at 320 px.
+@media (max-width: 26rem) {
+  .theme-toggle span { display: none; }
+}
+
 @media (pointer: coarse) {
-  .theme-toggle { height: 2.75rem; padding: 0 0.75rem; }
+  .theme-toggle {
+    min-width: var(--touch-target-min);
+    height: var(--touch-target-min);
+  }
 }
