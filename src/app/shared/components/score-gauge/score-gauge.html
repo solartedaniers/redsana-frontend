@@ -1,14 +1,32 @@
-<div class="score-gauge" [attr.data-band]="band()">
-  <svg viewBox="0 0 120 120">
-    <circle class="track" cx="60" cy="60" r="52" />
-    <circle
-      class="progress"
-      cx="60"
-      cy="60"
-      r="52"
-      [attr.stroke-dasharray]="circumference"
-      [attr.stroke-dashoffset]="dashOffset()"
-    />
-  </svg>
-  <span class="score-value">{{ score() }}%</span>
-</div>
+<figure class="score-gauge" [attr.data-band]="band()">
+  <div class="dial">
+    <svg viewBox="0 0 200 110" aria-hidden="true" focusable="false">
+      <path class="track" pathLength="100" d="M20 100a80 80 0 0 1 160 0" />
+      @if (parts(); as p) {
+        <path class="segment segment--questionnaire" pathLength="100" d="M20 100a80 80 0 0 1 160 0"
+          [attr.stroke-dasharray]="p.questionnaireFill + ' 100'" />
+        <path class="segment segment--technical" pathLength="100" d="M20 100a80 80 0 0 1 160 0"
+          [attr.stroke-dasharray]="'0 ' + weights.questionnaire + ' ' + p.technicalFill + ' 100'" />
+      } @else {
+        <path class="segment" pathLength="100" d="M20 100a80 80 0 0 1 160 0" [attr.stroke-dasharray]="score() + ' 100'" />
+      }
+      @for (tick of ticks; track tick) {
+        <line class="tick" [class.tick--split]="parts() && tick === weights.questionnaire" x1="4" y1="100" x2="12" y2="100"
+          [style.rotate]="tickAngle(tick)" />
+      }
+    </svg>
+    <span class="needle" [style.--needle-angle]="needleAngle()"></span>
+  </div>
+  <p class="reading"><app-metric-value [value]="'' + score()" /><span class="reading__unit">/100</span></p>
+
+  @if (parts(); as p) {
+    <figcaption class="legend">
+      <span class="legend__item legend__item--questionnaire">
+        {{ 'user.securityAssistant.score.questionnaire' | translate: { score: p.questionnaire } }}
+      </span>
+      <span class="legend__item legend__item--technical">
+        {{ 'user.securityAssistant.score.technical' | translate: { score: p.technical } }}
+      </span>
+    </figcaption>
+  }
+</figure>

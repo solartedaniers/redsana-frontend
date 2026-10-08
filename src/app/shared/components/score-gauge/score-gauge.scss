@@ -1,49 +1,101 @@
+:host { display: block; }
+
 .score-gauge {
-  position: relative;
-  width: 8rem;
-  height: 8rem;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
+  --gauge-fill: var(--color-fill-neutral);
+  margin: 0;
+  width: min(100%, 20rem);
+  margin-inline: auto;
 }
 
-svg {
-  width: 100%;
-  height: 100%;
-  transform: rotate(-90deg);
+.score-gauge[data-band='good'] { --gauge-fill: var(--color-fill-healthy); }
+.score-gauge[data-band='warning'] { --gauge-fill: var(--color-fill-warning); }
+.score-gauge[data-band='critical'] { --gauge-fill: var(--color-fill-critical); }
+
+.dial { position: relative; }
+
+svg { display: block; width: 100%; overflow: visible; }
+
+.track,
+.segment { fill: none; stroke-width: 18; }
+
+.track { stroke: var(--color-bg-surface-alt); }
+
+.segment {
+  stroke: var(--gauge-fill);
+  transition: stroke-dasharray var(--motion-duration-count) var(--motion-easing-decelerate);
 }
 
-.track {
-  fill: none;
-  stroke: var(--color-border);
-  stroke-width: 10;
+// The two real parts read as two inks: violet questionnaire, band-colored technical.
+.segment--questionnaire { stroke: var(--color-fill-brand); }
+
+.tick {
+  stroke: var(--color-ink);
+  stroke-width: 2;
+  transform-origin: 100px 100px;
 }
 
-.progress {
-  fill: none;
-  stroke-width: 10;
-  stroke-linecap: round;
-  stroke: var(--color-status-neutral);
-  transition:
-    stroke-dashoffset var(--motion-duration-slow) var(--motion-easing-decelerate),
-    stroke var(--motion-duration-base) var(--motion-easing-standard);
-}
+.tick--split { stroke-width: 4; }
 
-.score-gauge[data-band='good'] .progress {
-  stroke: var(--color-status-success);
-}
-
-.score-gauge[data-band='warning'] .progress {
-  stroke: var(--color-status-warning);
-}
-
-.score-gauge[data-band='critical'] .progress {
-  stroke: var(--color-status-danger);
-}
-
-.score-value {
+// Needle pivots on the dial center; rotation is a transform, so it animates cheaply.
+.needle {
   position: absolute;
-  font-size: 1.5rem;
-  font-weight: 700;
+  left: 10%;
+  bottom: calc(10 / 110 * 100%);
+  width: 40%;
+  height: 0.3rem;
+  border-radius: var(--radius-pill);
+  background: var(--color-ink);
+  transform-origin: right center;
+  transform: translateY(50%) rotate(var(--needle-angle));
+  transition: transform var(--motion-duration-count) var(--motion-easing-spring);
+
+  &::after {
+    content: '';
+    position: absolute;
+    right: -0.6rem;
+    top: 50%;
+    width: 1.2rem;
+    height: 1.2rem;
+    border: var(--border-width-ink) solid var(--color-ink);
+    border-radius: 50%;
+    background: var(--gauge-fill);
+    translate: 0 -50%;
+  }
+}
+
+.reading {
+  margin: var(--space-3) 0 0;
+  text-align: center;
+  font: 800 var(--font-size-metric-xl) var(--font-mono);
+  letter-spacing: -0.04em;
   color: var(--color-text-primary);
 }
+
+.reading__unit { font-size: var(--font-size-body); color: var(--color-text-secondary); letter-spacing: 0; }
+
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-2) var(--space-4);
+  margin-top: var(--space-3);
+  font-family: var(--font-mono);
+  font-size: var(--font-size-caption);
+  color: var(--color-text-primary);
+}
+
+.legend__item {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+
+  &::before {
+    content: '';
+    width: 0.75rem;
+    height: 0.75rem;
+    border: var(--border-width-hairline) solid var(--color-ink);
+    background: var(--gauge-fill);
+  }
+}
+
+.legend__item--questionnaire::before { background: var(--color-fill-brand); }
