@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
-import { Observable, interval, map, startWith, switchMap } from 'rxjs';
+import { EMPTY, Observable, catchError, interval, map, startWith, switchMap } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import {
   AnomalyDetectionStatus,
@@ -47,9 +47,10 @@ export class NetworkMetricsHttpRepository extends NetworkMetricsRepository {
   watchSnapshot(householdId?: string): Observable<NetworkMetricSnapshot> {
     // El backend aun no expone push/streaming: se simula "en vivo" reconsultando
     // el ultimo snapshot a intervalos, con switchMap para no acumular pedidos.
+    // catchError por consulta: un fallo puntual salta ese tick en vez de matar el sondeo.
     return interval(LIVE_UPDATE_INTERVAL_MS).pipe(
       startWith(0),
-      switchMap(() => this.getSnapshot(householdId))
+      switchMap(() => this.getSnapshot(householdId).pipe(catchError(() => EMPTY)))
     );
   }
 
