@@ -89,7 +89,7 @@
       [placeholder]="'user.securityAssistant.chat.placeholder' | translate"
       autocomplete="off"
     />
-    <button type="submit" class="submit-button" [disabled]="!draft().trim() || session.isSending()">
+    <button type="submit" class="action-button" [disabled]="!draft().trim() || session.isSending()">
       {{ 'user.securityAssistant.chat.send' | translate }}
     </button>
   </form>

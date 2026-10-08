@@ -1,171 +1,131 @@
-@use '../assistant-button' as *;
-
-@include assistant-submit-button;
-
 :host { display: block; }
 
 .chat-panel {
-  max-width: 70rem;
-  margin-top: 1rem;
-  padding: 1.25rem;
+  max-width: 72rem;
+  margin-top: var(--space-5);
+  padding: var(--space-5);
 
   &__header {
     display: flex;
     align-items: flex-start;
     justify-content: space-between;
-    gap: 1rem;
+    gap: var(--space-4);
   }
 
-  &__actions {
-    display: flex;
-    gap: 0.4rem;
-    flex-shrink: 0;
-  }
+  &__actions { display: flex; gap: var(--space-2); flex-shrink: 0; }
 
-  h2 {
-    margin: 0 0 0.35rem;
-    font-size: 1.05rem;
-    color: var(--color-text-primary);
-  }
+  h2 { margin: 0 0 var(--space-2); font-size: var(--font-size-heading); }
 }
 
 .chat-scope-hint {
-  margin: 0 0 1rem;
+  margin: 0 0 var(--space-4);
+  font-size: var(--font-size-caption);
   color: var(--color-text-secondary);
-  font-size: 0.8rem;
 }
 
 .icon-button {
   display: grid;
   place-items: center;
-  width: 2.1rem;
-  height: 2.1rem;
-  border-radius: 0.5rem;
-  border: 1px solid var(--color-border);
-  background: var(--color-bg-surface-alt);
-  color: var(--color-text-secondary);
+  width: var(--touch-target-min);
+  height: var(--touch-target-min);
+  border: var(--border-width-ink) solid var(--color-card-border);
+  border-radius: 50%;
+  background: var(--color-bg-surface);
+  color: var(--color-text-primary);
   cursor: pointer;
-  transition:
-    color var(--motion-duration-fast) var(--motion-easing-standard),
-    border-color var(--motion-duration-fast) var(--motion-easing-standard);
 
-  &:hover {
-    color: var(--color-accent);
-    border-color: var(--color-accent);
-  }
+  &:hover { background: var(--color-fill-healthy); color: var(--color-on-fill); }
 
-  &--ghost {
-    width: 1.8rem;
-    height: 1.8rem;
-    border: none;
-    background: transparent;
-  }
+  &--ghost { width: 2rem; height: 2rem; border-color: transparent; background: transparent; }
 }
 
 .chat-history {
-  display: flex;
-  flex-direction: column;
-  gap: 0.4rem;
+  display: grid;
+  gap: var(--space-1);
   max-height: 12rem;
   overflow-y: auto;
-  margin-bottom: 1rem;
-  padding: 0.6rem;
-  border-radius: 0.5rem;
-  border: 1px solid var(--color-border);
-  background: var(--color-bg-surface-alt);
+  margin-bottom: var(--space-4);
+  padding: var(--space-2);
+  border: var(--border-width-ink) dashed var(--color-card-border);
+  border-radius: var(--radius-sm);
 
-  &__empty {
-    margin: 0;
-    padding: 0.4rem;
-    color: var(--color-text-secondary);
-    font-size: 0.85rem;
-  }
+  &__empty { margin: 0; padding: var(--space-2); font-size: var(--font-size-caption); color: var(--color-text-secondary); }
 
   &__item {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 0.5rem;
-    padding: 0.45rem 0.6rem;
-    border-radius: 0.4rem;
+    gap: var(--space-2);
+    padding: var(--space-1) var(--space-3);
+    border-radius: var(--radius-sm);
     cursor: pointer;
-    color: var(--color-text-secondary);
 
-    &:hover {
-      background: var(--color-accent-muted);
-    }
-
-    &--active {
-      color: var(--color-accent);
-      background: var(--color-accent-muted);
-    }
+    &:hover { background: var(--color-bg-surface-alt); }
+    &--active { background: var(--color-fill-healthy); color: var(--color-on-fill); }
 
     input {
       flex: 1;
-      padding: 0.3rem 0.5rem;
-      border-radius: 0.35rem;
-      border: 1px solid var(--color-accent);
+      padding: var(--space-1) var(--space-2);
+      border: var(--border-width-ink) solid var(--color-accent);
+      border-radius: var(--radius-sm);
       background: var(--color-bg-surface);
       color: var(--color-text-primary);
-      font-size: 0.85rem;
     }
   }
 
-  &__title {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    font-size: 0.85rem;
-  }
+  &__title { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: var(--font-size-caption); font-weight: 700; }
 }
 
+// Consultation notes on chart paper: the assistant writes on paper slips, the
+// user answers in violet ink. Both keep the hard ink outline.
 .chat-messages {
   display: flex;
   flex-direction: column;
-  gap: 0.6rem;
-  max-height: 22rem;
+  gap: var(--space-3);
+  max-height: 24rem;
   overflow-y: auto;
-  margin-bottom: 1rem;
+  margin-bottom: var(--space-4);
+  padding: var(--space-4);
+  border: var(--border-width-ink) solid var(--color-card-border);
+  border-radius: var(--radius-sm);
+  background: var(--texture-chart-grid), var(--color-bg-app);
 }
 
 .chat-bubble {
   align-self: flex-start;
-  max-width: 32rem;
-  padding: 0.65rem 0.9rem;
-  border-radius: 0.65rem;
-  border: 1px solid var(--color-border);
-  background: var(--color-bg-surface-alt);
+  max-width: min(36rem, 88%);
+  padding: var(--space-3) var(--space-4);
+  border: var(--border-width-ink) solid var(--color-ink);
+  border-radius: var(--radius-md) var(--radius-md) var(--radius-md) 0;
+  background: var(--color-bg-surface);
   color: var(--color-text-primary);
-  font-size: 0.9rem;
-  line-height: 1.5;
+  font-size: var(--font-size-body);
   white-space: pre-wrap;
+  box-shadow: calc(var(--shadow-offset) / 2) calc(var(--shadow-offset) / 2) 0 var(--color-shadow);
 
   &--user {
     align-self: flex-end;
-    background: var(--color-accent-muted);
-    border-color: var(--color-accent);
+    border-radius: var(--radius-md) var(--radius-md) 0 var(--radius-md);
+    background: var(--color-fill-brand);
+    color: var(--color-on-fill-brand);
   }
 }
 
 .chat-input-row {
   display: flex;
-  gap: 0.6rem;
+  gap: var(--space-3);
 
   input {
     flex: 1;
-    padding: 0.6rem 0.9rem;
-    border-radius: 0.5rem;
-    border: 1px solid var(--color-border);
-    background: var(--color-bg-surface-alt);
+    min-width: 0;
+    min-height: var(--touch-target-min);
+    padding: 0 var(--space-4);
+    border: var(--border-width-ink) solid var(--color-card-border);
+    border-radius: var(--radius-sm);
+    background: var(--color-bg-surface);
     color: var(--color-text-primary);
-    font-size: 0.9rem;
+    font-size: var(--font-size-body);
 
-    &::placeholder {
-      color: var(--color-text-secondary);
-    }
-  }
-
-  .submit-button {
-    align-self: stretch;
+    &::placeholder { color: var(--color-text-secondary); }
   }
 }
