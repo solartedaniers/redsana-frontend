@@ -4,7 +4,7 @@
   gap: 1rem;
   margin-bottom: 1.5rem;
 }
-.devices-hero { display: flex; justify-content: space-between; align-items: center; gap: 1rem; padding: 1.25rem; margin-bottom: 1rem; }
+.devices-hero { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 1rem; padding: 1.25rem; margin-bottom: 1rem; }
 .devices-hero .page-header { margin: 0; }
 
 .scan-button {
@@ -51,6 +51,7 @@
 .topology__hub { position: relative; z-index: 1; display: grid; place-items: center; width: 4rem; height: 4rem; border-radius: 1rem; background: var(--color-accent); color: var(--color-text-inverse); box-shadow: 0 0 2rem var(--color-glow-accent); }
 .topology__node { position: absolute; width: .9rem; height: .9rem; border-radius: 50%; background: var(--color-status-success); box-shadow: 0 0 0 .35rem var(--color-accent-muted); }
 .topology__node[data-trust='unknown'] { background: var(--color-status-warning); }
+.topology__node[data-trust='blocked'] { background: var(--color-status-danger); }
 
 // Ondas expandiéndose desde el centro: solo deben verse mientras isScanning()
 // es true (topology--scanning), para no dar la impresión de rastreo continuo.
@@ -98,9 +99,14 @@
 
 .device-card__row {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
-  gap: 1rem;
+  gap: .5rem 1rem;
 }
+
+// El papel (router / este equipo) va en su propia línea y nunca se parte:
+// dentro de la línea de la IP se apretaba en varias líneas en tarjetas angostas.
+.device-role { margin-top: .3rem; white-space: nowrap; }
 
 .device-kind-icon {
   flex-shrink: 0;
@@ -110,7 +116,9 @@
 }
 
 .device-info {
-  flex: 1;
+  // Base de 12rem: si no cabe junto a las etiquetas, estas bajan a otra línea
+  // en vez de aplastar el nombre y la IP.
+  flex: 1 1 12rem;
   min-width: 0;
 }
 
@@ -126,16 +134,17 @@
   font-size: var(--font-size-body);
 }
 
-.trust-badge {
+.trust-badge, .presence-badge {
   font-size: var(--font-size-caption);
   font-weight: 700;
+}
+
+.trust-badge {
   text-transform: uppercase;
   color: var(--color-text-secondary);
 }
 
 .presence-badge {
-  font-size: var(--font-size-caption);
-  font-weight: 700;
   color: var(--color-status-warning);
 
   &[data-online='true'] {
@@ -145,6 +154,7 @@
 
 .device-actions {
   display: flex;
+  flex-wrap: wrap;
   gap: 0.5rem;
 
   button {
@@ -187,3 +197,7 @@
     color: var(--color-text-primary);
   }
 }
+
+.trust-note { margin-bottom: 1rem; }
+.topology__limit { position: absolute; bottom: .75rem; inset-inline: 1rem; text-align: center; }
+.show-more-button { align-self: center; min-height: 2.75rem; }

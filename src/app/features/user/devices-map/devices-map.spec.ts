@@ -94,3 +94,84 @@ describe('DevicesMap connected count', () => {
     expect(element.querySelector('.device-card .status-badge')?.textContent?.trim()).toBe('user.devicesMap.role.gateway');
   });
 });
+
+describe('DevicesMap failed scan', () => {
+  it('no muestra el número viejo cuando el escaneo falla, y pide intentar de nuevo', async () => {
+    vi.spyOn(console, 'error').mockImplementation(() => undefined);
+    const devices = [device(1, true, 'gateway'), device(100, true, 'other'), device(103, true, 'this_device')];
+    TestBed.configureTestingModule({
+      providers: [
+        provideHttpClient(),
+        { provide: DevicesRepository, useValue: { getDevices: () => of(devices) } },
+        { provide: LanScanGateway, useValue: { isAvailable: true, scan: () => Promise.reject(new Error('arp failed')) } },
+      ],
+    });
+    const fixture = TestBed.createComponent(DevicesMap);
+    fixture.detectChanges();
+    await fixture.whenStable();
+    fixture.detectChanges();
+    const element = fixture.nativeElement as HTMLElement;
+
+    expect(element.querySelector('.devices-hero .status-badge')?.textContent?.trim()).toBe('user.devicesMap.countUnavailable');
+    expect(element.querySelector('.scan-result.error')?.textContent?.trim()).toBe('user.devicesMap.scanError');
+  });
+});
+
+describe('DevicesMap trust marks', () => {
+  it('un equipo marcado se puede devolver a "Desconocido" con "Quitar marca"', async () => {
+    const marked = { ...device(7, true), trust: 'blocked' as const };
+    const repository = { getDevices: () => of([marked]), setTrust: vi.fn(() => of(undefined)) };
+    TestBed.configureTestingModule({
+      providers: [
+        provideHttpClient(),
+        { provide: DevicesRepository, useValue: repository },
+        { provide: LanScanGateway, useValue: { isAvailable: false } },
+      ],
+    });
+    const fixture = TestBed.createComponent(DevicesMap);
+    fixture.detectChanges();
+    await fixture.whenStable();
+    const element = fixture.nativeElement as HTMLElement;
+
+    const clear = [...element.querySelectorAll<HTMLButtonElement>('.device-actions button')].find(
+      (button) => button.textContent?.trim() === 'user.devicesMap.clearTrust'
+    );
+    clear!.click();
+
+    expect(repository.setTrust).toHaveBeenCalledExactlyOnceWith('device-7', 'unknown');
+    expect(element.querySelector('.trust-note')?.textContent?.trim()).toBe('user.devicesMap.trustNote');
+  });
+});
+
+describe('DevicesMap con una red de campus (~900 equipos)', () => {
+  const campus = () => [device(0, true, 'gateway'), device(1, true, 'this_device'), ...Array.from({ length: 898 }, (_, i) => device(i + 2, true))];
+
+  it('pinta una página de la lista, el mapa limitado y el contador con el total real', async () => {
+    const element = await renderWith(campus());
+
+    expect(element.querySelectorAll('.device-card')).toHaveLength(50);
+    expect(element.querySelectorAll('.topology__node')).toHaveLength(70);
+    expect(element.querySelector('.topology__limit')).not.toBeNull();
+    expect(element.querySelector('.devices-hero .status-badge')?.textContent?.trim()).toBe('899'); // todos menos el router
+    expect(element.querySelector('.show-more-button')).not.toBeNull();
+  });
+
+  it('"Ver más" agrega la siguiente página', async () => {
+    TestBed.configureTestingModule({
+      providers: [
+        provideHttpClient(),
+        { provide: DevicesRepository, useValue: { getDevices: () => of(campus()) } },
+        { provide: LanScanGateway, useValue: { isAvailable: false } },
+      ],
+    });
+    const fixture = TestBed.createComponent(DevicesMap);
+    fixture.detectChanges();
+    await fixture.whenStable();
+    const element = fixture.nativeElement as HTMLElement;
+
+    element.querySelector<HTMLButtonElement>('.show-more-button')!.click();
+    fixture.detectChanges();
+
+    expect(element.querySelectorAll('.device-card')).toHaveLength(100);
+  });
+});

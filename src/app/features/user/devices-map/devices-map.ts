@@ -13,6 +13,11 @@ import { Icon } from '../../../shared/components/icon/icon';
 // halo del punto más externo cuando hay tantos dispositivos que se abren anillos extra.
 const TOPOLOGY_MIN_HEIGHT_REM = 24;
 const TOPOLOGY_EDGE_MARGIN_REM = 1.5;
+// En una red de campus llegan ~900 equipos: pintarlos todos creaba ~16 000
+// nodos DOM (~1 s de bloqueo). La lista crece de a una página y el mapa dibuja
+// solo los primeros anillos; el contador sigue mostrando el total real.
+const DEVICES_PAGE_SIZE = 50;
+const MAX_TOPOLOGY_NODES = 70;
 
 // Router primero y luego este equipo: los dos que el usuario reconoce enseguida.
 const ROLE_ORDER: Record<DeviceNetworkRole, number> = { gateway: 0, this_device: 1, other: 2 };
@@ -49,9 +54,13 @@ export class DevicesMap {
   protected readonly networkMembers = computed(() =>
     this.connectedDevices().filter((device) => device.networkRole !== 'gateway')
   );
-  // Un punto del mapa por dispositivo conectado, cada uno en su propia posición.
+  protected readonly visibleCount = signal(DEVICES_PAGE_SIZE);
+  protected readonly visibleDevices = computed(() => this.connectedDevices().slice(0, this.visibleCount()));
+  protected readonly hiddenDeviceCount = computed(() => Math.max(0, this.connectedDevices().length - this.visibleCount()));
+  protected readonly mapShownCount = computed(() => Math.min(this.networkMembers().length, MAX_TOPOLOGY_NODES));
+  // Un punto del mapa por dispositivo conectado (hasta MAX_TOPOLOGY_NODES), cada uno en su propia posición.
   protected readonly topologyNodes = computed(() => {
-    const devices = this.networkMembers();
+    const devices = this.networkMembers().slice(0, MAX_TOPOLOGY_NODES);
     const offsets = layoutTopologyNodes(devices.length);
     return devices.map((device, index) => ({
       device,
@@ -112,6 +121,10 @@ export class DevicesMap {
       this.isScanning.set(false);
       this.scanFailed.set(true);
     }
+  }
+
+  protected showMoreDevices(): void {
+    this.visibleCount.update((count) => count + DEVICES_PAGE_SIZE);
   }
 
   protected setTrust(deviceId: string, trust: DeviceTrust): void {
