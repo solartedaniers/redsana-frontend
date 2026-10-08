@@ -1,0 +1,18 @@
+<header class="rx-header">
+  <span class="rx-mark" aria-hidden="true">{{ 'user.securityAssistant.rxMark' | translate }}</span>
+  <h2>{{ 'user.securityAssistant.recommendationsTitle' | translate }}</h2>
+</header>
+@if (recommendations().length === 0) {
+  <p class="all-good sticker" data-tone="healthy">{{ 'user.securityAssistant.allGood' | translate }}</p>
+} @else {
+  <ol class="doses">
+    @for (recommendation of recommendations(); track recommendation.id) {
+      @let urgency = urgencyOf(recommendation.priority);
+      <li class="dose" [attr.data-urgency]="urgency">
+        <span class="dose__urgency">{{ 'user.securityAssistant.urgency.' + urgency | translate }}</span>
+        <strong>{{ recommendation.titleKey | translate }}</strong>
+        <p>{{ recommendation.descriptionKey | translate }}</p>
+      </li>
+    }
+  </ol>
+}

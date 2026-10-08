@@ -1,0 +1,76 @@
+:host { display: block; }
+
+.rx-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin-bottom: var(--space-4);
+  padding-bottom: var(--space-3);
+  border-bottom: calc(var(--border-width-ink) * 2) double var(--color-card-border);
+
+  h2 { margin: 0; font-size: var(--font-size-heading); }
+}
+
+.rx-mark {
+  display: grid;
+  place-items: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  flex-shrink: 0;
+  border: var(--border-width-ink) solid var(--color-ink);
+  border-radius: 50%;
+  background: var(--color-fill-brand);
+  color: var(--color-on-fill-brand);
+  font: 800 var(--font-size-heading-sm) var(--font-display);
+}
+
+.doses {
+  display: grid;
+  gap: var(--space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: dose;
+}
+
+.dose {
+  --severity-fill: var(--color-fill-healthy);
+  display: grid;
+  grid-template-columns: auto 1fr;
+  column-gap: var(--space-4);
+  padding: var(--space-3) var(--space-4);
+  border: var(--border-width-ink) solid var(--color-card-border);
+  border-left-width: var(--space-2);
+  border-left-color: var(--severity-fill);
+  border-radius: var(--radius-sm);
+  background: var(--color-bg-surface);
+  counter-increment: dose;
+
+  &::before {
+    content: counter(dose);
+    grid-row: span 3;
+    font: 800 var(--font-size-heading) var(--font-mono);
+    line-height: 1;
+    color: var(--color-text-primary);
+  }
+
+  strong { font-family: var(--font-display); font-size: var(--font-size-body); }
+  p { margin: var(--space-1) 0 0; font-size: var(--font-size-caption); color: var(--color-text-secondary); }
+}
+
+.dose[data-urgency='high'] { --severity-fill: var(--color-fill-critical); }
+.dose[data-urgency='medium'] { --severity-fill: var(--color-fill-warning); }
+
+.dose__urgency {
+  justify-self: start;
+  margin-bottom: var(--space-1);
+  padding: 0 var(--space-2);
+  border: var(--border-width-hairline) solid var(--color-ink);
+  background: var(--severity-fill);
+  color: var(--color-on-fill);
+  font: 800 var(--font-size-caption) var(--font-mono);
+  letter-spacing: var(--font-label-tracking);
+  text-transform: uppercase;
+}
+
+.all-good { margin: 0; white-space: normal; }
