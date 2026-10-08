@@ -1,0 +1,237 @@
+// Shared primitives of the "Clinical Chart" language. Screens only describe
+// their content; surface, outline, shadow and states live in this contract.
+
+// ---- Layout -------------------------------------------------------------
+.workspace-grid { display: grid; gap: var(--space-5); }
+.workspace-grid--two { grid-template-columns: minmax(0, 1.15fr) minmax(18rem, 0.85fr); }
+.workspace-grid--aside { grid-template-columns: minmax(15rem, 0.55fr) minmax(0, 1.45fr); }
+
+// ---- Chart panel: a sheet of paper clipped to the board -------------------
+.surface-panel {
+  position: relative;
+  border: var(--border-width-ink) solid var(--color-card-border);
+  border-radius: var(--radius-md);
+  background: var(--color-bg-surface);
+  box-shadow: var(--shadow-hard);
+  transition:
+    box-shadow var(--motion-duration-base) var(--motion-easing-standard),
+    transform var(--motion-duration-base) var(--motion-easing-spring);
+}
+
+.surface-panel__header {
+  padding: var(--space-4) var(--space-5);
+  border-bottom: var(--border-width-ink) solid var(--color-card-border);
+  background: var(--color-bg-surface-alt);
+  border-radius: var(--radius-md) var(--radius-md) 0 0;
+}
+
+.surface-panel__title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: var(--font-size-heading-sm);
+  font-weight: var(--font-display-weight);
+  font-stretch: var(--font-display-stretch);
+  letter-spacing: var(--font-display-tracking);
+  line-height: var(--line-height-tight);
+  color: var(--color-text-primary);
+}
+
+.surface-panel__copy {
+  margin: var(--space-2) 0 0;
+  font-size: var(--font-size-caption);
+  color: var(--color-text-secondary);
+}
+
+// ---- Ink buttons: press = the button falls onto its own shadow ------------
+.action-button,
+.submit-button,
+.subtle-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-5);
+  border: var(--border-width-ink) solid var(--color-ink);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-display);
+  font-size: var(--font-size-body);
+  font-weight: var(--font-display-weight);
+  font-stretch: var(--font-display-stretch);
+  letter-spacing: 0.01em;
+  text-decoration: none;
+  cursor: pointer;
+  box-shadow: var(--shadow-hard);
+  transition:
+    transform var(--motion-duration-fast) var(--motion-easing-spring),
+    box-shadow var(--motion-duration-fast) var(--motion-easing-standard),
+    background-color var(--motion-duration-fast) var(--motion-easing-standard);
+
+  &:active:not(:disabled) {
+    transform: translate(var(--shadow-offset), var(--shadow-offset));
+    box-shadow: var(--shadow-hard-pressed);
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.55;
+    box-shadow: none;
+  }
+}
+
+.action-button,
+.submit-button {
+  background: var(--color-fill-brand);
+  color: var(--color-on-fill-brand);
+
+  &:hover:not(:disabled) { background: var(--color-accent-hover); }
+}
+
+.subtle-button {
+  background: var(--color-bg-surface);
+  color: var(--color-text-primary);
+
+  &:hover:not(:disabled) { background: var(--color-bg-surface-alt); }
+}
+
+// Lift on hover only for real pointers; touch keeps the static press.
+@media (hover: hover) and (pointer: fine) {
+  .action-button,
+  .submit-button,
+  .subtle-button {
+    &:hover:not(:disabled):not(:active) { transform: translate(var(--motion-lift), var(--motion-lift)); }
+  }
+}
+
+// ---- Stickers: tilted ink labels; status badges are stickers too ----------
+.sticker,
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-1) var(--space-3);
+  border: var(--border-width-ink) solid var(--color-ink);
+  border-radius: var(--radius-pill);
+  background: var(--color-fill-neutral);
+  color: var(--color-on-fill);
+  font-family: var(--font-mono);
+  font-size: var(--font-size-caption);
+  font-weight: 700;
+  letter-spacing: var(--font-label-tracking);
+  text-transform: uppercase;
+  white-space: nowrap;
+  transform: rotate(var(--sticker-tilt));
+  box-shadow: calc(var(--shadow-offset) / 2) calc(var(--shadow-offset) / 2) 0 var(--color-shadow);
+}
+
+.sticker--alt { transform: rotate(var(--sticker-tilt-alt)); }
+
+.status-badge::before {
+  content: '';
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+// Only a real network status beats with the shared heartbeat (transform/opacity).
+.status-badge[data-status]::before {
+  animation: heartbeat var(--motion-heartbeat) var(--motion-easing-standard) infinite;
+}
+
+.sticker[data-tone='healthy'], .status-badge[data-status='good'] { background: var(--color-fill-healthy); }
+.sticker[data-tone='warning'], .status-badge[data-status='warning'] { background: var(--color-fill-warning); }
+.sticker[data-tone='critical'], .status-badge[data-status='critical'] { background: var(--color-fill-critical); }
+.sticker[data-tone='brand'] { background: var(--color-fill-brand); color: var(--color-on-fill-brand); }
+
+// Phosphor Ward: stickers become glowing outlines instead of solid fills.
+:root[data-theme='dark'] {
+  .sticker,
+  .status-badge {
+    --sticker-tone: var(--color-status-neutral);
+    border-color: var(--sticker-tone);
+    background: color-mix(in srgb, var(--sticker-tone) 14%, var(--color-bg-surface));
+    color: var(--sticker-tone);
+    box-shadow: 0 0 1rem -0.25rem var(--sticker-tone);
+  }
+
+  .sticker[data-tone='healthy'], .status-badge[data-status='good'] { --sticker-tone: var(--color-fill-healthy); }
+  .sticker[data-tone='warning'], .status-badge[data-status='warning'] { --sticker-tone: var(--color-fill-warning); }
+  .sticker[data-tone='critical'], .status-badge[data-status='critical'] { --sticker-tone: var(--color-fill-critical); }
+  .sticker[data-tone='brand'] { --sticker-tone: var(--color-fill-brand); }
+}
+
+@keyframes heartbeat {
+  0%, 40%, 100% { transform: scale(1); opacity: 1; }
+  10% { transform: scale(1.45); opacity: 0.85; }
+  20% { transform: scale(1); }
+  28% { transform: scale(1.25); opacity: 0.9; }
+}
+
+// ---- Metric readings: giant tabular numbers -------------------------------
+.metric-strip { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--space-5); }
+.metric-tile { padding: var(--space-4) var(--space-5); }
+
+.metric-tile__label {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: var(--font-size-caption);
+  font-weight: 700;
+  letter-spacing: var(--font-label-tracking);
+  text-transform: uppercase;
+  color: var(--color-text-secondary);
+}
+
+.metric-tile__value {
+  margin: var(--space-2) 0 0;
+  font-family: var(--font-mono);
+  font-size: var(--font-size-metric);
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  color: var(--color-text-primary);
+}
+
+.metric-tile__detail {
+  margin: var(--space-2) 0 0;
+  font-size: var(--font-size-caption);
+  color: var(--color-status-success);
+}
+
+@media (max-width: 64rem) {
+  .workspace-grid--two,
+  .workspace-grid--aside { grid-template-columns: 1fr; }
+  .metric-strip { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (max-width: 28rem) {
+  .metric-strip { grid-template-columns: 1fr; }
+}
+
+// ---- Severity: one attribute, two tones (fill for blocks, ink for text) ---
+[data-severity='healthy'] { --severity-fill: var(--color-fill-healthy); --severity-ink: var(--color-status-success); }
+[data-severity='warning'] { --severity-fill: var(--color-fill-warning); --severity-ink: var(--color-status-warning); }
+[data-severity='critical'],
+[data-severity='cut'] { --severity-fill: var(--color-fill-critical); --severity-ink: var(--color-status-danger); }
+
+// ---- Skeleton: an empty chart slot swept by the monitor's scan beam -------
+.skeleton {
+  position: relative;
+  overflow: hidden;
+  min-height: 7rem;
+  border: var(--border-width-ink) dashed var(--color-card-border);
+  border-radius: var(--radius-md);
+  background: var(--color-bg-surface-alt);
+
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, transparent, var(--color-accent-muted), transparent);
+    transform: translateX(-100%);
+    animation: skeleton-scan calc(var(--motion-heartbeat) * 1.2) var(--motion-easing-standard) infinite;
+  }
+}
+
+@keyframes skeleton-scan {
+  to { transform: translateX(100%); }
+}
