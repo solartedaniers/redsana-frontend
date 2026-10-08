@@ -10,6 +10,7 @@ import { MetricCard } from '../../../shared/components/metric-card/metric-card';
 import { HistoryChart } from '../../../shared/components/history-chart/history-chart';
 import { ScoreGauge } from '../../../shared/components/score-gauge/score-gauge';
 import { TranslatePipe } from '../../../core/i18n/translate.pipe';
+import { APP_PATHS } from '../../../core/routing/app-paths';
 
 // El backend no expone un endpoint "por id" para hogares: se reutiliza
 // getHouseholds() y se filtra en cliente.
@@ -21,6 +22,7 @@ import { TranslatePipe } from '../../../core/i18n/translate.pipe';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class HouseholdDetail {
+  protected readonly paths = APP_PATHS;
   private readonly route = inject(ActivatedRoute);
   private readonly metricsRepository = inject(NetworkMetricsRepository);
   private readonly supervisionRepository = inject(NetworkSupervisionRepository);

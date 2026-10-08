@@ -1,22 +1,23 @@
 import { Routes } from '@angular/router';
+import { ROUTE_SEGMENTS } from '../../core/routing/app-paths';
 
 export const ADMIN_ROUTES: Routes = [
   {
-    path: 'dashboard',
+    path: ROUTE_SEGMENTS.dashboard,
     loadComponent: () => import('./admin-dashboard/admin-dashboard').then((m) => m.AdminDashboard),
   },
   {
-    path: 'network-supervision',
+    path: ROUTE_SEGMENTS.networkSupervision,
     loadComponent: () =>
       import('./network-supervision/network-supervision').then((m) => m.NetworkSupervision),
   },
   {
-    path: 'network-supervision/:id',
+    path: `${ROUTE_SEGMENTS.networkSupervision}/:id`,
     loadComponent: () => import('./household-detail/household-detail').then((m) => m.HouseholdDetail),
   },
   {
-    path: 'users',
+    path: ROUTE_SEGMENTS.users,
     loadComponent: () => import('./user-management/user-management').then((m) => m.UserManagement),
   },
-  { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
+  { path: '', redirectTo: ROUTE_SEGMENTS.dashboard, pathMatch: 'full' },
 ];
