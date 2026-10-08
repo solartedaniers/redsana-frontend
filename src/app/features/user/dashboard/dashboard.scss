@@ -30,7 +30,7 @@
   gap: var(--space-4);
 }
 
-// A taped note: the calibration notice is pinned to the chart, slightly tilted.
+// The calibration notice: an amber note pinned straight on the chart.
 .anomaly-calibrating-banner {
   max-width: 62ch;
   margin: 0 0 var(--space-6);
@@ -41,7 +41,6 @@
   color: var(--color-on-fill);
   font-size: var(--font-size-body);
   box-shadow: var(--shadow-hard);
-  transform: rotate(calc(var(--sticker-tilt) / 2));
 }
 
 // Vital signs: latency is the protagonist; the rest are secondary readings.
