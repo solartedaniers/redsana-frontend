@@ -27,7 +27,7 @@
       <app-icon name="shield" />
       <p>{{ 'user.familyMode.whyManual' | translate }}</p>
     </div>
-    <a class="submit-button family-ask" routerLink="/user/security-assistant" [queryParams]="assistantQueryParams">
+    <a class="submit-button family-ask" [routerLink]="paths.securityAssistant" [queryParams]="assistantQueryParams">
       {{ 'user.familyMode.askAssistant' | translate }}
     </a>
   </section>

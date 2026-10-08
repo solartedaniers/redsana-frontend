@@ -7,6 +7,7 @@ import { CHAT_TOPIC_QUERY_PARAM, UserStartableChatTopic } from '../../../core/mo
 import { TranslatePipe } from '../../../core/i18n/translate.pipe';
 import { Icon } from '../../../shared/components/icon/icon';
 import { PageHeader } from '../../../shared/components/page-header/page-header';
+import { APP_PATHS } from '../../../core/routing/app-paths';
 
 const STEP_KEYS = [
   'user.familyMode.steps.openPanel',
@@ -28,6 +29,7 @@ const STEP_KEYS = [
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class FamilyMode {
+  protected readonly paths = APP_PATHS;
   private readonly i18n = inject(I18nService);
 
   protected readonly dns = FAMILY_DNS;
