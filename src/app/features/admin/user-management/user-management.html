@@ -4,6 +4,7 @@
   {{ 'admin.userManagement.newUser' | translate }}
 </button>
 
+<div class="table-scroll">
 <table class="users-table">
   <thead>
     <tr>
@@ -37,6 +38,7 @@
     }
   </tbody>
 </table>
+</div>
 
 <dialog #userDialog class="user-dialog" (close)="errorKey.set(null)">
   <form [formGroup]="form" (ngSubmit)="submit()" class="auth-form">

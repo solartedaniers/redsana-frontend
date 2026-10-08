@@ -104,7 +104,7 @@
   border-radius: 0.75rem;
   background: var(--color-bg-surface);
   padding: 2rem;
-  min-width: 24rem;
+  min-width: min(24rem, calc(100vw - 2rem)); // en celulares no se sale de la pantalla
 
   &::backdrop {
     background: color-mix(in srgb, var(--color-bg-app) 60%, transparent);
@@ -117,3 +117,7 @@
   gap: 1rem;
   margin-top: 0.5rem;
 }
+
+// Seis columnas no caben en un celular: la tabla se desplaza dentro de su
+// contenedor en vez de ensanchar toda la página.
+.table-scroll { overflow-x: auto; }
