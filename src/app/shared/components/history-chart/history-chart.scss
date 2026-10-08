@@ -1,22 +1,150 @@
-.history-chart {
-  width: 100%;
-  height: 5rem;
-  display: block;
+:host { display: block; }
+
+.ecg { margin: 0; }
+
+.ecg-empty {
+  margin: 0;
+  padding: var(--space-6) var(--space-4);
+  text-align: center;
+  font-family: var(--font-mono);
+  font-size: var(--font-size-caption);
+  color: var(--color-text-secondary);
 }
 
-.line {
+// The monitor: chart paper with the trace; markers and head are HTML so they
+// stay round while the SVG stretches.
+.ecg__monitor {
+  position: relative;
+  height: clamp(9rem, 22vw, 13rem);
+  border: var(--border-width-ink) solid var(--color-card-border);
+  border-radius: var(--radius-sm);
+  background: var(--texture-chart-grid), var(--color-bg-surface);
+  cursor: crosshair;
+  touch-action: pan-y;
+}
+
+.ecg__plot { display: block; width: 100%; height: 100%; overflow: visible; }
+
+.ecg__band { fill: var(--severity-fill); opacity: 0.14; }
+
+.ecg__threshold {
+  stroke: var(--severity-ink);
+  stroke-width: 1.5;
+  stroke-dasharray: 6 5;
+  vector-effect: non-scaling-stroke;
+}
+
+.ecg__trace,
+.ecg__glow {
   fill: none;
-  stroke: var(--color-accent);
-  stroke-width: 2;
-  stroke-linecap: round;
   stroke-linejoin: round;
-  stroke-dasharray: 1200;
-  stroke-dashoffset: 1200;
-  animation: draw-in var(--motion-duration-slow) var(--motion-easing-decelerate) forwards;
+  stroke-linecap: round;
+  vector-effect: non-scaling-stroke;
 }
 
-@keyframes draw-in {
-  to {
-    stroke-dashoffset: 0;
+.ecg__trace { stroke: var(--color-text-primary); stroke-width: 2.5; }
+.ecg__glow { stroke: var(--color-fill-healthy); stroke-width: 8; opacity: 0.45; }
+
+// Draws in once from left to right (transform only); reduced motion shows it whole.
+.ecg__reveal {
+  transform-box: fill-box;
+  transform-origin: left;
+  animation: ecg-reveal calc(var(--motion-heartbeat) * 1.5) var(--motion-easing-decelerate) both;
+}
+
+.ecg__cursor { stroke: var(--color-accent); stroke-width: 1.5; vector-effect: non-scaling-stroke; }
+
+.ecg__marker,
+.ecg__head {
+  position: absolute;
+  translate: -50% -50%;
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.ecg__marker {
+  width: 0.8rem;
+  height: 0.8rem;
+  border: var(--border-width-ink) solid var(--color-ink);
+  background: var(--severity-fill);
+}
+
+.ecg__marker[data-severity='cut'] { border-radius: 0; rotate: 45deg; }
+
+.ecg__head {
+  width: 0.85rem;
+  height: 0.85rem;
+  background: var(--severity-fill);
+  box-shadow: 0 0 0 0.25rem color-mix(in srgb, var(--severity-fill) 35%, transparent), 0 0 1rem var(--severity-fill);
+  animation: heartbeat var(--motion-heartbeat) var(--motion-easing-standard) infinite;
+}
+
+.ecg__tooltip {
+  position: absolute;
+  z-index: 1;
+  display: grid;
+  gap: var(--space-1);
+  margin: var(--space-3) 0 0 var(--space-3);
+  padding: var(--space-2) var(--space-3);
+  border: var(--border-width-ink) solid var(--color-ink);
+  border-left: var(--space-2) solid var(--severity-fill);
+  border-radius: var(--radius-sm);
+  background: var(--color-bg-surface);
+  box-shadow: var(--shadow-hard);
+  white-space: nowrap;
+  pointer-events: none;
+  translate: var(--tip-x, 0) var(--tip-y, 0);
+
+  strong { font: 800 var(--font-size-body) var(--font-mono); }
+  time { font: 600 var(--font-size-caption) var(--font-mono); color: var(--color-text-secondary); }
+}
+
+.ecg__tooltip--flip { --tip-x: calc(-100% - 2 * var(--space-3)); }
+.ecg__tooltip--above { --tip-y: calc(-100% - 2 * var(--space-3)); }
+
+.ecg__heatmap {
+  display: block;
+  width: 100%;
+  height: 0.75rem;
+  margin-top: var(--space-2);
+  border: var(--border-width-ink) solid var(--color-card-border);
+  border-radius: var(--radius-sm);
+
+  rect { fill: var(--severity-fill); }
+}
+
+.ecg__axis,
+.ecg__legend {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: var(--space-2) var(--space-4);
+  font-family: var(--font-mono);
+  font-size: var(--font-size-caption);
+  color: var(--color-text-secondary);
+}
+
+.ecg__axis { margin-top: var(--space-2); }
+.ecg__hint { flex: 1; text-align: center; }
+
+.ecg__legend {
+  justify-content: flex-start;
+  margin: var(--space-3) 0 0;
+  padding: 0;
+  list-style: none;
+
+  li::before {
+    content: '';
+    display: inline-block;
+    width: 0.65rem;
+    height: 0.65rem;
+    margin-right: var(--space-2);
+    border: var(--border-width-hairline) solid var(--color-ink);
+    background: var(--severity-fill);
+    vertical-align: middle;
   }
 }
+
+@media (pointer: coarse) { .ecg__hint { display: none; } }
+
+@keyframes ecg-reveal { from { transform: scaleX(0); } }

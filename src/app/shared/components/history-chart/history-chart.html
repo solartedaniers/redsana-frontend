@@ -1,3 +1,104 @@
-<svg class="history-chart" viewBox="0 0 300 80" preserveAspectRatio="none">
-  <polyline [attr.points]="polylinePoints()" class="line" />
-</svg>
+@let data = trace();
+@if (data.points.length === 0) {
+  <p class="ecg-empty">{{ 'common.latencyChart.empty' | translate }}</p>
+} @else {
+  <figure class="ecg">
+    @if (summaryParams(); as summary) {
+      <figcaption class="visually-hidden">{{ 'common.latencyChart.summary' | translate: summary }}</figcaption>
+    }
+
+    <div
+      class="ecg__monitor"
+      tabindex="0"
+      role="group"
+      [attr.aria-label]="'common.latencyChart.label' | translate"
+      [attr.aria-describedby]="clipId + '-hint'"
+      (pointermove)="onPointerMove($event)"
+      (pointerleave)="activeIndex.set(null)"
+      (keydown)="onKeydown($event)"
+      (blur)="activeIndex.set(null)"
+    >
+      <svg class="ecg__plot" [attr.viewBox]="viewBox" preserveAspectRatio="none" aria-hidden="true" focusable="false">
+        <defs>
+          <clipPath [attr.id]="clipId">
+            <rect class="ecg__reveal" [attr.width]="width" [attr.height]="height" />
+          </clipPath>
+        </defs>
+
+        @if (data.criticalY !== null) {
+          <rect class="ecg__band" data-severity="critical" x="0" y="0" [attr.width]="width" [attr.height]="data.criticalY" />
+        }
+        @if (data.warningY !== null) {
+          <rect
+            class="ecg__band"
+            data-severity="warning"
+            x="0"
+            [attr.y]="data.criticalY ?? 0"
+            [attr.width]="width"
+            [attr.height]="data.warningY - (data.criticalY ?? 0)"
+          />
+          <line class="ecg__threshold" data-severity="warning" x1="0" [attr.x2]="width" [attr.y1]="data.warningY" [attr.y2]="data.warningY" />
+        }
+        @if (data.criticalY !== null) {
+          <line class="ecg__threshold" data-severity="critical" x1="0" [attr.x2]="width" [attr.y1]="data.criticalY" [attr.y2]="data.criticalY" />
+        }
+
+        <g [attr.clip-path]="'url(#' + clipId + ')'">
+          <path class="ecg__glow" [attr.d]="data.path" />
+          <path class="ecg__trace" [attr.d]="data.path" />
+        </g>
+
+        @if (active(); as point) {
+          <line class="ecg__cursor" [attr.x1]="point.x" [attr.x2]="point.x" y1="0" [attr.y2]="height" />
+        }
+      </svg>
+
+      @for (marker of data.markers; track $index) {
+        <span class="ecg__marker" [attr.data-severity]="marker.severity" [style.left]="left(marker)" [style.top]="top(marker)"></span>
+      }
+      @if (head(); as point) {
+        <span class="ecg__head" [attr.data-severity]="point.severity" [style.left]="left(point)" [style.top]="top(point)"></span>
+      }
+
+      @if (active(); as point) {
+        <div
+          class="ecg__tooltip"
+          [class.ecg__tooltip--flip]="point.x > width / 2"
+          [class.ecg__tooltip--above]="point.y > height / 2"
+          [attr.data-severity]="point.severity"
+          [style.left]="left(point)"
+          [style.top]="top(point)"
+          role="status"
+        >
+          <strong>
+            @if (point.severity === 'cut') {
+              {{ 'common.latencyChart.cut' | translate }}
+            } @else {
+              {{ format(point.latencyMs) }} ms
+            }
+          </strong>
+          <time [attr.datetime]="point.timestamp">{{ point.timestamp | date: 'short' }}</time>
+        </div>
+      }
+    </div>
+
+    <svg class="ecg__heatmap" [attr.viewBox]="'0 0 ' + width + ' 1'" preserveAspectRatio="none" aria-hidden="true" focusable="false">
+      @for (cell of data.heatmap; track $index) {
+        <rect [attr.x]="cell.x" y="0" [attr.width]="cell.width" height="1" [attr.data-severity]="cell.severity" />
+      }
+    </svg>
+
+    <div class="ecg__axis">
+      <time [attr.datetime]="data.points[0].timestamp">{{ data.points[0].timestamp | date: 'short' }}</time>
+      <span [id]="clipId + '-hint'" class="ecg__hint">{{ 'common.latencyChart.hint' | translate }}</span>
+      <time [attr.datetime]="data.points[data.points.length - 1].timestamp">{{ data.points[data.points.length - 1].timestamp | date: 'short' }}</time>
+    </div>
+
+    <ul class="ecg__legend">
+      <li data-severity="healthy">{{ 'common.latencyChart.legend.healthy' | translate: { warning: thresholds.warning } }}</li>
+      <li data-severity="warning">{{ 'common.latencyChart.legend.warning' | translate: { warning: thresholds.warning, critical: thresholds.critical } }}</li>
+      <li data-severity="critical">{{ 'common.latencyChart.legend.critical' | translate: { critical: thresholds.critical } }}</li>
+      <li data-severity="cut">{{ 'common.latencyChart.legend.cut' | translate }}</li>
+    </ul>
+  </figure>
+}
