@@ -36,6 +36,18 @@ ng build
 
 This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
 
+### Known build warning
+
+`bundle initial exceeded maximum budget` (~579 kB raw / ~144 kB transferred vs the 500 kB budget in
+`angular.json`) is a known, pre-existing warning. The initial chunks are Angular itself, the Supabase
+client (needed before the first render to restore the session), the Tauri API used to detect the
+runtime, and app bootstrap code; three.js is
+already in a lazy chunk. It does not break the build. The budget is intentionally not raised, so any
+further growth stays visible.
+
+`npm run build` regenerates `src/environments/environment.ts` from `.env` (or the hosting environment)
+and requires `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `API_BASE_URL`, `DESKTOP_DOWNLOAD_URL` and `WEB_APP_URL`.
+
 ## Running unit tests
 
 To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
