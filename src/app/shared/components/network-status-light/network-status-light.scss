@@ -1,47 +1,67 @@
+// Vital-signs light: a beating dot with an expanding ripple. Faster rhythm when
+// critical, flat (no beat) when the status is unknown.
 .status-light {
+  --light-tone: var(--color-status-neutral);
+  --light-fill: var(--color-fill-neutral);
+  --light-rate: var(--motion-heartbeat);
+
   display: inline-flex;
   align-items: center;
-  gap: 0.5rem;
-  font-weight: 600;
-  color: var(--color-text-primary);
+  gap: var(--space-3);
+  padding: var(--space-2) var(--space-4) var(--space-2) var(--space-3);
+  border: var(--border-width-ink) solid var(--color-card-border);
+  border-radius: var(--radius-pill);
+  background: var(--color-bg-surface);
+  box-shadow: calc(var(--shadow-offset) / 2) calc(var(--shadow-offset) / 2) 0 var(--color-shadow);
+}
+
+.status-light[data-status='good'] { --light-tone: var(--color-status-success); --light-fill: var(--color-fill-healthy); }
+.status-light[data-status='warning'] { --light-tone: var(--color-status-warning); --light-fill: var(--color-fill-warning); }
+.status-light[data-status='critical'] {
+  --light-tone: var(--color-status-danger);
+  --light-fill: var(--color-fill-critical);
+  --light-rate: calc(var(--motion-heartbeat) * 0.6);
 }
 
 .dot {
-  width: 0.75rem;
-  height: 0.75rem;
-  border-radius: 9999px;
-  background: var(--color-status-neutral);
-  color: var(--color-status-neutral);
-  transition: background-color var(--motion-duration-base) var(--motion-easing-standard);
-}
+  position: relative;
+  width: 0.9rem;
+  height: 0.9rem;
+  flex-shrink: 0;
+  border: var(--border-width-ink) solid var(--color-ink);
+  border-radius: 50%;
+  background: var(--light-fill);
 
-// El resplandor usa currentColor para heredar el color del estado sin
-// quemar ningún valor: "color" se fija por estado y el box-shadow lo copia.
-.status-light[data-status='good'] .dot {
-  background: var(--color-status-success);
-  color: var(--color-status-success);
-}
-
-.status-light[data-status='warning'] .dot,
-.status-light[data-status='critical'] .dot {
-  animation: pulse-glow var(--motion-duration-slow) var(--motion-easing-standard) infinite alternate;
-}
-
-.status-light[data-status='warning'] .dot {
-  background: var(--color-status-warning);
-  color: var(--color-status-warning);
-}
-
-.status-light[data-status='critical'] .dot {
-  background: var(--color-status-danger);
-  color: var(--color-status-danger);
-}
-
-@keyframes pulse-glow {
-  from {
-    box-shadow: 0 0 0 0 currentColor;
+  &::after {
+    content: '';
+    position: absolute;
+    inset: calc(var(--border-width-ink) * -1);
+    border-radius: 50%;
+    background: var(--light-fill);
+    opacity: 0;
   }
-  to {
-    box-shadow: 0 0 6px 2px currentColor;
-  }
+}
+
+.status-light:not([data-status='unknown']) .dot {
+  animation: heartbeat var(--light-rate) var(--motion-easing-standard) infinite;
+
+  &::after { animation: status-ripple var(--light-rate) var(--motion-easing-decelerate) infinite; }
+}
+
+.label {
+  font-family: var(--font-display);
+  font-size: var(--font-size-body);
+  font-weight: var(--font-display-weight);
+  font-stretch: var(--font-display-stretch);
+  color: var(--color-text-primary);
+}
+
+:root[data-theme='dark'] .status-light {
+  border-color: var(--light-tone);
+  box-shadow: 0 0 1.25rem -0.4rem var(--light-tone);
+}
+
+@keyframes status-ripple {
+  from { transform: scale(1); opacity: 0.6; }
+  to { transform: scale(2.6); opacity: 0; }
 }

@@ -13,7 +13,6 @@ import { TranslatePipe } from '../../../core/i18n/translate.pipe';
   template: `@if (visibleStatus(); as current) {
     <span class="status-badge" [attr.data-status]="current">{{ 'common.networkStatus.' + current | translate }}</span>
   }`,
-  styleUrl: './network-status-badge.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class NetworkStatusBadge {

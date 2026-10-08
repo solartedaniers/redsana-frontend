@@ -1,3 +1,0 @@
-// El punto del badge global es verde; aquí sigue al estado real.
-.status-badge[data-status='warning']::before { background: var(--color-status-warning); }
-.status-badge[data-status='critical']::before { background: var(--color-status-danger); }
