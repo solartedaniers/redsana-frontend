@@ -1,4 +1,3 @@
-import { MIN_PASSWORD_LENGTH } from '../password-policy';
 import { PasswordStrengthEvaluator } from './password-strength.evaluator';
 
 describe('PasswordStrengthEvaluator', () => {
@@ -8,22 +7,32 @@ describe('PasswordStrengthEvaluator', () => {
     expect(evaluator.evaluate('')).toEqual({ level: null, metCount: 0, totalCriteria: 5, met: [] });
   });
 
-  it('sin la longitud mínima se queda en débil aunque tenga mayúsculas, números y símbolos', () => {
-    const short = 'Ab1!'.slice(0, MIN_PASSWORD_LENGTH - 1);
-    const result = evaluator.evaluate(short);
-    expect(result.level).toBe('weak');
-    expect(result.met).toEqual(['mixedCase', 'digit', 'symbol']);
+  it('"Omaira25*" cumple los cinco criterios y es óptima', () => {
+    const result = evaluator.evaluate('Omaira25*');
+    expect(result.metCount).toBe(5);
+    expect(result.level).toBe('strong');
+    expect(evaluator.missing('Omaira25*')).toEqual([]);
   });
 
-  it('sube de nivel a medida que cumple criterios', () => {
+  it('sin mayúscula o sin símbolo no llega a óptima', () => {
+    expect(evaluator.evaluate('omaira25*').level).not.toBe('strong');
+    expect(evaluator.missing('omaira25*')).toEqual(['uppercase']);
+    expect(evaluator.evaluate('Omaira25').level).not.toBe('strong');
+    expect(evaluator.missing('Omaira25')).toEqual(['symbol']);
+  });
+
+  it('sin la longitud mínima se queda en débil aunque tenga todo lo demás', () => {
+    expect(evaluator.evaluate('Om25*').level).toBe('weak');
+    expect(evaluator.missing('Om25*')).toEqual(['minLength']);
+  });
+
+  it('los niveles siguen los umbrales de la configuración', () => {
     expect(evaluator.evaluate('abcdefgh').level).toBe('weak');
     expect(evaluator.evaluate('abcdefg1').level).toBe('fair');
     expect(evaluator.evaluate('Abcdefg1').level).toBe('good');
-    expect(evaluator.evaluate('Abcdef1!').level).toBe('good');
-    expect(evaluator.evaluate('Abcdefgh1!abcdef').level).toBe('strong');
   });
 
-  it('cuenta letras con acento y símbolos unicode como cualquier otro carácter', () => {
-    expect(evaluator.evaluate('Ñandú2026€xyz').met).toEqual(['minLength', 'mixedCase', 'digit', 'symbol']);
+  it('letras con acento y símbolos unicode cuentan: "Ñandú2026€" es óptima', () => {
+    expect(evaluator.evaluate('Ñandú2026€').level).toBe('strong');
   });
 });
