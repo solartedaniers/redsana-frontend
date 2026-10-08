@@ -28,3 +28,4 @@
 
 // On the brand block the primary action flips to lime so it stays visible.
 .download-card ::ng-deep .submit-button { background: var(--color-fill-healthy); color: var(--color-on-fill); }
+.download-card ::ng-deep .download-notice { color: var(--color-hero-text); }
