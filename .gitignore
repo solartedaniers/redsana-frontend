@@ -11,6 +11,11 @@
 npm-debug.log
 yarn-error.log
 
+# Secretos
+.env
+.env.*
+!.env.example
+
 # Credenciales locales (ver environment.example.ts)
 src/environments/environment.ts
 
@@ -45,3 +50,10 @@ __screenshots__/
 # System files
 .DS_Store
 Thumbs.db
+*.log
+
+# Herramientas locales (Claude Code, graphify)
+.claude/
+.claudeignore
+graphify-out/
+graph.json
