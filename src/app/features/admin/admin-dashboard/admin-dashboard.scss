@@ -5,7 +5,15 @@
   gap: var(--space-5);
 }
 
-.metrics-grid__hero { grid-column: 1 / -1; }
+.metrics-grid__hero { display: grid; gap: var(--space-2); grid-column: 1 / -1; }
+
+.metrics-grid__note {
+  margin: 0;
+  font: 700 var(--font-size-caption) var(--font-mono);
+  letter-spacing: var(--font-label-tracking);
+  text-transform: uppercase;
+  color: var(--color-text-secondary);
+}
 
 @media (min-width: 64rem) {
   .metrics-grid { grid-template-columns: minmax(0, 2fr) repeat(3, minmax(0, 1fr)); }

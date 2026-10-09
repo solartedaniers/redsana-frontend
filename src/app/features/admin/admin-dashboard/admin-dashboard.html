@@ -2,15 +2,19 @@
 
 @if (metrics(); as data) {
   <div class="metrics-grid">
-    <!-- Sin hogares no hay promedio: muestro "Sin datos" y no un 0 que parezca real. -->
-    @let hasHouseholds = data.monitoredHouseholds > 0;
-    <app-metric-card
-      class="metrics-grid__hero"
-      variant="hero"
-      labelKey="admin.dashboard.averageSecurityScore"
-      [value]="hasHouseholds ? data.averageSecurityScore : ('admin.dashboard.noData' | translate)"
-      [unit]="hasHouseholds ? '%' : undefined"
-    />
+    <!-- Sin puntajes reales no hay promedio: muestro "Sin datos" y no un 0 que parezca real. -->
+    @let hasRealScores = (data.realScoredHouseholds ?? data.monitoredHouseholds) > 0;
+    <div class="metrics-grid__hero">
+      <app-metric-card
+        variant="hero"
+        labelKey="admin.dashboard.averageSecurityScore"
+        [value]="hasRealScores ? data.averageSecurityScore : ('admin.dashboard.noData' | translate)"
+        [unit]="hasRealScores ? '%' : undefined"
+      />
+      @if (data.unevaluatedHouseholds) {
+        <p class="metrics-grid__note">{{ 'admin.dashboard.unevaluatedHouseholds' | translate: { count: data.unevaluatedHouseholds } }}</p>
+      }
+    </div>
     <app-metric-card labelKey="admin.dashboard.totalUsers" [value]="data.totalUsers" />
     <app-metric-card labelKey="admin.dashboard.monitoredHouseholds" [value]="data.monitoredHouseholds" />
     <app-metric-card labelKey="admin.dashboard.activeAlerts" [value]="data.activeAlerts" />
