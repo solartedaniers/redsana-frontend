@@ -16,7 +16,7 @@ const VARIABLES = {
 // building before these are added to its environment.
 const OPTIONAL_VARIABLES = {
   githubApiUrl: { name: 'GITHUB_API_URL', fallback: 'https://api.github.com' },
-  desktopReleaseRepo: { name: 'DESKTOP_RELEASE_REPO', fallback: 'solartedaniers/RedSana' },
+  desktopReleaseRepo: { name: 'DESKTOP_RELEASE_REPO', fallback: 'solartedaniers/redsana-frontend' },
   desktopInstallerAssetSuffix: { name: 'DESKTOP_INSTALLER_ASSET_SUFFIX', fallback: '-setup.exe' },
 };
 

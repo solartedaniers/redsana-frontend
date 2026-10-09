@@ -6,6 +6,16 @@ RedSana es una aplicación de escritorio que vigila tu conexión a internet en s
 
 ---
 
+## 🔗 Repositorios del proyecto
+
+| Repositorio | Qué contiene |
+|---|---|
+| [redsana-frontend](https://github.com/solartedaniers/redsana-frontend) (este) | App Angular (web en Vercel) y capa nativa Tauri/Rust (instalador de escritorio publicado en Releases) |
+| [redsana-backend](https://github.com/solartedaniers/redsana-backend) | API FastAPI, base de datos (SQLAlchemy + Alembic) y orquestación de la IA; desplegada en Render |
+| [redsana-ai](https://github.com/solartedaniers/redsana-ai) | Paquete Python `redsana-ai`: asistente de seguridad (Groq), detección de anomalías (IsolationForest) y de cortes |
+
+---
+
 ## 📑 Tabla de contenido
 
 - [🧠 ¿Qué es RedSana?](#-qué-es-redsana)
