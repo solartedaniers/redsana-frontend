@@ -33,6 +33,11 @@
         "critical": "Critical · ≥ {{critical}} ms",
         "cut": "Outage"
       }
+    },
+    "measurements": {
+      "emptySticker": "No readings",
+      "emptyTitle": "No measurements yet",
+      "emptyDescription": "Metrics will show up here as soon as RedSana records the first measurement of this network."
     }
   },
   "theme": {
@@ -58,7 +63,7 @@
         "description": "RedSana watches over your home network's health and security: latency, connected devices and alerts, all in one place.",
         "features": {
           "monitoring": {
-            "title": "Real-time monitoring",
+            "title": "Continuous monitoring",
             "description": "Latency, jitter and packet loss at a glance."
           },
           "security": {
@@ -66,8 +71,8 @@
             "description": "Assess your router's configuration with clear recommendations."
           },
           "alerts": {
-            "title": "Predictive alerts",
-            "description": "Find out about outages and latency spikes before they affect you."
+            "title": "Instant alerts",
+            "description": "Lets you know as soon as it detects an outage or a latency spike on your network."
           }
         }
       }
@@ -91,7 +96,7 @@
         "features": {
           "monitoring": {
             "title": "Full visibility",
-            "description": "Real-time network metrics right from your dashboard."
+            "description": "Your network metrics, measured every minute, right from your dashboard."
           },
           "security": {
             "title": "Security score",
@@ -165,7 +170,7 @@
   "user": {
     "dashboard": {
       "title": "Dashboard",
-      "subtitle": "Real-time status of your home network",
+      "subtitle": "Status of your home network, measured every minute",
       "latency": "Latency",
       "jitter": "Jitter",
       "packetLoss": "Packet loss",
@@ -175,7 +180,8 @@
       "historyDetail": "Continuous measurement of the link and perimeter latency.",
       "diagnose": "Run diagnosis",
       "anomalyCalibrating": "We're learning how this network normally behaves ({{collected}}/{{required}} measurements) — anomaly detection will turn on soon. Each network is learned separately.",
-      "anomalyUnknownNetwork": "We couldn't identify the network you're connected to, so these measurements don't count toward learning any network. Check that you're connected to your router."
+      "anomalyUnknownNetwork": "We couldn't identify the network you're connected to, so these measurements don't count toward learning any network. Check that you're connected to your router.",
+      "lastMeasurement": "Last recorded measurement"
     },
     "securityAssistant": {
       "title": "Security assistant",
@@ -294,12 +300,10 @@
     },
     "alertsCenter": {
       "title": "Alerts center",
-      "subtitle": "Outage history and predictive alerts",
+      "subtitle": "History of outages and anomalies detected on your network",
       "acknowledge": "Acknowledge alert",
       "messages": {
         "briefOutage": "Brief connectivity outage detected ({{minutes}} min).",
-        "congestionForecast": "Network congestion expected during peak hours tonight.",
-        "latencySpikePredicted": "A latency spike is predicted in the next few minutes.",
         "latencyDegraded": "Your connection is getting slower than usual ({{current}} ms, usually {{typical}} ms).",
         "connectionUnstable": "Your connection is more unstable than usual ({{current}} ms of variation, usually {{typical}} ms).",
         "packetsBeingLost": "Your network is losing more data than usual ({{current}}% packet loss, usually {{typical}}%).",
@@ -314,7 +318,10 @@
         "critical": "Critical",
         "warning": "Warnings",
         "info": "Info"
-      }
+      },
+      "loadError": "The alerts could not be loaded. This does not mean there are none.",
+      "retry": "Retry",
+      "summaryUnavailable": "The summary will appear once the alerts load."
     },
     "devicesMap": {
       "title": "Connected devices",
@@ -360,6 +367,11 @@
         "clear": "Clear search",
         "count": "Showing {{shown}} of {{total}}",
         "empty": "No device matches \"{{query}}\"."
+      },
+      "presence": {
+        "label": "Which devices to show",
+        "online": "Online",
+        "all": "All"
       }
     },
     "familyMode": {
@@ -396,7 +408,8 @@
       "totalUsers": "Total users",
       "monitoredHouseholds": "Monitored households",
       "activeAlerts": "Active alerts",
-      "averageSecurityScore": "Average security score"
+      "averageSecurityScore": "Average security score",
+      "noData": "No data"
     },
     "networkSupervision": {
       "title": "Network supervision",

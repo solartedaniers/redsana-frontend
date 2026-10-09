@@ -33,6 +33,11 @@
         "critical": "Crítica · ≥ {{critical}} ms",
         "cut": "Corte"
       }
+    },
+    "measurements": {
+      "emptySticker": "Sin lecturas",
+      "emptyTitle": "Aún no hay mediciones",
+      "emptyDescription": "Las métricas aparecerán aquí en cuanto RedSana registre la primera medición de esta red."
     }
   },
   "theme": {
@@ -58,7 +63,7 @@
         "description": "RedSana vigila la salud y seguridad de tu red doméstica: latencia, dispositivos conectados y alertas, todo en un solo lugar.",
         "features": {
           "monitoring": {
-            "title": "Monitoreo en tiempo real",
+            "title": "Monitoreo continuo",
             "description": "Latencia, jitter y pérdida de paquetes de un vistazo."
           },
           "security": {
@@ -66,8 +71,8 @@
             "description": "Evalúa la configuración de tu router con recomendaciones claras."
           },
           "alerts": {
-            "title": "Alertas predictivas",
-            "description": "Entérate de cortes y picos de latencia antes de que te afecten."
+            "title": "Alertas al instante",
+            "description": "Te avisa en cuanto detecta un corte o un pico de latencia en tu red."
           }
         }
       }
@@ -91,7 +96,7 @@
         "features": {
           "monitoring": {
             "title": "Visibilidad total",
-            "description": "Métricas de tu red en tiempo real desde tu panel."
+            "description": "Métricas de tu red, medidas cada minuto, desde tu panel."
           },
           "security": {
             "title": "Puntaje de seguridad",
@@ -165,7 +170,7 @@
   "user": {
     "dashboard": {
       "title": "Panel principal",
-      "subtitle": "Estado en tiempo real de tu red doméstica",
+      "subtitle": "Estado de tu red doméstica, medido cada minuto",
       "latency": "Latencia",
       "jitter": "Jitter",
       "packetLoss": "Pérdida de paquetes",
@@ -175,7 +180,8 @@
       "historyDetail": "Medición continua del enlace y de la latencia perimetral.",
       "diagnose": "Ejecutar diagnóstico",
       "anomalyCalibrating": "Estamos aprendiendo el comportamiento normal de esta red ({{collected}}/{{required}} mediciones) — la detección de anomalías se activará pronto. Cada red se aprende por separado.",
-      "anomalyUnknownNetwork": "No pudimos identificar la red a la que estás conectado, así que estas mediciones no cuentan para el aprendizaje de ninguna red. Revisa que estés conectado a tu router."
+      "anomalyUnknownNetwork": "No pudimos identificar la red a la que estás conectado, así que estas mediciones no cuentan para el aprendizaje de ninguna red. Revisa que estés conectado a tu router.",
+      "lastMeasurement": "Última medición registrada"
     },
     "securityAssistant": {
       "title": "Asistente de seguridad",
@@ -294,12 +300,10 @@
     },
     "alertsCenter": {
       "title": "Centro de alertas",
-      "subtitle": "Historial de cortes y alertas predictivas",
+      "subtitle": "Historial de cortes y anomalías detectadas en tu red",
       "acknowledge": "Marcar alerta como vista",
       "messages": {
         "briefOutage": "Se detectó un corte breve de conectividad ({{minutes}} min).",
-        "congestionForecast": "Se espera congestión de red esta noche en horas pico.",
-        "latencySpikePredicted": "Se predice un pico de latencia en los próximos minutos.",
         "latencyDegraded": "Tu conexión se está poniendo más lenta de lo normal ({{current}} ms, lo normal es {{typical}} ms).",
         "connectionUnstable": "Tu conexión está más inestable de lo normal ({{current}} ms de variación, lo normal es {{typical}} ms).",
         "packetsBeingLost": "Tu red está perdiendo más datos de lo normal ({{current}}% de paquetes perdidos, lo normal es {{typical}}%).",
@@ -314,7 +318,10 @@
         "critical": "Críticas",
         "warning": "Avisos",
         "info": "Informativas"
-      }
+      },
+      "loadError": "No se pudieron cargar las alertas. Esto no significa que no haya ninguna.",
+      "retry": "Reintentar",
+      "summaryUnavailable": "El resumen aparecerá cuando se carguen las alertas."
     },
     "devicesMap": {
       "title": "Dispositivos conectados",
@@ -346,7 +353,7 @@
       "firstSeen": "Visto por primera vez",
       "unknownDevice": "Dispositivo desconocido",
       "online": "En línea",
-      "offline": "Desconectado",
+      "offline": "Sin conexión",
       "scanError": "No se pudo completar el escaneo. Intenta de nuevo.",
       "countUnavailable": "—",
       "scanDesktopOnly": "El escaneo de dispositivos requiere la app de escritorio de RedSana: los navegadores no permiten ver los equipos conectados a tu red.",
@@ -360,6 +367,11 @@
         "clear": "Limpiar búsqueda",
         "count": "Mostrando {{shown}} de {{total}}",
         "empty": "Ningún dispositivo coincide con «{{query}}»."
+      },
+      "presence": {
+        "label": "Qué dispositivos mostrar",
+        "online": "En línea",
+        "all": "Todos"
       }
     },
     "familyMode": {
@@ -396,7 +408,8 @@
       "totalUsers": "Usuarios totales",
       "monitoredHouseholds": "Hogares monitoreados",
       "activeAlerts": "Alertas activas",
-      "averageSecurityScore": "Puntaje de seguridad promedio"
+      "averageSecurityScore": "Puntaje de seguridad promedio",
+      "noData": "Sin datos"
     },
     "networkSupervision": {
       "title": "Supervisión de red",
