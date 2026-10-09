@@ -10,6 +10,9 @@ interface BackendPlatformMetrics {
   monitored_households: number;
   active_alerts: number;
   average_security_score: number;
+  // Opcionales: un backend anterior no los envía.
+  real_scored_households?: number;
+  unevaluated_households?: number;
 }
 
 @Injectable()
@@ -24,6 +27,8 @@ export class AdminMetricsHttpRepository extends AdminMetricsRepository {
         monitoredHouseholds: metrics.monitored_households,
         activeAlerts: metrics.active_alerts,
         averageSecurityScore: metrics.average_security_score,
+        realScoredHouseholds: metrics.real_scored_households ?? null,
+        unevaluatedHouseholds: metrics.unevaluated_households ?? null,
       }))
     );
   }
