@@ -65,7 +65,7 @@
   // safe: si la tarjeta no cabe, se alinea arriba en vez de recortarse.
   align-items: safe center;
   justify-content: center;
-  padding: var(--space-6) var(--space-4) var(--space-5);
+  padding: var(--auth-gutter-top) var(--space-4) var(--auth-gutter-bottom);
   overflow-y: auto;
 }
 
