@@ -1,8 +1,7 @@
 import { animate, group, query, style, transition, trigger } from '@angular/animations';
 import { MOTION_DURATION, MOTION_EASING } from './motion.constants';
 
-// Crossfade discreto entre vistas enrutadas. Se aplica al contenedor que
-// envuelve el <router-outlet> en los layouts, no en cada página individual.
+// Fundido entre vistas; va en el contenedor del <router-outlet> de cada layout, no en cada página.
 export const routeTransitionAnimation = trigger('routeTransition', [
   transition('* <=> *', [
     style({ position: 'relative' }),

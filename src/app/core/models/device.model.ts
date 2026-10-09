@@ -1,5 +1,5 @@
 export type DeviceTrust = 'trusted' | 'unknown' | 'blocked';
-/** Papel en la red según el último escaneo: el router es la red misma y "this_device" es el equipo que escanea. */
+/** Papel en la red según el último escaneo: el router es la red misma y this_device es quien escanea. */
 export type DeviceNetworkRole = 'this_device' | 'gateway' | 'other';
 
 export interface NetworkDevice {
@@ -15,7 +15,7 @@ export interface NetworkDevice {
   networkRole: DeviceNetworkRole | null;
 }
 
-/** Resultado crudo de un escaneo real de la LAN (Tauri/ARP), antes de sincronizar con el backend. */
+/** Resultado crudo de un escaneo real de la LAN, antes de sincronizarlo con el backend. */
 export interface DiscoveredDevice {
   ip: string;
   mac: string;

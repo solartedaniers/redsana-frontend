@@ -8,7 +8,7 @@ describe('inferDeviceKind', () => {
   });
 
   it('reconoce computadores por fabricante de laptops o de su tarjeta WiFi', () => {
-    expect(inferDeviceKind('08-97-98-f4-2a-d3')).toBe('computer'); // Compal (laptops)
+    expect(inferDeviceKind('08-97-98-f4-2a-d3')).toBe('computer'); // Compal (portátiles)
     expect(inferDeviceKind('8c-c6-81-00-00-01')).toBe('computer'); // Intel
     expect(inferDeviceKind('50-bb-b5-00-06-8a')).toBe('computer'); // AzureWave
   });

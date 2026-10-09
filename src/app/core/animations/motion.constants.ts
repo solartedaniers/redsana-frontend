@@ -1,6 +1,4 @@
-// Espejo en TypeScript de src/styles/_motion.scss para usar los mismos
-// tiempos/curvas dentro de metadatos de @angular/animations (trigger/transition).
-// Mantener los valores sincronizados manualmente entre ambos archivos.
+// Espejo de src/styles/_motion.scss para @angular/animations; si cambias un valor, cámbialo en los dos.
 export const MOTION_DURATION = {
   fast: '120ms',
   base: '200ms',

@@ -6,11 +6,7 @@ export interface TemplateSegment {
 
 const PLACEHOLDER = /\{\{(\w+)\}\}/g;
 
-/**
- * Parte una plantilla i18n ("Escribe {{primary}} como DNS primario...") en
- * trozos de texto y valores, para que la vista resalte los valores sin
- * cambiar el texto traducido. Un placeholder sin valor queda como texto.
- */
+/** Parte una plantilla i18n en texto y valores para resaltar los valores sin tocar la traducción. */
 export function splitTemplate(template: string, params: Record<string, string>): TemplateSegment[] {
   const segments: TemplateSegment[] = [];
   let cursor = 0;

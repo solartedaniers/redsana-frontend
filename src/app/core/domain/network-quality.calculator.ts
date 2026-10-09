@@ -1,8 +1,6 @@
 import { NetworkQualityMeasurement } from '../models/network.model';
 
-// Misma fórmula que aggregate_samples en src-tauri/src/ping.rs: el modelo de
-// anomalías del backend mezcla mediciones web y nativas del mismo usuario, así
-// que ambas fuentes deben calcular jitter y pérdida exactamente igual.
+// Misma fórmula que aggregate_samples de ping.rs: el modelo de anomalías mezcla mediciones web y nativas.
 export function aggregateLatencySamples(latenciesMs: number[], expectedSamples: number): NetworkQualityMeasurement {
   const received = latenciesMs.length;
   const packetLossPercent = expectedSamples === 0 ? 0 : (100 * (expectedSamples - received)) / expectedSamples;

@@ -1,6 +1,4 @@
-// Documentación ejecutable del orden del Event Loop en el que se apoya la app:
-// las continuaciones de datos (Promise/async-await) son microtasks y los
-// sondeos periódicos (setTimeout/interval de RxJS) son tasks.
+// Documento ejecutable del orden del Event Loop: los datos async son microtasks y los sondeos de RxJS son tasks.
 describe('Event Loop: microtasks antes que tasks', () => {
   it('vacía toda la cola de microtasks antes de ejecutar la siguiente task', async () => {
     const order: string[] = [];
@@ -31,8 +29,7 @@ describe('Event Loop: microtasks antes que tasks', () => {
 
     await new Promise((resolve) => setTimeout(resolve, 0));
 
-    // Por eso una cadena recursiva de microtasks congelaría la UI: la task
-    // (y el pintado) no llega nunca mientras la cola de microtasks no se vacíe.
+    // Por eso una cadena infinita de microtasks congelaría la UI: la task y el pintado nunca llegarían.
     expect(order).toEqual(['microtask 1', 'microtask 2 (encadenada)', 'task']);
   });
 });

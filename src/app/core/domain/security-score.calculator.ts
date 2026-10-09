@@ -2,8 +2,7 @@ import { WifiEncryptionStatus } from '../models/security.model';
 
 export type SecurityScoreBand = 'good' | 'warning' | 'critical';
 
-// Mismos umbrales para cualquier lugar que pinte el puntaje de seguridad
-// (asistente, supervisión de admin) - una sola fuente de verdad.
+// Umbrales únicos para todo lugar que pinte el puntaje de seguridad.
 export function getSecurityScoreBand(score: number): SecurityScoreBand {
   if (score >= 80) {
     return 'good';
@@ -14,12 +13,10 @@ export function getSecurityScoreBand(score: number): SecurityScoreBand {
   return 'critical';
 }
 
-// Mismo criterio que app/domain/security_assessment.py (backend): sin código
-// compartido entre frontend/backend, se duplica el umbral a propósito.
+// Copio a propósito el criterio de app/domain/security_assessment.py porque no hay código compartido.
 const STRONG_WIFI_ENCRYPTION_PREFIXES = ['WPA3', 'WPA2'];
 
-/** Solo para mostrar el dato en el cuestionario; el score real (que también
- * pondera esto) se calcula en el backend a partir de wifiEncryptionRaw. */
+/** Solo para mostrarlo en el cuestionario; el puntaje real lo calcula el backend. */
 export function evaluateWifiEncryption(raw: string | null): WifiEncryptionStatus {
   if (!raw) {
     return 'unknown';
@@ -28,8 +25,7 @@ export function evaluateWifiEncryption(raw: string | null): WifiEncryptionStatus
   return STRONG_WIFI_ENCRYPTION_PREFIXES.some((prefix) => upper.startsWith(prefix)) ? 'secure' : 'weak';
 }
 
-// Intentional mirror of QUESTIONNAIRE_WEIGHT_PERCENT / TECHNICAL_WEIGHT_PERCENT
-// in backend/app/services/network_security_score_service.py.
+// Copia a propósito de los pesos de backend/app/services/network_security_score_service.py.
 export const SECURITY_SCORE_WEIGHTS = {
   questionnaire: 30,
   technical: 70,
@@ -37,7 +33,7 @@ export const SECURITY_SCORE_WEIGHTS = {
 
 export type RecommendationUrgency = 'high' | 'medium' | 'low';
 
-// Backend priorities go from 1 (most urgent) to 5; this only groups them for display.
+// El backend usa prioridades de 1 (más urgente) a 5; aquí solo las agrupo para mostrarlas.
 const URGENCY_MAX_PRIORITY: Record<Exclude<RecommendationUrgency, 'low'>, number> = { high: 2, medium: 3 };
 
 export function getRecommendationUrgency(priority: number): RecommendationUrgency {

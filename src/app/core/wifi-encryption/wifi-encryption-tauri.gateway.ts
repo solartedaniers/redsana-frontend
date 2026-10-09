@@ -10,8 +10,7 @@ export class WifiEncryptionTauriGateway extends WifiEncryptionGateway {
     try {
       return await invoke<string>('get_wifi_encryption');
     } catch {
-      // Sin WiFi, permisos insuficientes, etc.: se trata como "no detectado",
-      // no como error fatal del cuestionario.
+      // Sin WiFi o sin permisos lo trato como "no detectado", no como un error fatal del cuestionario.
       return null;
     }
   }

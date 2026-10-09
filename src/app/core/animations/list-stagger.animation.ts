@@ -1,8 +1,7 @@
 import { animate, query, stagger, style, transition, trigger } from '@angular/animations';
 import { MOTION_DURATION, MOTION_EASING } from './motion.constants';
 
-// Aparición escalonada de items nuevos en listas (centro de alertas, tablas).
-// Discreta a propósito: solo opacidad + una traslación mínima.
+// Entrada escalonada y discreta: solo opacidad y un desplazamiento mínimo.
 export const listStaggerAnimation = trigger('listStagger', [
   transition(':increment', [
     query(':enter', [

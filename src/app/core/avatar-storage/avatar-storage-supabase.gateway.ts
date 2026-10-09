@@ -3,14 +3,13 @@ import { Observable, from, switchMap, throwError } from 'rxjs';
 import { supabaseClient } from '../auth/supabase-client';
 import { AvatarStorageGateway } from './avatar-storage.gateway';
 
-/** Bucket público ya creado en Supabase Storage para las fotos de perfil. */
+/** Bucket público de Supabase Storage para las fotos de perfil. */
 const AVATARS_BUCKET = 'avatars';
 
 @Injectable()
 export class SupabaseAvatarStorageGateway extends AvatarStorageGateway {
   uploadAvatar(userId: string, file: File): Observable<string> {
-    // Un único objeto por usuario (no "{userId}/{timestamp}"): sube con upsert
-    // para no acumular fotos viejas huérfanas en el bucket en cada cambio.
+    // Un objeto por usuario con upsert, para no ir acumulando fotos viejas en el bucket.
     const extension = file.name.split('.').pop() ?? 'jpg';
     const path = `${userId}/avatar.${extension}`;
 
@@ -19,14 +18,12 @@ export class SupabaseAvatarStorageGateway extends AvatarStorageGateway {
     ).pipe(
       switchMap(({ error }) => {
         if (error) {
-          // La UI solo muestra el mensaje genérico; la causa real (p. ej. una
-          // política RLS de Storage) queda en consola para poder diagnosticarla.
+          // En pantalla solo va el mensaje genérico; la causa real (p. ej. una política RLS) la dejo en consola.
           console.error('[AvatarStorage] Supabase Storage rechazó la subida', error);
           return throwError(() => new Error('auth.errors.avatarUploadFailed'));
         }
         const { data } = supabaseClient.storage.from(AVATARS_BUCKET).getPublicUrl(path);
-        // Cache-buster: la ruta del objeto es siempre la misma (upsert), así que
-        // sin esto el navegador seguiría mostrando la imagen anterior cacheada.
+        // La ruta es siempre la misma por el upsert: sin este parámetro el navegador mostraría la foto vieja.
         return from([`${data.publicUrl}?t=${Date.now()}`]);
       })
     );

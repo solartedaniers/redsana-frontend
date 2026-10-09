@@ -2,12 +2,10 @@ import { COMPUTER_OUIS, PHONE_OUIS } from './oui-device-kinds.generated';
 
 export type DeviceKind = 'phone' | 'computer' | 'unknown';
 
-// Bit "localmente administrada" del primer octeto: la MAC es aleatoria/privada
-// (lo que hacen por defecto iOS, Android y Windows), así que su prefijo no
-// identifica a ningún fabricante.
+// Con el bit de "administrada localmente" la MAC es aleatoria (iOS, Android, Windows) y su prefijo no dice el fabricante.
 const LOCALLY_ADMINISTERED_BIT = 0x02;
 
-/** Normaliza a 6 hex chars mayúsculas sin separadores (soporta ':' y '-'). */
+/** Normaliza a 6 caracteres hex en mayúsculas, sin ':' ni '-'. */
 function ouiPrefix(macAddress: string): string {
   return macAddress.replace(/[:-]/g, '').toUpperCase().slice(0, 6);
 }
@@ -16,9 +14,7 @@ function isRandomizedMac(prefix: string): boolean {
   return (parseInt(prefix.slice(0, 2), 16) & LOCALLY_ADMINISTERED_BIT) !== 0;
 }
 
-// Infiere el tipo de dispositivo por el fabricante (OUI) de su MAC, según el
-// registro de la IEEE (ver scripts/generate-oui-table.mjs). Nunca adivina: MAC
-// aleatoria, fabricante que hace de todo o desconocido -> 'unknown'.
+// Deduzco el tipo por el fabricante (OUI) de la MAC; si hay duda devuelvo 'unknown' en vez de adivinar.
 export function inferDeviceKind(macAddress: string): DeviceKind {
   const prefix = ouiPrefix(macAddress);
   if (isRandomizedMac(prefix)) {

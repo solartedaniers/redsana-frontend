@@ -1,13 +1,8 @@
-/**
- * Fuente del cifrado WiFi real detectado por el SO. Hoy la resuelve el comando
- * Tauri get_wifi_encryption; separado en su propia abstracción por el mismo
- * motivo que NetworkMeasurementGateway (habla con el sistema operativo, no con
- * la API del backend).
- */
+/** Cifrado WiFi real que detecta el sistema operativo; va aparte porque no habla con la API. */
 export abstract class WifiEncryptionGateway {
-  /** false cuando el entorno (p. ej. navegador) no expone el cifrado; distingue "no se puede" de "falló la detección". */
+  /** false donde no se expone el cifrado (navegador); distingue "no se puede" de "falló la detección". */
   abstract readonly isAvailable: boolean;
 
-  /** null cuando la detección falla (sin WiFi, fuera de Tauri, netsh sin el campo esperado). */
+  /** null cuando la detección falla (sin WiFi, fuera de Tauri o netsh sin el campo esperado). */
   abstract detect(): Promise<string | null>;
 }

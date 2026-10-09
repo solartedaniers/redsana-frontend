@@ -5,11 +5,8 @@ import { SwUpdate } from '@angular/service-worker';
 import { EMPTY, filter, map } from 'rxjs';
 
 /**
- * El Service Worker sirve la versión cacheada y baja la nueva en segundo plano:
- * sin esto, tras un deploy el usuario seguía con la versión vieja hasta volver
- * a abrir la app. Aquí solo se avisa; recargar lo decide el usuario para no
- * perder un formulario o un chat a medio escribir. En escritorio (SW
- * desactivado) isEnabled es false y nunca hay aviso.
+ * Solo aviso que hay versión nueva; recargar lo decide el usuario para no perder
+ * un formulario o un chat a medio escribir. En escritorio el SW está apagado.
  */
 @Injectable({ providedIn: 'root' })
 export class AppUpdateService {

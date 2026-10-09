@@ -3,8 +3,7 @@ import { I18nService } from './i18n.service';
 
 @Pipe({
   name: 'translate',
-  // Impuro a propósito: debe re-evaluar cuando I18nService cambia de idioma,
-  // un cambio que no altera la referencia del argumento `key` en la plantilla.
+  // Impuro a propósito: tiene que reevaluarse cuando cambia el idioma aunque la clave sea la misma.
   pure: false,
 })
 export class TranslatePipe implements PipeTransform {

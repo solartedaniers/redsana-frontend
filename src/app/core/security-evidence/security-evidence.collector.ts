@@ -3,10 +3,7 @@ import { TechnicalEvidence } from '../models/security.model';
 import { RouterPortScanGateway } from '../router-port-scan/router-port-scan.gateway';
 import { WifiEncryptionGateway } from '../wifi-encryption/wifi-encryption.gateway';
 
-/**
- * Reúne la evidencia técnica de la red que el backend puntúa (70% del puntaje).
- * Solo recolecta: qué vale cada dato lo deciden los analizadores del backend.
- */
+/** Junta la evidencia técnica que puntúa el backend (70 %); solo recolecta, no califica. */
 @Injectable({ providedIn: 'root' })
 export class SecurityEvidenceCollector {
   private readonly wifiGateway = inject(WifiEncryptionGateway);

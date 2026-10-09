@@ -12,8 +12,7 @@ export class ThemeService {
   readonly mode = signal<ThemeMode>(this.readInitialMode());
 
   constructor() {
-    // El effect aplica el atributo cada vez que `mode` cambia, incluyendo
-    // el valor inicial leído de localStorage/preferencia del sistema.
+    // El effect aplica el atributo en cada cambio de modo, incluido el valor inicial.
     effect(() => {
       this.document.documentElement.setAttribute('data-theme', this.mode());
       if (this.isBrowser) {
@@ -31,7 +30,7 @@ export class ThemeService {
   }
 
   private readInitialMode(): ThemeMode {
-    // Prerender (SSG): sin preferencia del usuario disponible, se usa el default de marca.
+    // Al prerenderizar no hay preferencia del usuario, así que uso el tema de marca.
     if (!this.isBrowser) {
       return 'dark';
     }
@@ -39,8 +38,7 @@ export class ThemeService {
     if (stored === 'light' || stored === 'dark') {
       return stored;
     }
-    // Sin preferencia guardada: respeta el modo oscuro del sistema operativo,
-    // pero el oscuro es el default de marca para RedSana (panel tipo NOC).
+    // Sin preferencia guardada sigo al sistema operativo; si no dice nada, oscuro como marca.
     const prefersLight = window.matchMedia('(prefers-color-scheme: light)').matches;
     return prefersLight ? 'light' : 'dark';
   }

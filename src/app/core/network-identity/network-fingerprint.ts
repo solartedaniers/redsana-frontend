@@ -1,4 +1,4 @@
-/** SHA-256 en hex de la MAC normalizada (minúsculas, separador "-"), con Web Crypto. */
+/** SHA-256 en hex de la MAC normalizada, calculado con Web Crypto. */
 export async function fingerprintFromMac(mac: string): Promise<string> {
   const normalized = mac.trim().toLowerCase().replaceAll(':', '-');
   const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(normalized));

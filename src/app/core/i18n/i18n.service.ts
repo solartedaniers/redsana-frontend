@@ -9,12 +9,7 @@ const STORAGE_KEY = 'redsana-lang';
 const SUPPORTED_LANGUAGES: readonly AppLanguage[] = ['en', 'es'];
 const DEFAULT_LANGUAGE: AppLanguage = 'es';
 
-/**
- * Servicio de traducción propio y minimalista: carga en.json/es.json bajo
- * demanda. No se agregó ngx-translate ni ninguna librería porque el único
- * requisito (diccionario plano por idioma + interpolación simple) cabe en
- * unas pocas líneas con HttpClient + signals.
- */
+/** Traductor propio: diccionario plano por idioma e interpolación simple, sin librerías extra. */
 @Injectable({ providedIn: 'root' })
 export class I18nService {
   private readonly http = inject(HttpClient);
@@ -61,8 +56,7 @@ export class I18nService {
   }
 
   private readInitialLanguage(): AppLanguage {
-    // Al prerenderizar la landing (SSG) no hay localStorage ni navigator: se
-    // genera en el idioma por defecto y el navegador aplica la preferencia al arrancar.
+    // Al prerenderizar no hay localStorage ni navigator: genero el idioma por defecto y el navegador ajusta al arrancar.
     if (!this.isBrowser) {
       return DEFAULT_LANGUAGE;
     }

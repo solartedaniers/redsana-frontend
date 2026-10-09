@@ -353,6 +353,13 @@
       "role": {
         "gateway": "Router (puerta de enlace)",
         "this_device": "Este equipo"
+      },
+      "search": {
+        "label": "Buscar dispositivo por IP, nombre o MAC",
+        "placeholder": "Buscar por IP, nombre o MAC (ej. 192.168.1.15)",
+        "clear": "Limpiar búsqueda",
+        "count": "Mostrando {{shown}} de {{total}}",
+        "empty": "Ningún dispositivo coincide con «{{query}}»."
       }
     },
     "familyMode": {
