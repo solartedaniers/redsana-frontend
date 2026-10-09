@@ -6,7 +6,20 @@
   <section class="alerts-list surface-panel" [@listStagger]="alerts().length">
     <div class="surface-panel__header"><h2 class="surface-panel__title">{{ 'user.alertsCenter.timelineTitle' | translate }}</h2></div>
     @if (alerts().length === 0) {
-      <p class="alerts-empty">{{ 'user.alertsCenter.empty' | translate }}</p>
+      @switch (loadState()) {
+        @case ('loading') {
+          <div class="skeleton alerts-skeleton" aria-busy="true"><span class="visually-hidden">{{ 'common.loading' | translate }}</span></div>
+        }
+        @case ('error') {
+          <div class="alerts-error" role="alert">
+            <p>{{ 'user.alertsCenter.loadError' | translate }}</p>
+            <button type="button" class="subtle-button" (click)="loadAlerts()">{{ 'user.alertsCenter.retry' | translate }}</button>
+          </div>
+        }
+        @default {
+          <p class="alerts-empty">{{ 'user.alertsCenter.empty' | translate }}</p>
+        }
+      }
     } @else {
       <ol class="timeline">
         @for (alert of alerts(); track alert.id) {
@@ -19,6 +32,10 @@
   </section>
   <aside class="summary-panel surface-panel">
     <div class="surface-panel__header"><h2 class="surface-panel__title">{{ 'user.alertsCenter.summaryTitle' | translate }}</h2></div>
-    <app-alerts-summary [alerts]="alerts()" />
+    @if (loadState() === 'ready') {
+      <app-alerts-summary [alerts]="alerts()" />
+    } @else {
+      <p class="alerts-empty">{{ (loadState() === 'error' ? 'user.alertsCenter.summaryUnavailable' : 'common.loading') | translate }}</p>
+    }
   </aside>
 </div>

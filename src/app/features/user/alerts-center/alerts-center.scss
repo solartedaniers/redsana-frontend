@@ -50,3 +50,14 @@
 .summary-panel { position: sticky; top: var(--space-5); }
 
 @media (max-width: 64rem) { .summary-panel { position: static; order: -1; } }
+
+.alerts-skeleton { margin: var(--space-5); }
+
+.alerts-error {
+  display: grid;
+  justify-items: start;
+  gap: var(--space-3);
+  padding: var(--space-5);
+
+  p { margin: 0; font-weight: 600; color: var(--color-status-danger); }
+}
