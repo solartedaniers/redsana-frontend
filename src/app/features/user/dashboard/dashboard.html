@@ -20,6 +20,7 @@
 }
 
 @if (snapshot(); as data) {
+  @if (hasData()) {
   <div class="vitals">
     <app-metric-card class="vitals__latency" variant="hero" labelKey="user.dashboard.latency" [value]="data.latencyMs" unit="ms" />
     <app-metric-card class="vitals__jitter" labelKey="user.dashboard.jitter" [value]="data.jitterMs" unit="ms" />
@@ -29,7 +30,7 @@
       <p class="metric-tile__value">
         <time [attr.datetime]="data.updatedAt">{{ data.updatedAt | date: 'shortTime' }}</time>
       </p>
-      <p class="metric-tile__detail">{{ 'user.dashboard.live' | translate }}</p>
+      <p class="metric-tile__detail" [class.is-stale]="!isLive()">{{ (isLive() ? 'user.dashboard.live' : 'user.dashboard.lastMeasurement') | translate }}</p>
     </article>
   </div>
 
@@ -40,6 +41,9 @@
     </div>
     <app-history-chart [samples]="history()" />
   </section>
+  } @else {
+    <app-measurement-empty-state />
+  }
 } @else {
   <div class="vitals" aria-busy="true">
     <span class="visually-hidden">{{ 'common.loading' | translate }}</span>

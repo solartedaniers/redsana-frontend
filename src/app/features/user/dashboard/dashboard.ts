@@ -3,6 +3,9 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { NetworkMetricsRepository } from '../../../core/repositories/network-metrics.repository';
 import { AnomalyDetectionStatus, NetworkMetricSample, NetworkMetricSnapshot, NetworkStatus } from '../../../core/models/network.model';
 import { LatencySeverity } from '../../../core/domain/latency-severity';
+import { hasMeasurement, isLiveMeasurement } from '../../../core/domain/measurement-freshness';
+import { injectMeasurementClock } from '../../../core/network-measurement/measurement-clock';
+import { MeasurementEmptyState } from '../../../shared/components/measurement-empty-state/measurement-empty-state';
 import { PageHeader } from '../../../shared/components/page-header/page-header';
 import { NetworkStatusLight } from '../../../shared/components/network-status-light/network-status-light';
 import { NetworkStatusBadge } from '../../../shared/components/network-status-badge/network-status-badge';
@@ -22,7 +25,7 @@ const STATUS_AURA: Record<NetworkStatus, LatencySeverity | null> = {
 
 @Component({
   selector: 'app-dashboard',
-  imports: [PageHeader, NetworkStatusLight, NetworkStatusBadge, MetricCard, HistoryChart, TranslatePipe, DatePipe, RouterLink],
+  imports: [PageHeader, NetworkStatusLight, NetworkStatusBadge, MetricCard, HistoryChart, MeasurementEmptyState, TranslatePipe, DatePipe, RouterLink],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -36,6 +39,10 @@ export class Dashboard {
   protected readonly history = signal<NetworkMetricSample[]>([]);
   protected readonly anomalyStatus = signal<AnomalyDetectionStatus | null>(null);
   /** Tinte del aura ambiental; ninguno hasta que haya una medición real. */
+  private readonly clock = injectMeasurementClock();
+  /** false mientras el backend no tenga ninguna medición real (responde "unknown" con ceros). */
+  protected readonly hasData = computed(() => hasMeasurement(this.snapshot()));
+  protected readonly isLive = computed(() => isLiveMeasurement(this.snapshot(), Math.max(this.clock(), Date.now())));
   protected readonly aura = computed(() => STATUS_AURA[this.snapshot()?.status ?? 'unknown']);
 
   constructor() {
