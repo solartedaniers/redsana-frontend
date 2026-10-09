@@ -196,67 +196,45 @@ Las migraciones se gestionan con **Alembic**.
 
 ## 🚀 Instalación y ejecución
 
+Este repositorio contiene solo el **frontend**: la app Angular (web) y su capa nativa en Rust (Tauri, escritorio). Para usarla de punta a punta necesitas también la API:
+
+- [redsana-backend](https://github.com/solartedaniers/redsana-backend): API FastAPI y base de datos. Su README explica cómo levantarla en local.
+- [redsana-ai](https://github.com/solartedaniers/redsana-ai): paquete de IA que el backend instala solo; no hace falta clonarlo para correr la app.
+
 ### Requisitos previos
 
-- 🐍 Python 3.11+
 - 🟢 Node.js 18+
 - 🦀 Rust + Cargo (para compilar la capa nativa de Tauri) — instalable desde [rustup.rs](https://rustup.rs)
 - 🪟 En Windows: Microsoft C++ Build Tools (necesarios para compilar Rust)
-- ☁️ Una cuenta y proyecto de [Supabase](https://supabase.com) (gratis)
-- 🔑 Una API key gratuita de [Groq](https://console.groq.com) (para el asistente conversacional)
+- ☁️ Un proyecto de [Supabase](https://supabase.com) (el mismo que usa el backend)
+- 🐍 La API de [redsana-backend](https://github.com/solartedaniers/redsana-backend) corriendo en local o desplegada
 
-### 1️⃣ Backend
+### 1️⃣ Configuración
 
 ```bash
-cd backend
+npm ci
 
-# Crear y activar entorno virtual
-python -m venv venv
-venv\Scripts\activate        # Windows
-source venv/bin/activate     # macOS/Linux
-
-# Instalar dependencias
-pip install -r requirements.txt
-
-# Configurar variables de entorno
+# Variables de entorno: URL y anon key de Supabase, URL de la API, URL web y datos del release de escritorio
 cp .env.example .env
-# Editar .env con:
-#   DATABASE_URL, SUPABASE_URL, SUPABASE_JWT_AUDIENCE,
-#   SUPABASE_SERVICE_ROLE_KEY, GROQ_API_KEY, CORS_ORIGINS, etc.
-
-# Aplicar migraciones a la base de datos
-alembic upgrade head
-
-# Levantar el servidor
-uvicorn app.main:app --reload
+# Editar .env (cada variable está documentada en .env.example)
 ```
 
-El backend queda disponible en `http://localhost:8000`.
+`scripts/generate-environment.mjs` convierte esas variables en `src/environments/environment.ts` (ignorado por git). Se ejecuta solo antes de `npm run build` y de `npm test`; en Vercel las variables se definen en el panel del proyecto.
 
-### 2️⃣ Frontend (app de escritorio)
+### 2️⃣ Desarrollo
 
 ```bash
-cd frontend
-
-# Instalar dependencias
-npm install
-
-# Configurar credenciales de Supabase
-cp src/environments/environment.example.ts src/environments/environment.ts
-# Editar con supabaseUrl, supabaseAnonKey y apiBaseUrl (http://localhost:8000)
-
-# Modo desarrollo (abre la app de escritorio con recarga en caliente)
-npx tauri dev
+npm start           # solo web, en http://localhost:4200
+npx tauri dev       # app de escritorio con recarga en caliente
 ```
 
 ### 3️⃣ Compilar la app para distribución
 
 ```bash
-cd frontend
 npx tauri build
 ```
 
-Esto genera el instalador nativo (`.exe`/`.msi` en Windows, `.dmg` en macOS, `.deb`/`.AppImage` en Linux) dentro de `frontend/src-tauri/target/release/bundle/`.
+Esto genera el instalador nativo (`.exe`/`.msi` en Windows, `.dmg` en macOS, `.deb`/`.AppImage` en Linux) dentro de `src-tauri/target/release/bundle/`. El instalador de Windows (`*-setup.exe`) se publica en los Releases de este repositorio: el botón de descarga de la web lo busca en el repo indicado por `DESKTOP_RELEASE_REPO`.
 
 ---
 
@@ -264,45 +242,34 @@ Esto genera el instalador nativo (`.exe`/`.msi` en Windows, `.dmg` en macOS, `.d
 
 | Componente | Comando | Desde |
 |---|---|---|
-| 🐍 Backend (Python) | `pytest` | `backend/` (con el entorno virtual activado) |
-| 🅰️ Frontend (Angular/Vitest) | `ng test` | `frontend/` |
-| 🦀 Capa nativa (Rust) | `cargo test` | `frontend/src-tauri/` |
+| 🅰️ Frontend (Angular/Vitest) | `npm test` | raíz del repo |
+| 🦀 Capa nativa (Rust) | `cargo test` | `src-tauri/` |
 
-Todos los dominios del backend tienen tests con repositorios en memoria (sin necesitar base de datos real) más validaciones puntuales contra la base de datos real de Supabase durante el desarrollo.
+Las pruebas del backend y de la IA viven en sus propios repositorios ([redsana-backend](https://github.com/solartedaniers/redsana-backend), [redsana-ai](https://github.com/solartedaniers/redsana-ai)).
 
 ---
 
 ## 📂 Estructura del proyecto
 
 ```
-RedSana/
-├── frontend/                  # App Angular + Tauri
-│   ├── src/
-│   │   ├── app/
-│   │   │   ├── core/           # Servicios, repositorios, modelos, autenticación
-│   │   │   ├── features/       # Pantallas (auth, usuario, admin)
-│   │   │   ├── layouts/        # Estructura visual compartida
-│   │   │   └── shared/         # Componentes reutilizables
-│   │   └── environments/
-│   └── src-tauri/               # Capa nativa en Rust
-│       └── src/
-│           ├── ping.rs          # Medición ICMP real
-│           ├── lan_scan.rs      # Escaneo ARP de dispositivos
-│           └── wifi.rs          # Detección de cifrado WiFi
-│
-├── backend/                    # API FastAPI
+redsana-frontend/
+├── src/
 │   ├── app/
-│   │   ├── core/                # Configuración, seguridad, base de datos
-│   │   ├── domain/               # Lógica de negocio pura (sin I/O)
-│   │   ├── models/               # Modelos SQLAlchemy
-│   │   ├── repositories/         # Acceso a datos (contrato + implementación)
-│   │   ├── schemas/               # Esquemas Pydantic (entrada/salida de la API)
-│   │   ├── services/               # Orquestación de lógica de negocio
-│   │   └── routers/                 # Endpoints HTTP
-│   ├── alembic/                  # Migraciones de base de datos
-│   └── tests/
-│
-└── README.md
+│   │   ├── core/           # Servicios, repositorios, modelos, autenticación
+│   │   ├── features/       # Pantallas (auth, usuario, admin)
+│   │   ├── layouts/        # Estructura visual compartida
+│   │   └── shared/         # Componentes reutilizables
+│   └── environments/       # environment.ts generado desde .env (ignorado por git)
+├── src-tauri/              # Capa nativa en Rust
+│   └── src/
+│       ├── ping.rs         # Medición ICMP real
+│       ├── lan_scan.rs     # Escaneo ARP de dispositivos
+│       ├── router_ports.rs # Puertos de riesgo del router
+│       └── wifi.rs         # Detección de cifrado WiFi
+├── public/                 # Íconos, manifest e i18n (assets/i18n/es.json, en.json)
+├── scripts/                # Generación de environment.ts y de la tabla de fabricantes
+├── .env.example
+└── vercel.json
 ```
 
 ---
