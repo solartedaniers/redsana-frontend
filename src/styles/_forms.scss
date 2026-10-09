@@ -1,5 +1,4 @@
-// Shared form language (login, register, password recovery, profile): the
-// same fields everywhere, styled as entries on a clinical chart.
+// Formularios compartidos (login, registro, recuperación y perfil): los mismos campos en todas partes.
 .form-title {
   margin: 0 0 var(--space-3);
   font-family: var(--font-display);
@@ -30,7 +29,7 @@
   font-size: var(--font-size-form-label);
   color: var(--color-text-secondary);
 
-  // Operator-console label: mono, uppercase, wide tracking.
+  // Etiqueta de consola de operador: mono, mayúsculas y letras espaciadas.
   > span:first-child {
     font-family: var(--font-mono);
     font-size: var(--font-size-form-label);
@@ -87,7 +86,7 @@
   display: flex;
   justify-content: space-between;
   justify-content: center;
-  // Clears the hard shadow of the button above.
+  // Deja libre la sombra dura del botón de arriba.
   margin-top: var(--space-3);
   font-size: var(--font-size-caption);
 
@@ -101,21 +100,16 @@
   }
 }
 
-// Layout de dos columnas para login/registro: panel informativo + panel de
-// formulario. `.auth-card` detecta esta clase vía :has() para ensancharse.
-// Espaciado vertical de las pantallas de auth: se compacta con la altura de la
-// ventana (no con el ancho) para que quepan sin scroll en laptops y en Tauri.
+// Dos columnas en login y registro; el espaciado se ajusta a la altura de la ventana para que quepan sin scroll en Tauri.
 .auth-split {
   --auth-panel-padding: clamp(1rem, 3.6vh, 1.7rem);
   --auth-stack-gap: clamp(0.45rem, 1.6vh, 0.75rem);
 
   display: grid;
-  // minmax(0, 1fr) y no 1fr: en celulares de 320 px la fila "Fortaleza de
-  // cifrado" ensanchaba la columna y el formulario se recortaba por la derecha.
+  // minmax(0, 1fr) y no 1fr: a 320 px una fila ancha empujaba la columna y recortaba el formulario.
   grid-template-columns: minmax(0, 1fr);
 
-  // Ventanas muy bajas (p. ej. la ventana por defecto de Tauri, 800x600): se
-  // juntan también los campos del formulario; en pantallas normales no cambia nada.
+  // En ventanas muy bajas (p. ej. 800x600 de Tauri) junto también los campos; en pantallas normales no cambia nada.
   @media (max-height: 40rem) {
     .auth-form {
       gap: 0.5rem;
@@ -127,14 +121,12 @@
   }
 
   @media (min-width: 48rem) {
-    // minmax(0, …): sin esto el contenido mínimo de los inputs ensanchaba la
-    // columna del formulario y se salía de la tarjeta (registro recortado).
+    // minmax(0, …): sin esto los inputs ensanchaban la columna y se salían de la tarjeta.
     grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
   }
 }
 
-// Side panel: a full-bleed brand block on the chart sheet. Huge display title
-// and numbered findings instead of three identical cards.
+// Panel lateral: bloque de marca a sangre con título enorme y hallazgos numerados.
 .side-panel {
   display: none;
   flex-direction: column;
@@ -194,7 +186,7 @@
   border-top: var(--border-width-hairline) solid var(--color-hero-rule);
 }
 
-// One numbered finding per row: "01 ─ title / description".
+// Un hallazgo numerado por fila.
 .side-panel-feature {
   display: grid;
   grid-template-columns: auto auto 1fr;
@@ -245,7 +237,7 @@
   display: grid;
   grid-template-columns: 1fr;
   gap: 1.1rem;
-  // Si una etiqueta ocupa dos líneas, los inputs siguen alineados entre sí.
+  // Si una etiqueta ocupa dos líneas, los inputs siguen alineados.
   align-items: end;
 
   @media (min-width: 28rem) {
@@ -257,8 +249,7 @@
   }
 }
 
-// Variante de `.field` con icono inicial e input transparente dentro de un
-// contenedor propio (para poder sumar un botón de mostrar/ocultar al final).
+// Campo con icono e input transparente dentro de su propio contenedor, para sumar el botón de mostrar contraseña.
 .field.has-icon {
   .input-wrap {
     display: flex;
@@ -289,7 +280,7 @@
       background: transparent;
     }
 
-    // The wrapper already shows the focus ring; the inner input must not add its own.
+    // El contenedor ya muestra el foco; el input de adentro no debe agregar otro.
     input:focus-visible {
       outline: none;
       box-shadow: none;
@@ -334,11 +325,10 @@
   .icon { width: 1rem; height: 1rem; flex-shrink: 0; color: var(--icon-tone); }
 }
 
-// "Forgot password?" sits on its own line under the password strength meter.
+// "¿Olvidaste tu contraseña?" va en su propia línea bajo el medidor.
 .forgot-link { align-self: flex-start; }
 
-// En pantallas táctiles el ojo de "mostrar contraseña" y los enlaces del
-// formulario llegan a 44 px de área tocable sin cambiar cómo se ven.
+// En pantallas táctiles el ojo y los enlaces llegan a 44 px sin cambiar cómo se ven.
 @media (pointer: coarse) {
   .password-toggle { min-width: 2.75rem; min-height: 2.75rem; }
   .form-links a, .field-hint-link { display: inline-flex; align-items: center; min-height: 2.75rem; }

@@ -1,12 +1,10 @@
-// Shared primitives of the "Clinical Chart" language. Screens only describe
-// their content; surface, outline, shadow and states live in this contract.
+// Primitivas compartidas del lenguaje "Hoja Clínica": superficie, contorno, sombra y estados viven aquí.
 
-// ---- Layout -------------------------------------------------------------
 .workspace-grid { display: grid; gap: var(--space-5); }
 .workspace-grid--two { grid-template-columns: minmax(0, 1.15fr) minmax(18rem, 0.85fr); }
 .workspace-grid--aside { grid-template-columns: minmax(15rem, 0.55fr) minmax(0, 1.45fr); }
 
-// ---- Chart panel: a sheet of paper clipped to the board -------------------
+// Panel: una hoja de papel prendida al tablero.
 .surface-panel {
   position: relative;
   border: var(--border-width-ink) solid var(--color-card-border);
@@ -42,7 +40,7 @@
   color: var(--color-text-secondary);
 }
 
-// ---- Ink buttons: press = the button falls onto its own shadow ------------
+// Botones de tinta: al pulsar, el botón cae sobre su propia sombra.
 .action-button,
 .submit-button,
 .subtle-button {
@@ -93,7 +91,7 @@
   &:hover:not(:disabled) { background: var(--color-bg-surface-alt); }
 }
 
-// Lift on hover only for real pointers; touch keeps the static press.
+// La elevación solo con puntero real; en táctil queda la pulsación fija.
 @media (hover: hover) and (pointer: fine) {
   .action-button,
   .submit-button,
@@ -102,7 +100,7 @@
   }
 }
 
-// ---- Stickers: tilted ink labels; status badges are stickers too ----------
+// Stickers: etiquetas de tinta inclinadas; los badges de estado también lo son.
 .sticker,
 .status-badge {
   display: inline-flex;
@@ -133,7 +131,7 @@
   background: currentColor;
 }
 
-// Only a real network status beats with the shared heartbeat (transform/opacity).
+// Solo un estado de red real late con el ritmo compartido.
 .status-badge[data-status]::before {
   animation: heartbeat var(--motion-heartbeat) var(--motion-easing-standard) infinite;
 }
@@ -143,7 +141,7 @@
 .sticker[data-tone='critical'], .status-badge[data-status='critical'] { background: var(--color-fill-critical); }
 .sticker[data-tone='brand'] { background: var(--color-fill-brand); color: var(--color-on-fill-brand); }
 
-// Phosphor Ward: stickers become glowing outlines instead of solid fills.
+// En el tema oscuro los stickers pasan a contornos que brillan en vez de rellenos.
 :root[data-theme='dark'] {
   .sticker,
   .status-badge {
@@ -167,7 +165,7 @@
   28% { transform: scale(1.25); opacity: 0.9; }
 }
 
-// ---- Metric readings: giant tabular numbers -------------------------------
+// Lecturas métricas: números tabulares gigantes.
 .metric-strip { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--space-5); }
 .metric-tile { padding: var(--space-4) var(--space-5); }
 
@@ -207,13 +205,13 @@
   .metric-strip { grid-template-columns: 1fr; }
 }
 
-// ---- Severity: one attribute, two tones (fill for blocks, ink for text) ---
+// Severidad: un atributo y dos tonos (relleno para bloques y tinta para texto).
 [data-severity='healthy'] { --severity-fill: var(--color-fill-healthy); --severity-ink: var(--color-status-success); }
 [data-severity='warning'] { --severity-fill: var(--color-fill-warning); --severity-ink: var(--color-status-warning); }
 [data-severity='critical'],
 [data-severity='cut'] { --severity-fill: var(--color-fill-critical); --severity-ink: var(--color-status-danger); }
 
-// ---- Skeleton: an empty chart slot swept by the monitor's scan beam -------
+// Skeleton: un hueco de la hoja barrido por el haz del monitor.
 .skeleton {
   position: relative;
   overflow: hidden;

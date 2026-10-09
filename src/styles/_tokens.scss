@@ -1,16 +1,7 @@
-// Single source of truth for RedSana's visual language: "Clinical Chart".
-// Light = printed ECG chart paper stamped with fluorescent ink.
-// Dark  = "Phosphor Ward": the same chart on an oscilloscope screen.
-//
-// No component declares its own color, font, size, radius or shadow: every
-// stylesheet consumes these custom properties. Status colors carry meaning
-// everywhere: healthy = green/lime, warning = amber, critical = red/coral.
-//
-// `@theme static` registers the LIGHT palette as the default and makes Tailwind
-// emit every variable (not only the ones used by utilities), because most of
-// them are consumed from plain SCSS. The dark palette overrides it below.
+// Única fuente del lenguaje visual "Hoja Clínica": claro es papel de ECG con tinta fluorescente y oscuro es un
+// osciloscopio. @theme static deja la paleta clara por defecto y el oscuro la sobrescribe más abajo.
 @theme static {
-  // ---- Paper & ink ------------------------------------------------------
+  // Papel y tinta
   --color-bg-app: #f3eee3;
   --color-bg-surface: #fffdf8;
   --color-bg-surface-alt: #eae3d3;
@@ -24,19 +15,18 @@
   --color-text-secondary: #4a4239;
   --color-text-inverse: #fffdf8;
 
-  // ---- Brand ink (electric violet) --------------------------------------
+  // Tinta de marca (violeta eléctrico)
   --color-accent: #5a2bff;
   --color-accent-hover: #4317d9;
   --color-focus-ring: #5a2bff;
 
-  // ---- Status: text-safe tones (AA on paper and on surface) -------------
+  // Estados: tonos para texto (AA sobre papel y superficie)
   --color-status-success: #1d7a3a;
   --color-status-warning: #9a5b00;
   --color-status-danger: #c22a12;
   --color-status-neutral: #5e574e;
 
-  // ---- Status: fluorescent fills (stickers, blocks, aura) ---------------
-  // Text on top of a fill always uses --color-on-fill.
+  // Estados: rellenos fluorescentes; el texto encima siempre usa --color-on-fill.
   --color-fill-healthy: #c4f23a;
   --color-fill-warning: #ffb21f;
   --color-fill-critical: #ff5436;
@@ -45,7 +35,7 @@
   --color-on-fill: #15110e;
   --color-on-fill-brand: #fffdf8;
 
-  // ---- Icon tones: one token per icon (>= 3:1 on paper and on the lime tab) --
+  // Tonos de icono: uno por icono (>= 3:1 sobre papel y sobre la pestaña lima)
   --color-icon-dashboard: #5a2bff;
   --color-icon-shield: #1d7a3a;
   --color-icon-bell: #b45309;
@@ -59,25 +49,25 @@
   --color-icon-mail: #1d4ed8;
   --color-icon-lock: #5a2bff;
 
-  // ---- Chart paper texture ----------------------------------------------
+  // Textura del papel
   --color-grid-minor: rgb(226 120 108 / 10%);
   --color-grid-major: rgb(226 120 108 / 20%);
   --texture-grain-opacity: 0.07;
   --grid-minor-size: 0.5rem;
   --grid-major-size: 2.5rem;
-  // ECG chart paper: minor and major squares, drawn with gradients (no image).
+  // Papel de ECG: cuadros menores y mayores hechos con gradientes, sin imagen.
   --texture-chart-grid:
     linear-gradient(var(--color-grid-major) 1px, transparent 1px) 0 0 / var(--grid-major-size) var(--grid-major-size),
     linear-gradient(90deg, var(--color-grid-major) 1px, transparent 1px) 0 0 / var(--grid-major-size) var(--grid-major-size),
     linear-gradient(var(--color-grid-minor) 1px, transparent 1px) 0 0 / var(--grid-minor-size) var(--grid-minor-size),
     linear-gradient(90deg, var(--color-grid-minor) 1px, transparent 1px) 0 0 / var(--grid-minor-size) var(--grid-minor-size);
-  // Paper grain: a tiny SVG turbulence tile, rasterized once by the browser.
+  // Grano del papel: una pequeña turbulencia SVG que el navegador rasteriza una vez.
   --texture-grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-  // Oscilloscope scanlines (dark only; transparent in light).
+  // Líneas de escaneo del osciloscopio (solo en oscuro; transparentes en claro).
   --color-scanline: transparent;
   --scanline-gap: 3px;
 
-  // ---- Legacy surface aliases (kept so every screen adopts the concept) --
+  // Alias heredados: los mantengo para que todas las pantallas adopten el concepto.
   --color-surface-glass: #fffdf8;
   --color-glass-bg: #fffdf8;
   --color-glass-border: #15110e;
@@ -85,7 +75,7 @@
   --shadow-glass: var(--shadow-hard-lg);
   --shadow-card-hover: var(--shadow-hard-lg);
 
-  // ---- Shape language ---------------------------------------------------
+  // Lenguaje de formas
   --border-width-ink: 2.5px;
   --border-width-hairline: 1px;
   --radius-sm: 0.375rem;
@@ -104,7 +94,7 @@
   --focus-ring-offset: 2px;
   --touch-target-min: 2.75rem;
 
-  // ---- Spacing scale ----------------------------------------------------
+  // Escala de espacios
   --space-1: 0.25rem;
   --space-2: 0.5rem;
   --space-3: 0.75rem;
@@ -114,9 +104,7 @@
   --space-7: 3rem;
   --space-8: 4.5rem;
 
-  // ---- Typography -------------------------------------------------------
-  // Display: Bricolage Grotesque (wght + wdth + opsz axes) for huge titles.
-  // Body: Plus Jakarta Sans. Numbers: JetBrains Mono with tabular figures.
+  // Tipografía: Bricolage Grotesque para títulos, Plus Jakarta Sans para el cuerpo y JetBrains Mono para cifras.
   --font-display: 'Bricolage Grotesque Variable', 'Plus Jakarta Sans Variable', system-ui, sans-serif;
   --font-sans: 'Plus Jakarta Sans Variable', system-ui, sans-serif;
   --font-mono: 'JetBrains Mono Variable', ui-monospace, monospace;
@@ -132,7 +120,7 @@
   --font-size-heading-sm: 1.3rem;
   --font-size-heading: clamp(1.9rem, 1.3rem + 2.4vw, 3.1rem);
   --font-size-display: clamp(2.6rem, 1.5rem + 5vw, 6rem);
-  // Side-panel titles that share the sheet with a form.
+  // Títulos del panel lateral que comparten la hoja con un formulario.
   --font-size-hero: clamp(2.2rem, 1.4rem + 2.6vw, 3.9rem);
   --font-size-metric: 2rem;
   --font-size-metric-xl: clamp(2.6rem, 1.7rem + 3.4vw, 4.75rem);
@@ -140,24 +128,20 @@
   --line-height-body: 1.55;
 }
 
-// Tokens derived with color-mix() stay outside @theme: Tailwind would inline
-// the referenced color, and they must recompute when the theme changes.
+// Los tokens con color-mix() van fuera de @theme: Tailwind fijaría el color y no se recalcularían con el tema.
 :root {
   --color-accent-muted: color-mix(in srgb, var(--color-accent) 14%, transparent);
   --color-glow-accent: color-mix(in srgb, var(--color-accent) 30%, transparent);
 
-  // Brand block (side panels, hero): violet ink slab with paper text.
+  // Bloque de marca (paneles laterales y hero): losa violeta con texto de papel.
   --color-hero-bg: var(--color-fill-brand);
   --color-hero-text: var(--color-on-fill-brand);
   --color-hero-muted: color-mix(in srgb, var(--color-on-fill-brand) 84%, var(--color-fill-brand));
   --color-hero-rule: color-mix(in srgb, var(--color-on-fill-brand) 35%, transparent);
 }
 
-// Dark palette, "Phosphor Ward". Declared outside @theme on purpose: Tailwind
-// puts @theme inside its own layer, and unlayered rules always win over layered
-// ones, so the [data-theme] attribute can override the defaults at runtime.
-// Derived tokens (color-mix, shadows) are declared on the same :root element,
-// so they recompute from these values automatically.
+// Paleta oscura fuera de @theme a propósito: lo que no está en una capa le gana a @theme, y así [data-theme]
+// puede sobrescribirla en caliente. Los tokens derivados se recalculan solos.
 :root[data-theme='light'] {
   color-scheme: light;
 }
@@ -195,7 +179,7 @@
   --color-on-fill: #07090a;
   --color-on-fill-brand: #07090a;
 
-  // Icon tones on the oscilloscope (>= 3:1 on dark surfaces).
+  // Tonos de icono en el osciloscopio (>= 3:1 sobre las superficies oscuras).
   --color-icon-dashboard: #b8a3ff;
   --color-icon-shield: #3dff8e;
   --color-icon-bell: #ffc44d;
@@ -218,13 +202,13 @@
   --color-glass-bg: #0d1112;
   --color-glass-border: #4c6b5e;
 
-  // Brand block on the oscilloscope: dark violet-tinted glass, phosphor text.
+  // Bloque de marca en el osciloscopio: vidrio oscuro con tinte violeta y texto de fósforo.
   --color-hero-bg: color-mix(in srgb, var(--color-accent) 12%, var(--color-bg-surface));
   --color-hero-text: var(--color-text-primary);
   --color-hero-muted: var(--color-text-secondary);
   --color-hero-rule: var(--color-border);
 
-  // In the dark the hard shadow becomes a displaced neon glow.
+  // En oscuro la sombra dura se convierte en un brillo de neón desplazado.
   --border-width-ink: 1.5px;
   --color-shadow: color-mix(in srgb, var(--color-accent) 55%, transparent);
   --shadow-hard:

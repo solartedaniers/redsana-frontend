@@ -51,8 +51,7 @@ import { AvatarStorageGateway } from './core/avatar-storage/avatar-storage.gatew
 import { SupabaseAvatarStorageGateway } from './core/avatar-storage/avatar-storage-supabase.gateway';
 import { RuntimeEnvironmentService } from './core/runtime/runtime-environment.service';
 
-// Los gateways que hablan con el SO tienen una versión nativa (Tauri) y otra
-// de navegador; se elige aquí una sola vez para que ningún componente sepa cuál usa.
+// Cada gateway del sistema operativo tiene versión Tauri y de navegador; aquí elijo una sola vez.
 function provideByRuntime<T>(token: abstract new () => T, desktop: Type<T>, web: Type<T>): Provider {
   return { provide: token, useFactory: () => new (inject(RuntimeEnvironmentService).isDesktop ? desktop : web)() };
 }
@@ -64,9 +63,7 @@ export const appConfig: ApplicationConfig = {
     provideHttpClient(withInterceptors([authInterceptor])),
     provideAnimationsAsync(),
 
-    // Cada dominio depende de su clase abstracta, no de esta implementación
-    // concreta (HTTP/Supabase/Tauri): cambiar de proveedor de datos es
-    // solo tocar el useClass de aquí, sin tocar servicios ni componentes.
+    // Cada dominio depende de su clase abstracta: cambiar de proveedor es tocar solo el useClass de aquí.
     { provide: AuthRepository, useClass: SupabaseAuthRepository },
     { provide: NetworkMetricsRepository, useClass: NetworkMetricsHttpRepository },
     { provide: SecurityAssistantRepository, useClass: SecurityAssistantHttpRepository },
@@ -82,15 +79,13 @@ export const appConfig: ApplicationConfig = {
     provideByRuntime(NetworkIdentityGateway, NetworkIdentityTauriGateway, NetworkIdentityWebGateway),
     { provide: AvatarStorageGateway, useClass: SupabaseAvatarStorageGateway },
 
-    // Carga idioma y restaura sesión antes de renderizar: evita parpadeo de
-    // claves crudas y evita un salto visual login->dashboard en cada recarga.
+    // Cargo idioma y sesión antes de pintar para no mostrar claves crudas ni saltar del login al panel.
     provideAppInitializer(() => inject(I18nService).load()),
     provideAppInitializer(() => inject(AuthService).restoreSession()),
-    // start() dispara su propio ciclo periódico en segundo plano; no hay nada que esperar aquí.
+    // start() lanza su propio ciclo en segundo plano; aquí no hay nada que esperar.
     provideAppInitializer(() => inject(NetworkMeasurementService).start()),
 
-    // En Tauri los archivos ya vienen empaquetados en el instalable: un service
-    // worker solo agregaría una caché duplicada que puede servir versiones viejas.
+    // En Tauri los archivos ya vienen en el instalador; un service worker solo duplicaría la caché.
     provideServiceWorker('ngsw-worker.js'),
     {
       provide: SwRegistrationOptions,

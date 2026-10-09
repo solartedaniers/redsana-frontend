@@ -18,8 +18,7 @@ describe('App', () => {
     expect(app).toBeTruthy();
   });
 
-  // Reemplaza la prueba de la plantilla inicial de Angular ("Hello, frontend"),
-  // que fallaba desde siempre porque esa plantilla ya no existe.
+  // Reemplaza la prueba de la plantilla inicial de Angular, que ya no existe.
   it('renderiza el contenedor de rutas y no avisa de versión nueva sin Service Worker', async () => {
     const fixture = TestBed.createComponent(App);
     await fixture.whenStable();

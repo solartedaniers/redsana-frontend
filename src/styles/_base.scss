@@ -1,5 +1,4 @@
-// Global element defaults: the paper, the ink and the type. Components only
-// describe their own content on top of this.
+// Valores base de los elementos: el papel, la tinta y la tipografía.
 body {
   margin: 0;
   padding: 0;
@@ -12,8 +11,7 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-// Grain and scanlines live on a fixed pseudo-layer: painted once, never
-// repainted on scroll, and invisible to pointer events.
+// El grano y las líneas de escaneo van en una capa fija: se pintan una vez y no reciben clics.
 body::after {
   content: '';
   position: fixed;
@@ -59,20 +57,20 @@ p {
   color: var(--color-on-fill-brand);
 }
 
-// One visible focus style for every interactive element, in both themes.
+// Un solo estilo de foco visible para todo lo interactivo, en los dos temas.
 :focus-visible {
   outline: var(--focus-ring-width) solid var(--color-focus-ring);
   outline-offset: var(--focus-ring-offset);
 }
 
-// Every number reads in fixed-width figures so values never jitter.
+// Todas las cifras con ancho fijo para que los valores no bailen.
 .tabular,
 time,
 data {
   font-variant-numeric: tabular-nums;
 }
 
-// Visually hidden but still read by assistive technology.
+// Oculto a la vista pero leído por los lectores de pantalla.
 .visually-hidden {
   position: absolute;
   width: 1px;
@@ -82,7 +80,7 @@ data {
   white-space: nowrap;
 }
 
-// Touch screens: every control reaches a 44 px target without changing its look.
+// En pantallas táctiles todo control llega a 44 px sin cambiar su aspecto.
 @media (pointer: coarse) {
   button,
   [role='button'],
