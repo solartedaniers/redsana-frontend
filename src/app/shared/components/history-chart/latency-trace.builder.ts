@@ -26,30 +26,25 @@ export interface LatencyStats {
 export interface LatencyTrace {
   readonly points: readonly TracePoint[];
   readonly path: string;
-  /** Y of each threshold line; null when the threshold is above the visible range. */
+  /** Y de cada línea de umbral; null si el umbral queda por encima del rango visible. */
   readonly warningY: number | null;
   readonly criticalY: number | null;
-  /** Local maxima that crossed a threshold, and outages: both get a marker. */
+  /** Picos que cruzaron un umbral y cortes: los dos llevan marcador. */
   readonly markers: readonly TracePoint[];
   readonly heatmap: readonly HeatmapCell[];
-  /** Over answered samples only (outages have no latency); null if none. */
+  /** Solo sobre las muestras con respuesta (los cortes no tienen latencia); null si no hay ninguna. */
   readonly stats: LatencyStats | null;
 }
 
 const { viewBoxWidth: WIDTH, viewBoxHeight: HEIGHT } = HISTORY_CHART_CONFIG;
 
-/**
- * Turns real latency samples into the geometry of the ECG chart: the trace,
- * severity thresholds, peak/outage markers and a heatmap strip. Pure and
- * framework-free, so the chart component only renders what it gets.
- */
+/** Convierte las muestras reales en la geometría del ECG; es puro, el componente solo pinta lo que recibe. */
 export class LatencyTraceBuilder {
   build(samples: readonly NetworkMetricSample[]): LatencyTrace {
     const reduced = this.reduce(samples, HISTORY_CHART_CONFIG.maxTracePoints);
     const answered = samples.map((sample) => sample.latencyMs).filter((latency) => latency > 0);
     const peak = answered.reduce((max, latency) => Math.max(max, latency), 0);
-    // The scale always reaches the warning line, so a calm network reads as a
-    // low trace under it instead of a stretched, alarming zigzag.
+    // La escala siempre llega al umbral de alerta: así una red tranquila se ve tranquila y no como un zigzag alarmante.
     const yMax = Math.max(peak * HISTORY_CHART_CONFIG.headroom, LATENCY_THRESHOLDS_MS.warning);
     const toY = (latencyMs: number): number => HEIGHT - (Math.max(latencyMs, 0) / yMax) * HEIGHT;
     const step = WIDTH / Math.max(reduced.length - 1, 1);
@@ -82,7 +77,7 @@ export class LatencyTraceBuilder {
     return threshold > yMax ? null : toY(threshold);
   }
 
-  // Every outage, plus the highest local peaks that crossed a threshold.
+  // Todos los cortes, más los picos más altos que cruzaron un umbral.
   private markers(points: readonly TracePoint[]): TracePoint[] {
     const peaks = points
       .filter((point, index) => this.isThresholdPeak(points, index))
@@ -101,8 +96,7 @@ export class LatencyTraceBuilder {
     return point.latencyMs >= previous && point.latencyMs > next;
   }
 
-  // Keeps at most `limit` samples: each bucket is represented by its worst
-  // sample (an outage first, then the highest latency), so peaks never vanish.
+  // Cada grupo se representa con su peor muestra (primero un corte, luego la latencia más alta) para no perder picos.
   private reduce(samples: readonly NetworkMetricSample[], limit: number): NetworkMetricSample[] {
     if (samples.length <= limit) {
       return [...samples];

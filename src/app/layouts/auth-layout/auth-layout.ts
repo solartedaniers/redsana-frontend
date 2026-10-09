@@ -8,10 +8,8 @@ import { BrandMark } from '../../shared/components/brand-mark/brand-mark';
 import { routeTransitionAnimation } from '../../core/animations/route-transition.animation';
 import { APP_PATHS } from '../../core/routing/app-paths';
 
-// Wraps the public screens (landing and auth) in a chart sheet over the 3D
-// background, the only place it exists: no sidebar/top bar because there is
-// no session yet. The background lives here (not in each screen) so it is not
-// rebuilt when navigating between login/register/recovery.
+// Envuelve las pantallas públicas en la hoja clínica sobre el fondo 3D, el único lugar donde existe.
+// El fondo vive aquí para no reconstruirse al navegar entre login, registro y recuperación.
 @Component({
   selector: 'app-auth-layout',
   imports: [RouterLink, RouterOutlet, TranslatePipe, ThemeToggle, LanguageToggle, NetworkBackground, BrandMark],

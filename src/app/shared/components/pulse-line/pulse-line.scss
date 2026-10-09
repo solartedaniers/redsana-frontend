@@ -3,7 +3,7 @@
   display: block;
   height: 3.75rem;
   overflow: hidden;
-  // Container units let the playhead cross exactly the trace width.
+  // Con unidades de contenedor el cabezal recorre exactamente el ancho del trazo.
   container-type: inline-size;
   color: var(--pulse-color, var(--color-fill-healthy));
 }
@@ -30,7 +30,7 @@ svg {
   vector-effect: non-scaling-stroke;
 }
 
-// Phosphor dot sweeping left to right; with reduced motion it rests at the end.
+// Punto de fósforo que barre de izquierda a derecha; con movimiento reducido queda al final.
 .playhead {
   position: absolute;
   top: 0;

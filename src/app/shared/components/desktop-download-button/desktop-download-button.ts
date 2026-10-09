@@ -6,11 +6,8 @@ import { TranslatePipe } from '../../../core/i18n/translate.pipe';
 import { RuntimeEnvironmentService } from '../../../core/runtime/runtime-environment.service';
 
 /**
- * The only download entry point (landing and the user's download screen).
- * On click it asks DesktopReleaseResolver for the installer of the latest
- * release and navigates to it so the browser downloads the .exe; if that
- * fails it opens the release page and says so. Hidden inside the desktop app.
- * The href keeps the release page so the link still works without scripts.
+ * Único punto de descarga: pide el instalador del último release y navega a él; si falla, abre la
+ * página del release y lo avisa. El href conserva esa página para que funcione sin scripts.
  */
 @Component({
   selector: 'app-desktop-download-button',
@@ -43,7 +40,7 @@ export class DesktopDownloadButton {
 
   private open(link: DesktopInstallerLink): void {
     if (link.kind === 'installer') {
-      // A release asset is served as an attachment: the browser downloads it and stays on this page.
+      // GitHub sirve el asset como adjunto: el navegador lo descarga y se queda en esta página.
       this.window?.location.assign(link.url);
       return;
     }
@@ -52,7 +49,7 @@ export class DesktopDownloadButton {
     if (tab) {
       tab.opener = null;
     } else {
-      // Popup blocked: open the release page here instead.
+      // Si el navegador bloqueó la ventana, abro la página del release aquí mismo.
       this.window?.location.assign(link.url);
     }
   }

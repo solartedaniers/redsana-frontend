@@ -34,7 +34,7 @@
   }
 }
 
-// Phones: icon only, so the header never wraps at 320 px.
+// En el celular solo el icono, para que el encabezado no se parta a 320 px.
 @media (max-width: 26rem) {
   .theme-toggle span { display: none; }
 }

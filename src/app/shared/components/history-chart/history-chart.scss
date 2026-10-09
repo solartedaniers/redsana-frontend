@@ -11,8 +11,7 @@
   color: var(--color-text-secondary);
 }
 
-// The monitor: chart paper with the trace; markers and head are HTML so they
-// stay round while the SVG stretches.
+// Los marcadores y el cabezal son HTML para que sigan redondos aunque el SVG se estire.
 .ecg__monitor {
   position: relative;
   height: clamp(9rem, 22vw, 13rem);
@@ -45,7 +44,7 @@
 .ecg__trace { stroke: var(--color-text-primary); stroke-width: 2.5; }
 .ecg__glow { stroke: var(--color-fill-healthy); stroke-width: 8; opacity: 0.45; }
 
-// Draws in once from left to right (transform only); reduced motion shows it whole.
+// Se dibuja una vez de izquierda a derecha; con movimiento reducido aparece completo.
 .ecg__reveal {
   transform-box: fill-box;
   transform-origin: left;

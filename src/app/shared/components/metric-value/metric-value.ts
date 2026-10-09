@@ -7,11 +7,7 @@ interface OdometerChar {
 
 const DIGIT_PATTERN = /\d/;
 
-/**
- * Giant tabular reading that rolls each digit like an odometer when the value
- * changes. The real characters stay in the DOM (accessible, copyable); the
- * rolling digit strip is decorative and animates `transform` only.
- */
+/** Lectura que gira cada dígito como un odómetro; el texto real sigue en el DOM y solo se anima transform. */
 @Component({
   selector: 'app-metric-value',
   template: `@for (cell of chars(); track $index) {@if (cell.digit !== null) {<span class="odometer-cell" [style.--odometer-digit]="cell.digit"><span class="odometer-char">{{ cell.char }}</span></span>} @else {<span>{{ cell.char }}</span>}}`,

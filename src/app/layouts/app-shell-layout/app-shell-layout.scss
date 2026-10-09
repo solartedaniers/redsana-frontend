@@ -1,5 +1,4 @@
-// The shell sits directly on the chart paper of <body>: no 3D background here
-// (it only exists on the public screens).
+// El shell va directo sobre el papel del <body>: el fondo 3D solo existe en las pantallas públicas.
 .app-shell {
   min-height: 100dvh;
   display: grid;
@@ -8,7 +7,7 @@
   isolation: isolate;
 }
 
-// Chart index column: a paper strip stuck to the left edge.
+// Columna del índice: una tira de papel pegada al borde izquierdo.
 .sidebar {
   position: sticky;
   top: 0;
@@ -35,8 +34,7 @@
   padding: var(--space-6) clamp(var(--space-4), 3vw, var(--space-7)) var(--space-7);
 }
 
-// Narrow screens: the menu does not disappear, it becomes a drawer opened from
-// the top bar button.
+// En pantallas angostas el menú no desaparece: pasa a ser un cajón que abre el botón de la barra superior.
 @media (max-width: 52rem) {
   .app-shell { grid-template-columns: minmax(0, 1fr); }
 
@@ -44,7 +42,7 @@
     position: fixed;
     inset-block: 0;
     inset-inline-start: 0;
-    z-index: 3; // above the drawer backdrop (2)
+    z-index: 3; // encima del fondo del cajón (2)
     width: min(16rem, 85vw);
     box-shadow: var(--shadow-hard-lg);
     transform: translateX(calc(-100% - var(--shadow-offset-lg)));

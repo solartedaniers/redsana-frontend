@@ -25,7 +25,7 @@ svg { display: block; width: 100%; overflow: visible; }
   transition: stroke-dasharray var(--motion-duration-count) var(--motion-easing-decelerate);
 }
 
-// The two real parts read as two inks: violet questionnaire, band-colored technical.
+// Las dos partes reales se leen como dos tintas: violeta el cuestionario y el color de la banda el técnico.
 .segment--questionnaire { stroke: var(--color-fill-brand); }
 
 .tick {
@@ -36,7 +36,7 @@ svg { display: block; width: 100%; overflow: visible; }
 
 .tick--split { stroke-width: 4; }
 
-// Needle pivots on the dial center; rotation is a transform, so it animates cheaply.
+// La aguja gira sobre el centro del dial con transform, que es barato de animar.
 .needle {
   position: absolute;
   left: 10%;

@@ -33,8 +33,7 @@ const PROFILE_NAV_ITEM: NavItem = {
   icon: 'user',
 };
 
-// Shell compartido por usuario estándar y admin: la única diferencia entre
-// ambos roles es qué items de navegación se muestran, no la estructura.
+// Shell común para usuario y admin: lo único que cambia es qué opciones de menú se muestran.
 @Component({
   selector: 'app-shell-layout',
   imports: [RouterOutlet, SidebarNav, TopBar, TranslatePipe],
@@ -57,11 +56,11 @@ export class AppShellLayout {
     return [...USER_NAV_ITEMS, ...downloadItems, PROFILE_NAV_ITEM];
   });
 
-  /** Menú lateral como cajón en pantallas angostas; en escritorio siempre está visible y esto no tiene efecto. */
+  /** Menú lateral como cajón en pantallas angostas; en escritorio siempre se ve y esto no hace nada. */
   protected readonly isNavOpen = signal(false);
 
   constructor() {
-    // Al elegir una sección el cajón se cierra solo, para ver la pantalla elegida.
+    // Al elegir una sección cierro el cajón para que se vea la pantalla elegida.
     this.router.events
       .pipe(filter((event) => event instanceof NavigationEnd), takeUntilDestroyed())
       .subscribe(() => this.isNavOpen.set(false));

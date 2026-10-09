@@ -13,7 +13,7 @@
   height: 100%;
 }
 
-// No WebGL: a static constellation of dots stands in for the scene.
+// Sin WebGL, una constelación estática de puntos ocupa su lugar.
 :host(.is-static) .network-canvas {
   display: none;
 }

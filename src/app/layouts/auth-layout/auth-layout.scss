@@ -1,6 +1,5 @@
 .auth-layout {
-  // Fixed height (not min-height): if something does not fit, only .auth-main
-  // scrolls, never the whole page with the header.
+  // Alto fijo: si algo no cabe, solo se desplaza .auth-main y nunca el encabezado.
   height: 100dvh;
   display: flex;
   flex-direction: column;
@@ -63,14 +62,14 @@
   z-index: 1;
   flex: 1;
   display: flex;
-  // safe: if the card does not fit, align it to the top instead of clipping it.
+  // safe: si la tarjeta no cabe, se alinea arriba en vez de recortarse.
   align-items: safe center;
   justify-content: center;
   padding: var(--space-6) var(--space-4) var(--space-5);
   overflow-y: auto;
 }
 
-// The chart sheet: ink outline, hard offset shadow, a sticker on its corner.
+// La hoja clínica: contorno de tinta, sombra dura y un sticker en la esquina.
 .auth-card {
   position: relative;
   width: 100%;
@@ -82,7 +81,7 @@
   background: var(--color-bg-surface);
   box-shadow: var(--shadow-hard-lg);
 
-  // Landing/login/register carry a side panel and need two columns.
+  // Landing, login y registro llevan panel lateral y necesitan dos columnas.
   &:has(.auth-split) {
     max-width: 58rem;
     padding: 0;

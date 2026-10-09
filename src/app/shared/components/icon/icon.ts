@@ -24,16 +24,14 @@ export type IconName =
   | 'download'
   | 'menu';
 
-// Set fijo de iconos en un solo componente: evita repetir SVGs en sidebar,
-// top-bar y alertas, y mantiene el estilo (stroke, grosor) consistente.
+// Todos los iconos en un componente para no repetir SVGs y mantener el mismo trazo.
 @Component({
   selector: 'app-icon',
   imports: [],
   templateUrl: './icon.html',
   styleUrl: './icon.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  // Every icon exposes its own color token as --icon-tone; each context
-  // decides whether to paint with it (color: var(--icon-tone)) or keep currentColor.
+  // Cada icono expone su color como --icon-tone; cada sitio decide si lo usa o se queda con currentColor.
   host: { '[style.--icon-tone]': 'tone()' },
 })
 export class Icon {

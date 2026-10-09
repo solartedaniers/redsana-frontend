@@ -4,11 +4,7 @@ import { PASSWORD_STRENGTH_CONFIG } from '../../../core/auth/password-strength/p
 import { TranslatePipe } from '../../../core/i18n/translate.pipe';
 import { Icon } from '../icon/icon';
 
-/**
- * Live password strength feedback: one bar per criterion, filled as the user
- * meets them, plus a text level (never color alone). Visual only: it does not
- * block submits, touch validators, or send/store the password anywhere.
- */
+/** Medidor en vivo de la contraseña: solo visual, no bloquea envíos ni guarda ni envía nada. */
 @Component({
   selector: 'app-password-strength-meter',
   imports: [TranslatePipe, Icon],
@@ -18,7 +14,7 @@ import { Icon } from '../icon/icon';
 })
 export class PasswordStrengthMeter {
   readonly password = input.required<string | null>();
-  /** Lists every criterion as met/pending: used where the rule is enforced (register, reset). */
+  /** Muestra cada criterio como cumplido o pendiente, donde la regla se exige (registro y restablecimiento). */
   readonly showRequirements = input(false);
 
   private readonly evaluator = new PasswordStrengthEvaluator();

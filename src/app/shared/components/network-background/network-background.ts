@@ -24,12 +24,8 @@ interface NodeUserData {
   phase: number;
 }
 
-// Decorative constellation of connected nodes (a home network topology) that
-// lives only on the public screens (landing and auth). It lives in AuthLayout,
-// not in each screen, so the scene is not rebuilt when navigating between them.
-// It follows the mouse with a lerped parallax, drifts slowly on touch screens,
-// pauses while the tab is hidden and falls back to a static frame when WebGL
-// is unavailable or the user prefers reduced motion.
+// Constelación decorativa solo para las pantallas públicas: sigue al mouse, deriva en táctil, se pausa
+// con la pestaña oculta y queda fija sin WebGL o con movimiento reducido.
 @Component({
   selector: 'app-network-background',
   templateUrl: './network-background.html',
@@ -72,7 +68,7 @@ export class NetworkBackground {
   constructor() {
     const destroyRef = inject(DestroyRef);
 
-    // Recolors the scene when the theme changes, without rebuilding it.
+    // Recoloreo la escena al cambiar de tema, sin reconstruirla.
     effect(() => {
       this.theme.mode();
       if (this.scene) {
@@ -81,8 +77,7 @@ export class NetworkBackground {
       }
     });
 
-    // afterNextRender, not ngAfterViewInit: WebGL only exists in the browser
-    // and this callback never runs while prerendering the landing page.
+    // afterNextRender y no ngAfterViewInit: WebGL solo existe en el navegador y esto no corre al prerenderizar.
     afterNextRender(() => {
       if (!this.buildScene()) {
         this.webglUnavailable.set(true);
@@ -106,9 +101,7 @@ export class NetworkBackground {
     this.reducedMotion.addEventListener('change', onVisibility);
     window.addEventListener('pointermove', onPointerMove, { passive: true });
 
-    // ResizeObserver instead of window:resize: the canvas can change size
-    // without a window resize (lazy styles, scrollbars), which used to leave a
-    // stale camera aspect and stretched the nodes into ovals.
+    // ResizeObserver y no window:resize: el canvas cambia de tamaño sin que cambie la ventana, y eso ovalaba los nodos.
     this.resizeObserver = new ResizeObserver(() => this.resize());
     this.resizeObserver.observe(this.canvasRef().nativeElement);
 
@@ -120,8 +113,7 @@ export class NetworkBackground {
     });
   }
 
-  // Runs the loop only when it is visible and motion is allowed; otherwise
-  // leaves one static frame on screen.
+  // Solo anima si la pestaña se ve y se permite movimiento; si no, deja un cuadro fijo.
   private syncPlayback(): void {
     const shouldAnimate = !document.hidden && !this.reducedMotion?.matches;
     if (shouldAnimate && this.animationFrameId === null) {
@@ -146,7 +138,7 @@ export class NetworkBackground {
     }
   }
 
-  // Parallax only follows a real mouse; touch and pen-less screens drift.
+  // El parallax sigue solo a un mouse real; en táctil hay deriva.
   private trackPointer(event: PointerEvent): void {
     if (event.pointerType !== 'mouse' || !this.finePointer?.matches) {
       return;
@@ -235,8 +227,7 @@ export class NetworkBackground {
     return node;
   }
 
-  // Reads the current color tokens and applies them to the existing
-  // materials: no color is ever hardcoded in the scene.
+  // Leo los tokens de color actuales y los aplico a los materiales: nunca hay un color quemado en la escena.
   private applyThemeColors(): void {
     const styles = getComputedStyle(document.documentElement);
     const accent = styles.getPropertyValue('--color-accent').trim();
@@ -251,7 +242,7 @@ export class NetworkBackground {
     this.rings.forEach((ring) => (ring.material as THREE.MeshBasicMaterial).color.set(accent));
   }
 
-  // Rebuilds the hub-node and nearby node-node links.
+  // Reconstruyo las uniones del centro con los nodos y entre nodos cercanos.
   private updateConnections(): void {
     const positions: number[] = [];
     for (let i = 0; i < this.nodes.length; i++) {

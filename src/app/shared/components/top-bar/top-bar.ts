@@ -19,7 +19,7 @@ export class TopBar {
   protected readonly paths = APP_PATHS;
   protected readonly auth = inject(AuthService);
   readonly signOut = output<void>();
-  /** Abre/cierra el menú lateral; el botón solo se ve en pantallas angostas (ver app-shell-layout.scss). */
+  /** Abre o cierra el menú lateral; el botón solo se ve en pantallas angostas. */
   readonly menuToggle = output<void>();
   readonly isMenuOpen = input(false);
 }

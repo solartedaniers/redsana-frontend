@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 
-/** RedSana mark: a single heartbeat drawn in fluorescent ink on an ink block. */
+/** Marca de RedSana: un latido en tinta fluorescente sobre un bloque de tinta. */
 @Component({
   selector: 'app-brand-mark',
   template: `<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">

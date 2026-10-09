@@ -2,7 +2,7 @@
   display: contents;
 }
 
-// Resolving the installer: the button stays put but reads as busy.
+// Mientras resuelve el instalador el botón se queda en su sitio pero se ve ocupado.
 .submit-button.is-busy {
   cursor: progress;
   opacity: 0.75;

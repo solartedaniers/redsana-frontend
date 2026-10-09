@@ -11,13 +11,7 @@ const PERCENT = 100;
 
 let nextChartId = 0;
 
-/**
- * Latency history drawn as an electrocardiogram: severity bands, the real
- * trace with a glowing playhead on the latest sample, markers on threshold
- * peaks and outages, and a heatmap strip of severity over time. Pointer and
- * keyboard (arrows, Home/End) inspect individual samples in an accessible
- * tooltip; a visually hidden summary describes the whole series.
- */
+/** Historial de latencia como electrocardiograma, con tooltip accesible por puntero y teclado. */
 @Component({
   selector: 'app-history-chart',
   imports: [TranslatePipe, DatePipe],

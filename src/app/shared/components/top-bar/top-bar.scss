@@ -104,8 +104,7 @@
   min-width: 0;
 }
 
-// Solo en pantallas angostas, donde el menú lateral pasa a ser un cajón (52rem,
-// el mismo corte de app-shell-layout.scss). 2.75rem = 44px, objetivo táctil mínimo.
+// Solo en pantallas angostas, donde el menú pasa a cajón (mismo corte que app-shell-layout). 44 px de toque.
 .menu-button {
   display: none;
   align-items: center;
@@ -126,7 +125,7 @@
   .logout-button, .user-avatar { width: 2.75rem; height: 2.75rem; }
 }
 
-// En celulares el nombre no cabe junto a idioma, tema y salir: queda el avatar.
+// En el celular el nombre no cabe junto a idioma, tema y salir: queda el avatar.
 @media (max-width: 30rem) {
   .brand-name { display: none; }
 }

@@ -1,22 +1,21 @@
-// Tuning knobs of the public-screens 3D background. Speeds are in radians (or
-// world units) per second, so the motion is identical at any frame rate.
+// Ajustes del fondo 3D de las pantallas públicas. Las velocidades van por segundo, no por cuadro.
 export const NETWORK_BACKGROUND_CONFIG = {
   scene: {
     nodeCount: 64,
     nodeRadius: 0.8,
     hubRadius: 4.2,
-    // Narrow FOV + farther camera: wide angles stretched edge nodes into ovals.
+    // FOV estrecho y cámara lejana: con ángulos amplios los nodos del borde se veían ovalados.
     cameraFov: 35,
     cameraZ: 125,
     maxPixelRatio: 1.5,
-    // Nodes live on a spherical shell, leaving the center clear for the card.
+    // Los nodos viven en un cascarón esférico y dejan libre el centro para la tarjeta.
     shellRadiusMin: 26,
     shellRadiusSpan: 38,
     shellSquashY: 0.65,
     shellSquashZ: 0.8,
     connectDistance: 26,
     hubConnectDistance: 40,
-    // Every n-th node may link to the hub.
+    // Cada n nodos uno puede unirse al centro.
     hubLinkEvery: 3,
     lineOpacity: 0.22,
     ringCount: 3,
@@ -28,13 +27,13 @@ export const NETWORK_BACKGROUND_CONFIG = {
     ringTilt: Math.PI / 2.3,
   },
   motion: {
-    // Whole constellation: a very slow turn plus a gentle nod.
+    // Toda la constelación: un giro muy lento y un leve cabeceo.
     spinY: 0.012,
     wobbleX: 0.008,
     wobbleXAmplitude: 0.1,
     hubSpinX: 0.06,
     hubSpinY: 0.09,
-    // Hub "heartbeat": cycles per second and scale amplitude.
+    // Latido del centro: ciclos por segundo y amplitud de escala.
     hubPulseRate: 0.7,
     hubPulseAmplitude: 0.06,
     nodeDriftSpeedMin: 0.05,
@@ -46,17 +45,17 @@ export const NETWORK_BACKGROUND_CONFIG = {
     ringBreathRate: 0.06,
     ringBreathSpan: 1.5,
     ringBreathScale: 0.2,
-    // Connections are O(n²): recomputed every n frames, not every frame.
+    // Las conexiones son O(n²): las recalculo cada n cuadros, no en todos.
     connectionRefreshFrames: 6,
-    // Longest frame delta accepted (s): avoids a jump after a long stall.
+    // Delta máximo por cuadro (s): evita un salto después de una pausa larga.
     maxFrameDelta: 0.1,
   },
   parallax: {
-    // Max extra rotation (rad) when the cursor reaches the viewport edge.
+    // Rotación extra máxima (rad) cuando el cursor llega al borde.
     strength: 0.32,
-    // Fraction of the remaining distance covered per frame (lerp factor).
+    // Fracción de la distancia que se recorre en cada cuadro (factor del lerp).
     lerp: 0.035,
-    // Touch screens: no cursor, only a slow automatic drift.
+    // En táctil no hay cursor: solo una deriva lenta automática.
     touchDriftRate: 0.03,
     touchDriftAmplitude: 0.12,
   },

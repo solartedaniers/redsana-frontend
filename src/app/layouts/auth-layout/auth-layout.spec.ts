@@ -6,7 +6,7 @@ import { AuthLayout } from './auth-layout';
 
 describe('AuthLayout', () => {
   it('la marca del encabezado lleva a la pantalla de inicio', async () => {
-    // jsdom no implementa matchMedia (ThemeService lo usa para el tema inicial).
+    // jsdom no implementa matchMedia y ThemeService lo usa para el tema inicial.
     vi.stubGlobal('matchMedia', () => ({ matches: false }));
     TestBed.configureTestingModule({ providers: [provideHttpClient(), provideRouter([]), provideNoopAnimations()] });
     const fixture = TestBed.createComponent(AuthLayout);

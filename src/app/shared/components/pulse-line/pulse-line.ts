@@ -1,10 +1,6 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 
-/**
- * Decorative ECG trace with a glowing playhead that sweeps across it on the
- * shared heartbeat rhythm. Purely ornamental (aria-hidden): it never stands
- * for real data. The playhead moves with transform only.
- */
+/** Trazo de ECG puramente decorativo (aria-hidden): nunca representa datos reales. */
 @Component({
   selector: 'app-pulse-line',
   template: `<svg viewBox="0 0 400 60" preserveAspectRatio="none" aria-hidden="true" focusable="false">

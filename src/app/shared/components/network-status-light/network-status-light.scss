@@ -1,5 +1,4 @@
-// Vital-signs light: a beating dot with an expanding ripple. Faster rhythm when
-// critical, flat (no beat) when the status is unknown.
+// Luz de signos vitales: un punto que late con una onda; más rápido si es crítico y plano si es desconocido.
 .status-light {
   --light-tone: var(--color-status-neutral);
   --light-fill: var(--color-fill-neutral);

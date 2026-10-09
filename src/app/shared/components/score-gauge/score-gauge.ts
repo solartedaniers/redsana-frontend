@@ -8,11 +8,8 @@ const SWEEP_DEGREES = 180;
 const TICK_STEP = 10;
 
 /**
- * Security score as a vital-signs dial (0-100). When both partial scores are
- * known, the arc is split into its real parts: the questionnaire segment
- * (30 % of the scale) and the technical segment (70 %), each filled in
- * proportion to its own score, so the two fills add up to the total.
- * Without a technical score the arc is a single gauge of the total.
+ * Puntaje de seguridad como dial de signos vitales. Si conozco las dos partes, el arco se divide
+ * en cuestionario (30 %) y técnico (70 %), cada tramo lleno según su propio puntaje.
  */
 @Component({
   selector: 'app-score-gauge',
@@ -31,7 +28,7 @@ export class ScoreGauge {
   protected readonly band = computed(() => getSecurityScoreBand(this.score()));
   protected readonly needleAngle = computed(() => `${(this.clamp(this.score()) / MAX_SCORE) * SWEEP_DEGREES}deg`);
 
-  /** Segment fills in path units (the arc has pathLength 100); null = single gauge. */
+  /** Rellenos de cada tramo en unidades del arco (pathLength 100); null si es un medidor simple. */
   protected readonly parts = computed(() => {
     const questionnaire = this.questionnaireScore();
     const technical = this.technicalScore();

@@ -1,5 +1,4 @@
-// One alert as a chart entry: severity strip, message, mono timestamp and a
-// round "seen" stamp. Acknowledged entries fade like an archived note.
+// Cada alerta como entrada de la hoja; las ya vistas se atenúan como una nota archivada.
 .alert-item {
   display: flex;
   align-items: flex-start;
