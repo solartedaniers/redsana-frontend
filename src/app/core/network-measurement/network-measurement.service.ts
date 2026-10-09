@@ -6,9 +6,9 @@ import { AuthService } from '../auth/auth.service';
 import { NetworkMetricsRepository } from '../repositories/network-metrics.repository';
 import { NetworkMeasurementGateway } from './network-measurement.gateway';
 import { NetworkIdentityGateway } from '../network-identity/network-identity.gateway';
+import { MEASUREMENT_CONFIG } from '../domain/measurement-freshness';
 
-/** Cada cuánto se mide la red en segundo plano. */
-const MEASUREMENT_INTERVAL_MS = 60000;
+const MEASUREMENT_INTERVAL_MS = MEASUREMENT_CONFIG.intervalMs;
 /** Candado entre pestañas (Web Locks): sin él, cada pestaña guardaba su medición y sesgaba la calibración. */
 const MEASUREMENT_LOCK_NAME = 'redsana-network-measurement';
 
