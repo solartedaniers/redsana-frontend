@@ -47,12 +47,13 @@
     </ul>
   </section>
   <div class="devices-list surface-panel">
+  <app-presence-filter-toggle [value]="presenceFilter()" (valueChange)="onPresenceChange($event)" />
   <app-device-search-box
     [query]="searchQuery()"
     (queryChange)="onSearchChange($event)"
     [isActive]="isSearching()"
     [matchCount]="matchingDevices().length"
-    [totalCount]="connectedDevices().length"
+    [totalCount]="listedDevices().length"
   />
   @for (device of visibleDevices(); track device.id) {
     <app-device-card [device]="device" (trustChange)="setTrust(device.id, $event)" />

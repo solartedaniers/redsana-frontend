@@ -238,3 +238,37 @@ describe('DevicesMap search', () => {
     expect(element.querySelectorAll('.device-card')).toHaveLength(50);
   });
 });
+
+describe('DevicesMap presence filter', () => {
+  it('"Todos" agrega los sin conexión, sin cambiar el contador ni el radar, y el buscador los incluye', async () => {
+    TestBed.configureTestingModule({
+      providers: [
+        provideHttpClient(),
+        { provide: DevicesRepository, useValue: { getDevices: () => of([device(1, true), device(2, true), device(50, false)]) } },
+        { provide: LanScanGateway, useValue: { isAvailable: false } },
+      ],
+    });
+    const fixture = TestBed.createComponent(DevicesMap);
+    fixture.detectChanges();
+    await fixture.whenStable();
+    const element = fixture.nativeElement as HTMLElement;
+    const search = (text: string) => {
+      const input = element.querySelector<HTMLInputElement>('app-device-search-box input')!;
+      input.value = text;
+      input.dispatchEvent(new Event('input'));
+      fixture.detectChanges();
+    };
+
+    expect(element.querySelectorAll('.device-card')).toHaveLength(2);
+    search('192.168.0.50');
+    expect(element.querySelectorAll('.device-card')).toHaveLength(0);
+
+    element.querySelectorAll<HTMLButtonElement>('app-presence-filter-toggle button')[1].click();
+    fixture.detectChanges();
+
+    expect(element.querySelectorAll('.device-card')).toHaveLength(1);
+    expect(element.querySelector('.device-card .presence-badge')?.getAttribute('data-online')).toBe('false');
+    expect(element.querySelector('.devices-hero .status-badge')?.textContent?.trim()).toBe('2');
+    expect(element.querySelectorAll('.topology__node')).toHaveLength(2);
+  });
+});
