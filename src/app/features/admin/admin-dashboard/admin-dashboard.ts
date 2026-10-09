@@ -1,4 +1,5 @@
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
+import { TranslatePipe } from '../../../core/i18n/translate.pipe';
 import { AdminMetricsRepository } from '../../../core/repositories/admin-metrics.repository';
 import { PlatformMetrics } from '../../../core/models/admin.model';
 import { PageHeader } from '../../../shared/components/page-header/page-header';
@@ -6,7 +7,7 @@ import { MetricCard } from '../../../shared/components/metric-card/metric-card';
 
 @Component({
   selector: 'app-admin-dashboard',
-  imports: [PageHeader, MetricCard],
+  imports: [PageHeader, MetricCard, TranslatePipe],
   templateUrl: './admin-dashboard.html',
   styleUrl: './admin-dashboard.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

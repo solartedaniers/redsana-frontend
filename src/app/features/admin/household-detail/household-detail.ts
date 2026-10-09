@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { NetworkMetricsRepository } from '../../../core/repositories/network-metrics.repository';
 import { NetworkSupervisionRepository } from '../../../core/repositories/network-supervision.repository';
@@ -11,11 +11,13 @@ import { HistoryChart } from '../../../shared/components/history-chart/history-c
 import { ScoreGauge } from '../../../shared/components/score-gauge/score-gauge';
 import { TranslatePipe } from '../../../core/i18n/translate.pipe';
 import { APP_PATHS } from '../../../core/routing/app-paths';
+import { hasMeasurement } from '../../../core/domain/measurement-freshness';
+import { MeasurementEmptyState } from '../../../shared/components/measurement-empty-state/measurement-empty-state';
 
 // El backend no tiene un endpoint por id para hogares, así que filtro el resultado de getHouseholds().
 @Component({
   selector: 'app-household-detail',
-  imports: [RouterLink, PageHeader, NetworkStatusLight, MetricCard, HistoryChart, ScoreGauge, TranslatePipe],
+  imports: [RouterLink, PageHeader, NetworkStatusLight, MetricCard, HistoryChart, ScoreGauge, MeasurementEmptyState, TranslatePipe],
   templateUrl: './household-detail.html',
   styleUrl: './household-detail.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -29,6 +31,8 @@ export class HouseholdDetail {
   protected readonly household = signal<MonitoredHousehold | null>(null);
   protected readonly snapshot = signal<NetworkMetricSnapshot | null>(null);
   protected readonly history = signal<NetworkMetricSample[]>([]);
+  /** false mientras ese hogar no tenga ninguna medición real. */
+  protected readonly hasData = computed(() => hasMeasurement(this.snapshot()));
 
   constructor() {
     const householdId = this.route.snapshot.paramMap.get('id') ?? '';

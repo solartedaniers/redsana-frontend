@@ -19,15 +19,19 @@
   </div>
 
   @if (snapshot(); as data) {
+    @if (hasData()) {
     <div class="metrics-grid">
       <app-metric-card labelKey="user.dashboard.latency" [value]="data.latencyMs" unit="ms" />
       <app-metric-card labelKey="user.dashboard.jitter" [value]="data.jitterMs" unit="ms" />
       <app-metric-card labelKey="user.dashboard.packetLoss" [value]="data.packetLossPercent" unit="%" />
     </div>
-  }
 
-  <section class="history-section">
-    <h2>{{ 'user.dashboard.historyTitle' | translate }}</h2>
-    <app-history-chart [samples]="history()" />
-  </section>
+    <section class="history-section">
+      <h2>{{ 'user.dashboard.historyTitle' | translate }}</h2>
+      <app-history-chart [samples]="history()" />
+    </section>
+    } @else {
+      <app-measurement-empty-state />
+    }
+  }
 }
