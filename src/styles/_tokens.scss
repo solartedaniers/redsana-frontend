@@ -126,6 +126,17 @@
   --font-size-metric: 2rem;
   --font-size-metric-xl: clamp(2.6rem, 1.7rem + 3.4vw, 4.75rem);
   --line-height-tight: 0.95;
+
+  // Ritmo de las pantallas públicas según el ALTO de la ventana (svh): en escritorios bajos o con
+  // escalado de Windows la hoja se compacta para caber sin scroll, sin tocar el contenido.
+  --auth-gutter-top: clamp(var(--space-5), 3svh, var(--space-6));
+  --auth-gutter-bottom: clamp(var(--space-3), 2svh, var(--space-5));
+  --font-size-display-fit: min(var(--font-size-display), 8svh);
+  --font-size-hero-fit: min(var(--font-size-hero), 7svh);
+  --font-size-heading-fit: min(var(--font-size-heading), 6svh);
+  --pulse-line-height: clamp(2rem, 5svh, 3.75rem);
+  --form-control-pad-y: clamp(var(--space-2), 1.6svh, var(--space-3));
+  --form-rhythm: clamp(var(--space-2), 2svh, var(--space-4));
   --line-height-body: 1.55;
 }
 

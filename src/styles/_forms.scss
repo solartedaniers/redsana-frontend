@@ -1,8 +1,8 @@
 // Formularios compartidos (login, registro, recuperación y perfil): los mismos campos en todas partes.
 .form-title {
-  margin: 0 0 var(--space-3);
+  margin: 0 0 var(--form-rhythm);
   font-family: var(--font-display);
-  font-size: var(--font-size-heading);
+  font-size: var(--font-size-heading-fit);
   font-weight: var(--font-display-weight);
   font-stretch: var(--font-display-stretch);
   letter-spacing: var(--font-display-tracking);
@@ -11,7 +11,7 @@
 }
 
 .form-subtitle {
-  margin: 0 0 var(--space-4);
+  margin: 0 0 var(--form-rhythm);
   font-size: var(--font-size-body);
   color: var(--color-text-secondary);
 }
@@ -40,7 +40,7 @@
   }
 
   input {
-    padding: var(--space-3);
+    padding: var(--form-control-pad-y) var(--space-3);
     border-radius: var(--radius-sm);
     border: var(--border-width-ink) solid var(--color-card-border);
     background: var(--color-bg-surface);
@@ -102,8 +102,8 @@
 
 // Dos columnas en login y registro; el espaciado se ajusta a la altura de la ventana para que quepan sin scroll en Tauri.
 .auth-split {
-  --auth-panel-padding: clamp(1rem, 3.6vh, 1.7rem);
-  --auth-stack-gap: clamp(0.45rem, 1.6vh, 0.75rem);
+  --auth-panel-padding: clamp(0.75rem, 3.2svh, 1.7rem);
+  --auth-stack-gap: clamp(0.35rem, 1.4svh, 0.75rem);
 
   display: grid;
   // minmax(0, 1fr) y no 1fr: a 320 px una fila ancha empujaba la columna y recortaba el formulario.
@@ -143,6 +143,7 @@
   }
 
   app-pulse-line {
+    height: var(--pulse-line-height);
     margin-top: auto;
     --pulse-color: var(--color-fill-healthy);
   }
@@ -168,8 +169,8 @@
 }
 
 .side-panel-title {
-  margin: var(--space-3) 0 var(--space-3);
-  font-size: var(--font-size-hero);
+  margin: var(--auth-stack-gap) 0;
+  font-size: var(--font-size-hero-fit);
   color: var(--color-hero-text);
 }
 
@@ -229,6 +230,27 @@
   }
 }
 
+// Ventanas bajas y anchas (laptops con escalado de Windows): reparto las columnas por igual y los
+// hallazgos van lado a lado en vez de apilados, para que la hoja quepa sin scroll y sin esconder nada.
+// Por debajo de 60rem de ancho las columnas quedarían tan angostas que la hoja crecería en vez de
+// encogerse. Las media queries no aceptan variables, por eso los cortes van aquí.
+@media (min-width: 60rem) and (max-height: 42rem) {
+  .auth-split { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+
+  .side-panel-features {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(8rem, 1fr));
+    column-gap: var(--space-3);
+  }
+
+  .side-panel-feature {
+    grid-template-columns: auto 1fr;
+    align-content: start;
+
+    > div { grid-column: 1 / -1; }
+  }
+}
+
 .form-panel {
   padding: var(--auth-panel-padding);
 }
@@ -236,7 +258,7 @@
 .field-row {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 1.1rem;
+  gap: var(--form-rhythm);
   // Si una etiqueta ocupa dos líneas, los inputs siguen alineados.
   align-items: end;
 
@@ -275,7 +297,7 @@
     input {
       flex: 1;
       min-width: 0;
-    padding: 0.7rem 0;
+    padding: var(--form-control-pad-y) 0;
       border: none;
       background: transparent;
     }
