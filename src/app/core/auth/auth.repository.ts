@@ -6,20 +6,15 @@ import {
   RegisterPayload,
 } from '../models/user.model';
 
-/**
- * Contrato de acceso a autenticación. Lo resuelve SupabaseAuthRepository;
- * cualquier otra implementación (mock, HTTP propio, etc.) solo necesita
- * implementar esta misma clase abstracta y cambiar el provider en
- * app.config.ts — ningún componente ni AuthService cambia.
- */
+/** Contrato de autenticación; hoy lo cumple SupabaseAuthRepository y se cambia en app.config.ts. */
 export abstract class AuthRepository {
   abstract signIn(email: string, password: string): Observable<AuthSession>;
   abstract signUp(payload: RegisterPayload): Observable<AuthSession>;
   abstract signOut(): Observable<void>;
   abstract requestPasswordReset(email: string): Observable<void>;
-  /** true si se llegó desde el enlace del correo de recuperación con una sesión válida. */
+  /** true si se llegó desde el enlace de recuperación con una sesión válida. */
   abstract hasRecoverySession(): Observable<boolean>;
-  /** Fija la nueva contraseña usando la sesión de recuperación (no pide la actual). */
+  /** Fija la nueva contraseña con la sesión de recuperación, sin pedir la actual. */
   abstract resetPassword(newPassword: string): Observable<void>;
   abstract updateProfile(userId: string, payload: ProfileUpdatePayload): Observable<AuthSession>;
   abstract updateAvatar(userId: string, avatarUrl: string): Observable<AuthSession>;

@@ -1,7 +1,6 @@
 import { AbstractControl, ValidationErrors, ValidatorFn } from '@angular/forms';
 
-// Compartido entre registro y cambio de contraseña: mismas dos casillas,
-// mismo criterio de coincidencia.
+// Compartido entre registro y cambio de contraseña: mismo criterio de coincidencia.
 export function passwordsMatchValidator(
   passwordControlName: string,
   confirmControlName: string

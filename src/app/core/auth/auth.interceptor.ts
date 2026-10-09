@@ -3,8 +3,7 @@ import { from, switchMap } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { supabaseClient } from './supabase-client';
 
-// Agrega el Bearer token de la sesión activa de Supabase solo en las
-// peticiones dirigidas a nuestro backend FastAPI.
+// El token de Supabase solo viaja a nuestro backend, nunca a otros dominios.
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
   if (!req.url.startsWith(environment.apiBaseUrl)) {
     return next(req);

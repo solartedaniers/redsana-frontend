@@ -4,7 +4,7 @@ import { Observable, catchError, map, of, tap } from 'rxjs';
 import { DESKTOP_RELEASE_CONFIG } from './desktop-release.config';
 import { ReleaseAsset, selectInstallerAsset } from './installer-asset.selector';
 
-/** 'installer': direct download of the .exe. 'fallback': release page (lookup failed or no matching asset). */
+/** 'installer': descarga directa del .exe. 'fallback': página del release. */
 export interface DesktopInstallerLink {
   readonly kind: 'installer' | 'fallback';
   readonly url: string;
@@ -15,11 +15,8 @@ interface GitHubRelease {
 }
 
 /**
- * Resolves the direct download URL of the Windows installer from the latest
- * GitHub release (public API, no token). Never fails: on network errors, rate
- * limits or a release without a matching asset it returns the release page.
- * A resolved installer link is cached for the session; fallbacks are not, so a
- * later click can still succeed.
+ * Busca el instalador de Windows del último release de GitHub. Nunca falla: si algo sale mal
+ * devuelvo la página del release. Solo guardo en memoria los enlaces buenos.
  */
 @Injectable({ providedIn: 'root' })
 export class DesktopReleaseResolver {

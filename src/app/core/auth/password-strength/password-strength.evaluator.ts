@@ -1,7 +1,7 @@
 import { PASSWORD_STRENGTH_CONFIG, PasswordCriterionId, PasswordStrengthLevel } from './password-strength.config';
 
 export interface PasswordStrength {
-  /** null for an empty password: nothing to rate yet. */
+  /** null con la contraseña vacía: todavía no hay nada que calificar. */
   readonly level: PasswordStrengthLevel | null;
   readonly metCount: number;
   readonly totalCriteria: number;
@@ -12,7 +12,7 @@ type CriterionCheck = (password: string) => boolean;
 
 const { patterns } = PASSWORD_STRENGTH_CONFIG;
 
-/** Rates a password against PASSWORD_STRENGTH_CONFIG. Pure: no storage, no network. */
+/** Califica una contraseña; es puro: no guarda nada ni hace peticiones. */
 export class PasswordStrengthEvaluator {
   private readonly criteria: Record<PasswordCriterionId, CriterionCheck> = {
     minLength: (password) => [...password].length >= PASSWORD_STRENGTH_CONFIG.minLength,
@@ -22,7 +22,7 @@ export class PasswordStrengthEvaluator {
     symbol: (password) => patterns.symbol.test(password),
   };
 
-  /** Criteria in display order (one bar each). */
+  /** Criterios en orden de pantalla (una barra cada uno). */
   readonly criterionIds = Object.keys(this.criteria) as PasswordCriterionId[];
   readonly totalCriteria = this.criterionIds.length;
 
@@ -34,7 +34,7 @@ export class PasswordStrengthEvaluator {
     return { level: this.levelFor(met), metCount: met.length, totalCriteria: this.totalCriteria, met };
   }
 
-  /** Criteria still missing; empty when the password meets them all. */
+  /** Criterios que aún faltan; vacío cuando los cumple todos. */
   missing(password: string): PasswordCriterionId[] {
     return this.criterionIds.filter((id) => !this.criteria[id](password));
   }

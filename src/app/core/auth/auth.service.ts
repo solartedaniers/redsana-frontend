@@ -10,10 +10,7 @@ import {
   UserRole,
 } from '../models/user.model';
 
-/**
- * Orquesta el estado de sesión de la app; delega toda llamada de datos en
- * AuthRepository para no mezclar "quién soy ahora" con "cómo se obtiene".
- */
+/** Guarda el estado de la sesión; cómo se obtienen los datos lo resuelve AuthRepository. */
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   private readonly repository = inject(AuthRepository);
@@ -47,7 +44,7 @@ export class AuthService {
     return this.repository.hasRecoverySession();
   }
 
-  /** Tras fijar la contraseña se cierra la sesión de recuperación: el usuario entra con la nueva. */
+  /** Después de fijar la contraseña cierro la sesión de recuperación para que entre con la nueva. */
   resetPassword(newPassword: string): Observable<void> {
     return this.repository.resetPassword(newPassword).pipe(switchMap(() => this.signOut()));
   }

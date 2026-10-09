@@ -53,7 +53,7 @@ export class SupabaseAuthRepository extends AuthRepository {
           return throwError(() => new Error(this.mapAuthError(error.message)));
         }
         if (!data.session) {
-          // Confirmación de correo habilitada en Supabase: no hay sesión hasta que el usuario confirme.
+          // Con confirmación de correo activa en Supabase no hay sesión hasta que el usuario confirme.
           return throwError(() => new Error('auth.errors.confirmationRequired'));
         }
         return this.buildSession(data.session.access_token, data.session.expires_at);
@@ -74,7 +74,7 @@ export class SupabaseAuthRepository extends AuthRepository {
   }
 
   hasRecoverySession(): Observable<boolean> {
-    // getSession espera a que supabase-js termine de leer el token del enlace (detectSessionInUrl).
+    // getSession espera a que supabase-js termine de leer el token que trae el enlace.
     return from(supabaseClient.auth.getSession()).pipe(map(({ data }) => data.session !== null));
   }
 
@@ -92,7 +92,7 @@ export class SupabaseAuthRepository extends AuthRepository {
         if (error) {
           return throwError(() => new Error(this.mapAuthError(error.message)));
         }
-        // Supabase Auth ya quedo actualizado; sincroniza la tabla propia para que no diverja.
+        // Supabase ya quedó actualizado; ahora sincronizo nuestra tabla para que no diverjan.
         return this.http.patch<void>(`${environment.apiBaseUrl}/api/me`, {
           full_name: payload.fullName,
         });
@@ -108,8 +108,7 @@ export class SupabaseAuthRepository extends AuthRepository {
   }
 
   updateAvatar(_userId: string, avatarUrl: string): Observable<AuthSession> {
-    // El archivo ya está subido a Supabase Storage en este punto: aquí solo se
-    // persiste la URL pública resultante, mismo patrón que full_name.
+    // El archivo ya está en Storage; aquí solo guardo su URL pública, igual que con full_name.
     return this.http.patch<void>(`${environment.apiBaseUrl}/api/me`, { avatar_url: avatarUrl }).pipe(
       switchMap(() => from(supabaseClient.auth.getSession())),
       switchMap(({ data }) => {
@@ -160,10 +159,7 @@ export class SupabaseAuthRepository extends AuthRepository {
     );
   }
 
-  /**
-   * El enlace del correo se abre en el navegador: en Tauri el origen de la app
-   * (tauri.localhost) no existe fuera de ella, así que se usa la web pública.
-   */
+  /** El enlace del correo se abre en el navegador, donde tauri.localhost no existe: uso la web pública. */
   private recoveryOrigin(): string {
     return this.isDesktop ? environment.webAppUrl : window.location.origin;
   }

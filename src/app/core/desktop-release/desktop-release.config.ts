@@ -2,11 +2,11 @@ import { InjectionToken } from '@angular/core';
 import { environment } from '../../../environments/environment';
 
 export interface DesktopReleaseConfig {
-  /** GitHub API endpoint of the repository's latest published release. */
+  /** Endpoint de la API de GitHub con el último release publicado. */
   readonly latestReleaseUrl: string;
-  /** The Windows installer is the asset whose name ends with this (case-insensitive). */
+  /** El instalador de Windows es el asset cuyo nombre termina así (sin distinguir mayúsculas). */
   readonly installerAssetSuffix: string;
-  /** Opened instead when the installer cannot be resolved (release page). */
+  /** Página del release que se abre cuando no se puede resolver el instalador. */
   readonly fallbackUrl: string;
 }
 

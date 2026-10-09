@@ -1,14 +1,12 @@
 import { AbstractControl, ValidationErrors, ValidatorFn } from '@angular/forms';
 import { PasswordStrengthEvaluator } from '../auth/password-strength/password-strength.evaluator';
 
-/** Error key set on the control; its value lists the missing criterion ids. */
+/** Clave del error en el control; su valor lista los criterios que faltan. */
 export const STRONG_PASSWORD_ERROR = 'passwordStrength';
 
 /**
- * Requires every criterion of PASSWORD_STRENGTH_CONFIG (the same rules the
- * strength meter draws). Used where a NEW password is chosen (register,
- * reset); never on login, so older passwords can still sign in. An empty value
- * is left to Validators.required.
+ * Exige todos los criterios del medidor, solo donde se elige una contraseña nueva (registro y
+ * restablecimiento). En el login no se usa para no dejar fuera contraseñas viejas.
  */
 export function strongPasswordValidator(evaluator = new PasswordStrengthEvaluator()): ValidatorFn {
   return (control: AbstractControl<string | null>): ValidationErrors | null => {
