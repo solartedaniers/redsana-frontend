@@ -1,4 +1,4 @@
-// Copia a propósito de los umbrales de backend/app/domain/network_status.py: si cambian allá, cámbialos aquí.
+// Copia a propósito de los umbrales de app/domain/network_status.py del repo del backend: si cambian allá, cámbialos aquí.
 export const LATENCY_THRESHOLDS_MS = {
   warning: 80,
   critical: 150,

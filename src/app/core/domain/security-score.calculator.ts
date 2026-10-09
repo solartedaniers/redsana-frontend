@@ -25,7 +25,7 @@ export function evaluateWifiEncryption(raw: string | null): WifiEncryptionStatus
   return STRONG_WIFI_ENCRYPTION_PREFIXES.some((prefix) => upper.startsWith(prefix)) ? 'secure' : 'weak';
 }
 
-// Copia a propósito de los pesos de backend/app/services/network_security_score_service.py.
+// Copia a propósito de los pesos de app/services/network_security_score_service.py del repo del backend.
 export const SECURITY_SCORE_WEIGHTS = {
   questionnaire: 30,
   technical: 70,
