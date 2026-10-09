@@ -1,18 +1,14 @@
 use crate::console_command::hidden_console_command;
 
-/// Comando y argumentos nativos de Windows para consultar la interfaz WiFi activa.
 const NETSH_COMMAND: &str = "netsh";
 const NETSH_SHOW_INTERFACES_ARGS: [&str; 3] = ["wlan", "show", "interfaces"];
-/// Etiquetas de campo válidas para el tipo de autenticación, según el idioma de Windows.
-/// Coincidencia exacta (no substring): netsh también expone "Autenticación 802.1x", que
-/// es un campo distinto y no debe confundirse con este.
+/// Etiquetas del tipo de autenticación según el idioma. Coincidencia exacta: "Autenticación 802.1x" es otro campo.
 const NETSH_AUTH_FIELD_LABELS: [&str; 2] = ["Autenticación", "Authentication"];
 
-/// Consulta el tipo real de cifrado/autenticación de la red WiFi actual usando
-/// `netsh wlan show interfaces` (no depende de que el usuario lo indique a mano).
+/// Lee el cifrado real de la red WiFi actual con `netsh wlan show interfaces`.
 #[tauri::command]
 pub async fn get_wifi_encryption() -> Result<String, String> {
-    // netsh es un proceso bloqueante; se ejecuta fuera del runtime async de tokio.
+    // netsh bloquea, así que lo corro fuera del runtime async de tokio.
     tokio::task::spawn_blocking(run_netsh_show_interfaces)
         .await
         .map_err(|e| format!("no se pudo ejecutar netsh: {e}"))?
@@ -32,8 +28,7 @@ fn run_netsh_show_interfaces() -> Result<String, String> {
     parse_auth_type(&stdout).ok_or_else(|| "no se encontró el campo de autenticación en la salida de netsh".to_string())
 }
 
-/// Busca la línea cuya etiqueta (antes de ':') coincide exactamente con alguna
-/// de las etiquetas de autenticación conocidas, y devuelve su valor.
+/// Busca la línea cuya etiqueta coincide exactamente con una de las conocidas y devuelve su valor.
 fn parse_auth_type(netsh_output: &str) -> Option<String> {
     netsh_output.lines().find_map(|line| {
         let (label, value) = line.split_once(':')?;
@@ -50,8 +45,7 @@ fn parse_auth_type(netsh_output: &str) -> Option<String> {
 mod tests {
     use super::*;
 
-    // Muestra real de `netsh wlan show interfaces` en Windows en español, incluyendo
-    // el campo "Autenticación 802.1x" que no debe confundirse con "Autenticación".
+    // Muestra real de netsh en español, con el campo "Autenticación 802.1x" que no debe confundirse.
     const SAMPLE_OUTPUT: &str = "\
 Hay 1 interfaz en el sistema:
 

@@ -11,12 +11,11 @@ const ROUTE_COMMAND: &str = "route";
 const ROUTE_PRINT_IPV4_ARGS: [&str; 2] = ["print", "-4"];
 const DEFAULT_ROUTE: &str = "0.0.0.0";
 
-/// Puertos TCP de riesgo conocido en un router doméstico. Espejo intencional de
-/// RISKY_ROUTER_PORTS en backend/app/domain/security_analyzers.py, que decide
-/// cuánto penaliza cada uno: aquí solo se comprueba si están abiertos.
+/// Puertos TCP de riesgo en un router doméstico. Copia a propósito de RISKY_ROUTER_PORTS del backend;
+/// aquí solo compruebo si están abiertos.
 const PROBED_PORTS: [u16; 6] = [21, 22, 23, 139, 445, 7547];
 
-/// Un puerto que no acepta conexión en este tiempo se considera cerrado/filtrado.
+/// Si no acepta conexión en este tiempo, lo doy por cerrado o filtrado.
 const CONNECT_TIMEOUT: Duration = Duration::from_millis(800);
 
 #[derive(Serialize)]
@@ -26,9 +25,7 @@ pub struct RouterPortScan {
     pub open_ports: Vec<u16>,
 }
 
-/// Comprueba qué puertos de riesgo acepta conexiones en el router (la puerta de
-/// enlace predeterminada) y en ningún otro equipo: es una conexión TCP normal
-/// por puerto, sin enviar datos, contra el router de la propia red del usuario.
+/// Comprueba qué puertos de riesgo acepta el router y solo el router: una conexión TCP normal, sin enviar datos.
 #[tauri::command]
 pub async fn scan_router_open_ports() -> Result<RouterPortScan, String> {
     let route_table = tokio::task::spawn_blocking(run_route_print)
@@ -59,12 +56,11 @@ fn run_route_print() -> Result<String, String> {
     if !output.status.success() {
         return Err("route print devolvió un error".to_string());
     }
-    // Solo se leen IPs y números, que no dependen del idioma ni de la página de códigos.
+    // Solo leo IPs y números, que no dependen del idioma ni de la página de códigos.
     Ok(String::from_utf8_lossy(&output.stdout).into_owned())
 }
 
-/// Ruta por defecto (destino y máscara 0.0.0.0) con la menor métrica: es la
-/// que Windows usa de verdad cuando hay varios adaptadores con gateway.
+/// La ruta por defecto con menor métrica es la que Windows usa de verdad cuando hay varios gateways.
 fn parse_default_gateway(route_table: &str) -> Option<Ipv4Addr> {
     route_table
         .lines()
@@ -115,7 +111,7 @@ Persistent Routes:
 
     #[test]
     fn a_closed_port_is_reported_as_closed() {
-        // Puerto 9 (discard) en loopback: no hay servicio en Windows, el connect falla.
+        // Puerto 9 (discard) en loopback: no hay servicio en Windows, así que el connect falla.
         assert!(!block_on(is_port_open(Ipv4Addr::LOCALHOST, 9)));
     }
 

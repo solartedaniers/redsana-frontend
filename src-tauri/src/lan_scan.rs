@@ -8,54 +8,33 @@ use tokio::task::JoinSet;
 
 use crate::ping::new_client;
 
-/// Comando nativo de Windows para leer la configuración IP de las interfaces activas.
-/// "/all" agrega la dirección física (MAC) del adaptador, necesaria para contar
-/// a este mismo equipo entre los dispositivos de la red.
+/// Configuración IP de Windows; "/all" agrega la MAC del adaptador para contar a este equipo en la red.
 const IPCONFIG_COMMAND: &str = "ipconfig";
 const IPCONFIG_ARGS: [&str; 1] = ["/all"];
-/// Etiquetas de campo (normalizadas: sin espacios/puntos, en minúsculas) para la
-/// IPv4 y la máscara de subred, según el idioma de Windows.
+/// Etiquetas normalizadas (sin espacios ni puntos, en minúsculas) de la IPv4 y la máscara, según el idioma.
 const IPV4_ADDRESS_LABELS: [&str; 2] = ["ipv4address", "direcciónipv4"];
 const SUBNET_MASK_LABELS: [&str; 2] = ["subnetmask", "máscaradesubred"];
 const PHYSICAL_ADDRESS_LABELS: [&str; 2] = ["physicaladdress", "direcciónfísica"];
 const DEFAULT_GATEWAY_LABELS: [&str; 2] = ["defaultgateway", "puertadeenlacepredeterminada"];
 
-/// Palabras que delatan un adaptador virtual/túnel (WSL, Hyper-V, Docker, VPN,
-/// loopback) en el encabezado de su sección de `ipconfig`. Estos adaptadores
-/// casi siempre aparecen ANTES del adaptador físico real en la salida (ej.
-/// "vEthernet (WSL)" antes de "Wi-Fi"), y si se toma la primera IPv4 sin
-/// filtrar, el escaneo termina barriendo la subred virtual (172.20.x.x, etc.)
-/// en vez de la red real -- confirmado en vivo en esta misma máquina.
+/// Palabras que delatan un adaptador virtual o túnel. Suelen salir ANTES del físico y, sin filtrarlos,
+/// el escaneo barría la subred virtual (172.20.x.x) en vez de la red real.
 const VIRTUAL_ADAPTER_MARKERS: [&str; 6] = ["virtual", "vethernet", "vpn", "tunel", "túnel", "loopback"];
 
-/// Comando nativo de Windows para leer la tabla ARP real del sistema.
 const ARP_COMMAND: &str = "arp";
 const ARP_ARGS: [&str; 1] = ["-a"];
 const BROADCAST_MAC: &str = "ff-ff-ff-ff-ff-ff";
 const MULTICAST_MAC_PREFIX: &str = "01-00-5e";
 
-/// Timeout corto por IP: no necesitamos una respuesta ICMP real, solo forzar
-/// que el SO intente resolver la MAC por ARP (eso ocurre en la capa IP antes
-/// de enviar el paquete, responda o no el destino).
+/// Timeout corto: no busco respuesta ICMP, solo forzar que el sistema resuelva la MAC por ARP.
 const ARP_TRIGGER_TIMEOUT: Duration = Duration::from_millis(300);
-/// Límite de IPs a barrer: evita un escaneo desmedido si un adaptador reporta
-/// una máscara inusualmente amplia. Una LAN doméstica (/24, 254 hosts) nunca
-/// lo alcanza; 4096 cubre hasta un /20, que ya es una subred plana grande
-/// típica de una red corporativa/de campus. El barrido es concurrente (ver
-/// scan_connected_devices), así que subir este número no multiplica el
-/// tiempo del escaneo, solo su cobertura.
+/// Tope de IPs a barrer ante máscaras muy amplias; 4096 cubre hasta un /20 y, como es concurrente, no multiplica el tiempo.
 const MAX_HOSTS_TO_SCAN: usize = 4096;
-/// Espera tras cada pasada del barrido. Un celular en ahorro de energía solo
-/// atiende la radio en sus ventanas de despertar (cientos de ms a ~1s), así que
-/// contesta el ARP tarde: con una sola pasada y lectura inmediata de la tabla
-/// ARP quedaba fuera (confirmado en vivo: un escaneo vio solo el router y los
-/// siguientes vieron también el celular).
+/// Espera entre pasadas: un celular en ahorro de energía contesta el ARP tarde y con una sola pasada quedaba fuera.
 const SWEEP_SETTLE_DELAY: Duration = Duration::from_millis(1000);
 const SWEEP_PASSES: usize = 2;
 
-/// Papel del dispositivo en la red: el router (puerta de enlace) es la red
-/// misma y este equipo no aparece en su propia tabla ARP; ambos se marcan para
-/// que la interfaz no los confunda con "otros dispositivos conectados".
+/// Papel en la red: el router es la red misma y este equipo no sale en su propia tabla ARP; los marco para no confundirlos.
 #[derive(Serialize, Clone, Copy, Debug, PartialEq)]
 #[serde(rename_all = "snake_case")]
 pub enum DeviceRole {
@@ -64,8 +43,7 @@ pub enum DeviceRole {
     Other,
 }
 
-/// Dispositivo descubierto por ARP: solo IP y MAC, el nombre casi nunca está
-/// disponible por este medio y no debe inventarse (queda a cargo del backend/UI).
+/// Dispositivo descubierto por ARP: solo IP y MAC; el nombre casi nunca está disponible y no lo invento.
 #[derive(Serialize, Clone, Debug)]
 pub struct DiscoveredDevice {
     pub ip: String,
@@ -82,9 +60,7 @@ struct LocalInterface {
     mac: Option<String>,
 }
 
-/// Descubre los dispositivos realmente conectados a la LAN local: determina
-/// la subred propia, fuerza su resolución ARP con un barrido concurrente, y
-/// lee la tabla ARP resultante.
+/// Descubre los dispositivos conectados: saco la subred propia, fuerzo el ARP con un barrido concurrente y leo la tabla.
 #[tauri::command]
 pub async fn scan_connected_devices() -> Result<Vec<DiscoveredDevice>, String> {
     let interface = tokio::task::spawn_blocking(local_interface)
@@ -106,8 +82,7 @@ pub async fn scan_connected_devices() -> Result<Vec<DiscoveredDevice>, String> {
     Ok(classify_devices(&interface, parse_arp_table(&arp_output)))
 }
 
-/// Los pings corren en paralelo: una pasada tarda ~ARP_TRIGGER_TIMEOUT, no
-/// ARP_TRIGGER_TIMEOUT * cantidad_de_hosts. El resultado de cada ping no importa.
+/// Los pings van en paralelo: una pasada tarda ~ARP_TRIGGER_TIMEOUT y no eso por cada host.
 async fn sweep_subnet(client: &Client, targets: &[Ipv4Addr]) {
     let mut sweep = JoinSet::new();
     for (sequence, ip) in targets.iter().copied().enumerate() {
@@ -117,15 +92,13 @@ async fn sweep_subnet(client: &Client, targets: &[Ipv4Addr]) {
     while sweep.join_next().await.is_some() {}
 }
 
-/// MAC de la puerta de enlace de la red actual: identifica la red (cada router
-/// tiene la suya) para que la detección de anomalías aprenda cada red por
-/// separado. Sale cruda solo hacia el frontend de este mismo equipo, que la
-/// convierte en hash antes de enviarla. None si no hay red o no se pudo resolver.
+/// MAC del router de la red actual, para aprender cada red por separado. Solo sale hacia el frontend
+/// de este equipo, que la convierte en hash. None si no hay red.
 #[tauri::command]
 pub async fn current_gateway_mac() -> Result<Option<String>, String> {
     let interface = match tokio::task::spawn_blocking(local_interface).await {
         Ok(Ok(interface)) => interface,
-        _ => return Ok(None), // sin adaptador con IPv4: no hay red que identificar
+        _ => return Ok(None), // sin adaptador con IPv4 no hay red que identificar
     };
     let Some(gateway) = interface.gateway else { return Ok(None) };
 
@@ -150,8 +123,7 @@ fn find_mac_for_ip(neighbors: &[DiscoveredDevice], ip: Ipv4Addr) -> Option<Strin
     neighbors.iter().find(|device| device.ip == ip).map(|device| device.mac.clone())
 }
 
-/// Deja solo los vecinos de la subred propia, marca el router y agrega este
-/// mismo equipo (que nunca está en su propia tabla ARP).
+/// Deja solo los vecinos de la subred propia, marca el router y agrega este equipo.
 fn classify_devices(interface: &LocalInterface, neighbors: Vec<DiscoveredDevice>) -> Vec<DiscoveredDevice> {
     let network = u32::from(interface.ip) & u32::from(interface.mask);
     let broadcast = network | !u32::from(interface.mask);
@@ -192,11 +164,8 @@ fn local_interface() -> Result<LocalInterface, String> {
     })
 }
 
-/// Busca el primer adaptador FÍSICO (no virtual/túnel) con una IPv4 real (no
-/// APIPA 169.254.x.x) y su máscara asociada, junto con su MAC y su puerta de
-/// enlace. No asume nombre de adaptador ni rango: los deriva del propio texto
-/// de ipconfig, pero descarta secciones completas cuyo encabezado delate un
-/// adaptador virtual (ver VIRTUAL_ADAPTER_MARKERS).
+/// Busca el primer adaptador FÍSICO con IPv4 real (no APIPA), su máscara, MAC y puerta de enlace,
+/// descartando las secciones virtuales; no asume nombres ni rangos.
 fn parse_local_interface(ipconfig_output: &str) -> Option<LocalInterface> {
     let mut section = SectionFields::default();
     let mut in_virtual_adapter = false;
@@ -214,8 +183,7 @@ fn parse_local_interface(ipconfig_output: &str) -> Option<LocalInterface> {
             continue;
         }
 
-        // "Puerta de enlace" puede traer varios valores en líneas siguientes
-        // sin etiqueta (primero la IPv6 y debajo la IPv4): son un solo token.
+        // La puerta de enlace puede traer varios valores en líneas sin etiqueta (IPv6 y debajo IPv4): son un solo dato.
         let token = line.trim();
         if section.awaiting_gateway && !token.is_empty() && !token.contains(char::is_whitespace) {
             if let Ok(gateway) = token.parse::<Ipv4Addr>() {
@@ -230,7 +198,7 @@ fn parse_local_interface(ipconfig_output: &str) -> Option<LocalInterface> {
         section.awaiting_gateway = DEFAULT_GATEWAY_LABELS.contains(&label.as_str());
 
         if IPV4_ADDRESS_LABELS.contains(&label.as_str()) {
-            // ipconfig a veces agrega "(Preferido)"/"(Preferred)" pegado al valor.
+            // ipconfig a veces pega "(Preferido)" al valor.
             let ip_text = value.split('(').next().unwrap_or(value).trim();
             section.ip = ip_text.parse::<Ipv4Addr>().ok().filter(|ip| !is_link_local(*ip));
         } else if SUBNET_MASK_LABELS.contains(&label.as_str()) {
@@ -260,10 +228,7 @@ impl SectionFields {
     }
 }
 
-/// Encabezado de sección de adaptador en `ipconfig`: no tiene sangría y no
-/// trae valor después de los dos puntos (a diferencia de una línea de campo
-/// como "   IPv4 Address. . . : 192.168.1.23"). Detectarlo por forma, no por
-/// palabra ("adapter"/"adaptador"), evita depender del idioma de Windows.
+/// Encabezado de adaptador: sin sangría y sin valor tras los dos puntos. Lo detecto por forma para no depender del idioma.
 fn is_adapter_header(line: &str) -> bool {
     !line.is_empty() && !line.starts_with(char::is_whitespace) && line.trim_end().ends_with(':')
 }
@@ -281,8 +246,7 @@ fn is_link_local(ip: Ipv4Addr) -> bool {
     ip.octets()[0] == 169 && ip.octets()[1] == 254
 }
 
-/// Direcciones host de la subred (excluye red, broadcast y la propia IP),
-/// acotadas a MAX_HOSTS_TO_SCAN.
+/// Direcciones host de la subred (sin red, broadcast ni la propia), hasta MAX_HOSTS_TO_SCAN.
 fn hosts_in_subnet(ip: Ipv4Addr, mask: Ipv4Addr, exclude: Ipv4Addr) -> Vec<Ipv4Addr> {
     let network = u32::from(ip) & u32::from(mask);
     let broadcast = network | !u32::from(mask);
@@ -299,8 +263,7 @@ fn hosts_in_subnet(ip: Ipv4Addr, mask: Ipv4Addr, exclude: Ipv4Addr) -> Vec<Ipv4A
         .collect()
 }
 
-/// Envía un ping con timeout corto solo para forzar la resolución ARP del SO;
-/// el resultado del ping en sí (éxito, timeout, error) es irrelevante aquí.
+/// Ping con timeout corto solo para forzar el ARP del sistema; su resultado no importa.
 async fn trigger_arp_resolution(client: &Client, ip: Ipv4Addr, sequence: u16) {
     let mut pinger = client.pinger(IpAddr::V4(ip), PingIdentifier(sequence)).await;
     pinger.timeout(ARP_TRIGGER_TIMEOUT);
@@ -321,11 +284,8 @@ fn run_arp_a() -> Result<String, String> {
     Ok(decode_console_output(&output.stdout))
 }
 
-/// Decodifica la salida cruda de un comando de consola de Windows (ipconfig, arp)
-/// usando la página de códigos OEM realmente activa (850, 437, 866... según el
-/// idioma del sistema), en vez de asumir UTF-8. `String::from_utf8_lossy` corrompe
-/// silenciosamente cualquier tilde/ñ (ej. "Dirección") en locales no-inglesas,
-/// lo que rompe el parseo de etiquetas sin dar ningún error visible.
+/// Decodifica la salida de consola con la página de códigos OEM activa: from_utf8_lossy rompía en silencio
+/// las tildes ("Dirección") y con ellas el parseo de etiquetas.
 #[cfg(windows)]
 fn decode_console_output(bytes: &[u8]) -> String {
     use std::ptr;
@@ -347,8 +307,7 @@ fn decode_console_output(bytes: &[u8]) -> String {
         return String::new();
     }
 
-    // ponytail: solo cubre la página de códigos activa al arrancar el proceso;
-    // si el usuario la cambia en pleno vuelo (raro), habría que releer GetOEMCP cada vez.
+    // ponytail: solo cubre la página de códigos activa al arrancar; si cambia en caliente habría que releer GetOEMCP.
     unsafe {
         let code_page = GetOEMCP();
         let len = MultiByteToWideChar(code_page, 0, bytes.as_ptr(), bytes.len() as i32, ptr::null_mut(), 0);
@@ -371,9 +330,7 @@ fn decode_console_output(bytes: &[u8]) -> String {
     String::from_utf8_lossy(bytes).into_owned()
 }
 
-/// Reconoce las líneas de datos de `arp -a` por su FORMA (ip + mac), no por el
-/// texto de sus encabezados: así se descartan solas las líneas de
-/// "Interface: ..." y de cabecera de columnas sin depender del idioma de Windows.
+/// Reconozco las líneas de `arp -a` por su forma (IP + MAC), así descarto encabezados sin depender del idioma.
 fn parse_arp_table(arp_output: &str) -> Vec<DiscoveredDevice> {
     arp_output
         .lines()
@@ -424,10 +381,7 @@ Wireless LAN adapter Wi-Fi:
    Default Gateway . . . . . . . . . : 192.168.1.1
 ";
 
-    // Captura real de esta misma máquina: el adaptador virtual de WSL/Hyper-V
-    // aparece ANTES que el Wi-Fi real y sí tiene una IPv4 válida (no APIPA) --
-    // sin el filtro de adaptador virtual, esto haría que se escaneara
-    // 172.20.240.0/20 en vez de la red real.
+    // Captura real: el adaptador de WSL sale ANTES del Wi-Fi con una IPv4 válida; sin el filtro se barría 172.20.240.0/20.
     const IPCONFIG_WITH_VIRTUAL_ADAPTER_FIRST: &str = "\
 Adaptador de Ethernet vEthernet (WSL (Hyper-V firewall)):
 
@@ -485,7 +439,7 @@ Interface: 192.168.1.23 --- 0xe
         assert_eq!(parse_local_interface(output), None);
     }
 
-    // Captura real (ipconfig /all, español) de esta máquina, recortada.
+    // Captura real de ipconfig /all en español, recortada.
     const IPCONFIG_ALL_ES: &str = "\
 Adaptador de LAN inalámbrica Wi-Fi:
 
@@ -524,8 +478,7 @@ Wireless LAN adapter Wi-Fi:
         DiscoveredDevice { ip: ip.to_string(), mac: mac.to_string(), role: DeviceRole::Other }
     }
 
-    // El caso real que mostraba "1 dispositivo": router + celular en la tabla ARP,
-    // y este PC (que nunca aparece en su propia tabla ARP) quedaba sin contar.
+    // El caso real que mostraba "1 dispositivo": router y celular en la tabla ARP, y este PC sin contar.
     #[test]
     fn classify_devices_marks_the_router_and_adds_this_computer() {
         let interface = LocalInterface {
@@ -605,10 +558,7 @@ Wireless LAN adapter Wi-Fi:
     #[test]
     #[cfg(windows)]
     fn decode_console_output_handles_oem_codepage_accents() {
-        // Bytes reales que devuelve `ipconfig` en Windows en español (CP850) para
-        // "Dirección IPv4": 0xA2 es 'ó' en CP850, no UTF-8 válido. Antes del fix,
-        // String::from_utf8_lossy lo reemplazaba por U+FFFD y rompía el parseo de
-        // "Dirección IPv4" -> las etiquetas dejaban de matchear silenciosamente.
+        // Bytes reales de ipconfig en español (CP850): 0xA2 es 'ó' y no es UTF-8 válido; antes rompía "Dirección IPv4".
         let cp850_bytes = [b'D', b'i', b'r', b'e', b'c', b'c', b'i', 0xA2, b'n'];
         assert_eq!(decode_console_output(&cp850_bytes), "Direcci\u{f3}n");
     }

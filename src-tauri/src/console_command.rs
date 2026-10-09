@@ -1,9 +1,6 @@
 use std::process::Command;
 
-/// Proceso de consola de Windows (ipconfig, arp, netsh) que se ejecuta sin
-/// abrir ventana. La app de escritorio no tiene consola propia (windows_subsystem
-/// = "windows"), así que cada Command::new a secas mostraba una ventana negra que
-/// aparecía y se cerraba al instante en cada escaneo.
+/// Proceso de consola de Windows sin ventana: sin esto cada escaneo hacía parpadear una ventana negra.
 pub(crate) fn hidden_console_command(program: &str) -> Command {
     #[allow(unused_mut)]
     let mut command = Command::new(program);

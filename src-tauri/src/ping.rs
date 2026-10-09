@@ -5,18 +5,18 @@ use serde::Serialize;
 use surge_ping::{Client, Config, PingIdentifier, PingSequence, SurgeError, ICMP};
 use tokio::net::lookup_host;
 
-/// Host de referencia para medir la calidad de la red cuando el llamador no especifica uno.
+/// Host de referencia cuando el llamador no indica uno.
 const DEFAULT_PING_TARGET: &str = "1.1.1.1";
-/// Cantidad de pings de muestra por medición: suficiente para estimar jitter sin tardar demasiado.
+/// Pings por medición: suficientes para estimar el jitter sin tardar demasiado.
 const QUALITY_SAMPLE_COUNT: u16 = 5;
-/// Espera entre cada ping de la muestra, para no saturar la red ni el hilo.
+/// Espera entre pings para no saturar la red ni el hilo.
 const QUALITY_SAMPLE_INTERVAL: Duration = Duration::from_millis(200);
-/// Tiempo máximo de espera por cada ping antes de contarlo como paquete perdido.
+/// Espera máxima por ping antes de contarlo como perdido.
 const PING_TIMEOUT: Duration = Duration::from_secs(1);
-/// Tamaño del payload ICMP en bytes (sin datos reales, solo para completar el paquete).
+/// Tamaño del payload ICMP en bytes (relleno, sin datos reales).
 const PING_PAYLOAD_SIZE: usize = 8;
 
-/// Resultado agregado de una medición de calidad de red (varios pings reales).
+/// Resultado agregado de una medición con varios pings reales.
 #[derive(Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct NetworkQualityMeasurement {
@@ -25,8 +25,7 @@ pub struct NetworkQualityMeasurement {
     pub packet_loss_percent: f64,
 }
 
-/// Envía un único ICMP echo real al host indicado y devuelve la latencia en milisegundos.
-/// Acepta tanto IPs como hostnames (se resuelven vía DNS antes del ping).
+/// Envía un ICMP echo real y devuelve la latencia en ms; acepta IPs y nombres (los resuelve por DNS).
 #[tauri::command]
 pub async fn measure_latency(host: String) -> Result<f64, String> {
     let address = resolve_host(&host).await?;
@@ -37,8 +36,7 @@ pub async fn measure_latency(host: String) -> Result<f64, String> {
         .ok_or_else(|| format!("ping a {host} superó el tiempo de espera"))
 }
 
-/// Mide latencia, jitter y pérdida de paquetes reales, enviando varios pings
-/// al host en una ventana corta de tiempo.
+/// Mide latencia, jitter y pérdida reales con varios pings en una ventana corta.
 #[tauri::command]
 pub async fn measure_network_quality(host: Option<String>) -> Result<NetworkQualityMeasurement, String> {
     let target = host.unwrap_or_else(|| DEFAULT_PING_TARGET.to_string());
@@ -56,8 +54,7 @@ pub async fn measure_network_quality(host: Option<String>) -> Result<NetworkQual
     Ok(aggregate_samples(&latencies_ms, QUALITY_SAMPLE_COUNT))
 }
 
-/// Crea el cliente ICMP apropiado para la familia de direcciones del host resuelto.
-/// pub(crate): también lo reutiliza lan_scan.rs para el barrido de descubrimiento.
+/// Crea el cliente ICMP según la familia de la dirección; lan_scan.rs también lo reutiliza.
 pub(crate) fn new_client(address: IpAddr) -> Result<Client, String> {
     let config = match address {
         IpAddr::V4(_) => Config::default(),
@@ -66,7 +63,7 @@ pub(crate) fn new_client(address: IpAddr) -> Result<Client, String> {
     Client::new(&config).map_err(|e| format!("no se pudo crear el cliente ICMP: {e}"))
 }
 
-/// Envía un ping y devuelve la latencia, o None si se agotó el timeout (paquete perdido).
+/// Envía un ping y devuelve la latencia, o None si se agotó el timeout.
 async fn ping_once(client: &Client, address: IpAddr, sequence: u16) -> Result<Option<f64>, String> {
     let mut pinger = client.pinger(address, PingIdentifier(sequence)).await;
     pinger.timeout(PING_TIMEOUT);
@@ -79,8 +76,7 @@ async fn ping_once(client: &Client, address: IpAddr, sequence: u16) -> Result<Op
     }
 }
 
-/// Calcula latencia promedio, jitter (desviación media entre pings consecutivos) y
-/// porcentaje de pérdida de paquetes a partir de las muestras recolectadas.
+/// Latencia promedio, jitter (diferencia media entre pings seguidos) y porcentaje de pérdida.
 fn aggregate_samples(latencies_ms: &[f64], expected_samples: u16) -> NetworkQualityMeasurement {
     let received = latencies_ms.len();
     let packet_loss_percent = if expected_samples == 0 {
