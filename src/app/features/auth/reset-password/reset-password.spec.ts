@@ -55,7 +55,7 @@ describe('ResetPassword', () => {
     await detect();
     fill(element, 'Nueva-Clave-2026', 'Otra-Clave-2026');
     await detect();
-    // Long enough but missing uppercase, digit and symbol: the strength rule blocks it.
+    // Larga pero sin mayúscula, número ni símbolo: la regla de fortaleza la bloquea.
     fill(element, 'nueva-clave-segura', 'nueva-clave-segura');
     await detect();
 

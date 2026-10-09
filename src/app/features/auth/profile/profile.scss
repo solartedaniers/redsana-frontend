@@ -1,6 +1,6 @@
 .profile-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(20rem, 100%), 1fr)); // min(): at 320 px a 20rem card overflowed
+  grid-template-columns: repeat(auto-fit, minmax(min(20rem, 100%), 1fr)); // min(): a 320 px una tarjeta de 20rem se salía
   gap: var(--space-5);
   align-items: start;
 }
@@ -15,7 +15,7 @@
   h2 { margin: 0 0 var(--space-4); font-size: var(--font-size-heading-sm); }
 }
 
-// The personal data reads as a patient ID card: lime band across the top.
+// Los datos personales se leen como una credencial de paciente: franja lima arriba.
 .profile-section--id { border-top: var(--space-3) solid var(--color-fill-healthy); }
 
 .avatar-row {
@@ -40,11 +40,11 @@
 
   img { width: 100%; height: 100%; object-fit: cover; }
 
-  // The svg lives inside <app-icon> (encapsulated): enlarged only here.
+  // El svg vive dentro de <app-icon> (encapsulado): lo agrando solo aquí.
   app-icon ::ng-deep .icon { width: 2rem; height: 2rem; }
 }
 
-// Second entry point to the same "change photo" input.
+// Segunda entrada al mismo input de "cambiar foto".
 button.avatar-preview {
   padding: 0;
   cursor: pointer;
@@ -55,5 +55,5 @@ button.avatar-preview {
 .avatar-controls { display: flex; flex-direction: column; gap: var(--space-2); }
 .avatar-upload-button { width: fit-content; }
 
-// Visible but not editable: dashed, so it reads differently from editable fields.
+// Visible pero no editable: con borde punteado para que se distinga de los editables.
 .field input[readonly] { border-style: dashed; color: var(--color-text-secondary); cursor: default; }

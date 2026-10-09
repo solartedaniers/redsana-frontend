@@ -1,7 +1,6 @@
 .new-user-button { margin-bottom: var(--space-5); }
 
-// Patient register: an ink-ruled ledger with a solid header band. Five columns
-// do not fit on a phone, so the table scrolls inside this box.
+// Registro con encabezado de tinta; en el celular la tabla se desplaza dentro de esta caja.
 .table-scroll {
   overflow-x: auto;
   border: var(--border-width-ink) solid var(--color-card-border);
@@ -35,7 +34,7 @@
   tr:last-child td { border-bottom: none; }
 }
 
-// Status sticker without tilt so table rows stay aligned.
+// Sin inclinación para que las filas de la tabla queden alineadas.
 .status-badge { transform: none; }
 
 .actions-cell { display: flex; gap: var(--space-2); }
@@ -55,7 +54,7 @@
 }
 
 .user-dialog {
-  min-width: min(26rem, calc(100vw - 2rem)); // never wider than a phone screen
+  min-width: min(26rem, calc(100vw - 2rem)); // nunca más ancho que la pantalla del celular
   padding: var(--space-6);
   border: var(--border-width-ink) solid var(--color-card-border);
   border-radius: var(--radius-lg);

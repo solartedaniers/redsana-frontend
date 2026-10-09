@@ -15,7 +15,7 @@ export const AUTH_ROUTES: Routes = [
     loadComponent: () => import('./forgot-password/forgot-password').then((m) => m.ForgotPassword),
   },
   {
-    // Destino del enlace del correo de recuperación (ver SupabaseAuthRepository.requestPasswordReset).
+    // Destino del enlace del correo de recuperación.
     path: ROUTE_SEGMENTS.resetPassword,
     loadComponent: () => import('./reset-password/reset-password').then((m) => m.ResetPassword),
   },

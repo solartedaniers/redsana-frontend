@@ -12,8 +12,7 @@ import { ScoreGauge } from '../../../shared/components/score-gauge/score-gauge';
 import { TranslatePipe } from '../../../core/i18n/translate.pipe';
 import { APP_PATHS } from '../../../core/routing/app-paths';
 
-// El backend no expone un endpoint "por id" para hogares: se reutiliza
-// getHouseholds() y se filtra en cliente.
+// El backend no tiene un endpoint por id para hogares, así que filtro el resultado de getHouseholds().
 @Component({
   selector: 'app-household-detail',
   imports: [RouterLink, PageHeader, NetworkStatusLight, MetricCard, HistoryChart, ScoreGauge, TranslatePipe],

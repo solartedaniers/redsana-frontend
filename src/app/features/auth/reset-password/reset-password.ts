@@ -10,11 +10,10 @@ import { STRONG_PASSWORD_ERROR, strongPasswordValidator } from '../../../core/va
 import { Icon } from '../../../shared/components/icon/icon';
 import { PasswordStrengthMeter } from '../../../shared/components/password-strength-meter/password-strength-meter';
 
-/** checking: leyendo el enlace del correo; invalidLink: vencido o ya usado; done: contraseña cambiada. */
+/** checking: leyendo el enlace; invalidLink: vencido o ya usado; done: contraseña cambiada. */
 type ResetPasswordState = 'checking' | 'invalidLink' | 'form' | 'done';
 
-// Destino del enlace del correo de recuperación: supabase-js ya abrió la sesión
-// de recuperación con el token de la URL, aquí solo se fija la contraseña nueva.
+// supabase-js ya abrió la sesión de recuperación con el token del enlace; aquí solo fijo la contraseña nueva.
 @Component({
   selector: 'app-reset-password',
   imports: [ReactiveFormsModule, RouterLink, TranslatePipe, Icon, PasswordStrengthMeter],

@@ -1,5 +1,4 @@
-// Ward rounds: one row per household, with the security score as a big
-// reading on a strip of its band color.
+// Una fila por hogar, con el puntaje grande sobre una franja del color de su banda.
 .households-list {
   display: grid;
   gap: var(--space-4);
@@ -48,7 +47,7 @@
   &[data-source='real'] { color: var(--color-status-success); }
 }
 
-// Date of a reused technical measurement: secondary, discreet.
+// Fecha de una medición técnica reutilizada: dato secundario y discreto.
 .score-date { max-width: 12rem; font-size: var(--font-size-caption); color: var(--color-text-secondary); text-align: right; }
 
 @media (max-width: 48rem) {
