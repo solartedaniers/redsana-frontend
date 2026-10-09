@@ -1,0 +1,35 @@
+<div class="search" role="search">
+  <div class="search__field">
+    <app-icon name="search" />
+    <input
+      #field
+      type="search"
+      inputmode="search"
+      autocomplete="off"
+      spellcheck="false"
+      [value]="query()"
+      (input)="query.set(field.value)"
+      (keydown.escape)="clear(field)"
+      [attr.aria-label]="'user.devicesMap.search.label' | translate"
+      [placeholder]="'user.devicesMap.search.placeholder' | translate"
+    />
+    @if (query()) {
+      <button type="button" class="search__clear" (click)="clear(field)" [attr.aria-label]="'user.devicesMap.search.clear' | translate">
+        <span aria-hidden="true">×</span>
+      </button>
+    }
+  </div>
+
+  <p class="search__count" aria-live="polite">
+    @if (isActive()) {
+      {{ 'user.devicesMap.search.count' | translate: { shown: matchCount(), total: totalCount() } }}
+    }
+  </p>
+
+  @if (isActive() && matchCount() === 0) {
+    <div class="search__empty">
+      <p>{{ 'user.devicesMap.search.empty' | translate: { query: query().trim() } }}</p>
+      <button type="button" class="subtle-button" (click)="clear(field)">{{ 'user.devicesMap.search.clear' | translate }}</button>
+    </div>
+  }
+</div>

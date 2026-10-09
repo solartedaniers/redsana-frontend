@@ -107,6 +107,10 @@
 [data-trust='blocked'] > i,
 .topology__node[data-trust='blocked']::before { border-radius: 0; background: var(--color-fill-critical); }
 
+// Con una búsqueda activa atenúo los puntos que no coinciden y resalto los que sí.
+.topology--searching .topology__node:not(.topology__node--match) { opacity: 0.2; }
+.topology__node--match::before { box-shadow: 0 0 0 0.25rem var(--color-accent); }
+
 .topology__limit { position: absolute; bottom: var(--space-3); inset-inline: var(--space-4); text-align: center; }
 
 .radar__legend {

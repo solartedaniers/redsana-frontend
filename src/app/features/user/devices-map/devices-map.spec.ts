@@ -1,6 +1,6 @@
 import { provideHttpClient } from '@angular/common/http';
 import { TestBed } from '@angular/core/testing';
-import { of } from 'rxjs';
+import { Subject, of } from 'rxjs';
 import { LanScanGateway } from '../../../core/lan-scan/lan-scan.gateway';
 import { NetworkDevice } from '../../../core/models/device.model';
 import { DevicesRepository } from '../../../core/repositories/devices.repository';
@@ -172,5 +172,69 @@ describe('DevicesMap con una red de campus (~900 equipos)', () => {
     fixture.detectChanges();
 
     expect(element.querySelectorAll('.device-card')).toHaveLength(100);
+  });
+});
+
+describe('DevicesMap search', () => {
+  const campus = () => [device(0, true, 'gateway'), ...Array.from({ length: 120 }, (_, i) => device(i + 1, true))];
+
+  async function setup(devices$ = new Subject<NetworkDevice[]>()) {
+    TestBed.configureTestingModule({
+      providers: [
+        provideHttpClient(),
+        { provide: DevicesRepository, useValue: { getDevices: () => devices$ } },
+        { provide: LanScanGateway, useValue: { isAvailable: false } },
+      ],
+    });
+    const fixture = TestBed.createComponent(DevicesMap);
+    fixture.detectChanges();
+    const element = fixture.nativeElement as HTMLElement;
+    const input = () => element.querySelector<HTMLInputElement>('app-device-search-box input')!;
+    const type = (text: string) => {
+      input().value = text;
+      input().dispatchEvent(new Event('input'));
+      fixture.detectChanges();
+    };
+    const ips = () => [...element.querySelectorAll('.device-card')].map((card) => card.querySelector('.device-meta')?.textContent?.split('·')[1]?.trim());
+    return { fixture, element, input, type, ips, devices$ };
+  }
+
+  it('busca en todos los cargados, no solo en la primera página de 50', async () => {
+    const { devices$, type, ips, element, fixture } = await setup();
+    devices$.next(campus());
+    fixture.detectChanges();
+
+    type('  192.168.0.115 ');
+
+    expect(ips()).toEqual(['192.168.0.115']);
+    expect(element.querySelector('.search__count')?.textContent?.trim()).toBe('user.devicesMap.search.count');
+    expect(element.querySelectorAll('.topology__node')).toHaveLength(70);
+  });
+
+  it('la búsqueda se mantiene cuando llega un escaneo nuevo y Escape la borra', async () => {
+    const { devices$, type, ips, input, fixture } = await setup();
+    devices$.next(campus());
+    type('192.168.0.11');
+    devices$.next(campus());
+    fixture.detectChanges();
+
+    expect(ips()).toEqual(['192.168.0.11', '192.168.0.110', '192.168.0.111', '192.168.0.112', '192.168.0.113', '192.168.0.114', '192.168.0.115', '192.168.0.116', '192.168.0.117', '192.168.0.118', '192.168.0.119']);
+
+    input().dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }));
+    fixture.detectChanges();
+    expect(input().value).toBe('');
+    expect(ips()).toHaveLength(50);
+  });
+
+  it('sin coincidencias muestra el aviso con la opción de limpiar', async () => {
+    const { devices$, type, element, fixture } = await setup();
+    devices$.next(campus());
+    fixture.detectChanges();
+    type('10.9.9.9');
+
+    expect(element.querySelectorAll('.device-card')).toHaveLength(0);
+    element.querySelector<HTMLButtonElement>('.search__empty button')!.click();
+    fixture.detectChanges();
+    expect(element.querySelectorAll('.device-card')).toHaveLength(50);
   });
 });

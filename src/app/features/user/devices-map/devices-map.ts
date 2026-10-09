@@ -7,6 +7,8 @@ import { PageHeader } from '../../../shared/components/page-header/page-header';
 import { TranslatePipe } from '../../../core/i18n/translate.pipe';
 import { Icon } from '../../../shared/components/icon/icon';
 import { DeviceCard } from './device-card/device-card';
+import { DeviceSearchBox } from './device-search/device-search-box';
+import { DeviceSearchFilter } from './device-search/device-search.filter';
 
 // Alto mínimo del mapa (el mismo de .topology) y margen para el halo del punto más externo.
 const TOPOLOGY_MIN_HEIGHT_REM = 24;
@@ -22,7 +24,7 @@ const ROLE_ORDER: Record<DeviceNetworkRole, number> = { gateway: 0, this_device:
 
 @Component({
   selector: 'app-devices-map',
-  imports: [PageHeader, TranslatePipe, Icon, DeviceCard],
+  imports: [PageHeader, TranslatePipe, Icon, DeviceCard, DeviceSearchBox],
   templateUrl: './devices-map.html',
   styleUrl: './devices-map.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -43,9 +45,16 @@ export class DevicesMap {
   protected readonly networkMembers = computed(() =>
     this.connectedDevices().filter((device) => device.networkRole !== 'gateway')
   );
+  // La búsqueda es estado de pantalla: no se guarda y sobrevive a cada escaneo porque vive en su propio signal.
+  private readonly searchFilter = new DeviceSearchFilter();
+  protected readonly searchQuery = signal('');
+  protected readonly isSearching = computed(() => !this.searchFilter.isEmpty(this.searchQuery()));
+  // Busco en todo lo cargado, no solo en la página visible; luego pagino las coincidencias igual que la lista.
+  protected readonly matchingDevices = computed(() => this.searchFilter.filter(this.connectedDevices(), this.searchQuery()));
+  protected readonly matchingIds = computed(() => (this.isSearching() ? new Set(this.matchingDevices().map((device) => device.id)) : null));
   protected readonly visibleCount = signal(DEVICES_PAGE_SIZE);
-  protected readonly visibleDevices = computed(() => this.connectedDevices().slice(0, this.visibleCount()));
-  protected readonly hiddenDeviceCount = computed(() => Math.max(0, this.connectedDevices().length - this.visibleCount()));
+  protected readonly visibleDevices = computed(() => this.matchingDevices().slice(0, this.visibleCount()));
+  protected readonly hiddenDeviceCount = computed(() => Math.max(0, this.matchingDevices().length - this.visibleCount()));
   /** Conteo real por nivel de confianza para la leyenda del radar. */
   protected readonly trustCounts = computed(() =>
     TRUST_LEVELS.map((trust) => ({ trust, count: this.networkMembers().filter((device) => device.trust === trust).length }))
@@ -109,6 +118,11 @@ export class DevicesMap {
       this.isScanning.set(false);
       this.scanFailed.set(true);
     }
+  }
+
+  protected onSearchChange(query: string): void {
+    this.searchQuery.set(query);
+    this.visibleCount.set(DEVICES_PAGE_SIZE);
   }
 
   protected showMoreDevices(): void {
