@@ -5,7 +5,7 @@ import { AUTH_ROUTES } from '../../features/auth/auth.routes';
 import { USER_ROUTES } from '../../features/user/user.routes';
 import { APP_PATHS, ROUTE_SEGMENTS } from './app-paths';
 
-// Las rutas hijas se cargan perezosamente (loadChildren): se enlazan a mano a su padre.
+// Las rutas hijas se cargan perezosamente, así que las engancho a mano con su padre.
 const LAZY_CHILDREN: Record<string, Routes> = {
   [ROUTE_SEGMENTS.auth]: AUTH_ROUTES,
   [ROUTE_SEGMENTS.user]: USER_ROUTES,

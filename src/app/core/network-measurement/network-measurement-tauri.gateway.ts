@@ -3,8 +3,7 @@ import { invoke } from '@tauri-apps/api/core';
 import { NetworkQualityMeasurement } from '../models/network.model';
 import { NetworkMeasurementGateway } from './network-measurement.gateway';
 
-// El comando Rust ya serializa en camelCase (#[serde(rename_all = "camelCase")]),
-// por lo que measure() no necesita mapear nombres de campo.
+// Rust ya serializa en camelCase, así que aquí no hace falta mapear campos.
 @Injectable()
 export class NetworkMeasurementTauriGateway extends NetworkMeasurementGateway {
   readonly source = 'native';

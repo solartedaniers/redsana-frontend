@@ -45,9 +45,8 @@ export class NetworkMetricsHttpRepository extends NetworkMetricsRepository {
   }
 
   watchSnapshot(householdId?: string): Observable<NetworkMetricSnapshot> {
-    // El backend aun no expone push/streaming: se simula "en vivo" reconsultando
-    // el ultimo snapshot a intervalos, con switchMap para no acumular pedidos.
-    // catchError por consulta: un fallo puntual salta ese tick en vez de matar el sondeo.
+    // Sin streaming en el backend, reconsulto cada pocos segundos; switchMap evita acumular pedidos
+    // y catchError por consulta salta ese tick en vez de matar el sondeo.
     return interval(LIVE_UPDATE_INTERVAL_MS).pipe(
       startWith(0),
       switchMap(() => this.getSnapshot(householdId).pipe(catchError(() => EMPTY)))
@@ -87,8 +86,7 @@ export class NetworkMetricsHttpRepository extends NetworkMetricsRepository {
       );
   }
 
-  // El backend por defecto scopea al usuario autenticado; user_id solo aplica
-  // cuando un admin inspecciona la red de otro hogar (household-detail).
+  // user_id solo aplica cuando un admin revisa la red de otro hogar; si no, el backend usa el usuario actual.
   private ownerParams(householdId?: string): Record<string, string> {
     return householdId ? { user_id: householdId } : {};
   }

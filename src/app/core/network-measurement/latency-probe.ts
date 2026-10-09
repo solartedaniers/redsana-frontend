@@ -6,23 +6,17 @@ export interface LatencyProbeConfig {
   sampleTimeoutMs: number;
 }
 
-/** null = muestra perdida (timeout, red caída o respuesta no exitosa). */
+/** null es una muestra perdida (timeout, red caída o respuesta fallida). */
 export type LatencySample = number | null;
 
-/** Mensaje del hilo principal al Worker. */
 export interface LatencyProbeRequest {
   type: 'measure';
   config: LatencyProbeConfig;
 }
 
-/** Respuesta del Worker al hilo principal. */
 export type LatencyProbeResponse = { type: 'samples'; samples: LatencySample[] } | { type: 'failed'; reason: string };
 
-/**
- * Bucle de sondeo compartido por el Worker y el respaldo en el hilo principal:
- * cada muestra es una petición HTTP cronometrada (el navegador no puede enviar
- * ICMP). Sin DOM, solo fetch, timers y performance, que existen en ambos.
- */
+/** Bucle de sondeo que comparten el Worker y el respaldo; cada muestra es una petición HTTP cronometrada. */
 export async function runLatencyProbes(config: LatencyProbeConfig): Promise<LatencySample[]> {
   const samples: LatencySample[] = [];
   for (let i = 0; i < config.sampleCount; i++) {
@@ -35,7 +29,7 @@ export async function runLatencyProbes(config: LatencyProbeConfig): Promise<Late
 async function probeOnce(config: LatencyProbeConfig): Promise<LatencySample> {
   const startedAt = performance.now();
   try {
-    // no-store: una respuesta servida desde caché (HTTP o service worker) daría ~0 ms falsos.
+    // no-store: una respuesta de caché daría ~0 ms falsos.
     const response = await fetch(config.probeUrl, { cache: 'no-store', signal: AbortSignal.timeout(config.sampleTimeoutMs) });
     return response.ok ? performance.now() - startedAt : null;
   } catch {

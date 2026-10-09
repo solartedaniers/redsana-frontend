@@ -7,15 +7,12 @@ import {
   NetworkQualityMeasurement,
 } from '../models/network.model';
 
-/**
- * householdId es opcional: el usuario estándar lo omite (ve su propia red),
- * el admin lo pasa para inspeccionar la red de un hogar específico.
- */
+/** householdId solo lo pasa el admin para ver la red de otro hogar. */
 export abstract class NetworkMetricsRepository {
   abstract getSnapshot(householdId?: string): Observable<NetworkMetricSnapshot>;
   abstract watchSnapshot(householdId?: string): Observable<NetworkMetricSnapshot>;
   abstract getHistory(householdId?: string): Observable<NetworkMetricSample[]>;
-  /** Persiste una medición real propia del usuario autenticado. */
+  /** Guarda una medición real del usuario autenticado. */
   /** networkFingerprint: hash de la red actual (solo escritorio); null si no se pudo identificar. */
   abstract record(
     measurement: NetworkQualityMeasurement,

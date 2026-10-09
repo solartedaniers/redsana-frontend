@@ -19,8 +19,7 @@ import {
 } from '../models/security.model';
 import { SecurityAssistantRepository } from './security-assistant.repository';
 
-// El cifrado WiFi (antes 'wpa3-enabled') ya no se pregunta: se auto-detecta
-// via WifiEncryptionGateway y se informa como dato de solo lectura.
+// El cifrado WiFi ya no se pregunta: se detecta solo y se muestra como dato de lectura.
 const QUESTIONS: SecurityQuestion[] = [
   { id: 'default-password', textKey: 'user.securityAssistant.questions.defaultPassword' },
   { id: 'firmware-updated', textKey: 'user.securityAssistant.questions.firmwareUpdated' },

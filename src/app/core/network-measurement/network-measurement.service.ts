@@ -7,24 +7,14 @@ import { NetworkMetricsRepository } from '../repositories/network-metrics.reposi
 import { NetworkMeasurementGateway } from './network-measurement.gateway';
 import { NetworkIdentityGateway } from '../network-identity/network-identity.gateway';
 
-/** Frecuencia de la medición real de red en segundo plano. */
+/** Cada cuánto se mide la red en segundo plano. */
 const MEASUREMENT_INTERVAL_MS = 60000;
-/**
- * Candado compartido entre pestañas del mismo origen (Web Locks API): sin él,
- * cada pestaña abierta guardaba su propia medición por minuto y N pestañas
- * sesgaban la calibración de anomalías de esa red.
- */
+/** Candado entre pestañas (Web Locks): sin él, cada pestaña guardaba su medición y sesgaba la calibración. */
 const MEASUREMENT_LOCK_NAME = 'redsana-network-measurement';
 
 /**
- * Dispara la medición del gateway activo (Rust en escritorio, fetch
- * cronometrado en navegador) a intervalos y persiste cada snapshot en el
- * backend. En escritorio el trabajo pesado ocurre en Rust/el SO y en
- * navegador son awaits de red, nunca cómputo en el hilo de JS: interval +
- * switchMap solo orquesta, no bloquea ni satura el Event Loop; switchMap
- * además evita solapar ciclos si uno tarda más que el intervalo, y
- * catchError por ciclo evita que un fallo puntual (red caída) mate la
- * suscripción completa.
+ * Mide a intervalos y guarda cada resultado sin bloquear el hilo de JS. switchMap evita
+ * que dos ciclos se pisen y catchError por ciclo evita que un fallo mate la suscripción.
  */
 @Injectable({ providedIn: 'root' })
 export class NetworkMeasurementService {
@@ -32,21 +22,16 @@ export class NetworkMeasurementService {
   private readonly repository = inject(NetworkMetricsRepository);
   private readonly networkIdentity = inject(NetworkIdentityGateway);
   private readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
-  // Las mediciones se guardan a nombre del usuario: sin sesión no hay a quién
-  // atribuirlas (el backend responde 401) y en la landing pública solo serían
-  // tráfico inútil de cada visitante anónimo.
+  // Las mediciones van a nombre del usuario: sin sesión no hay a quién atribuirlas.
   private readonly isAuthenticated$ = toObservable(inject(AuthService).isAuthenticated);
 
   start(): void {
-    // Al prerenderizar no hay red que medir, y un interval vivo impediría que
-    // el prerender termine (la app nunca quedaría estable).
+    // Al prerenderizar no hay red y un intervalo vivo no dejaría terminar el prerender.
     if (!this.isBrowser) {
       return;
     }
 
-    // Solo mide la pestaña que tiene el candado; el resto espera en cola y
-    // toma el relevo sola si esa pestaña se cierra. Sin Web Locks (navegador
-    // viejo) se mide igual que antes, una vez por pestaña.
+    // Solo mide la pestaña con el candado; las demás esperan y toman el relevo si se cierra. Sin Web Locks mido igual.
     const locks = globalThis.navigator?.locks;
     if (!locks) {
       this.measureWhileAuthenticated();
@@ -54,7 +39,7 @@ export class NetworkMeasurementService {
     }
     void locks.request(MEASUREMENT_LOCK_NAME, () => {
       this.measureWhileAuthenticated();
-      // Promesa que nunca se resuelve: el candado se conserva mientras viva la pestaña.
+      // Esta promesa nunca se resuelve a propósito: así conservo el candado mientras viva la pestaña.
       return new Promise<never>(() => undefined);
     });
   }
@@ -62,7 +47,7 @@ export class NetworkMeasurementService {
   private measureWhileAuthenticated(): void {
     this.isAuthenticated$
       .pipe(
-        // Al iniciar sesión mide de inmediato; al cerrarla, switchMap corta el ciclo.
+        // Al iniciar sesión mido enseguida; al cerrarla, switchMap corta el ciclo.
         switchMap((isAuthenticated) =>
           isAuthenticated ? interval(MEASUREMENT_INTERVAL_MS).pipe(startWith(0)) : EMPTY
         ),
@@ -72,8 +57,7 @@ export class NetworkMeasurementService {
   }
 
   private runCycle() {
-    // La red se identifica en cada ciclo: si el equipo cambió de red, la
-    // medición se cuenta para la red nueva (cada una calibra por separado).
+    // Identifico la red en cada ciclo: si el equipo cambió de red, la medición cuenta para la nueva.
     return from(Promise.all([this.gateway.measure(), this.networkIdentity.currentNetworkFingerprint()])).pipe(
       switchMap(([measurement, fingerprint]) => this.repository.record(measurement, this.gateway.source, fingerprint)),
       catchError((error) => {

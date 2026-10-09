@@ -7,7 +7,7 @@ import { NetworkMetricsRepository } from '../repositories/network-metrics.reposi
 import { NetworkMeasurementGateway } from './network-measurement.gateway';
 import { NetworkMeasurementService } from './network-measurement.service';
 
-/** Imita navigator.locks: el primero obtiene el candado y los demás quedan esperando. */
+/** Imita navigator.locks: el primero toma el candado y los demás esperan. */
 function fakeLockManager() {
   let held = false;
   const waiting: (() => void)[] = [];

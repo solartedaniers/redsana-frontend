@@ -6,8 +6,7 @@ import { NetworkAlert } from '../models/alert.model';
 import { AlertsRepository } from './alerts.repository';
 
 const NEW_ALERTS_POLL_INTERVAL_MS = 10000;
-// Alertas guardadas antes de que el backend usara la ruta completa del
-// diccionario: sin el prefijo se mostraba la clave cruda en vez del texto.
+// Alertas viejas guardadas sin la ruta completa del diccionario; sin el prefijo se veía la clave cruda.
 const LEGACY_ALERT_KEY_PREFIX = 'alertsCenter.';
 const ALERT_KEY_NAMESPACE = 'user.';
 
@@ -31,11 +30,10 @@ export class AlertsHttpRepository extends AlertsRepository {
   }
 
   watchNewAlerts(): Observable<NetworkAlert> {
-    // Sin push real del backend: se hace polling a /new con un cursor "since" que
-    // avanza al timestamp de la ultima alerta vista, para no repetir ni perder alertas.
+    // No hay push: consulto /new con un cursor "since" que avanza con la última alerta vista.
     let since = new Date().toISOString();
     return interval(NEW_ALERTS_POLL_INTERVAL_MS).pipe(
-      // Si un sondeo falla, el cursor no avanza: el siguiente vuelve a pedir desde el mismo "since" y no se pierde nada.
+      // Si una consulta falla el cursor no avanza, así la siguiente lo vuelve a pedir y no se pierde nada.
       switchMap(() => this.http.get<BackendAlert[]>(`${this.baseUrl}/new`, { params: { since } }).pipe(catchError(() => EMPTY))),
       tap((alerts) => {
         if (alerts.length > 0) {

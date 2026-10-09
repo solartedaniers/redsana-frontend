@@ -2,6 +2,5 @@ import { inject } from '@angular/core';
 import { CanMatchFn } from '@angular/router';
 import { RuntimeEnvironmentService } from './runtime-environment.service';
 
-// El escritorio ya es la app instalada: no tiene sentido presentarle la
-// landing, así que sigue abriendo directo en el login como siempre.
+// En escritorio la app ya está instalada: no tiene sentido mostrar la landing, abro directo en el login.
 export const webOnlyGuard: CanMatchFn = () => !inject(RuntimeEnvironmentService).isDesktop;

@@ -1,8 +1,4 @@
-/**
- * Única fuente de las URLs de la app: las definiciones de rutas usan los
- * segmentos y los enlaces, guards y navegaciones usan las rutas completas, así
- * renombrar una URL es cambiar una sola línea aquí.
- */
+/** Única fuente de las URLs: renombrar una ruta es cambiar una línea aquí. */
 export const ROUTE_SEGMENTS = {
   auth: 'auth',
   user: 'user',

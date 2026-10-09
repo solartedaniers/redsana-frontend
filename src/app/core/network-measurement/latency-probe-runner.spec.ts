@@ -3,7 +3,7 @@ import { MainThreadLatencyProbeRunner, WorkerLatencyProbeRunner, createLatencyPr
 
 const CONFIG: LatencyProbeConfig = { probeUrl: 'https://api.test/health', sampleCount: 3, sampleIntervalMs: 0, sampleTimeoutMs: 1000 };
 
-/** Imita un Worker: responde con la misma lógica que el hilo real y registra si se terminó. */
+/** Imita un Worker: responde como el hilo real y registra si se terminó. */
 class FakeWorker {
   static instances: FakeWorker[] = [];
   onmessage: ((event: MessageEvent<LatencyProbeResponse>) => void) | null = null;
