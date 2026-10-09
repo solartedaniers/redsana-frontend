@@ -5,7 +5,7 @@ import { ChatConversationSummary } from '../../../../core/models/security.model'
 import { Icon } from '../../../../shared/components/icon/icon';
 import { SecurityChatSession } from '../security-chat-session.service';
 
-/** Interfaz del chat; el estado de la conversación vive en SecurityChatSession, aquí solo el de la vista. */
+/** Vista del chat; el estado de la conversación vive en SecurityChatSession. */
 @Component({
   selector: 'app-security-chat-panel',
   imports: [FormsModule, TranslatePipe, Icon],

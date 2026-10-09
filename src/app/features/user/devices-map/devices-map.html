@@ -1,6 +1,6 @@
 <section class="devices-hero">
   <app-page-header titleKey="user.devicesMap.title" subtitleKey="user.devicesMap.subtitle" />
-  <!-- Si el último escaneo falló, la lista guardada puede ser vieja o parcial: no se da un número. -->
+  <!-- Si el último escaneo falló, la lista guardada puede estar vieja o incompleta: no muestro un número. -->
   <span class="status-badge">{{ scanFailed() ? ('user.devicesMap.countUnavailable' | translate) : networkMembers().length }}</span>
 </section>
 
@@ -25,7 +25,7 @@
   }
 </div>
 
-<!-- "Inseguro" es solo una marca para el usuario: RedSana no tiene acceso al router para bloquear a nadie. -->
+<!-- "Inseguro" es solo una marca para el usuario: RedSana no puede bloquear a nadie en el router. -->
 <p class="surface-panel__copy trust-note">{{ 'user.devicesMap.trustNote' | translate }}</p>
 
 <div class="devices-workspace workspace-grid workspace-grid--two">

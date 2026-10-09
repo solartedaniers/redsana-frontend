@@ -8,19 +8,16 @@ import { TranslatePipe } from '../../../core/i18n/translate.pipe';
 import { Icon } from '../../../shared/components/icon/icon';
 import { DeviceCard } from './device-card/device-card';
 
-// Alto mínimo del mapa (igual al de .topology en el SCSS) y margen para el
-// halo del punto más externo cuando hay tantos dispositivos que se abren anillos extra.
+// Alto mínimo del mapa (el mismo de .topology) y margen para el halo del punto más externo.
 const TOPOLOGY_MIN_HEIGHT_REM = 24;
 const TOPOLOGY_EDGE_MARGIN_REM = 1.5;
-// En una red de campus llegan ~900 equipos: pintarlos todos creaba ~16 000
-// nodos DOM (~1 s de bloqueo). La lista crece de a una página y el mapa dibuja
-// solo los primeros anillos; el contador sigue mostrando el total real.
+// En una red de campus llegan ~900 equipos y pintarlos todos bloqueaba ~1 s; por eso pagino la lista y limito el mapa.
 const DEVICES_PAGE_SIZE = 50;
 const MAX_TOPOLOGY_NODES = 70;
 
 const TRUST_LEVELS: readonly DeviceTrust[] = ['trusted', 'unknown', 'blocked'];
 
-// Router primero y luego este equipo: los dos que el usuario reconoce enseguida.
+// Primero el router y luego este equipo, que son los que el usuario reconoce enseguida.
 const ROLE_ORDER: Record<DeviceNetworkRole, number> = { gateway: 0, this_device: 1, other: 2 };
 
 @Component({
@@ -36,28 +33,25 @@ export class DevicesMap {
 
   protected readonly isScanAvailable = this.lanScanGateway.isAvailable;
   protected readonly devices = signal<NetworkDevice[]>([]);
-  // El backend guarda todo el historial del usuario (incluidas otras redes en
-  // las que escaneó alguna vez); la pantalla muestra solo lo que vio el escaneo
-  // más reciente, que es lo que está conectado ahora (is_online lo calcula el backend).
+  // El backend guarda todo el historial; aquí muestro solo lo del último escaneo, que es lo conectado ahora.
   protected readonly connectedDevices = computed(() =>
     this.devices()
       .filter((device) => device.isOnline)
       .sort((a, b) => ROLE_ORDER[a.networkRole ?? 'other'] - ROLE_ORDER[b.networkRole ?? 'other'])
   );
-  // El router es la red misma (el hub del mapa), no un dispositivo conectado a
-  // ella: se lista aparte pero no cuenta. Este equipo sí cuenta.
+  // El router es la red misma (el centro del mapa): se lista aparte y no cuenta. Este equipo sí cuenta.
   protected readonly networkMembers = computed(() =>
     this.connectedDevices().filter((device) => device.networkRole !== 'gateway')
   );
   protected readonly visibleCount = signal(DEVICES_PAGE_SIZE);
   protected readonly visibleDevices = computed(() => this.connectedDevices().slice(0, this.visibleCount()));
   protected readonly hiddenDeviceCount = computed(() => Math.max(0, this.connectedDevices().length - this.visibleCount()));
-  /** Real count per trust level for the radar legend (same members as the counter). */
+  /** Conteo real por nivel de confianza para la leyenda del radar. */
   protected readonly trustCounts = computed(() =>
     TRUST_LEVELS.map((trust) => ({ trust, count: this.networkMembers().filter((device) => device.trust === trust).length }))
   );
   protected readonly mapShownCount = computed(() => Math.min(this.networkMembers().length, MAX_TOPOLOGY_NODES));
-  // Un punto del mapa por dispositivo conectado (hasta MAX_TOPOLOGY_NODES), cada uno en su propia posición.
+  // Un punto por dispositivo conectado (hasta MAX_TOPOLOGY_NODES), cada uno en su posición.
   protected readonly topologyNodes = computed(() => {
     const devices = this.networkMembers().slice(0, MAX_TOPOLOGY_NODES);
     const offsets = layoutTopologyNodes(devices.length);
@@ -79,8 +73,7 @@ export class DevicesMap {
 
   constructor() {
     this.repository.getDevices().subscribe((devices) => this.devices.set(devices));
-    // Donde se puede escanear (escritorio), se escanea al entrar: así la lista
-    // refleja la red actual aunque el último escaneo guardado sea de otra red.
+    // En escritorio escaneo al entrar para que la lista refleje la red actual.
     if (this.isScanAvailable) {
       void this.scan();
     }
@@ -92,29 +85,26 @@ export class DevicesMap {
     this.scanFailed.set(false);
 
     try {
-      // 1) descubre qué hay realmente en la red (Tauri/ARP); 2) sincroniza el
-      // backend con eso, que crea lo nuevo y refresca la presencia de lo conocido.
+      // Primero descubro lo que hay en la red y luego lo sincronizo con el backend.
       const discovered = await this.lanScanGateway.scan();
       this.repository.syncDiscoveredDevices(discovered).subscribe({
         next: (devices) => {
           this.isScanning.set(false);
           this.devices.set(devices);
-          // El router y este equipo no son "intrusos" posibles: solo se revisan los demás.
+          // El router y este equipo no pueden ser intrusos: solo reviso los demás.
           this.lastScanFindings.set(
             devices.filter((device) => device.isOnline && device.networkRole === 'other' && device.trust !== 'trusted')
           );
         },
         error: (error) => {
-          // La causa real (ej. fallo de sincronización con el backend) queda en
-          // consola: el signal solo dispara el mensaje genérico de la UI.
+          // La causa real queda en consola; en pantalla solo va el mensaje genérico.
           console.error('[DevicesMap] fallo al sincronizar dispositivos escaneados', error);
           this.isScanning.set(false);
           this.scanFailed.set(true);
         },
       });
     } catch (error) {
-      // Sin Tauri, sin permisos, ipconfig/arp fallaron, etc. El mensaje real
-      // (qué paso exacto falló) viaja en el Err de Rust y aparece aquí.
+      // Sin Tauri, sin permisos o con ipconfig/arp fallando; el detalle llega en el Err de Rust.
       console.error('[DevicesMap] fallo al escanear la LAN', error);
       this.isScanning.set(false);
       this.scanFailed.set(true);

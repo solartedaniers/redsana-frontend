@@ -9,7 +9,7 @@
 
 .devices-hero .page-header { margin: 0; }
 
-// The device counter is the hero number of this chart.
+// El contador de dispositivos es el número protagonista de esta hoja.
 .devices-hero .status-badge { font-size: var(--font-size-heading-sm); padding: var(--space-2) var(--space-4); }
 
 .scan-bar {
@@ -31,8 +31,7 @@
 
 .trust-note { margin: 0 0 var(--space-5); max-width: 70ch; }
 
-// The radar scope spans the sheet; the cards fill a responsive grid below it,
-// so long networks do not become one endless narrow column.
+// El radar ocupa todo el ancho y las tarjetas van en una cuadrícula debajo, para que una red grande no sea una columna eterna.
 .devices-workspace { grid-template-columns: minmax(0, 1fr); }
 
 .devices-list {
@@ -45,8 +44,7 @@
 
 .show-more-button { grid-column: 1 / -1; justify-self: center; }
 
-// ---- Radar: router at the center, range rings, crosshair; the sweep only
-// turns while a real scan runs (never pretends to scan continuously).
+// Radar: el router al centro; el barrido solo gira durante un escaneo real, nunca finge escanear.
 .radar { overflow: hidden; }
 
 .topology {
@@ -88,9 +86,7 @@
   box-shadow: var(--shadow-hard);
 }
 
-// Trust is told by shape AND color: circle = trusted, diamond = unknown,
-// square = unsafe. The node itself only carries the inline position; the shape
-// is drawn in ::before so its rotation never shifts that position.
+// La confianza se distingue por forma y color; la forma va en ::before para que su giro no mueva la posición.
 .topology__node { position: absolute; width: 0.9rem; height: 0.9rem; }
 
 .topology__node::before,

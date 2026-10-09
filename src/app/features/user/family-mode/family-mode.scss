@@ -3,7 +3,7 @@
 
 .family-layout { align-items: start; }
 
-// ---- Steps as recipe cards: big numeral, tilted alternately like pinned notes.
+// Pasos como tarjetas de receta, inclinadas de forma alterna como notas pegadas.
 .family-steps ol {
   display: grid;
   gap: var(--space-4);
@@ -66,7 +66,7 @@
 
 .family-ask { margin: 0 var(--space-5) var(--space-5); }
 
-// ---- DNS as giant copyable pills
+// DNS como píldoras grandes que se copian con un clic.
 .dns-cards { display: grid; gap: var(--space-4); margin: var(--space-5); }
 
 .dns-card {

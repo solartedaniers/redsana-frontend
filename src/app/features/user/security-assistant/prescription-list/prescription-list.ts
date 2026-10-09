@@ -3,8 +3,7 @@ import { RecommendationUrgency, getRecommendationUrgency } from '../../../../cor
 import { TranslatePipe } from '../../../../core/i18n/translate.pipe';
 import { SecurityRecommendation } from '../../../../core/models/security.model';
 
-/** The prioritized guide written as a prescription: numbered doses, each one
- * stamped with the urgency derived from its real backend priority. */
+/** La guía priorizada como receta: dosis numeradas, cada una con la urgencia de su prioridad real. */
 @Component({
   selector: 'app-prescription-list',
   imports: [TranslatePipe],

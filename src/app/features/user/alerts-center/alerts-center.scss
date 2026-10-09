@@ -10,7 +10,7 @@
   color: var(--color-text-secondary);
 }
 
-// A vertical ECG spine: every alert hangs from it on a node of its severity.
+// Una columna vertebral tipo ECG: cada alerta cuelga de ella con un nodo de su severidad.
 .timeline {
   position: relative;
   display: grid;
@@ -37,7 +37,7 @@
     content: '';
     position: absolute;
     top: var(--space-4);
-    // Centered on the spine: spine offset minus the list indent minus half a node.
+    // Centrado sobre la columna: su desplazamiento menos la sangría de la lista y medio nodo.
     left: calc(var(--space-6) - var(--space-7) - var(--space-2) - 0.55rem);
     width: 1.1rem;
     height: 1.1rem;

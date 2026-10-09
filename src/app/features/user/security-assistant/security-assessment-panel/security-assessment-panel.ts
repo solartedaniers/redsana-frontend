@@ -47,8 +47,7 @@ export class SecurityAssessmentPanel {
   constructor() {
     this.repository.getQuestionnaire().subscribe((questions) => this.questions.set(questions));
     this.wifiGateway.detect().then((raw) => this.wifiEncryptionRaw.set(raw));
-    // Si ya respondió antes, se muestra directo el resultado guardado en vez de
-    // un formulario vacío: verlo en blanco cada vez se sentía como un bug.
+    // Si ya respondió antes, muestro directo el resultado guardado; verlo en blanco cada vez parecía un error.
     this.repository.getLatest().subscribe((latest) => {
       this.result.set(latest);
       this.isLoadingLatest.set(false);
@@ -61,8 +60,7 @@ export class SecurityAssessmentPanel {
 
   protected async submit(): Promise<void> {
     this.isSubmitting.set(true);
-    // El análisis técnico (cifrado + puertos del router) se mide justo al
-    // enviar, para que el puntaje refleje la red de este momento.
+    // El análisis técnico se mide justo al enviar, para que el puntaje refleje la red de este momento.
     const evidence = await this.evidenceCollector.collect();
     this.repository.submitAnswers(this.answers(), evidence).subscribe((result) => {
       this.isSubmitting.set(false);

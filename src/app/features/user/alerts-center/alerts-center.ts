@@ -23,9 +23,7 @@ export class AlertsCenter {
 
   constructor() {
     this.repository.getAlerts().subscribe((alerts) => this.alerts.set(alerts));
-    // Cada alerta predictiva nueva se antepone a la lista para que el
-    // stagger de entrada sea visible sin recargar la pantalla.
-    // takeUntilDestroyed: el sondeo vive solo mientras la pantalla está abierta.
+    // Antepongo cada alerta nueva para que se vea su entrada; el sondeo vive solo mientras la pantalla está abierta.
     this.repository
       .watchNewAlerts()
       .pipe(takeUntilDestroyed())

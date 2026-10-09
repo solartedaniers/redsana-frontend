@@ -17,10 +17,8 @@ const STEP_KEYS = [
   'user.familyMode.steps.save',
 ] as const;
 
-// Guía y no automatización: cambiar el DNS por HTTP exigiría un conector por
-// marca/firmware de router (login cifrado, tokens CSRF, menús distintos) y
-// fallaría sin aviso en la mayoría. Por eso RedSana nunca pide la contraseña
-// del router: el usuario hace el cambio en el panel de su propio router.
+// Es una guía y no una automatización: cambiar el DNS por HTTP exigiría un conector por cada router.
+// Por eso RedSana nunca pide la contraseña del router.
 @Component({
   selector: 'app-family-mode',
   imports: [RouterLink, TranslatePipe, Icon, PageHeader],
@@ -37,16 +35,14 @@ export class FamilyMode {
     { labelKey: 'user.familyMode.primaryDns', value: FAMILY_DNS.primary },
     { labelKey: 'user.familyMode.secondaryDns', value: FAMILY_DNS.secondary },
   ] as const;
-  /** Last DNS copied to the clipboard, announced in a live region. */
+  /** Último DNS copiado, anunciado en una región en vivo. */
   protected readonly copiedValue = signal<string | null>(null);
-  // Cada paso en trozos de texto y valores: los DNS del paso 4 se muestran como
-  // chips sin tocar el texto traducido (se recalcula al cambiar de idioma).
+  // Parto cada paso en texto y valores para mostrar los DNS como píldoras sin tocar la traducción.
   protected readonly steps = computed(() => {
     const dnsParams = { primary: this.dns.primary, secondary: this.dns.secondary };
     return STEP_KEYS.map((key) => ({ key, segments: splitTemplate(this.i18n.translate(key), dnsParams) }));
   });
-  // El asistente recibe los DNS y estos mismos pasos como contexto; la guía
-  // fija de esta pantalla se queda como respaldo.
+  // El asistente recibe estos mismos pasos como contexto; la guía fija queda de respaldo.
   protected readonly assistantQueryParams: Record<string, UserStartableChatTopic> = {
     [CHAT_TOPIC_QUERY_PARAM]: 'family_mode',
   };
@@ -56,7 +52,7 @@ export class FamilyMode {
       await navigator.clipboard.writeText(value);
       this.copiedValue.set(value);
     } catch {
-      // Clipboard denied (permissions/insecure context): the value stays visible to copy by hand.
+      // Portapapeles denegado: el valor sigue a la vista para copiarlo a mano.
       this.copiedValue.set(null);
     }
   }

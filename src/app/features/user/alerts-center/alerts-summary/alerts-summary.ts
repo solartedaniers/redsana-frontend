@@ -5,11 +5,7 @@ import { TranslatePipe } from '../../../../core/i18n/translate.pipe';
 const SEVERITIES: readonly AlertSeverity[] = ['critical', 'warning', 'info'];
 const PERCENT = 100;
 
-/**
- * Real summary of the loaded alerts: how many of each severity, how many are
- * still pending, and a time strip where every alert is a tick placed at its
- * real timestamp between the oldest and the newest one.
- */
+/** Resumen real de las alertas cargadas: cuántas hay de cada severidad, cuántas faltan y cuándo ocurrieron. */
 @Component({
   selector: 'app-alerts-summary',
   imports: [TranslatePipe],

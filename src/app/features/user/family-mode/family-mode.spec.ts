@@ -39,7 +39,7 @@ describe('FamilyMode', () => {
   });
 
   it('numera cada paso y resalta los DNS del paso 4 como chips', async () => {
-    // Plantilla real del paso 4 (el diccionario no se carga en los tests).
+    // Plantilla real del paso 4 (el diccionario no se carga en las pruebas).
     const setDnsTemplate = 'Escribe {{primary}} como DNS primario y {{secondary}} como DNS secundario.';
     TestBed.configureTestingModule({
       providers: [

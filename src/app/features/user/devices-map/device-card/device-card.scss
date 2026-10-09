@@ -1,7 +1,6 @@
 :host { display: block; }
 
-// Device as a patient tag: kind icon block, big name, mono IP; trust is a
-// sticker and the folder edge takes the trust color.
+// El dispositivo como etiqueta de paciente; el borde superior toma el color de su confianza.
 .device-card {
   --severity-fill: var(--color-fill-healthy);
   display: flex;
@@ -24,8 +23,7 @@
   gap: var(--space-2) var(--space-4);
 }
 
-// The role (router / this device) sits on its own line; it only wraps when the
-// card is narrower than the sticker (phones), instead of overflowing it.
+// El papel (router o este equipo) va en su propia línea y solo se parte si la tarjeta es más angosta.
 .device-role { max-width: 100%; margin-top: var(--space-2); white-space: normal; }
 
 .device-kind-icon {
@@ -40,7 +38,7 @@
   color: var(--color-on-fill);
 }
 
-// 12rem basis: badges drop to another line instead of squeezing name and IP.
+// Base de 12rem: las etiquetas bajan de línea en vez de aplastar el nombre y la IP.
 .device-info { flex: 1 1 12rem; min-width: 0; }
 
 .device-name {

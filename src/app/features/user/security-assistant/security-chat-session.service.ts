@@ -8,12 +8,7 @@ import {
 } from '../../../core/models/security.model';
 import { SecurityAssistantRepository } from '../../../core/repositories/security-assistant.repository';
 
-/**
- * Estado y acciones del chat del asistente (conversaciones, mensajes, envío).
- * Se provee en SecurityAssistant, no en root: cada visita a la pantalla
- * arranca con su propia sesión, y el panel de evaluación y el de chat
- * comparten la misma instancia.
- */
+/** Estado del chat; se provee en SecurityAssistant para que cada visita arranque con su propia sesión. */
 @Injectable()
 export class SecurityChatSession {
   private readonly repository = inject(SecurityAssistantRepository);
@@ -45,7 +40,7 @@ export class SecurityChatSession {
     });
   }
 
-  /** Conversación sobre un tema que abre otra pantalla (p. ej. Modo familiar), con su saludo inicial. */
+  /** Conversación sobre un tema que abre otra pantalla, con su saludo inicial. */
   startTopicConversation(topic: UserStartableChatTopic, introKey: string): Observable<ChatConversationSummary> {
     return this.repository.createConversation(topic).pipe(
       tap((conversation) => {
@@ -61,7 +56,7 @@ export class SecurityChatSession {
     });
   }
 
-  /** El asistente abre la conversación con el resumen de esta evaluación (una sola vez por evaluación). */
+  /** El asistente abre la conversación con el resumen de esta evaluación, una sola vez. */
   startAssessmentBriefing(assessmentId: string): void {
     this.isSending.set(true);
     this.repository.startAssessmentBriefing(assessmentId, this.i18n.language()).subscribe({
@@ -71,7 +66,7 @@ export class SecurityChatSession {
         this.messages.set(messages);
         this.isSending.set(false);
       },
-      // Sin resumen no se muestra nada inventado: el chat queda disponible como siempre.
+      // Si no hay resumen no invento nada: el chat sigue disponible como siempre.
       error: () => this.isSending.set(false),
     });
   }
@@ -85,8 +80,7 @@ export class SecurityChatSession {
       this.dispatch(existingConversationId, text);
       return;
     }
-    // Primer mensaje sin conversación activa: se crea una silenciosamente
-    // (así "solo escribir" funciona sin exigir un click previo en "Nueva conversación").
+    // Sin conversación activa creo una en silencio, para que baste con escribir.
     this.repository.createConversation().subscribe((conversation) => {
       this.addConversation(conversation);
       this.dispatch(conversation.id, text);
@@ -107,15 +101,14 @@ export class SecurityChatSession {
           ? [{ role: 'assistant', text: noticeKey, isTranslationKey: true, translationParams: noticeParams ?? undefined }]
           : [];
         if (reply === null) {
-          // El mensaje no se guardó (p. ej. traía una contraseña): se quita de la
-          // pantalla y en su lugar se muestra el aviso.
+          // El mensaje no se guardó (p. ej. traía una contraseña): lo quito y muestro el aviso.
           this.messages.update((messages) => [...messages.slice(0, -1), ...notice]);
           this.isSending.set(false);
           return;
         }
         this.messages.update((messages) => [...messages, { role: 'assistant', text: reply }, ...notice]);
         this.isSending.set(false);
-        // Refresca título autogenerado (primer mensaje) y orden por actividad reciente.
+        // Refresco el título autogenerado y el orden por actividad reciente.
         this.loadConversations(false);
       },
       error: () => {

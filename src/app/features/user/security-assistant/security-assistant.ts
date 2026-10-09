@@ -12,11 +12,7 @@ import { SecurityChatSession } from './security-chat-session.service';
 const FAMILY_MODE_TOPIC: UserStartableChatTopic = 'family_mode';
 const FAMILY_MODE_INTRO_KEY = 'user.securityAssistant.chat.familyModeIntro';
 
-/**
- * Pantalla del asistente: compone el panel de evaluación y el de chat, y los
- * conecta (una evaluación nueva abre su resumen en el chat). La sesión del chat
- * se provee aquí para que ambos paneles compartan la misma.
- */
+/** Une el panel de evaluación y el chat; la sesión del chat se provee aquí para que ambos la compartan. */
 @Component({
   selector: 'app-security-assistant',
   imports: [PageHeader, SecurityAssessmentPanel, SecurityChatPanel, NetworkStatusBadge],
@@ -31,7 +27,7 @@ export class SecurityAssistant {
   private readonly router = inject(Router);
   private readonly chatPanel = viewChild(SecurityChatPanel, { read: ElementRef });
 
-  /** Estado real de la última medición; null hasta que llega (o si falla la consulta). */
+  /** Estado real de la última medición; null hasta que llega o si falla la consulta. */
   protected readonly networkStatus = signal<NetworkStatus | null>(null);
 
   constructor() {
@@ -43,7 +39,7 @@ export class SecurityAssistant {
     this.chat.loadConversations(!startsFamilyMode);
     if (startsFamilyMode) {
       this.chat.startTopicConversation(FAMILY_MODE_TOPIC, FAMILY_MODE_INTRO_KEY).subscribe(() => {
-        // Sin el query param, recargar la página no abre otra conversación igual.
+        // Quito el query param para que recargar no abra otra conversación igual.
         void this.router.navigate([], { relativeTo: this.route, queryParams: {}, replaceUrl: true });
         this.chatPanel()?.nativeElement.scrollIntoView({ behavior: 'smooth' });
       });

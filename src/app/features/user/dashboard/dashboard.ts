@@ -35,20 +35,17 @@ export class Dashboard {
   protected readonly snapshot = signal<NetworkMetricSnapshot | null>(null);
   protected readonly history = signal<NetworkMetricSample[]>([]);
   protected readonly anomalyStatus = signal<AnomalyDetectionStatus | null>(null);
-  /** Severity tint of the ambient aura; none until there is a real measurement. */
+  /** Tinte del aura ambiental; ninguno hasta que haya una medición real. */
   protected readonly aura = computed(() => STATUS_AURA[this.snapshot()?.status ?? 'unknown']);
 
   constructor() {
-    // watchSnapshot ya emite un valor inicial y se re-suscribe sola cada
-    // pocos segundos; no hace falta gestionar un intervalo aquí.
-    // takeUntilDestroyed: sin esto cada visita al panel dejaba otro sondeo de 4 s vivo para siempre.
+    // watchSnapshot ya reconsulta solo; takeUntilDestroyed evita que cada visita deje otro sondeo vivo para siempre.
     this.metricsRepository
       .watchSnapshot()
       .pipe(takeUntilDestroyed())
       .subscribe((snapshot) => this.snapshot.set(snapshot));
     this.metricsRepository.getHistory().subscribe((history) => this.history.set(history));
-    // Se consulta una sola vez al cargar: el conteo solo importa mientras
-    // calibra, no hace falta refrescarlo en vivo como el snapshot de red.
+    // Lo consulto una sola vez: el conteo solo importa mientras calibra.
     this.metricsRepository.getAnomalyStatus().subscribe((status) => this.anomalyStatus.set(status));
   }
 }

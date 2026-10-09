@@ -17,7 +17,7 @@ const TRUST_TONE: Record<DeviceTrust, 'healthy' | 'warning' | 'critical'> = {
   blocked: 'critical',
 };
 
-/** Tarjeta de un dispositivo de la lista: muestra sus datos y pide cambios de confianza al mapa, que los guarda. */
+/** Muestra un dispositivo y pide los cambios de confianza al mapa, que es quien los guarda. */
 @Component({
   selector: 'app-device-card',
   imports: [DatePipe, TranslatePipe, Icon],
@@ -29,7 +29,7 @@ export class DeviceCard {
   readonly device = input.required<NetworkDevice>();
   readonly trustChange = output<DeviceTrust>();
 
-  /** "Más info" es estado de vista de esta tarjeta, no del mapa. */
+  /** "Más info" es estado de esta tarjeta, no del mapa. */
   protected readonly isExpanded = signal(false);
   protected readonly kindIcon = computed(() => DEVICE_KIND_ICON[inferDeviceKind(this.device().macAddress)]);
   protected readonly trustTone = computed(() => TRUST_TONE[this.device().trust]);

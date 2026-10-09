@@ -1,5 +1,4 @@
-// Ambient aura: the edges of the screen take the tint of the REAL network
-// status (nothing when there is no measurement yet).
+// Aura ambiental: los bordes toman el tinte del estado REAL de la red (nada si aún no hay medición).
 :host { display: block; }
 
 :host([data-severity])::before {
@@ -30,7 +29,7 @@
   gap: var(--space-4);
 }
 
-// The calibration notice: an amber note pinned straight on the chart.
+// Nota de calibración: una nota ámbar pegada recta sobre la hoja.
 .anomaly-calibrating-banner {
   max-width: 62ch;
   margin: 0 0 var(--space-6);
@@ -43,7 +42,7 @@
   box-shadow: var(--shadow-hard);
 }
 
-// Vital signs: latency is the protagonist; the rest are secondary readings.
+// Signos vitales: la latencia es la protagonista y el resto son lecturas secundarias.
 .vitals {
   display: grid;
   grid-template-columns: minmax(0, 2fr) repeat(2, minmax(0, 1fr));

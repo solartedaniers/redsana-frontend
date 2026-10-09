@@ -76,8 +76,7 @@
   &__title { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: var(--font-size-caption); font-weight: 700; }
 }
 
-// Consultation notes on chart paper: the assistant writes on paper slips, the
-// user answers in violet ink. Both keep the hard ink outline.
+// Notas de consulta: el asistente escribe en papel y el usuario responde en tinta violeta.
 .chat-messages {
   display: flex;
   flex-direction: column;
