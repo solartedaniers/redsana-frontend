@@ -409,7 +409,8 @@
       "monitoredHouseholds": "Hogares monitoreados",
       "activeAlerts": "Alertas activas",
       "averageSecurityScore": "Puntaje de seguridad promedio",
-      "noData": "Sin datos"
+      "noData": "Sin datos",
+      "unevaluatedHouseholds": "{{count}} hogares sin evaluar"
     },
     "networkSupervision": {
       "title": "Supervisión de red",
