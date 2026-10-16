@@ -1,5 +1,8 @@
-import { Injectable, inject, signal } from '@angular/core';
-import { Observable, tap } from 'rxjs';
+import { DestroyRef, Injectable, inject, signal } from '@angular/core';
+import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
+import { Observable, filter, map, of, switchMap, take, tap } from 'rxjs';
+import { AiStatusService } from '../../../core/ai-status/ai-status.service';
+import { AiWarmingUpError } from '../../../core/ai-status/ai-warming-up.error';
 import { I18nService } from '../../../core/i18n/i18n.service';
 import {
   ChatConversationSummary,
@@ -13,6 +16,9 @@ import { SecurityAssistantRepository } from '../../../core/repositories/security
 export class SecurityChatSession {
   private readonly repository = inject(SecurityAssistantRepository);
   private readonly i18n = inject(I18nService);
+  private readonly aiStatus = inject(AiStatusService);
+  private readonly destroyRef = inject(DestroyRef);
+  private readonly aiReady$ = toObservable(this.aiStatus.isReady);
 
   readonly conversations = signal<ChatConversationSummary[]>([]);
   readonly currentConversationId = signal<string | null>(null);
@@ -58,17 +64,30 @@ export class SecurityChatSession {
 
   /** El asistente abre la conversación con el resumen de esta evaluación, una sola vez. */
   startAssessmentBriefing(assessmentId: string): void {
-    this.isSending.set(true);
-    this.repository.startAssessmentBriefing(assessmentId, this.i18n.language()).subscribe({
-      next: ({ conversation, messages }) => {
-        this.conversations.update((list) => [conversation, ...list.filter((c) => c.id !== conversation.id)]);
-        this.currentConversationId.set(conversation.id);
-        this.messages.set(messages);
-        this.isSending.set(false);
-      },
-      // Si no hay resumen no invento nada: el chat sigue disponible como siempre.
-      error: () => this.isSending.set(false),
-    });
+    // La evaluación ya quedó guardada (no usa IA); el resumen sí, así que lo pido cuando la IA esté lista.
+    this.whenAiReady()
+      .pipe(
+        tap(() => this.isSending.set(true)),
+        switchMap(() => this.repository.startAssessmentBriefing(assessmentId, this.i18n.language())),
+        takeUntilDestroyed(this.destroyRef)
+      )
+      .subscribe({
+        next: ({ conversation, messages }) => {
+          this.conversations.update((list) => [conversation, ...list.filter((c) => c.id !== conversation.id)]);
+          this.currentConversationId.set(conversation.id);
+          this.messages.set(messages);
+          this.isSending.set(false);
+        },
+        error: (error: unknown) => {
+          this.isSending.set(false);
+          // Se durmió justo antes de pedirlo: la despierto y lo pido otra vez cuando vuelva a estar lista.
+          if (error instanceof AiWarmingUpError) {
+            this.aiStatus.reportWarmingUp();
+            this.startAssessmentBriefing(assessmentId);
+          }
+          // Si no hay resumen no invento nada: el chat sigue disponible como siempre.
+        },
+      });
   }
 
   send(text: string): void {
@@ -85,6 +104,16 @@ export class SecurityChatSession {
       this.addConversation(conversation);
       this.dispatch(conversation.id, text);
     });
+  }
+
+  private whenAiReady(): Observable<void> {
+    return this.aiStatus.isReady()
+      ? of(undefined)
+      : this.aiReady$.pipe(
+          filter(Boolean),
+          take(1),
+          map(() => undefined)
+        );
   }
 
   private addConversation(conversation: ChatConversationSummary): void {
@@ -111,11 +140,14 @@ export class SecurityChatSession {
         // Refresco el título autogenerado y el orden por actividad reciente.
         this.loadConversations(false);
       },
-      error: () => {
-        this.messages.update((messages) => [
-          ...messages,
-          { role: 'assistant', text: 'user.securityAssistant.chat.errorReply', isTranslationKey: true },
-        ]);
+      error: (error: unknown) => {
+        // "Encendiendo" no es un fallo: aviso que espere a "IA lista" y despierto la IA de nuevo.
+        const isWarmingUp = error instanceof AiWarmingUpError;
+        if (isWarmingUp) {
+          this.aiStatus.reportWarmingUp();
+        }
+        const replyKey = isWarmingUp ? 'user.securityAssistant.chat.aiWarmingUpReply' : 'user.securityAssistant.chat.errorReply';
+        this.messages.update((messages) => [...messages, { role: 'assistant', text: replyKey, isTranslationKey: true }]);
         this.isSending.set(false);
       },
     });

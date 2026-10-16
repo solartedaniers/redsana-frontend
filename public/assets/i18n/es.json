@@ -231,7 +231,8 @@
           "assessment_briefing": "Resumen de tu evaluación",
           "family_mode": "Modo familiar"
         },
-        "familyDnsCheck": "Revisa los DNS antes de guardarlos: deben ser exactamente {{primary}} (primario) y {{secondary}} (secundario), los mismos de la guía de Modo familiar. Si escribes otros, podrías quedarte sin internet."
+        "familyDnsCheck": "Revisa los DNS antes de guardarlos: deben ser exactamente {{primary}} (primario) y {{secondary}} (secundario), los mismos de la guía de Modo familiar. Si escribes otros, podrías quedarte sin internet.",
+        "aiWarmingUpReply": "El asistente se estaba encendiendo y no alcanzó a responder. Vuelve a enviar tu pregunta cuando aparezca \"IA lista\" arriba."
       },
       "recommendations": {
         "changeDefaultPassword": {

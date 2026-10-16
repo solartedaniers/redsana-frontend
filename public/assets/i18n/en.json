@@ -231,7 +231,8 @@
           "assessment_briefing": "Your assessment summary",
           "family_mode": "Family mode"
         },
-        "familyDnsCheck": "Check the DNS before saving: they must be exactly {{primary}} (primary) and {{secondary}} (secondary), the same as in the Family mode guide. If you type others, you could lose internet access."
+        "familyDnsCheck": "Check the DNS before saving: they must be exactly {{primary}} (primary) and {{secondary}} (secondary), the same as in the Family mode guide. If you type others, you could lose internet access.",
+        "aiWarmingUpReply": "The assistant was starting up and could not answer. Send your question again once \"AI ready\" shows up at the top."
       },
       "recommendations": {
         "changeDefaultPassword": {

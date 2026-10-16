@@ -1,7 +1,9 @@
 import { provideHttpClient } from '@angular/common/http';
+import { signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { ActivatedRoute, convertToParamMap, provideRouter } from '@angular/router';
 import { NEVER, of } from 'rxjs';
+import { AiStatusService } from '../../../core/ai-status/ai-status.service';
 import { NetworkMetricsRepository } from '../../../core/repositories/network-metrics.repository';
 import { SecurityAssistantRepository } from '../../../core/repositories/security-assistant.repository';
 import { SecurityEvidenceCollector } from '../../../core/security-evidence/security-evidence.collector';
@@ -26,6 +28,7 @@ function render(queryParams: Record<string, string> = {}, networkStatus: 'good' 
       { provide: NetworkMetricsRepository, useValue: { getSnapshot: () => of({ status: networkStatus }) } },
       { provide: WifiEncryptionGateway, useValue: { isAvailable: false, detect: () => Promise.resolve(null) } },
       { provide: SecurityEvidenceCollector, useValue: { collect: () => Promise.resolve({}) } },
+      { provide: AiStatusService, useValue: { status: signal('ready'), isReady: signal(true), reportWarmingUp: vi.fn() } },
     ],
   });
   const fixture = TestBed.createComponent(SecurityAssistant);
