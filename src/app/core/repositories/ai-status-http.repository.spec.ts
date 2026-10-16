@@ -32,4 +32,26 @@ describe('AiStatusHttpRepository', () => {
     expect(status).toBe('ready');
     http.verify();
   });
+
+  it('un backend anterior sin estos endpoints tiene la IA en su proceso: la da por lista', () => {
+    const { repository, http } = setup();
+    let status: AiAvailability | undefined;
+
+    repository.warmUp().subscribe((result) => (status = result));
+    http.expectOne(`${environment.apiBaseUrl}/api/ai/warm-up`).flush({ detail: 'Not Found' }, { status: 404, statusText: 'Not Found' });
+
+    expect(status).toBe('ready');
+    http.verify();
+  });
+
+  it('otros errores (p. ej. el proxy mientras Render despierta) siguen siendo errores', () => {
+    const { repository, http } = setup();
+    let failed = false;
+
+    repository.getStatus().subscribe({ error: () => (failed = true) });
+    http.expectOne(`${environment.apiBaseUrl}/api/ai/status`).flush('', { status: 502, statusText: 'Bad Gateway' });
+
+    expect(failed).toBe(true);
+    http.verify();
+  });
 });
