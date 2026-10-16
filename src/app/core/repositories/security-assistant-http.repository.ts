@@ -2,6 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable, map, of } from 'rxjs';
 import { environment } from '../../../environments/environment';
+import { mapAiWarmingUp } from '../ai-status/ai-warming-up.error';
 import { AppLanguage } from '../i18n/i18n.service';
 import {
   ChatBriefing,
@@ -120,6 +121,7 @@ export class SecurityAssistantHttpRepository extends SecurityAssistantRepository
         utc_offset_minutes: new Date().getTimezoneOffset(),
       })
       .pipe(
+        mapAiWarmingUp(),
         map((response) => ({
           reply: response.reply,
           noticeKey: response.notice_key,
@@ -137,6 +139,7 @@ export class SecurityAssistantHttpRepository extends SecurityAssistantRepository
         utc_offset_minutes: new Date().getTimezoneOffset(),
       })
       .pipe(
+        mapAiWarmingUp(),
         map((briefing) => ({
           conversation: this.toConversation(briefing.conversation),
           messages: briefing.messages.map((m) => this.toMessage(m)),
