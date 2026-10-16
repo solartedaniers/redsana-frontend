@@ -5,6 +5,9 @@ Todo lo configurable (tamaños, rutas, colores) vive en branding/brand.json.
 """
 import json
 import re
+import shutil
+import subprocess
+import tempfile
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -107,6 +110,56 @@ class PwaIconWriter:
         path.write_text(json.dumps(manifest, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
 
 
+class TauriIconWriter:
+    """Set del instalador con el CLI de Tauri (ya es devDependency); luego redibujo lo chico con el escudo compacto."""
+
+    def __init__(self, config: BrandConfig, renderer: IconRenderer) -> None:
+        self._config = config
+        self._tauri = config.section("tauri")
+        self._renderer = renderer
+        self._directory = config.path(self._tauri["iconsDirectory"])
+
+    def write(self) -> list[Path]:
+        self._run_tauri_cli()
+        # Lo que el CLI genera de más y el instalador no usa: dejo el mismo set que lista tauri.conf.json.
+        for name in self._tauri["generatedEntriesToDiscard"]:
+            entry = self._directory / name
+            if entry.is_dir():
+                shutil.rmtree(entry)
+            else:
+                entry.unlink(missing_ok=True)
+        written = [self._redraw_if_small(path) for path in sorted(self._directory.glob("*.png"))]
+        written.append(self._write_ico())
+        written.append(self._directory / "icon.icns")
+        return written
+
+    def _run_tauri_cli(self) -> None:
+        npx = shutil.which("npx")
+        if npx is None:
+            raise RuntimeError("npx not found: install Node.js to regenerate the Tauri icons")
+        size = self._tauri["cliSourceSize"]
+        with tempfile.TemporaryDirectory() as temporary:
+            source = Path(temporary) / "app-icon.png"
+            self._renderer.render(size, self._config["paddingRatio"]).save(source)
+            subprocess.run([npx, "--no-install", "tauri", "icon", str(source), "--output", str(self._directory)],
+                           cwd=BRANDING_DIR.parent, check=True, capture_output=True)
+
+    def _redraw_if_small(self, path: Path) -> Path:
+        with Image.open(path) as image:
+            size = image.width
+        if size <= self._config["compactMaxSize"]:
+            self._renderer.render(size, self._config["paddingRatio"]).save(path, optimize=True)
+        return path
+
+    def _write_ico(self) -> Path:
+        ico = self._tauri["ico"]
+        sizes = ico["sizes"]
+        frames = [self._renderer.render(size, self._config["paddingRatio"]) for size in sizes]
+        path = self._directory / ico["file"]
+        frames[-1].save(path, format="ICO", sizes=[(s, s) for s in sizes], append_images=frames[:-1])
+        return path
+
+
 class ThemeColorSync:
     """El color del manifest y del <meta theme-color> sale del token de fondo del tema oscuro, nunca escrito a mano."""
 
@@ -140,7 +193,7 @@ class ThemeColorSync:
 class BrandAssetsGenerator:
     def __init__(self, config: BrandConfig) -> None:
         renderer = IconRenderer(config)
-        self._writers = [PwaIconWriter(config, renderer), ThemeColorSync(config)]
+        self._writers = [PwaIconWriter(config, renderer), TauriIconWriter(config, renderer), ThemeColorSync(config)]
 
     def run(self) -> None:
         for writer in self._writers:

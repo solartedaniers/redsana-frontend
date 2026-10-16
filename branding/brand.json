@@ -19,6 +19,15 @@
     "path": "../public/favicon.ico",
     "sizes": [16, 32, 48]
   },
+  "tauri": {
+    "iconsDirectory": "../src-tauri/icons",
+    "cliSourceSize": 1024,
+    "generatedEntriesToDiscard": ["android", "ios", "64x64.png"],
+    "ico": {
+      "file": "icon.ico",
+      "sizes": [16, 24, 32, 48, 64, 256]
+    }
+  },
   "theme": {
     "tokensFile": "../src/styles/_tokens.scss",
     "selector": ":root[data-theme='dark']",
