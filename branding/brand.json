@@ -1,0 +1,22 @@
+{
+  "iconBackground": "#0a0e11",
+  "sources": {
+    "full": "redsana-symbol.png",
+    "compact": "redsana-symbol-compact.png"
+  },
+  "compactMaxSize": 48,
+  "paddingRatio": 0.08,
+  "maskablePaddingRatio": 0.14,
+  "pwa": {
+    "directory": "../public/icons",
+    "publicRoot": "../public",
+    "sizes": [72, 96, 128, 144, 152, 192, 384, 512],
+    "maskableSizes": [192, 512],
+    "appleTouchSize": 180,
+    "manifest": "../public/manifest.webmanifest"
+  },
+  "favicon": {
+    "path": "../public/favicon.ico",
+    "sizes": [16, 32, 48]
+  }
+}
