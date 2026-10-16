@@ -34,6 +34,9 @@
   --color-fill-neutral: #e0d8c6;
   --color-on-fill: #15110e;
   --color-on-fill-brand: #fffdf8;
+  // Dorado del logo (branding/). En el tema claro lo oscurezco con la tinta para llegar a 5,2:1 sobre la superficie.
+  --color-brand-gold: #eaaa3c;
+  --color-brand-symbol: color-mix(in srgb, var(--color-brand-gold) 55%, var(--color-ink));
 
   // Tonos de icono: uno por icono (>= 3:1 sobre papel y sobre la pestaña lima)
   --color-icon-dashboard: #5a2bff;
@@ -196,6 +199,8 @@
   --color-fill-neutral: #24302c;
   --color-on-fill: #07090a;
   --color-on-fill-brand: #07090a;
+  // Sobre el fondo oscuro el dorado del logo ya se lee (9,3:1).
+  --color-brand-symbol: var(--color-brand-gold);
 
   // Tonos de icono en el osciloscopio (>= 3:1 sobre las superficies oscuras).
   --color-icon-dashboard: #b8a3ff;
