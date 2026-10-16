@@ -38,6 +38,9 @@
   <div class="form-panel">
     <h2 class="form-title">{{ 'auth.login.title' | translate }}</h2>
     <p class="form-subtitle">{{ 'auth.login.subtitle' | translate }}</p>
+    @if (demoLogin.enabled) {
+      <p class="credential-notice" role="note"><app-icon name="lock" />{{ 'auth.login.demoNotice' | translate }}</p>
+    }
 
     <form class="auth-form" [formGroup]="form" (ngSubmit)="submit()">
       <label class="field has-icon">

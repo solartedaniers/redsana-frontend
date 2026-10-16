@@ -7,6 +7,7 @@ import { Icon } from '../../../shared/components/icon/icon';
 import { PulseLine } from '../../../shared/components/pulse-line/pulse-line';
 import { PasswordStrengthMeter } from '../../../shared/components/password-strength-meter/password-strength-meter';
 import { APP_PATHS } from '../../../core/routing/app-paths';
+import { DEMO_LOGIN_CONFIG } from '../../../core/auth/demo-login.config';
 
 @Component({
   selector: 'app-login',
@@ -23,10 +24,12 @@ export class Login {
   protected readonly isSubmitting = signal(false);
   protected readonly errorKey = signal<string | null>(null);
   protected readonly showPassword = signal(false);
+  /** Con el interruptor encendido los campos llegan precargados; validación y medidor no cambian. */
+  protected readonly demoLogin = inject(DEMO_LOGIN_CONFIG);
 
   protected readonly form = this.fb.nonNullable.group({
-    email: ['', [Validators.required, Validators.email]],
-    password: ['', [Validators.required]],
+    email: [this.demoLogin.email, [Validators.required, Validators.email]],
+    password: [this.demoLogin.password, [Validators.required]],
   });
 
   protected submit(): void {

@@ -75,7 +75,8 @@
             "description": "Lets you know as soon as it detects an outage or a latency spike on your network."
           }
         }
-      }
+      },
+      "demoNotice": "Sample credentials for the academic review: the email and password are already filled in, just press Sign in."
     },
     "console": {
       "networkStatus": "Network monitor active",

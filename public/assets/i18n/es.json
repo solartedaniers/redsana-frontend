@@ -75,7 +75,8 @@
             "description": "Te avisa en cuanto detecta un corte o un pico de latencia en tu red."
           }
         }
-      }
+      },
+      "demoNotice": "Credenciales de ejemplo para la revisión académica: el correo y la contraseña ya están escritos, solo presiona Entrar."
     },
     "console": {
       "networkStatus": "Monitor de red activo",
