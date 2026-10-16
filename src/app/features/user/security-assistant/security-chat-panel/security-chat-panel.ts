@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { AiStatusService } from '../../../../core/ai-status/ai-status.service';
 import { TranslatePipe } from '../../../../core/i18n/translate.pipe';
 import { ChatConversationSummary } from '../../../../core/models/security.model';
 import { Icon } from '../../../../shared/components/icon/icon';
@@ -15,6 +16,8 @@ import { SecurityChatSession } from '../security-chat-session.service';
 })
 export class SecurityChatPanel {
   protected readonly session = inject(SecurityChatSession);
+  /** Mientras la IA no esté lista el chat queda deshabilitado con un aviso, en vez de fallar al enviar. */
+  protected readonly aiStatus = inject(AiStatusService);
 
   protected readonly draft = signal('');
   protected readonly isHistoryOpen = signal(false);
@@ -52,7 +55,7 @@ export class SecurityChatPanel {
 
   protected send(): void {
     const text = this.draft().trim();
-    if (!text || this.session.isSending()) {
+    if (!text || this.session.isSending() || !this.aiStatus.isReady()) {
       return;
     }
     this.draft.set('');

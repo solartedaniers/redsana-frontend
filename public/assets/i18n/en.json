@@ -232,7 +232,12 @@
           "family_mode": "Family mode"
         },
         "familyDnsCheck": "Check the DNS before saving: they must be exactly {{primary}} (primary) and {{secondary}} (secondary), the same as in the Family mode guide. If you type others, you could lose internet access.",
-        "aiWarmingUpReply": "The assistant was starting up and could not answer. Send your question again once \"AI ready\" shows up at the top."
+        "aiWarmingUpReply": "The assistant was starting up and could not answer. Send your question again once \"AI ready\" shows up at the top.",
+        "aiNotReady": {
+          "warming_up": "The assistant is starting up (it can take about a minute). You can type as soon as \"AI ready\" shows up.",
+          "unavailable": "The assistant is not available right now. Use \"Retry\" in the top bar to start it again.",
+          "idle": "The assistant will be available once your session finishes loading."
+        }
       },
       "recommendations": {
         "changeDefaultPassword": {

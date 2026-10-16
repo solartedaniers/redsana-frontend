@@ -80,8 +80,13 @@
     }
   </div>
 
+  @if (!aiStatus.isReady()) {
+    <p class="chat-ai-notice" role="status">{{ 'user.securityAssistant.chat.aiNotReady.' + aiStatus.status() | translate }}</p>
+  }
+
   <form class="chat-input-row" (ngSubmit)="send()">
     <input
+      [disabled]="!aiStatus.isReady()"
       type="text"
       [ngModel]="draft()"
       (ngModelChange)="draft.set($event)"
@@ -89,7 +94,7 @@
       [placeholder]="'user.securityAssistant.chat.placeholder' | translate"
       autocomplete="off"
     />
-    <button type="submit" class="action-button" [disabled]="!draft().trim() || session.isSending()">
+    <button type="submit" class="action-button" [disabled]="!draft().trim() || session.isSending() || !aiStatus.isReady()">
       {{ 'user.securityAssistant.chat.send' | translate }}
     </button>
   </form>

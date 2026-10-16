@@ -232,7 +232,12 @@
           "family_mode": "Modo familiar"
         },
         "familyDnsCheck": "Revisa los DNS antes de guardarlos: deben ser exactamente {{primary}} (primario) y {{secondary}} (secundario), los mismos de la guía de Modo familiar. Si escribes otros, podrías quedarte sin internet.",
-        "aiWarmingUpReply": "El asistente se estaba encendiendo y no alcanzó a responder. Vuelve a enviar tu pregunta cuando aparezca \"IA lista\" arriba."
+        "aiWarmingUpReply": "El asistente se estaba encendiendo y no alcanzó a responder. Vuelve a enviar tu pregunta cuando aparezca \"IA lista\" arriba.",
+        "aiNotReady": {
+          "warming_up": "El asistente se está encendiendo (puede tardar cerca de un minuto). Podrás escribir en cuanto aparezca \"IA lista\".",
+          "unavailable": "El asistente no está disponible ahora. Usa \"Reintentar\" en la barra superior para volver a encenderlo.",
+          "idle": "El asistente estará disponible cuando termine de cargar tu sesión."
+        }
       },
       "recommendations": {
         "changeDefaultPassword": {
