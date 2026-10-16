@@ -2,7 +2,7 @@
 .app-shell {
   min-height: 100dvh;
   display: grid;
-  grid-template-columns: 16rem minmax(0, 1fr);
+  grid-template-columns: var(--layout-sidebar-width) minmax(0, 1fr);
   position: relative;
   isolation: isolate;
 }
@@ -43,7 +43,7 @@
     inset-block: 0;
     inset-inline-start: 0;
     z-index: 3; // encima del fondo del cajón (2)
-    width: min(16rem, 85vw);
+    width: min(var(--layout-sidebar-width), 85vw);
     box-shadow: var(--shadow-hard-lg);
     transform: translateX(calc(-100% - var(--shadow-offset-lg)));
     visibility: hidden;
