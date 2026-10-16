@@ -44,7 +44,8 @@
       "ready": "AI ready",
       "unavailable": "AI unavailable",
       "retry": "Retry"
-    }
+    },
+    "documentTitle": "RedSana · Home network clinic"
   },
   "theme": {
     "toggleToLight": "Switch to light mode",

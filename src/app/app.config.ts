@@ -13,6 +13,7 @@ import { provideRouter } from '@angular/router';
 import { SwRegistrationOptions, provideServiceWorker } from '@angular/service-worker';
 import { routes } from './app.routes';
 import { I18nService } from './core/i18n/i18n.service';
+import { DocumentMetadataService } from './core/i18n/document-metadata.service';
 import { AuthRepository } from './core/auth/auth.repository';
 import { SupabaseAuthRepository } from './core/auth/auth-supabase.repository';
 import { authInterceptor } from './core/auth/auth.interceptor';
@@ -85,6 +86,8 @@ export const appConfig: ApplicationConfig = {
 
     // Cargo idioma y sesión antes de pintar para no mostrar claves crudas ni saltar del login al panel.
     provideAppInitializer(() => inject(I18nService).load()),
+    // Título de la pestaña y lang de <html> desde i18n, en el idioma activo.
+    provideAppInitializer(() => void inject(DocumentMetadataService)),
     provideAppInitializer(() => inject(AuthService).restoreSession()),
     // start() lanza su propio ciclo en segundo plano; aquí no hay nada que esperar.
     provideAppInitializer(() => inject(NetworkMeasurementService).start()),

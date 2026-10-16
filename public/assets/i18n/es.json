@@ -44,7 +44,8 @@
       "ready": "IA lista",
       "unavailable": "IA no disponible",
       "retry": "Reintentar"
-    }
+    },
+    "documentTitle": "RedSana · Clínica de redes domésticas"
   },
   "theme": {
     "toggleToLight": "Cambiar a modo claro",
