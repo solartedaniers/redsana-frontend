@@ -126,6 +126,9 @@
     font-size: var(--font-size-body);
 
     &::placeholder { color: var(--color-text-secondary); }
+
+    // Igual que los botones deshabilitados: se nota que no se puede escribir mientras la IA no esté lista.
+    &:disabled { cursor: not-allowed; opacity: 0.55; }
   }
 }
 
