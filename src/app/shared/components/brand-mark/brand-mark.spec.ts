@@ -3,12 +3,13 @@ import { BRAND_ASSETS } from '../../../core/branding/brand-assets';
 import { BrandMark } from './brand-mark';
 
 describe('BrandMark', () => {
-  it('muestra el logo desde el asset configurado y es decorativo', () => {
+  it('usa el símbolo transparente configurado como máscara y es decorativo', () => {
     const fixture = TestBed.createComponent(BrandMark);
     fixture.detectChanges();
 
-    const image = (fixture.nativeElement as HTMLElement).querySelector('img')!;
-    expect(image.getAttribute('src')).toBe(BRAND_ASSETS.mark);
-    expect(image.getAttribute('alt')).toBe('');
+    const host = fixture.nativeElement as HTMLElement;
+    expect(host.style.getPropertyValue('--brand-symbol-mask')).toBe(`url(${BRAND_ASSETS.symbolMask})`);
+    expect(host.querySelector('.symbol')?.getAttribute('aria-hidden')).toBe('true');
+    expect(host.querySelector('img')).toBeNull();
   });
 });

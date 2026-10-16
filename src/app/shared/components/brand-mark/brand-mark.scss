@@ -4,18 +4,12 @@
   width: 1.9rem;
   height: 1.9rem;
   flex-shrink: 0;
-  overflow: hidden;
-  border: var(--border-width-ink) solid var(--color-ink);
-  border-radius: var(--radius-sm);
-  background: var(--color-fill-brand);
-  box-shadow: calc(var(--shadow-offset) / 2) calc(var(--shadow-offset) / 2) 0 var(--color-shadow);
-  transform: rotate(var(--sticker-tilt));
 }
 
-// La imagen trae su propio fondo negro del logo y llena el sticker.
-img {
-  display: block;
+// La imagen solo aporta la forma (su transparencia); el color sale del token, así cambia con el tema.
+.symbol {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  background-color: var(--color-brand-symbol);
+  mask: var(--brand-symbol-mask) center / contain no-repeat;
 }
