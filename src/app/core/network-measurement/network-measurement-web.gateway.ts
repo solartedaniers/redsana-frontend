@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { environment } from '../../../environments/environment';
+import { BACKEND_HEALTH_URL } from '../backend/backend-endpoints';
 import { aggregateLatencySamples } from '../domain/network-quality.calculator';
 import { NetworkQualityMeasurement } from '../models/network.model';
 import { LatencyProbeConfig } from './latency-probe';
@@ -21,7 +21,7 @@ export class NetworkMeasurementWebGateway extends NetworkMeasurementGateway {
   // Uso el Worker si existe; si no, el mismo bucle en el hilo principal.
   private readonly runner: LatencyProbeRunner = createLatencyProbeRunner();
   private readonly config: LatencyProbeConfig = {
-    probeUrl: `${environment.apiBaseUrl}/api/health`,
+    probeUrl: BACKEND_HEALTH_URL,
     sampleCount: SAMPLE_COUNT,
     sampleIntervalMs: SAMPLE_INTERVAL_MS,
     sampleTimeoutMs: SAMPLE_TIMEOUT_MS,

@@ -8,6 +8,7 @@ import { PulseLine } from '../../../shared/components/pulse-line/pulse-line';
 import { PasswordStrengthMeter } from '../../../shared/components/password-strength-meter/password-strength-meter';
 import { APP_PATHS } from '../../../core/routing/app-paths';
 import { DEMO_LOGIN_CONFIG } from '../../../core/auth/demo-login.config';
+import { BackendWakeUpService } from '../../../core/backend/backend-wake-up.service';
 
 @Component({
   selector: 'app-login',
@@ -31,6 +32,10 @@ export class Login {
     email: [this.demoLogin.email, [Validators.required, Validators.email]],
     password: [this.demoLogin.password, [Validators.required]],
   });
+
+  constructor() {
+    inject(BackendWakeUpService).wakeUp();
+  }
 
   protected submit(): void {
     if (this.form.invalid) {

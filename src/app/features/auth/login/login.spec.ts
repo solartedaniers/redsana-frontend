@@ -4,6 +4,7 @@ import { Router, provideRouter } from '@angular/router';
 import { of } from 'rxjs';
 import { AuthService } from '../../../core/auth/auth.service';
 import { DEMO_LOGIN_CONFIG, DemoLoginConfig, readDemoLoginConfig } from '../../../core/auth/demo-login.config';
+import { BackendWakeUpService } from '../../../core/backend/backend-wake-up.service';
 import { APP_PATHS } from '../../../core/routing/app-paths';
 import { Login } from './login';
 
@@ -12,12 +13,14 @@ const DEMO: DemoLoginConfig = { enabled: true, email: 'demo@example.invalid', pa
 const OFF: DemoLoginConfig = { enabled: false, email: '', password: '' };
 
 async function render(demoLogin: DemoLoginConfig, signIn = vi.fn(() => of({ user: { role: 'user' } }))) {
+  const wakeUp = vi.fn();
   TestBed.configureTestingModule({
     providers: [
       provideHttpClient(),
       provideRouter([]),
       { provide: AuthService, useValue: { signIn } },
       { provide: DEMO_LOGIN_CONFIG, useValue: demoLogin },
+      { provide: BackendWakeUpService, useValue: { wakeUp } },
     ],
   });
   // Sin las rutas reales, entrar no debe intentar una navegación de verdad.
@@ -28,10 +31,16 @@ async function render(demoLogin: DemoLoginConfig, signIn = vi.fn(() => of({ user
   fixture.detectChanges();
   const element = fixture.nativeElement as HTMLElement;
   const [email, password] = element.querySelectorAll<HTMLInputElement>('input');
-  return { element, email, password, signIn, navigateByUrl };
+  return { element, email, password, signIn, navigateByUrl, wakeUp };
 }
 
 describe('Login', () => {
+  it('al abrirse despierta el backend una sola vez', async () => {
+    const { wakeUp } = await render(OFF);
+
+    expect(wakeUp).toHaveBeenCalledOnce();
+  });
+
   it('sin el interruptor los campos llegan vacíos y no hay aviso de ejemplo', async () => {
     const { element, email, password } = await render(OFF);
 
