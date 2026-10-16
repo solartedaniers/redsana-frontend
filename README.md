@@ -221,6 +221,20 @@ cp .env.example .env
 
 `scripts/generate-environment.mjs` convierte esas variables en `src/environments/environment.ts` (ignorado por git). Se ejecuta solo antes de `npm run build` y de `npm test`; en Vercel las variables se definen en el panel del proyecto.
 
+#### 🎓 Credenciales de ejemplo en el login (requisito académico)
+
+Para la revisión del proyecto, el login puede mostrar precargados un correo y una contraseña de ejemplo, con un aviso (en español e inglés) de que son credenciales de prueba. **No es seguro**: con el interruptor encendido esos valores quedan dentro del JavaScript publicado, así que solo deben ser los de una cuenta de demostración. Nunca se escriben en el código: llegan por variables de entorno.
+
+| Variable | Valor |
+|---|---|
+| `DEMO_LOGIN_ENABLED` | `true` para precargarlas; cualquier otro valor (o no definirla) las apaga |
+| `DEMO_LOGIN_EMAIL` | Correo de la cuenta de demostración |
+| `DEMO_LOGIN_PASSWORD` | Contraseña de esa cuenta (se usa tal cual, sin recortar caracteres) |
+
+Con el interruptor encendido el build falla si falta el correo o la contraseña. La validación, el medidor de contraseña y "¿Olvidaste tu contraseña?" funcionan igual con los campos precargados.
+
+**Para desactivarlo:** en Vercel (Project Settings → Environment Variables) pon `DEMO_LOGIN_ENABLED=false` o borra la variable, y vuelve a desplegar. Con el interruptor apagado el build no escribe el correo ni la contraseña en `environment.ts` aunque sigan definidos. Para no dejarlos ni en el panel, borra también `DEMO_LOGIN_EMAIL` y `DEMO_LOGIN_PASSWORD`. Si la contraseña de demostración llegó a publicarse, cámbiala en Supabase.
+
 ### 2️⃣ Desarrollo
 
 ```bash
