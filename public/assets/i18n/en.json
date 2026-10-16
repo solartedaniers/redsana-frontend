@@ -237,7 +237,9 @@
           "warming_up": "The assistant is starting up (it can take about a minute). You can type as soon as \"AI ready\" shows up.",
           "unavailable": "The assistant is not available right now. Use \"Retry\" in the top bar to start it again.",
           "idle": "The assistant will be available once your session finishes loading."
-        }
+        },
+        "expand": "Expand the chat",
+        "collapse": "Minimize the chat"
       },
       "recommendations": {
         "changeDefaultPassword": {

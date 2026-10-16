@@ -132,6 +132,30 @@
   }
 }
 
+// Ampliado: debajo de la barra superior y a la derecha del menú, con la lista ocupando el alto que sobra.
+.chat-panel--expanded {
+  position: fixed;
+  z-index: var(--z-chat-expanded);
+  inset: var(--layout-top-bar-height) 0 0 var(--layout-sidebar-width);
+  display: flex;
+  flex-direction: column;
+  max-width: none;
+  margin: 0;
+  border-radius: 0;
+  box-shadow: none;
+
+  .chat-messages {
+    flex: 1;
+    min-height: 0;
+    max-height: none;
+  }
+
+  // En pantallas angostas el menú es un cajón y la barra se tapa: el chat ocupa la pantalla completa.
+  @media (max-width: 52rem) {
+    inset: 0;
+  }
+}
+
 .chat-ai-notice {
   margin: 0 0 var(--space-3);
   font-size: var(--font-size-caption);

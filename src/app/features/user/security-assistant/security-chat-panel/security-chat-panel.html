@@ -1,4 +1,9 @@
-<section class="chat-panel surface-panel">
+<section
+  id="security-chat-panel"
+  class="chat-panel surface-panel"
+  [class.chat-panel--expanded]="isExpanded()"
+  (keydown.escape)="collapse()"
+>
   <div class="chat-panel__header">
     <div>
       <h2>{{ 'user.securityAssistant.chat.title' | translate }}</h2>
@@ -20,6 +25,16 @@
         [attr.aria-label]="'user.securityAssistant.chat.history' | translate"
       >
         <app-icon name="clock" />
+      </button>
+      <button
+        type="button"
+        class="icon-button"
+        (click)="toggleExpanded()"
+        aria-controls="security-chat-panel"
+        [attr.aria-expanded]="isExpanded()"
+        [attr.aria-label]="(isExpanded() ? 'user.securityAssistant.chat.collapse' : 'user.securityAssistant.chat.expand') | translate"
+      >
+        <app-icon [name]="isExpanded() ? 'collapse' : 'expand'" />
       </button>
     </div>
   </div>
@@ -86,6 +101,7 @@
 
   <form class="chat-input-row" (ngSubmit)="send()">
     <input
+      #draftInput
       [disabled]="!aiStatus.isReady()"
       type="text"
       [ngModel]="draft()"

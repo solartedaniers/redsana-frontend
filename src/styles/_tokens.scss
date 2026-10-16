@@ -98,6 +98,8 @@
   // Medidas del layout de la app, compartidas por quien necesita alinearse con ellas (p. ej. el chat ampliado)
   --layout-top-bar-height: 3.5rem;
   --layout-sidebar-width: 16rem;
+  // Dentro del contenido de la app: por encima de la página, por debajo del cajón móvil y del banner de actualización
+  --z-chat-expanded: 10;
 
   // Escala de espacios
   --space-1: 0.25rem;

@@ -237,7 +237,9 @@
           "warming_up": "El asistente se está encendiendo (puede tardar cerca de un minuto). Podrás escribir en cuanto aparezca \"IA lista\".",
           "unavailable": "El asistente no está disponible ahora. Usa \"Reintentar\" en la barra superior para volver a encenderlo.",
           "idle": "El asistente estará disponible cuando termine de cargar tu sesión."
-        }
+        },
+        "expand": "Ampliar el chat",
+        "collapse": "Minimizar el chat"
       },
       "recommendations": {
         "changeDefaultPassword": {
