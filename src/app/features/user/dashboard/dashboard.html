@@ -1,10 +1,10 @@
 <section class="dashboard-hero">
   <div class="dashboard-hero__heading">
-    <app-network-status-badge [status]="snapshot()?.status ?? null" />
+    <app-network-status-badge [status]="snapshot()?.status ?? null" [source]="snapshot()?.source" />
     <app-page-header titleKey="user.dashboard.title" subtitleKey="user.dashboard.subtitle" />
   </div>
   <div class="dashboard-hero__actions">
-    @if (snapshot(); as data) { <app-network-status-light [status]="data.status" /> }
+    @if (snapshot(); as data) { <app-network-status-light [status]="data.status" [source]="data.source" /> }
     <a class="action-button" [routerLink]="paths.securityAssistant">{{ 'user.dashboard.diagnose' | translate }}</a>
   </div>
 </section>
@@ -22,7 +22,7 @@
 @if (snapshot(); as data) {
   @if (hasData()) {
   <div class="vitals">
-    <app-metric-card class="vitals__latency" variant="hero" labelKey="user.dashboard.latency" [value]="data.latencyMs" unit="ms" />
+    <app-metric-card class="vitals__latency" variant="hero" [labelKey]="latencyLabelKey(data.source)" [value]="data.latencyMs" unit="ms" />
     <app-metric-card class="vitals__jitter" labelKey="user.dashboard.jitter" [value]="data.jitterMs" unit="ms" />
     <app-metric-card class="vitals__loss" labelKey="user.dashboard.packetLoss" [value]="data.packetLossPercent" unit="%" />
     <article class="vitals__updated">

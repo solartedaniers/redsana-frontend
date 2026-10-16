@@ -6,6 +6,8 @@ export interface NetworkMetricSnapshot {
   jitterMs: number;
   packetLossPercent: number;
   updatedAt: string;
+  /** Quién la midió; falta si el backend es anterior a este campo o aún no hay mediciones. */
+  source?: MeasurementSource;
 }
 
 export interface NetworkMetricSample {

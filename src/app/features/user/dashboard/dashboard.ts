@@ -3,6 +3,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { NetworkMetricsRepository } from '../../../core/repositories/network-metrics.repository';
 import { AnomalyDetectionStatus, NetworkMetricSample, NetworkMetricSnapshot, NetworkStatus } from '../../../core/models/network.model';
 import { LatencySeverity } from '../../../core/domain/latency-severity';
+import { latencyLabelKey } from '../../../core/domain/network-status-label';
 import { hasMeasurement, isLiveMeasurement } from '../../../core/domain/measurement-freshness';
 import { injectMeasurementClock } from '../../../core/network-measurement/measurement-clock';
 import { MeasurementEmptyState } from '../../../shared/components/measurement-empty-state/measurement-empty-state';
@@ -33,6 +34,7 @@ const STATUS_AURA: Record<NetworkStatus, LatencySeverity | null> = {
 })
 export class Dashboard {
   protected readonly paths = APP_PATHS;
+  protected readonly latencyLabelKey = latencyLabelKey;
   private readonly metricsRepository = inject(NetworkMetricsRepository);
 
   protected readonly snapshot = signal<NetworkMetricSnapshot | null>(null);

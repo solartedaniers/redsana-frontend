@@ -9,7 +9,7 @@
       <p class="owner">{{ home.ownerName }}</p>
       <p class="label">{{ home.label }}</p>
     </div>
-    <app-network-status-light [status]="home.status" />
+    <app-network-status-light [status]="home.status" [source]="snapshot()?.source" />
     <div class="score-block">
       <app-score-gauge [score]="home.securityScore" />
       <span class="score-source" [attr.data-source]="home.securityScoreSource">
@@ -21,7 +21,7 @@
   @if (snapshot(); as data) {
     @if (hasData()) {
     <div class="metrics-grid">
-      <app-metric-card labelKey="user.dashboard.latency" [value]="data.latencyMs" unit="ms" />
+      <app-metric-card [labelKey]="latencyLabelKey(data.source)" [value]="data.latencyMs" unit="ms" />
       <app-metric-card labelKey="user.dashboard.jitter" [value]="data.jitterMs" unit="ms" />
       <app-metric-card labelKey="user.dashboard.packetLoss" [value]="data.packetLossPercent" unit="%" />
     </div>

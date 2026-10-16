@@ -45,7 +45,13 @@
       "unavailable": "IA no disponible",
       "retry": "Reintentar"
     },
-    "documentTitle": "RedSana · Clínica de redes domésticas"
+    "documentTitle": "RedSana · Clínica de redes domésticas",
+    "serverLatencyStatus": {
+      "good": "Latencia al servidor normal",
+      "warning": "Latencia al servidor alta",
+      "critical": "Latencia al servidor crítica",
+      "unknown": "Estado desconocido"
+    }
   },
   "theme": {
     "toggleToLight": "Cambiar a modo claro",
@@ -189,7 +195,8 @@
       "diagnose": "Ejecutar diagnóstico",
       "anomalyCalibrating": "Estamos aprendiendo el comportamiento normal de esta red ({{collected}}/{{required}} mediciones) — la detección de anomalías se activará pronto. Cada red se aprende por separado.",
       "anomalyUnknownNetwork": "No pudimos identificar la red a la que estás conectado, así que estas mediciones no cuentan para el aprendizaje de ninguna red. Revisa que estés conectado a tu router.",
-      "lastMeasurement": "Última medición registrada"
+      "lastMeasurement": "Última medición registrada",
+      "serverLatency": "Latencia al servidor"
     },
     "securityAssistant": {
       "title": "Asistente de seguridad",
