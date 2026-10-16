@@ -31,6 +31,8 @@ import { NetworkSupervisionRepository } from './core/repositories/network-superv
 import { NetworkSupervisionHttpRepository } from './core/repositories/network-supervision-http.repository';
 import { UsersRepository } from './core/repositories/users.repository';
 import { UsersHttpRepository } from './core/repositories/users-http.repository';
+import { AiStatusRepository } from './core/repositories/ai-status.repository';
+import { AiStatusHttpRepository } from './core/repositories/ai-status-http.repository';
 import { NetworkMeasurementGateway } from './core/network-measurement/network-measurement.gateway';
 import { NetworkMeasurementTauriGateway } from './core/network-measurement/network-measurement-tauri.gateway';
 import { NetworkMeasurementWebGateway } from './core/network-measurement/network-measurement-web.gateway';
@@ -72,6 +74,7 @@ export const appConfig: ApplicationConfig = {
     { provide: AdminMetricsRepository, useClass: AdminMetricsHttpRepository },
     { provide: NetworkSupervisionRepository, useClass: NetworkSupervisionHttpRepository },
     { provide: UsersRepository, useClass: UsersHttpRepository },
+    { provide: AiStatusRepository, useClass: AiStatusHttpRepository },
     provideByRuntime(NetworkMeasurementGateway, NetworkMeasurementTauriGateway, NetworkMeasurementWebGateway),
     provideByRuntime(WifiEncryptionGateway, WifiEncryptionTauriGateway, WifiEncryptionWebGateway),
     provideByRuntime(LanScanGateway, LanScanTauriGateway, LanScanWebGateway),
