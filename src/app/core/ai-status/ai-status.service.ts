@@ -12,6 +12,7 @@ import {
   of,
   startWith,
   switchMap,
+  takeUntil,
   takeWhile,
   timer,
 } from 'rxjs';
@@ -73,8 +74,12 @@ export class AiStatusService {
     const polls$ = from(this.pollDelays).pipe(
       concatMap((delayMs) => timer(delayMs).pipe(switchMap(() => this.orWarmingUp(this.repository.getStatus()))))
     );
-    // Si se agotan los intentos sin respuesta lista, la doy por no disponible (con botón de reintentar).
-    return concat(of<AiAvailability>('warming_up'), this.orWarmingUp(this.repository.warmUp()), polls$, of<AiAvailability>('unavailable')).pipe(
+    // El tope es de reloj, no la suma de pausas: con el servicio dormido cada consulta tarda, y sin este corte se
+    // esperaba bastante más de maxWaitMs. Agotado el tiempo o los intentos, queda no disponible (con reintentar).
+    const waiting$ = concat(of<AiAvailability>('warming_up'), this.orWarmingUp(this.repository.warmUp()), polls$).pipe(
+      takeUntil(timer(AI_STATUS_CONFIG.maxWaitMs))
+    );
+    return concat(waiting$, of<AiAvailability>('unavailable')).pipe(
       takeWhile((status) => status === 'warming_up', true),
       distinctUntilChanged()
     );

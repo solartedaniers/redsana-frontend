@@ -13,7 +13,8 @@ export const AI_STATUS_CONFIG: AiStatusPollConfig = {
   maxPollDelayMs: 10_000,
 };
 
-/** Esperas entre consultas: crecen hasta maxPollDelayMs y su suma cubre maxWaitMs. Su largo es el tope de intentos. */
+/** Esperas entre consultas: crecen hasta maxPollDelayMs y su suma cubre maxWaitMs. Su largo es el tope de intentos;
+ * el de tiempo lo corta AiStatusService con un reloj aparte. */
 export function buildPollDelays(config: AiStatusPollConfig): number[] {
   const delays: number[] = [];
   let waitedMs = 0;

@@ -1,6 +1,6 @@
 import { PLATFORM_ID, signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
-import { Observable, of, throwError } from 'rxjs';
+import { Observable, map, of, throwError, timer } from 'rxjs';
 import { AuthService } from '../auth/auth.service';
 import { AiAvailability } from '../models/ai.model';
 import { AiStatusRepository } from '../repositories/ai-status.repository';
@@ -85,8 +85,22 @@ describe('AiStatusService', () => {
 
     vi.advanceTimersByTime(AI_STATUS_CONFIG.maxWaitMs + 60_000);
 
+    // Solo las consultas que caben antes del tope de reloj; después ya no consulta más.
+    const pollsWithinCap = DELAYS.filter((_, i) => DELAYS.slice(0, i + 1).reduce((a, b) => a + b, 0) < AI_STATUS_CONFIG.maxWaitMs).length;
     expect(service.status()).toBe('unavailable');
-    expect(repository.getStatus).toHaveBeenCalledTimes(DELAYS.length);
+    expect(repository.getStatus).toHaveBeenCalledTimes(pollsWithinCap);
+  });
+
+  it('el tope es de reloj: con consultas lentas (servicio dormido) no se pasa de la espera máxima', () => {
+    const { service, repository } = setup([]);
+    // Cada consulta tarda lo que el timeout de estado del backend con el servicio dormido.
+    repository.getStatus.mockImplementation(() => timer(5_000).pipe(map((): AiAvailability => 'warming_up')));
+
+    vi.advanceTimersByTime(AI_STATUS_CONFIG.maxWaitMs - 1);
+    expect(service.status()).toBe('warming_up');
+    vi.advanceTimersByTime(1);
+
+    expect(service.status()).toBe('unavailable');
   });
 
   it('si el backend dice no disponible se detiene enseguida', () => {
