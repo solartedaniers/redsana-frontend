@@ -11,6 +11,7 @@ import { HistoryChart } from '../../../shared/components/history-chart/history-c
 import { ScoreGauge } from '../../../shared/components/score-gauge/score-gauge';
 import { TranslatePipe } from '../../../core/i18n/translate.pipe';
 import { APP_PATHS } from '../../../core/routing/app-paths';
+import { latencyLabelKey } from '../../../core/domain/network-status-label';
 import { hasMeasurement } from '../../../core/domain/measurement-freshness';
 import { MeasurementEmptyState } from '../../../shared/components/measurement-empty-state/measurement-empty-state';
 
@@ -24,6 +25,7 @@ import { MeasurementEmptyState } from '../../../shared/components/measurement-em
 })
 export class HouseholdDetail {
   protected readonly paths = APP_PATHS;
+  protected readonly latencyLabelKey = latencyLabelKey;
   private readonly route = inject(ActivatedRoute);
   private readonly metricsRepository = inject(NetworkMetricsRepository);
   private readonly supervisionRepository = inject(NetworkSupervisionRepository);

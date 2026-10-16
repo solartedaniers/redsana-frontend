@@ -20,6 +20,7 @@ interface BackendSnapshot {
   jitter_ms: number;
   packet_loss_percent: number;
   updated_at: string;
+  source?: MeasurementSource | null;
 }
 
 interface BackendSample {
@@ -98,6 +99,7 @@ export class NetworkMetricsHttpRepository extends NetworkMetricsRepository {
       jitterMs: snapshot.jitter_ms,
       packetLossPercent: snapshot.packet_loss_percent,
       updatedAt: snapshot.updated_at,
+      source: snapshot.source ?? undefined,
     };
   }
 

@@ -61,4 +61,11 @@ describe('Dashboard sin mediciones', () => {
     const old = render({ status: 'good', latencyMs: 20, jitterMs: 2, packetLossPercent: 0, updatedAt: '2020-01-01T00:00:00Z' });
     expect(old.querySelector('.metric-tile__detail')?.textContent?.trim()).toBe('user.dashboard.lastMeasurement');
   });
+  it('una medición de la web se presenta como latencia al servidor, no como estado de la red', () => {
+    const element = render({ status: 'critical', latencyMs: 263, jitterMs: 116, packetLossPercent: 0, updatedAt: new Date().toISOString(), source: 'web' });
+
+    expect(element.querySelector('.status-badge')?.textContent?.trim()).toBe('common.serverLatencyStatus.critical');
+    expect(element.querySelector('.status-light .label')?.textContent?.trim()).toBe('common.serverLatencyStatus.critical');
+    expect(element.querySelector('.vitals__latency')?.textContent).toContain('user.dashboard.serverLatency');
+  });
 });

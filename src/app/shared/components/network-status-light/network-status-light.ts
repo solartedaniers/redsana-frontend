@@ -1,5 +1,6 @@
-import { ChangeDetectionStrategy, Component, input } from '@angular/core';
-import { NetworkStatus } from '../../../core/models/network.model';
+import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
+import { MeasurementSource, NetworkStatus } from '../../../core/models/network.model';
+import { networkStatusLabelKey } from '../../../core/domain/network-status-label';
 import { TranslatePipe } from '../../../core/i18n/translate.pipe';
 
 @Component({
@@ -11,4 +12,6 @@ import { TranslatePipe } from '../../../core/i18n/translate.pipe';
 })
 export class NetworkStatusLight {
   readonly status = input.required<NetworkStatus>();
+  readonly source = input<MeasurementSource | undefined>(undefined);
+  protected readonly labelKey = computed(() => networkStatusLabelKey(this.status(), this.source()));
 }

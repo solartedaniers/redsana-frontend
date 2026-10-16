@@ -45,7 +45,13 @@
       "unavailable": "AI unavailable",
       "retry": "Retry"
     },
-    "documentTitle": "RedSana · Home network clinic"
+    "documentTitle": "RedSana · Home network clinic",
+    "serverLatencyStatus": {
+      "good": "Server latency normal",
+      "warning": "Server latency high",
+      "critical": "Server latency critical",
+      "unknown": "Status unknown"
+    }
   },
   "theme": {
     "toggleToLight": "Switch to light mode",
@@ -189,7 +195,8 @@
       "diagnose": "Run diagnosis",
       "anomalyCalibrating": "We're learning how this network normally behaves ({{collected}}/{{required}} measurements) — anomaly detection will turn on soon. Each network is learned separately.",
       "anomalyUnknownNetwork": "We couldn't identify the network you're connected to, so these measurements don't count toward learning any network. Check that you're connected to your router.",
-      "lastMeasurement": "Last recorded measurement"
+      "lastMeasurement": "Last recorded measurement",
+      "serverLatency": "Server latency"
     },
     "securityAssistant": {
       "title": "Security assistant",

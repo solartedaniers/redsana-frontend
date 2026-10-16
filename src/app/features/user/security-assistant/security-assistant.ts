@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, ElementRef, inject, signal, viewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { CHAT_TOPIC_QUERY_PARAM, UserStartableChatTopic } from '../../../core/models/security.model';
-import { NetworkStatus } from '../../../core/models/network.model';
+import { NetworkMetricSnapshot } from '../../../core/models/network.model';
 import { NetworkMetricsRepository } from '../../../core/repositories/network-metrics.repository';
 import { NetworkStatusBadge } from '../../../shared/components/network-status-badge/network-status-badge';
 import { PageHeader } from '../../../shared/components/page-header/page-header';
@@ -28,12 +28,12 @@ export class SecurityAssistant {
   private readonly chatPanel = viewChild(SecurityChatPanel, { read: ElementRef });
 
   /** Estado real de la última medición; null hasta que llega o si falla la consulta. */
-  protected readonly networkStatus = signal<NetworkStatus | null>(null);
+  protected readonly networkSnapshot = signal<NetworkMetricSnapshot | null>(null);
 
   constructor() {
     inject(NetworkMetricsRepository)
       .getSnapshot()
-      .subscribe({ next: (snapshot) => this.networkStatus.set(snapshot.status), error: () => this.networkStatus.set(null) });
+      .subscribe({ next: (snapshot) => this.networkSnapshot.set(snapshot), error: () => this.networkSnapshot.set(null) });
     // Otra pantalla (p. ej. Modo familiar) puede abrir el asistente en un tema.
     const startsFamilyMode = this.route.snapshot.queryParamMap.get(CHAT_TOPIC_QUERY_PARAM) === FAMILY_MODE_TOPIC;
     this.chat.loadConversations(!startsFamilyMode);
