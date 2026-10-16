@@ -6,11 +6,12 @@ import { ThemeToggle } from '../theme-toggle/theme-toggle';
 import { LanguageToggle } from '../language-toggle/language-toggle';
 import { Icon } from '../icon/icon';
 import { BrandMark } from '../brand-mark/brand-mark';
+import { AiStatusIndicator } from '../ai-status-indicator/ai-status-indicator';
 import { APP_PATHS } from '../../../core/routing/app-paths';
 
 @Component({
   selector: 'app-top-bar',
-  imports: [RouterLink, TranslatePipe, ThemeToggle, LanguageToggle, Icon, BrandMark],
+  imports: [RouterLink, TranslatePipe, ThemeToggle, LanguageToggle, Icon, BrandMark, AiStatusIndicator],
   templateUrl: './top-bar.html',
   styleUrl: './top-bar.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

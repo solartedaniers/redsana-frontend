@@ -38,6 +38,12 @@
       "emptySticker": "No readings",
       "emptyTitle": "No measurements yet",
       "emptyDescription": "Metrics will show up here as soon as RedSana records the first measurement of this network."
+    },
+    "aiStatus": {
+      "warming_up": "AI starting up…",
+      "ready": "AI ready",
+      "unavailable": "AI unavailable",
+      "retry": "Retry"
     }
   },
   "theme": {

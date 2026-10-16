@@ -13,6 +13,7 @@
     <span class="brand"><app-brand-mark /><span class="brand-name">{{ 'common.appName' | translate }}</span></span>
   </div>
   <div class="actions">
+    <app-ai-status-indicator />
     <app-language-toggle />
     <app-theme-toggle />
     @if (auth.currentUser(); as user) {

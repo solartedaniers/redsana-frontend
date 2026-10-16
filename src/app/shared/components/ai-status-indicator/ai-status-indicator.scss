@@ -1,0 +1,35 @@
+.ai-status {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+// Mientras despierta, el punto late con el mismo ritmo que los estados de red.
+.sticker::before {
+  content: '';
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.sticker[data-ai-status='warming_up']::before {
+  animation: heartbeat var(--motion-heartbeat) var(--motion-easing-standard) infinite;
+}
+
+.ai-status__retry {
+  padding: var(--space-1) var(--space-3);
+  font-size: var(--font-size-caption);
+}
+
+// En el celular queda solo el punto de color; el texto sigue para lectores de pantalla (como .visually-hidden).
+@media (max-width: 30rem) {
+  .ai-status__label {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+}

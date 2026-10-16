@@ -38,6 +38,12 @@
       "emptySticker": "Sin lecturas",
       "emptyTitle": "Aún no hay mediciones",
       "emptyDescription": "Las métricas aparecerán aquí en cuanto RedSana registre la primera medición de esta red."
+    },
+    "aiStatus": {
+      "warming_up": "IA encendiendo…",
+      "ready": "IA lista",
+      "unavailable": "IA no disponible",
+      "retry": "Reintentar"
     }
   },
   "theme": {
