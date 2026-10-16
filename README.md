@@ -254,7 +254,7 @@ Todos los iconos salen de las dos fuentes de `branding/`, derivadas del logo de 
 python branding/generate_icons.py   # requiere Pillow (pip install pillow); usa el CLI de Tauri ya instalado
 ```
 
-El script genera los PNG de la PWA (normales y maskable), `apple-touch-icon`, `favicon.ico` (16, 32, 48), la marca de la barra superior y el login, y el set de Tauri (`.ico` de 16 a 256, `.icns` y logos de Windows). Hasta 48 px usa el escudo compacto. Tamaños, rutas y el fondo de los iconos están en `branding/brand.json`. El color del manifest y del `<meta theme-color>` lo toma del token `--color-bg-app` del tema oscuro; `npm test` falla si dejan de coincidir o si la marca que carga la app no es la generada.
+El script genera los PNG de la PWA (normales y maskable), `apple-touch-icon`, `favicon.ico` (16, 32, 48), la marca de la barra superior y el login (solo el escudo, sin fondo: la luminancia del dorado pasa a ser transparencia y la app lo pinta con el token `--color-brand-symbol`, dorado en el tema oscuro y más oscuro en el claro), y el set de Tauri (`.ico` de 16 a 256, `.icns` y logos de Windows). Hasta 48 px usa el escudo compacto. Tamaños, rutas y el fondo de los iconos están en `branding/brand.json`. El color del manifest y del `<meta theme-color>` lo toma del token `--color-bg-app` del tema oscuro; `npm test` falla si dejan de coincidir o si la marca que carga la app no es la generada o deja de tener transparencia.
 
 ### 2️⃣ Desarrollo
 
