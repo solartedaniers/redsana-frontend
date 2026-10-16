@@ -122,6 +122,17 @@ RedSana usa **dos motores de IA distintos**, cada uno elegido para el problema q
 - **Frontend + capa nativa (Rust)**: se instalan en la máquina del usuario como una app de escritorio normal (vía Tauri). Es la única forma de que la app pueda medir la red *de verdad* — un navegador no tiene ese acceso.
 - **Backend (FastAPI)**: corre localmente junto a la app durante el desarrollo (`uvicorn`, puerto 8000). Es la pieza intermedia entre la medición local y la base de datos en la nube. *(Para producción, este backend puede desplegarse igual como servicio local que arranca junto con la app, o evaluarse su empaquetado dentro del propio instalador — queda como decisión de la etapa de distribución.)*
 - **Base de datos y autenticación**: viven en Supabase, en la nube — así los datos persisten entre sesiones y el panel de administración puede ver todos los usuarios desde cualquier lugar.
+- **Servicio de IA**: el backend puede usar la IA en su propio proceso o llamar a [redsana-ai](https://github.com/solartedaniers/redsana-ai) desplegado aparte en Render (variable `AI_MODE` del backend).
+
+#### 💤 Arranque en frío (Render, plan gratuito)
+
+Render apaga el backend y el servicio de IA tras un rato sin uso, y tardan cerca de un minuto en volver. Para que el usuario no vea errores:
+
+- Al abrir el login, un `GET /api/health` liviano despierta el backend mientras el usuario escribe (`BackendWakeUpService`).
+- Tras iniciar sesión, `AiStatusService` pide `POST /api/ai/warm-up` y consulta `GET /api/ai/status` con backoff y un tope de espera (`AI_STATUS_CONFIG`, 150 s por defecto) hasta que la IA esté lista. Usa el mismo patrón de cancelación que las mediciones: al cerrar sesión o reintentar no quedan consultas vivas.
+- La barra superior muestra **"IA encendiendo… / IA lista"**; agotado el tope, **"IA no disponible"** con un botón de reintentar.
+- Mientras la IA no está lista el chat del asistente queda deshabilitado con un aviso, y el resumen de una evaluación se pide en cuanto esté lista (la evaluación se guarda igual, no usa IA). Si el backend responde "encendiendo" a un mensaje, se muestra como espera y no como fallo.
+- Con un backend anterior que no tiene estos endpoints (404) la IA se da por lista, así que el orden de despliegue no bloquea el chat.
 
 ---
 
