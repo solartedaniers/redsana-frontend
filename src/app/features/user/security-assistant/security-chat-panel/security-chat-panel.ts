@@ -1,4 +1,14 @@
-import { ChangeDetectionStrategy, Component, DestroyRef, ElementRef, effect, inject, signal, viewChild } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  DestroyRef,
+  ElementRef,
+  afterRenderEffect,
+  effect,
+  inject,
+  signal,
+  viewChild,
+} from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { AiStatusService } from '../../../../core/ai-status/ai-status.service';
 import { TranslatePipe } from '../../../../core/i18n/translate.pipe';
@@ -6,6 +16,7 @@ import { PageScrollController } from '../../../../core/layout/page-scroll.contro
 import { ChatConversationSummary } from '../../../../core/models/security.model';
 import { Icon } from '../../../../shared/components/icon/icon';
 import { SecurityChatSession } from '../security-chat-session.service';
+import { ChatScrollAnchor } from './chat-scroll-anchor';
 
 /** Vista del chat; el estado de la conversación vive en SecurityChatSession. */
 @Component({
@@ -21,6 +32,10 @@ export class SecurityChatPanel {
   protected readonly aiStatus = inject(AiStatusService);
   private readonly pageScroll = inject(PageScrollController);
   private readonly draftInput = viewChild.required<ElementRef<HTMLInputElement>>('draftInput');
+  private readonly messageList = viewChild.required<ElementRef<HTMLElement>>('messageList');
+  private readonly scrollAnchor = inject(ChatScrollAnchor);
+  /** Desde que envío hasta que llega la respuesta, mantengo la pregunta arriba de la lista. */
+  private isAnchoringQuestion = false;
 
   /** Ampliado ocupa el área visible (en el celular, la pantalla) para leer la respuesta sin bajar la página. */
   protected readonly isExpanded = signal(false);
@@ -34,6 +49,18 @@ export class SecurityChatPanel {
     // Ampliado, el fondo no se desplaza; al cerrar la vista (o salir de la pantalla) lo libero siempre.
     effect(() => (this.isExpanded() ? this.pageScroll.lockAtTop() : this.pageScroll.unlock()));
     inject(DestroyRef).onDestroy(() => this.pageScroll.unlock());
+    // Tras pintar la pregunta (y luego la respuesta) la dejo arriba: se lee el inicio de la respuesta sin bajar.
+    afterRenderEffect(() => {
+      this.session.messages();
+      const isWaitingReply = this.session.isSending();
+      if (!this.isAnchoringQuestion) {
+        return;
+      }
+      this.anchorLastQuestion();
+      if (!isWaitingReply) {
+        this.isAnchoringQuestion = false;
+      }
+    });
   }
 
   protected toggleExpanded(): void {
@@ -84,7 +111,23 @@ export class SecurityChatPanel {
       return;
     }
     this.draft.set('');
+    this.isAnchoringQuestion = true;
+    if (!this.isExpanded()) {
+      // Minimizado puede estar fuera de la pantalla: lo traigo para ver la pregunta y la respuesta.
+      this.scrollAnchor.bringIntoView(this.messageList().nativeElement);
+    }
     this.session.send(text);
+    // Si envió con el botón, el foco quedó en él: lo devuelvo al campo para seguir escribiendo.
+    this.focusDraft();
+  }
+
+  private anchorLastQuestion(): void {
+    const list = this.messageList().nativeElement;
+    const questions = list.querySelectorAll<HTMLElement>('.chat-bubble--user');
+    const lastQuestion = questions.item(questions.length - 1);
+    if (lastQuestion) {
+      this.scrollAnchor.showAtTop(list, lastQuestion);
+    }
   }
 
   private focusDraft(): void {

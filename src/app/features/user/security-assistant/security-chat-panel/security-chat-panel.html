@@ -84,7 +84,7 @@
     </div>
   }
 
-  <div class="chat-messages">
+  <div class="chat-messages" #messageList>
     @for (message of session.messages(); track $index) {
       <div class="chat-bubble" [class.chat-bubble--user]="message.role === 'user'">
         {{ message.isTranslationKey ? (message.text | translate: message.translationParams) : message.text }}
