@@ -19,6 +19,12 @@
     "path": "../public/favicon.ico",
     "sizes": [16, 32, 48]
   },
+  "brandMark": {
+    "path": "../public/assets/branding/brand-mark.png",
+    "size": 96,
+    "variant": "compact",
+    "paddingRatio": 0.12
+  },
   "tauri": {
     "iconsDirectory": "../src-tauri/icons",
     "cliSourceSize": 1024,

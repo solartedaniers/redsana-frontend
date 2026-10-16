@@ -1,12 +1,13 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { BRAND_ASSETS } from '../../../core/branding/brand-assets';
 
-/** Marca de RedSana: un latido en tinta fluorescente sobre un bloque de tinta. */
+/** Marca de RedSana: el escudo dorado del logo dentro del sticker de tinta. Decorativa: el nombre va siempre al lado. */
 @Component({
   selector: 'app-brand-mark',
-  template: `<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-    <path class="trace" d="M2 13h5l2-5 3 10 2.5-7 1.5 2H22" />
-  </svg>`,
+  template: `<img [src]="markUrl" alt="" decoding="async" />`,
   styleUrl: './brand-mark.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class BrandMark {}
+export class BrandMark {
+  protected readonly markUrl = BRAND_ASSETS.mark;
+}

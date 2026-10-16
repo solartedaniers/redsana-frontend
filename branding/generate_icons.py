@@ -43,8 +43,11 @@ class IconRenderer:
         self._compact_max_size = config["compactMaxSize"]
         self._background = config["iconBackground"]
 
-    def render(self, size: int, padding_ratio: float) -> Image.Image:
-        source = self._compact if size <= self._compact_max_size else self._full
+    def render(self, size: int, padding_ratio: float, variant: str | None = None) -> Image.Image:
+        # variant fuerza la fuente cuando el tamaño en pantalla no es el de los píxeles (p. ej. un asset @3x).
+        if variant is None:
+            variant = "compact" if size <= self._compact_max_size else "full"
+        source = self._compact if variant == "compact" else self._full
         content = max(1, round(size * (1 - 2 * padding_ratio)))
         canvas = Image.new("RGB", (size, size), self._background)
         offset = (size - content) // 2
@@ -108,6 +111,21 @@ class PwaIconWriter:
         manifest = json.loads(path.read_text(encoding="utf-8"))
         manifest["icons"] = icons
         path.write_text(json.dumps(manifest, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+
+
+class BrandMarkWriter:
+    """La marca de la barra superior y del login: se ve chica, así que va con el escudo compacto aunque el PNG sea @3x."""
+
+    def __init__(self, config: BrandConfig, renderer: IconRenderer) -> None:
+        self._mark = config.section("brandMark")
+        self._renderer = renderer
+        self._path = config.path(self._mark["path"])
+
+    def write(self) -> list[Path]:
+        self._path.parent.mkdir(parents=True, exist_ok=True)
+        image = self._renderer.render(self._mark["size"], self._mark["paddingRatio"], self._mark["variant"])
+        image.save(self._path, optimize=True)
+        return [self._path]
 
 
 class TauriIconWriter:
@@ -193,7 +211,12 @@ class ThemeColorSync:
 class BrandAssetsGenerator:
     def __init__(self, config: BrandConfig) -> None:
         renderer = IconRenderer(config)
-        self._writers = [PwaIconWriter(config, renderer), TauriIconWriter(config, renderer), ThemeColorSync(config)]
+        self._writers = [
+            PwaIconWriter(config, renderer),
+            BrandMarkWriter(config, renderer),
+            TauriIconWriter(config, renderer),
+            ThemeColorSync(config),
+        ]
 
     def run(self) -> None:
         for writer in self._writers:
