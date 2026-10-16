@@ -113,19 +113,42 @@ class PwaIconWriter:
         path.write_text(json.dumps(manifest, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
 
 
-class BrandMarkWriter:
-    """La marca de la barra superior y del login: se ve chica, así que va con el escudo compacto aunque el PNG sea @3x."""
+class TransparentSymbolWriter:
+    """Marca de la barra superior y del login: solo el símbolo, sin fondo. La luminancia del dorado sobre el negro se
+     vuelve opacidad (sin dibujar nada); el color lo pone la app con un token del tema usando la imagen como máscara."""
 
     def __init__(self, config: BrandConfig, renderer: IconRenderer) -> None:
         self._mark = config.section("brandMark")
         self._renderer = renderer
         self._path = config.path(self._mark["path"])
+        self._background_luma = Image.new("RGB", (1, 1), config["iconBackground"]).convert("L").getpixel((0, 0))
 
     def write(self) -> list[Path]:
         self._path.parent.mkdir(parents=True, exist_ok=True)
-        image = self._renderer.render(self._mark["size"], self._mark["paddingRatio"], self._mark["variant"])
-        image.save(self._path, optimize=True)
+        # Calculo la opacidad a tamaño grande y luego reduzco: así los bordes del trazo quedan suaves.
+        source = self._renderer.render(self._mark["renderSize"], self._mark["paddingRatio"], self._mark["variant"])
+        alpha = self._luminance_to_alpha(source.convert("L"))
+        size = self._mark["size"]
+        alpha = alpha.resize((size, size), Image.LANCZOS)
+        # Blanco con la opacidad del trazo: como máscara CSS solo cuenta el canal alfa.
+        white = Image.new("L", (size, size), 255)
+        Image.merge("RGBA", (white, white, white, alpha)).save(self._path, optimize=True)
         return [self._path]
+
+    def _luminance_to_alpha(self, luma: Image.Image) -> Image.Image:
+        # El dorado más brillante (percentil configurado, para ignorar píxeles sueltos) queda totalmente opaco.
+        histogram = luma.histogram()
+        threshold = sum(histogram) * self._mark["opaqueLuminancePercentile"]
+        accumulated = 0
+        opaque_luma = 255
+        for value, count in enumerate(histogram):
+            accumulated += count
+            if accumulated >= threshold:
+                opaque_luma = value
+                break
+        span = max(1, opaque_luma - self._background_luma)
+        lookup = [max(0, min(255, round((value - self._background_luma) * 255 / span))) for value in range(256)]
+        return luma.point(lookup)
 
 
 class TauriIconWriter:
@@ -213,7 +236,7 @@ class BrandAssetsGenerator:
         renderer = IconRenderer(config)
         self._writers = [
             PwaIconWriter(config, renderer),
-            BrandMarkWriter(config, renderer),
+            TransparentSymbolWriter(config, renderer),
             TauriIconWriter(config, renderer),
             ThemeColorSync(config),
         ]
