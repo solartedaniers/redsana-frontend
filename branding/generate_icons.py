@@ -4,6 +4,7 @@ Uso, desde la raíz del frontend:  python branding/generate_icons.py
 Todo lo configurable (tamaños, rutas, colores) vive en branding/brand.json.
 """
 import json
+import re
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -106,10 +107,40 @@ class PwaIconWriter:
         path.write_text(json.dumps(manifest, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
 
 
+class ThemeColorSync:
+    """El color del manifest y del <meta theme-color> sale del token de fondo del tema oscuro, nunca escrito a mano."""
+
+    def __init__(self, config: BrandConfig) -> None:
+        self._config = config
+        self._theme = config.section("theme")
+
+    def token_value(self) -> str:
+        tokens = self._config.path(self._theme["tokensFile"]).read_text(encoding="utf-8")
+        block = tokens.split(self._theme["selector"], 1)[1].split("}", 1)[0]
+        match = re.search(re.escape(self._theme["token"]) + r":\s*([^;]+);", block)
+        if match is None:
+            raise ValueError(f"token {self._theme['token']} not found under {self._theme['selector']}")
+        return match.group(1).strip()
+
+    def write(self) -> list[Path]:
+        color = self.token_value()
+        manifest_path = self._config.path(self._theme["manifest"])
+        manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+        manifest["theme_color"] = color
+        manifest["background_color"] = color
+        manifest_path.write_text(json.dumps(manifest, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+        index_path = self._config.path(self._theme["indexHtml"])
+        # Leo y escribo bytes para conservar los saltos de línea originales del archivo.
+        html = index_path.read_bytes().decode("utf-8")
+        html = re.sub(r'(<meta name="theme-color" content=")[^"]*(")', lambda m: f"{m.group(1)}{color}{m.group(2)}", html)
+        index_path.write_bytes(html.encode("utf-8"))
+        return [manifest_path, index_path]
+
+
 class BrandAssetsGenerator:
     def __init__(self, config: BrandConfig) -> None:
         renderer = IconRenderer(config)
-        self._writers = [PwaIconWriter(config, renderer)]
+        self._writers = [PwaIconWriter(config, renderer), ThemeColorSync(config)]
 
     def run(self) -> None:
         for writer in self._writers:

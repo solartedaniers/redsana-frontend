@@ -18,5 +18,12 @@
   "favicon": {
     "path": "../public/favicon.ico",
     "sizes": [16, 32, 48]
+  },
+  "theme": {
+    "tokensFile": "../src/styles/_tokens.scss",
+    "selector": ":root[data-theme='dark']",
+    "token": "--color-bg-app",
+    "manifest": "../public/manifest.webmanifest",
+    "indexHtml": "../src/index.html"
   }
 }
