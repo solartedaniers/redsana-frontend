@@ -8,4 +8,6 @@ export const environment = {
   desktopReleaseRepo: 'solartedaniers/redsana-frontend',
   desktopInstallerAssetSuffix: '-setup.exe',
   webAppUrl: 'https://red-sana.vercel.app',
+  // Credenciales de ejemplo del login (requisito académico); apagadas y vacías por defecto.
+  demoLogin: { enabled: false, email: '', password: '' },
 };
