@@ -23,7 +23,9 @@ export type IconName =
   | 'computer'
   | 'download'
   | 'menu'
-  | 'search';
+  | 'search'
+  | 'expand'
+  | 'collapse';
 
 // Todos los iconos en un componente para no repetir SVGs y mantener el mismo trazo.
 @Component({
