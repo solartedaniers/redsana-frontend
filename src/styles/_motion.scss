@@ -14,6 +14,8 @@
 
   // El latido: un solo ritmo para las luces de estado, el cabezal del ECG y el radar.
   --motion-heartbeat: 1.4s;
+  // Antes de mostrar "Despertando el servidor…": con el backend despierto el perfil llega antes y el texto no parpadea.
+  --motion-notice-delay: 800ms;
   --motion-sweep: 6s;
 
   // Elevación al pasar el cursor y hundimiento al pulsar.

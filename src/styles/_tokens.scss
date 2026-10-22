@@ -103,6 +103,8 @@
   --layout-sidebar-width: 16rem;
   // Dentro del contenido de la app: por encima de la página, por debajo del cajón móvil y del banner de actualización
   --z-chat-expanded: 10;
+  // La pantalla de arranque y de espera de la sesión tapa todo, menos el grano del papel (body::after).
+  --z-startup-screen: 20;
 
   // Escala de espacios
   --space-1: 0.25rem;

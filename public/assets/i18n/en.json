@@ -49,6 +49,13 @@
         "service_error": "The AI had a problem while starting. You can try again; if it keeps happening, let the administrator know."
       }
     },
+    "sessionRestore": {
+      "wakingTitle": "Waking up the server…",
+      "wakingBody": "If nobody used it for a while, it takes about a minute to wake up. Thanks for waiting.",
+      "failedTitle": "We couldn't reach the server",
+      "failedBody": "Check your internet connection and try again. If it keeps happening, the service may be under maintenance.",
+      "retry": "Try again"
+    },
     "documentTitle": "RedSana · Home network clinic",
     "serverLatencyStatus": {
       "good": "Server latency normal",

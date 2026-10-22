@@ -1,0 +1,32 @@
+.session-status {
+  display: grid;
+  justify-items: center;
+  gap: var(--space-2);
+  max-width: 26rem;
+}
+
+.session-status__title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: var(--font-size-heading-sm);
+  font-weight: var(--font-display-weight);
+}
+
+.session-status__body {
+  margin: 0;
+  color: var(--color-text-secondary);
+}
+
+.session-status .action-button {
+  margin-top: var(--space-3);
+}
+
+// Con el backend despierto el perfil llega antes de este retraso y el texto ni se asoma.
+.session-status--waking {
+  animation: session-status-appear var(--motion-duration-slow) var(--motion-easing-decelerate) var(--motion-notice-delay) both;
+}
+
+@keyframes session-status-appear {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}

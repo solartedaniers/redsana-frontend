@@ -84,11 +84,13 @@ export const appConfig: ApplicationConfig = {
     provideByRuntime(NetworkIdentityGateway, NetworkIdentityTauriGateway, NetworkIdentityWebGateway),
     { provide: AvatarStorageGateway, useClass: SupabaseAvatarStorageGateway },
 
-    // Cargo idioma y sesión antes de pintar para no mostrar claves crudas ni saltar del login al panel.
-    provideAppInitializer(() => inject(I18nService).load()),
+    // Cargo el idioma antes de pintar para no mostrar claves crudas; si el diccionario no llega, la app arranca igual.
+    provideAppInitializer(() => inject(I18nService).load().catch((error: unknown) => console.error(error))),
     // Título de la pestaña y lang de <html> desde i18n, en el idioma activo.
     provideAppInitializer(() => void inject(DocumentMetadataService)),
-    provideAppInitializer(() => inject(AuthService).restoreSession()),
+    // La sesión se recupera en segundo plano: el backend dormido en Render tardaba más de un minuto y dejaba la página
+    // en blanco. Solo las pantallas protegidas esperan el perfil (ver authGuard y roleGuard).
+    provideAppInitializer(() => inject(AuthService).startRestore()),
     // start() lanza su propio ciclo en segundo plano; aquí no hay nada que esperar.
     provideAppInitializer(() => inject(NetworkMeasurementService).start()),
     // Igual: al haber sesión despierta la IA en segundo plano y sigue su estado.

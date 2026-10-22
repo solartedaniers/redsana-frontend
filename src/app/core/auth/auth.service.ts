@@ -1,6 +1,24 @@
+import { HttpErrorResponse, HttpStatusCode } from '@angular/common/http';
 import { Injectable, computed, inject, signal } from '@angular/core';
-import { Observable, switchMap, tap } from 'rxjs';
+import { toObservable } from '@angular/core/rxjs-interop';
+import {
+  Observable,
+  Subscription,
+  defer,
+  filter,
+  finalize,
+  map,
+  of,
+  retry,
+  switchMap,
+  take,
+  tap,
+  throwError,
+  timeout,
+  timer,
+} from 'rxjs';
 import { AuthRepository } from './auth.repository';
+import { SESSION_RESTORE_CONFIG } from './session-restore.config';
 import {
   AuthSession,
   AuthUser,
@@ -9,6 +27,9 @@ import {
   RegisterPayload,
   UserRole,
 } from '../models/user.model';
+
+/** pending: aún no se sabe si hay sesión (el backend puede estar despertando); failed: venció la espera. */
+export type SessionRestoreState = 'pending' | 'restored' | 'failed';
 
 /** Guarda el estado de la sesión; cómo se obtienen los datos lo resuelve AuthRepository. */
 @Injectable({ providedIn: 'root' })
@@ -20,16 +41,63 @@ export class AuthService {
   readonly isAuthenticated = computed(() => this.session() !== null);
   readonly role = computed<UserRole | null>(() => this.currentUser()?.role ?? null);
 
-  restoreSession(): Observable<AuthSession | null> {
-    return this.repository.restoreSession().pipe(tap((session) => this.session.set(session)));
+  readonly restoreState = signal<SessionRestoreState>('pending');
+  private readonly restoreState$ = toObservable(this.restoreState);
+  private restoreSubscription?: Subscription;
+  private readonly waitingGuards = signal(0);
+  /** Hay una pantalla protegida esperando el perfil: la app muestra "Despertando el servidor…" o el fallo. */
+  readonly isWaitingForSession = computed(() => this.waitingGuards() > 0);
+
+  /**
+   * Recupera la sesión guardada sin frenar el arranque: la app se pinta ya y solo las pantallas protegidas esperan.
+   * Mientras Render despierta el backend, /api/me falla o tarda; insisto hasta el plazo y, si vence, queda "failed".
+   */
+  startRestore(): void {
+    this.restoreSubscription?.unsubscribe();
+    this.restoreState.set('pending');
+    // defer: cada reintento vuelve a leer la sesión de Supabase (el token pudo renovarse mientras tanto).
+    this.restoreSubscription = defer(() => this.repository.restoreSession())
+      .pipe(
+        retry({
+          delay: (error: unknown) =>
+            isRejectedSession(error) ? throwError(() => error) : timer(SESSION_RESTORE_CONFIG.retryDelayMs),
+        }),
+        timeout({ first: SESSION_RESTORE_CONFIG.profileTimeoutMs })
+      )
+      .subscribe({
+        next: (session) => this.settle(session),
+        // Sesión rechazada (usuario dado de baja o token inválido): es lo mismo que no tener sesión.
+        error: (error: unknown) => (isRejectedSession(error) ? this.settle(null) : this.restoreState.set('failed')),
+      });
+  }
+
+  /** El botón de reintentar de la pantalla de fallo. */
+  retryRestore(): void {
+    this.startRestore();
+  }
+
+  /** Para los guards: emite una vez cuando ya se sabe si hay sesión; mientras tanto la app muestra la espera. */
+  whenRestored(): Observable<void> {
+    if (this.restoreState() === 'restored') {
+      return of(undefined);
+    }
+    return defer(() => {
+      this.waitingGuards.update((count) => count + 1);
+      return this.restoreState$.pipe(
+        filter((state) => state === 'restored'),
+        take(1),
+        map(() => undefined),
+        finalize(() => this.waitingGuards.update((count) => count - 1))
+      );
+    });
   }
 
   signIn(email: string, password: string): Observable<AuthSession> {
-    return this.repository.signIn(email, password).pipe(tap((session) => this.session.set(session)));
+    return this.repository.signIn(email, password).pipe(tap((session) => this.settle(session)));
   }
 
   signUp(payload: RegisterPayload): Observable<AuthSession> {
-    return this.repository.signUp(payload).pipe(tap((session) => this.session.set(session)));
+    return this.repository.signUp(payload).pipe(tap((session) => this.settle(session)));
   }
 
   signOut(): Observable<void> {
@@ -66,6 +134,13 @@ export class AuthService {
     return this.repository.changePassword(this.requireUserId(), payload);
   }
 
+  /** Un inicio de sesión manual también resuelve la espera: deja de importar la restauración pendiente. */
+  private settle(session: AuthSession | null): void {
+    this.restoreSubscription?.unsubscribe();
+    this.session.set(session);
+    this.restoreState.set('restored');
+  }
+
   private requireUserId(): string {
     const userId = this.currentUser()?.id;
     if (!userId) {
@@ -73,4 +148,11 @@ export class AuthService {
     }
     return userId;
   }
+}
+
+function isRejectedSession(error: unknown): boolean {
+  return (
+    error instanceof HttpErrorResponse &&
+    (error.status === HttpStatusCode.Unauthorized || error.status === HttpStatusCode.Forbidden)
+  );
 }

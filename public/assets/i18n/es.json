@@ -49,6 +49,13 @@
         "service_error": "La IA tuvo un problema al encenderse. Puedes intentarlo de nuevo; si sigue pasando, avisa al administrador."
       }
     },
+    "sessionRestore": {
+      "wakingTitle": "Despertando el servidor…",
+      "wakingBody": "Si nadie lo usó en un rato, tarda alrededor de un minuto en despertar. Gracias por esperar.",
+      "failedTitle": "No pudimos conectar con el servidor",
+      "failedBody": "Revisa tu conexión a internet e inténtalo de nuevo. Si sigue pasando, puede que el servicio esté en mantenimiento.",
+      "retry": "Reintentar"
+    },
     "documentTitle": "RedSana · Clínica de redes domésticas",
     "serverLatencyStatus": {
       "good": "Latencia al servidor normal",

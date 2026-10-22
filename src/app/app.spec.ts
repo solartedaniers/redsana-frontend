@@ -2,12 +2,16 @@ import { TestBed } from '@angular/core/testing';
 import { SwUpdate } from '@angular/service-worker';
 import { NEVER } from 'rxjs';
 import { App } from './app';
+import { AuthRepository } from './core/auth/auth.repository';
 
 describe('App', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [App],
-      providers: [{ provide: SwUpdate, useValue: { isEnabled: false, versionUpdates: NEVER } }],
+      providers: [
+        { provide: SwUpdate, useValue: { isEnabled: false, versionUpdates: NEVER } },
+        { provide: AuthRepository, useValue: { restoreSession: () => NEVER } },
+      ],
     })
       .compileComponents();
   });

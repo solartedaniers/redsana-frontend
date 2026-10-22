@@ -70,6 +70,34 @@ data {
   font-variant-numeric: tabular-nums;
 }
 
+// Pantalla de arranque: la misma en index.html (antes de que cargue Angular) y mientras se espera la sesión, así el
+// paso de una a otra no se nota. Solo el símbolo de la marca, sin texto: los textos llegan con i18n.
+.startup-screen {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-startup-screen);
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: var(--space-4);
+  padding: var(--space-5);
+  text-align: center;
+  background: var(--texture-chart-grid), var(--color-bg-app);
+}
+
+.startup-screen__symbol {
+  width: var(--space-8);
+  height: var(--space-8);
+  background-color: var(--color-brand-symbol);
+  mask: var(--brand-symbol-mask) center / contain no-repeat;
+  animation: startup-breathe var(--motion-heartbeat) var(--motion-easing-standard) infinite alternate;
+}
+
+@keyframes startup-breathe {
+  from { opacity: 1; }
+  to { opacity: 0.55; }
+}
+
 // Oculto a la vista pero leído por los lectores de pantalla.
 .visually-hidden {
   position: absolute;
