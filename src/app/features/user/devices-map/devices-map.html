@@ -5,7 +5,7 @@
 </section>
 
 <div class="scan-bar">
-  <button type="button" class="action-button scan-button" (click)="scan()" [disabled]="isScanning() || !isScanAvailable">
+  <button type="button" class="action-button scan-button" (click)="scan(true)" [disabled]="isScanning() || !isScanAvailable">
     <app-icon name="shield" />
     {{ (isScanning() ? 'user.devicesMap.scanning' : 'user.devicesMap.scan') | translate }}
   </button>

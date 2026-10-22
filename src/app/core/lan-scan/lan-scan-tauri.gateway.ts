@@ -7,7 +7,7 @@ import { LanScanGateway } from './lan-scan.gateway';
 export class LanScanTauriGateway extends LanScanGateway {
   readonly isAvailable = true;
 
-  scan(): Promise<DiscoveredDevice[]> {
-    return invoke<DiscoveredDevice[]>('scan_connected_devices');
+  scan(manual = false): Promise<DiscoveredDevice[]> {
+    return invoke<DiscoveredDevice[]>(manual ? 'scan_present_devices' : 'scan_connected_devices');
   }
 }

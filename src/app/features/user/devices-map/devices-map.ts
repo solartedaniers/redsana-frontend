@@ -97,15 +97,16 @@ export class DevicesMap {
     }
   }
 
-  protected async scan(): Promise<void> {
+  /** manual: lo pidió el usuario con el botón; el escaneo al entrar sigue como siempre. */
+  protected async scan(manual = false): Promise<void> {
     this.isScanning.set(true);
     this.lastScanFindings.set(null);
     this.scanFailed.set(false);
 
     try {
       // Primero descubro lo que hay en la red y luego lo sincronizo con el backend.
-      const discovered = await this.lanScanGateway.scan();
-      this.repository.syncDiscoveredDevices(discovered).subscribe({
+      const discovered = await this.lanScanGateway.scan(manual);
+      this.repository.syncDiscoveredDevices(discovered, manual).subscribe({
         next: (devices) => {
           this.isScanning.set(false);
           this.devices.set(devices);

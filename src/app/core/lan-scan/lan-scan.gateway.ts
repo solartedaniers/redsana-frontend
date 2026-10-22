@@ -5,6 +5,7 @@ export abstract class LanScanGateway {
   /** false donde no se puede escanear (navegador); scan() rechaza con UnavailableInEnvironmentError. */
   abstract readonly isAvailable: boolean;
 
-  /** Aquí el fallo se propaga a propósito: tratarlo como lista vacía mostraría una red vacía como si fuera real. */
-  abstract scan(): Promise<DiscoveredDevice[]>;
+  /** Aquí el fallo se propaga a propósito: tratarlo como lista vacía mostraría una red vacía como si fuera real.
+   * manual: el usuario pidió revisar ahora, así que solo cuenta quien respondió en este escaneo. */
+  abstract scan(manual?: boolean): Promise<DiscoveredDevice[]>;
 }

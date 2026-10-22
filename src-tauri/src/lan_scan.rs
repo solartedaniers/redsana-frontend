@@ -1,3 +1,4 @@
+use std::collections::HashSet;
 use std::net::{IpAddr, Ipv4Addr};
 use crate::console_command::hidden_console_command;
 use std::time::Duration;
@@ -33,6 +34,22 @@ const MAX_HOSTS_TO_SCAN: usize = 4096;
 /// Espera entre pasadas: un celular en ahorro de energía contesta el ARP tarde y con una sola pasada quedaba fuera.
 const SWEEP_SETTLE_DELAY: Duration = Duration::from_millis(1000);
 const SWEEP_PASSES: usize = 2;
+
+/// `arp -a` sigue listando por minutos un celular que ya se desconectó (entrada "Stale"); Get-NetNeighbor dice
+/// en qué estado quedó cada vecino tras el barrido. Las propiedades y los estados salen en inglés en cualquier idioma.
+const NEIGHBOR_COMMAND: &str = "powershell";
+const NEIGHBOR_ARGS: [&str; 4] = [
+    "-NoProfile",
+    "-NonInteractive",
+    "-Command",
+    "Get-NetNeighbor -AddressFamily IPv4 | ForEach-Object { \"$($_.IPAddress) $($_.LinkLayerAddress) $($_.State)\" }",
+];
+/// Estados en que el sistema confirmó hace poco que el equipo contesta (o fijados a mano).
+const CONFIRMED_NEIGHBOR_STATES: [&str; 2] = ["Reachable", "Permanent"];
+/// Así anota Windows a los vecinos que no respondieron al ARP.
+const UNRESOLVED_MAC: &str = "00-00-00-00-00-00";
+/// Aquí sí importa la respuesta: un celular en ahorro de energía tarda más que ARP_TRIGGER_TIMEOUT en contestar.
+const PRESENCE_PING_TIMEOUT: Duration = Duration::from_millis(1000);
 
 /// Papel en la red: el router es la red misma y este equipo no sale en su propia tabla ARP; los marco para no confundirlos.
 #[derive(Serialize, Clone, Copy, Debug, PartialEq)]
@@ -80,6 +97,93 @@ pub async fn scan_connected_devices() -> Result<Vec<DiscoveredDevice>, String> {
         .map_err(|e| format!("no se pudo ejecutar arp: {e}"))??;
 
     Ok(classify_devices(&interface, parse_arp_table(&arp_output)))
+}
+
+/// Para el botón "Escanear en busca de intrusos": cuenta solo a quien respondió en este escaneo (ping o ARP),
+/// no a quien sigue en la tabla ARP de un rato antes. El escaneo automático sigue usando scan_connected_devices.
+#[tauri::command]
+pub async fn scan_present_devices() -> Result<Vec<DiscoveredDevice>, String> {
+    let interface = tokio::task::spawn_blocking(local_interface)
+        .await
+        .map_err(|e| format!("no se pudo determinar la subred local: {e}"))??;
+
+    let targets = hosts_in_subnet(interface.ip, interface.mask, interface.ip);
+    let client = new_client(IpAddr::V4(interface.ip))?;
+
+    let mut replied = HashSet::new();
+    for _ in 0..SWEEP_PASSES {
+        replied.extend(sweep_subnet_for_replies(&client, &targets).await);
+        tokio::time::sleep(SWEEP_SETTLE_DELAY).await;
+    }
+
+    let neighbors = match tokio::task::spawn_blocking(run_get_net_neighbor).await {
+        Ok(Ok(output)) => parse_present_neighbors(&output, &replied),
+        // Sin PowerShell disponible, mejor el resultado de siempre que un escaneo fallido.
+        _ => {
+            let arp_output = tokio::task::spawn_blocking(run_arp_a)
+                .await
+                .map_err(|e| format!("no se pudo ejecutar arp: {e}"))??;
+            parse_arp_table(&arp_output)
+        }
+    };
+
+    Ok(classify_devices(&interface, neighbors))
+}
+
+/// Como sweep_subnet, pero devuelve qué IPs contestaron el ping.
+async fn sweep_subnet_for_replies(client: &Client, targets: &[Ipv4Addr]) -> Vec<Ipv4Addr> {
+    let mut sweep = JoinSet::new();
+    for (sequence, ip) in targets.iter().copied().enumerate() {
+        let client = client.clone();
+        sweep.spawn(async move {
+            let mut pinger = client.pinger(IpAddr::V4(ip), PingIdentifier(sequence as u16)).await;
+            pinger.timeout(PRESENCE_PING_TIMEOUT);
+            pinger.ping(PingSequence(sequence as u16), &[]).await.ok().map(|_| ip)
+        });
+    }
+
+    let mut replied = Vec::new();
+    while let Some(result) = sweep.join_next().await {
+        if let Ok(Some(ip)) = result {
+            replied.push(ip);
+        }
+    }
+    replied
+}
+
+fn run_get_net_neighbor() -> Result<String, String> {
+    let output = hidden_console_command(NEIGHBOR_COMMAND)
+        .args(NEIGHBOR_ARGS)
+        .output()
+        .map_err(|e| format!("no se pudo lanzar Get-NetNeighbor: {e}"))?;
+
+    if !output.status.success() {
+        return Err(format!("Get-NetNeighbor devolvió un error (código {:?})", output.status.code()));
+    }
+
+    Ok(decode_console_output(&output.stdout))
+}
+
+/// Cada línea es "IP MAC Estado". Queda el vecino que contestó el ping o que el sistema confirmó por ARP.
+fn parse_present_neighbors(output: &str, replied: &HashSet<Ipv4Addr>) -> Vec<DiscoveredDevice> {
+    output
+        .lines()
+        .filter_map(|line| {
+            let mut tokens = line.split_whitespace();
+            let ip = tokens.next()?.parse::<Ipv4Addr>().ok()?;
+            let mac = tokens.next()?;
+            let state = tokens.next()?;
+
+            if !is_mac_shaped(mac) || is_non_host_mac(mac) || mac == UNRESOLVED_MAC {
+                return None;
+            }
+            if !CONFIRMED_NEIGHBOR_STATES.contains(&state) && !replied.contains(&ip) {
+                return None;
+            }
+
+            Some(DiscoveredDevice { ip: ip.to_string(), mac: mac.to_lowercase(), role: DeviceRole::Other })
+        })
+        .collect()
 }
 
 /// Los pings van en paralelo: una pasada tarda ~ARP_TRIGGER_TIMEOUT y no eso por cada host.
@@ -511,6 +615,46 @@ Wireless LAN adapter Wi-Fi:
         let neighbors = parse_arp_table(ARP_A_OUTPUT);
         assert_eq!(find_mac_for_ip(&neighbors, ip("192.168.1.1")), Some("18-56-80-3b-2c-11".to_string()));
         assert_eq!(find_mac_for_ip(&neighbors, ip("192.168.1.99")), None);
+    }
+
+    // Formato real de Get-NetNeighbor: el celular desconectado sigue "Stale" con su MAC y arp -a lo listaba.
+    const GET_NET_NEIGHBOR_OUTPUT: &str = "\
+224.0.0.22 01-00-5E-00-00-16 Permanent
+192.168.0.255 FF-FF-FF-FF-FF-FF Permanent
+192.168.0.1 3C-6A-D2-C8-5A-EC Reachable
+192.168.0.100 82-DC-10-19-EA-CF Stale
+192.168.0.101 AA-BB-CC-DD-EE-01 Stale
+192.168.0.102 AA-BB-CC-DD-EE-02 Delay
+192.168.0.150 00-00-00-00-00-00 Unreachable
+192.168.0.151  Incomplete
+";
+
+    #[test]
+    fn parse_present_neighbors_drops_stale_entries_that_did_not_answer() {
+        let replied = HashSet::from([ip("192.168.0.101"), ip("192.168.0.150")]);
+
+        let present: Vec<(String, String)> = parse_present_neighbors(GET_NET_NEIGHBOR_OUTPUT, &replied)
+            .into_iter()
+            .map(|device| (device.ip, device.mac))
+            .collect();
+
+        assert_eq!(
+            present,
+            vec![
+                ("192.168.0.1".to_string(), "3c-6a-d2-c8-5a-ec".to_string()),
+                // Seguía "Stale" pero contestó el ping: está.
+                ("192.168.0.101".to_string(), "aa-bb-cc-dd-ee-01".to_string()),
+            ]
+        );
+    }
+
+    #[test]
+    fn parse_present_neighbors_uses_the_same_mac_format_as_arp() {
+        let from_neighbors = parse_present_neighbors("192.168.1.42 AA-BB-CC-DD-EE-FF Reachable", &HashSet::new());
+        let from_arp = parse_arp_table(ARP_A_OUTPUT);
+
+        // La MAC es la llave con la que el backend reconoce al equipo: debe coincidir con la que ya guardó.
+        assert!(from_arp.iter().any(|device| device.mac == from_neighbors[0].mac));
     }
 
     #[test]

@@ -26,8 +26,11 @@ export class DevicesHttpRepository extends DevicesRepository {
     return this.http.get<BackendDevice[]>(this.baseUrl).pipe(map((devices) => devices.map(this.toNetworkDevice)));
   }
 
-  syncDiscoveredDevices(devices: DiscoveredDevice[]): Observable<NetworkDevice[]> {
-    const payload = { devices: devices.map((device) => ({ mac_address: device.mac, ip_address: device.ip, role: device.role })) };
+  syncDiscoveredDevices(devices: DiscoveredDevice[], manual = false): Observable<NetworkDevice[]> {
+    const payload = {
+      devices: devices.map((device) => ({ mac_address: device.mac, ip_address: device.ip, role: device.role })),
+      manual,
+    };
     return this.http
       .post<BackendDevice[]>(`${this.baseUrl}/sync`, payload)
       .pipe(map((result) => result.map(this.toNetworkDevice)));

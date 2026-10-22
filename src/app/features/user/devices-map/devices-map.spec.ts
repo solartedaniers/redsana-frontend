@@ -79,6 +79,33 @@ describe('DevicesMap trust marking', () => {
   });
 });
 
+describe('DevicesMap manual scan', () => {
+  it('el botón pide un escaneo manual y el escaneo al entrar sigue siendo el de siempre', async () => {
+    const repository = { getDevices: () => of([]), syncDiscoveredDevices: vi.fn(() => of([])) };
+    const lanScan = { isAvailable: true, scan: vi.fn(() => Promise.resolve([])) };
+    TestBed.configureTestingModule({
+      providers: [
+        provideHttpClient(),
+        { provide: DevicesRepository, useValue: repository },
+        { provide: LanScanGateway, useValue: lanScan },
+      ],
+    });
+    const fixture = TestBed.createComponent(DevicesMap);
+    fixture.detectChanges();
+    await fixture.whenStable();
+    fixture.detectChanges();
+
+    expect(lanScan.scan).toHaveBeenCalledExactlyOnceWith(false);
+    expect(repository.syncDiscoveredDevices).toHaveBeenCalledExactlyOnceWith([], false);
+
+    (fixture.nativeElement as HTMLElement).querySelector<HTMLButtonElement>('.scan-button')!.click();
+    await fixture.whenStable();
+
+    expect(lanScan.scan).toHaveBeenLastCalledWith(true);
+    expect(repository.syncDiscoveredDevices).toHaveBeenLastCalledWith([], true);
+  });
+});
+
 describe('DevicesMap connected count', () => {
   // Caso real: router, celular y este PC en la tabla ARP; antes solo se contaba el router.
   it('cuenta este equipo y los demás, pero no el router, que es el hub del mapa', async () => {
