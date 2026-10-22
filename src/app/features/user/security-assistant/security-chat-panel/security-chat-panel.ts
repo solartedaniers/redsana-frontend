@@ -46,6 +46,8 @@ export class SecurityChatPanel {
   protected readonly renameDraft = signal('');
 
   constructor() {
+    // Abrir el chat es querer usar la IA: si se durmió o quedó no disponible, la despierto.
+    this.aiStatus.wakeUp();
     // Ampliado, el fondo no se desplaza; al cerrar la vista (o salir de la pantalla) lo libero siempre.
     effect(() => (this.isExpanded() ? this.pageScroll.lockAtTop() : this.pageScroll.unlock()));
     inject(DestroyRef).onDestroy(() => this.pageScroll.unlock());

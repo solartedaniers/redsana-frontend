@@ -6,7 +6,8 @@ import { AiStatusIndicator } from './ai-status-indicator';
 function render(initial: AiStatusState) {
   const status = signal<AiStatusState>(initial);
   const retry = vi.fn();
-  TestBed.configureTestingModule({ providers: [{ provide: AiStatusService, useValue: { status, retry } }] });
+  const unavailableReason = signal('timed_out');
+  TestBed.configureTestingModule({ providers: [{ provide: AiStatusService, useValue: { status, retry, unavailableReason } }] });
   const fixture = TestBed.createComponent(AiStatusIndicator);
   fixture.detectChanges();
   const element = fixture.nativeElement as HTMLElement;
@@ -49,5 +50,19 @@ describe('AiStatusIndicator', () => {
     element.querySelector<HTMLButtonElement>('button')!.click();
 
     expect(retry).toHaveBeenCalledOnce();
+  });
+
+  it('no disponible explica el motivo a lectores de pantalla y al pasar el puntero', () => {
+    const { element } = render('unavailable');
+
+    expect(element.querySelector('.visually-hidden')?.textContent?.trim()).toBe('common.aiStatus.reason.timed_out');
+    expect(element.querySelector('.ai-status')?.getAttribute('title')).toBe('common.aiStatus.reason.timed_out');
+  });
+
+  it('mientras enciende no muestra motivo', () => {
+    const { element } = render('warming_up');
+
+    expect(element.querySelector('.visually-hidden')).toBeNull();
+    expect(element.querySelector('.ai-status')?.hasAttribute('title')).toBe(false);
   });
 });

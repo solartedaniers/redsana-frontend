@@ -28,7 +28,7 @@ function render(queryParams: Record<string, string> = {}, networkStatus: 'good' 
       { provide: NetworkMetricsRepository, useValue: { getSnapshot: () => of({ status: networkStatus }) } },
       { provide: WifiEncryptionGateway, useValue: { isAvailable: false, detect: () => Promise.resolve(null) } },
       { provide: SecurityEvidenceCollector, useValue: { collect: () => Promise.resolve({}) } },
-      { provide: AiStatusService, useValue: { status: signal('ready'), isReady: signal(true), reportWarmingUp: vi.fn() } },
+      { provide: AiStatusService, useValue: { status: signal('ready'), isReady: signal(true), notReadyKey: signal('ready'), reportWarmingUp: vi.fn(), wakeUp: vi.fn() } },
     ],
   });
   const fixture = TestBed.createComponent(SecurityAssistant);

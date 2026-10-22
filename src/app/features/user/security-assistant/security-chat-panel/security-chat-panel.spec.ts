@@ -1,4 +1,4 @@
-import { signal } from '@angular/core';
+import { computed, signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { AiStatusService, AiStatusState } from '../../../../core/ai-status/ai-status.service';
 import { PageScrollController } from '../../../../core/layout/page-scroll.controller';
@@ -10,6 +10,9 @@ import { SecurityChatPanel } from './security-chat-panel';
 async function render(initial: AiStatusState) {
   const status = signal<AiStatusState>(initial);
   const isReady = signal(initial === 'ready');
+  // Como el servicio real: un "no disponible" sin motivo del backend cuenta como problema del servicio.
+  const notReadyKey = computed(() => (status() === 'unavailable' ? 'service_error' : status()));
+  const wakeUp = vi.fn();
   const session = {
     conversations: signal([]),
     currentConversationId: signal(null),
@@ -30,7 +33,7 @@ async function render(initial: AiStatusState) {
   const pageScroll = { lockAtTop: vi.fn(), unlock: vi.fn() };
   TestBed.configureTestingModule({
     providers: [
-      { provide: AiStatusService, useValue: { status, isReady } },
+      { provide: AiStatusService, useValue: { status, isReady, notReadyKey, wakeUp } },
       { provide: SecurityChatSession, useValue: session },
       { provide: PageScrollController, useValue: pageScroll },
       { provide: ChatScrollAnchor, useValue: scrollAnchor },
@@ -55,7 +58,7 @@ async function render(initial: AiStatusState) {
     element.querySelector<HTMLFormElement>('form.chat-input-row')!.dispatchEvent(new Event('submit'));
     await refresh();
   };
-  return { fixture, element, input, list, panel, toggle, status, isReady, session, pageScroll, scrollAnchor, reply, ask, refresh };
+  return { fixture, element, input, list, panel, toggle, status, isReady, wakeUp, session, pageScroll, scrollAnchor, reply, ask, refresh };
 }
 
 describe('SecurityChatPanel', () => {
@@ -72,8 +75,14 @@ describe('SecurityChatPanel', () => {
     const { element } = await render('unavailable');
 
     expect(element.querySelector('.chat-ai-notice')?.textContent?.trim()).toBe(
-      'user.securityAssistant.chat.aiNotReady.unavailable'
+      'user.securityAssistant.chat.aiNotReady.service_error'
     );
+  });
+
+  it('abrir el chat pide despertar la IA', async () => {
+    const { wakeUp } = await render('ready');
+
+    expect(wakeUp).toHaveBeenCalledOnce();
   });
 
   it('con la IA lista se habilita, sin aviso, y envía', async () => {

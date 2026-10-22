@@ -96,7 +96,7 @@
   </div>
 
   @if (!aiStatus.isReady()) {
-    <p class="chat-ai-notice" role="status">{{ 'user.securityAssistant.chat.aiNotReady.' + aiStatus.status() | translate }}</p>
+    <p class="chat-ai-notice" role="status">{{ 'user.securityAssistant.chat.aiNotReady.' + aiStatus.notReadyKey() | translate }}</p>
   }
 
   <form class="chat-input-row" (ngSubmit)="send()">

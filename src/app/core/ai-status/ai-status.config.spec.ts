@@ -15,8 +15,10 @@ describe('buildPollDelays', () => {
     expect(total - delays.at(-1)!).toBeLessThan(AI_STATUS_CONFIG.maxWaitMs);
   });
 
-  it('el tope por defecto es amplio para un arranque en frío y tiene un número finito de intentos', () => {
-    expect(AI_STATUS_CONFIG.maxWaitMs).toBe(150_000);
-    expect(buildPollDelays(AI_STATUS_CONFIG).length).toBeLessThanOrEqual(20);
+  it('el tope por defecto supera el plazo del calentamiento del backend y tiene un número finito de intentos', () => {
+    // 300 s del calentamiento del backend más el arranque en frío del propio backend.
+    expect(AI_STATUS_CONFIG.maxWaitMs).toBeGreaterThan(300_000 + 70_000);
+    // Cada consulta lee la memoria del backend (no llega a la IA), así que unas decenas no cuestan nada.
+    expect(buildPollDelays(AI_STATUS_CONFIG).length).toBeLessThanOrEqual(50);
   });
 });

@@ -43,7 +43,11 @@
       "warming_up": "AI starting up…",
       "ready": "AI ready",
       "unavailable": "AI unavailable",
-      "retry": "Retry"
+      "retry": "Retry",
+      "reason": {
+        "timed_out": "The AI took longer than usual to start. You can try again.",
+        "service_error": "The AI had a problem while starting. You can try again; if it keeps happening, let the administrator know."
+      }
     },
     "documentTitle": "RedSana · Home network clinic",
     "serverLatencyStatus": {
@@ -242,8 +246,9 @@
         "familyDnsCheck": "Check the DNS before saving: they must be exactly {{primary}} (primary) and {{secondary}} (secondary), the same as in the Family mode guide. If you type others, you could lose internet access.",
         "aiWarmingUpReply": "The assistant was starting up and could not answer. Send your question again once \"AI ready\" shows up at the top.",
         "aiNotReady": {
-          "warming_up": "The assistant is starting up (it can take about a minute). You can type as soon as \"AI ready\" shows up.",
-          "unavailable": "The assistant is not available right now. Use \"Retry\" in the top bar to start it again.",
+          "warming_up": "The assistant is starting up. It usually takes a minute or two; you can type as soon as \"AI ready\" shows up.",
+          "timed_out": "The assistant took longer than usual to start. Press \"Retry\" in the top bar to try again.",
+          "service_error": "The assistant had a problem while starting. Press \"Retry\" in the top bar; if it keeps happening, let the administrator know.",
           "idle": "The assistant will be available once your session finishes loading."
         },
         "expand": "Expand the chat",

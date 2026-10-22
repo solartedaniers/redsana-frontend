@@ -43,7 +43,11 @@
       "warming_up": "IA encendiendo…",
       "ready": "IA lista",
       "unavailable": "IA no disponible",
-      "retry": "Reintentar"
+      "retry": "Reintentar",
+      "reason": {
+        "timed_out": "La IA tardó más de lo normal en encenderse. Puedes intentarlo de nuevo.",
+        "service_error": "La IA tuvo un problema al encenderse. Puedes intentarlo de nuevo; si sigue pasando, avisa al administrador."
+      }
     },
     "documentTitle": "RedSana · Clínica de redes domésticas",
     "serverLatencyStatus": {
@@ -242,8 +246,9 @@
         "familyDnsCheck": "Revisa los DNS antes de guardarlos: deben ser exactamente {{primary}} (primario) y {{secondary}} (secundario), los mismos de la guía de Modo familiar. Si escribes otros, podrías quedarte sin internet.",
         "aiWarmingUpReply": "El asistente se estaba encendiendo y no alcanzó a responder. Vuelve a enviar tu pregunta cuando aparezca \"IA lista\" arriba.",
         "aiNotReady": {
-          "warming_up": "El asistente se está encendiendo (puede tardar cerca de un minuto). Podrás escribir en cuanto aparezca \"IA lista\".",
-          "unavailable": "El asistente no está disponible ahora. Usa \"Reintentar\" en la barra superior para volver a encenderlo.",
+          "warming_up": "El asistente se está encendiendo. Suele tardar uno o dos minutos; podrás escribir en cuanto aparezca \"IA lista\".",
+          "timed_out": "El asistente tardó más de lo normal en encenderse. Pulsa \"Reintentar\" en la barra superior para intentarlo de nuevo.",
+          "service_error": "El asistente tuvo un problema al encenderse. Pulsa \"Reintentar\" en la barra superior; si sigue pasando, avísale al administrador.",
           "idle": "El asistente estará disponible cuando termine de cargar tu sesión."
         },
         "expand": "Ampliar el chat",

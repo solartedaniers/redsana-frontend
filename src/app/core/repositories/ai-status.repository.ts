@@ -1,9 +1,9 @@
 import { Observable } from 'rxjs';
-import { AiAvailability } from '../models/ai.model';
+import { AiStatusReport } from '../models/ai.model';
 
 export abstract class AiStatusRepository {
-  /** Consulta liviana del estado actual de la IA. */
-  abstract getStatus(): Observable<AiAvailability>;
-  /** Pide despertar la IA y devuelve el estado de ese momento; el calentamiento sigue en el backend. */
-  abstract warmUp(): Observable<AiAvailability>;
+  /** Lee el estado que mantiene el calentamiento del backend; no despierta la IA. */
+  abstract getStatus(): Observable<AiStatusReport>;
+  /** Pide despertar la IA (o reiniciar un intento terminado) y devuelve el estado de ese momento. */
+  abstract warmUp(): Observable<AiStatusReport>;
 }

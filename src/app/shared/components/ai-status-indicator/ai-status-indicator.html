@@ -1,8 +1,12 @@
 @if (visibleStatus(); as status) {
-  <span class="ai-status" role="status" aria-live="polite">
+  <span class="ai-status" role="status" aria-live="polite" [attr.title]="hintKey() ? (hintKey()! | translate) : null">
     <span class="sticker" [attr.data-tone]="tone()" [attr.data-ai-status]="status">
       <span class="ai-status__label">{{ 'common.aiStatus.' + status | translate }}</span>
     </span>
+    @if (hintKey(); as hint) {
+      <!-- El aviso del chat ya lo explica a la vista; aquí va para lectores de pantalla y al pasar el puntero. -->
+      <span class="visually-hidden">{{ hint | translate }}</span>
+    }
     @if (status === 'unavailable') {
       <button type="button" class="subtle-button ai-status__retry" (click)="aiStatus.retry()">
         {{ 'common.aiStatus.retry' | translate }}
