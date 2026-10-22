@@ -5,6 +5,7 @@ import {
   EMPTY,
   Observable,
   Subject,
+  Subscription,
   catchError,
   concat,
   concatMap,
@@ -48,9 +49,18 @@ export class AiStatusService {
 
   readonly status = signal<AiStatusState>('idle');
   readonly unavailableReason = signal<AiUnavailableReason>(DEFAULT_REASON);
+  /** Lleva más de slowNoticeAfterMs encendiéndose: se avisa que puede tardar y que se puede seguir usando la app. */
+  readonly isTakingLong = signal(false);
+  private slowNotice?: Subscription;
   readonly isReady = computed(() => this.status() === 'ready');
   /** La clave del aviso del chat: el estado, o el motivo cuando no está disponible. */
-  readonly notReadyKey = computed(() => (this.status() === 'unavailable' ? this.unavailableReason() : this.status()));
+  readonly notReadyKey = computed(() => {
+    const status = this.status();
+    if (status === 'unavailable') {
+      return this.unavailableReason();
+    }
+    return status === 'warming_up' && this.isTakingLong() ? 'warming_up_slow' : status;
+  });
 
   start(): void {
     // Al prerenderizar no hay sesión ni red, y un temporizador vivo no dejaría terminar el prerender.
@@ -70,6 +80,7 @@ export class AiStatusService {
       )
       .subscribe((report) => {
         this.unavailableReason.set(report?.reason ?? DEFAULT_REASON);
+        this.trackSlowWarmUp(report?.status === 'warming_up');
         this.status.set(report?.status ?? 'idle');
       });
   }
@@ -92,6 +103,17 @@ export class AiStatusService {
     if (this.status() !== 'warming_up') {
       this.restart$.next(true);
     }
+  }
+
+  /** El reloj del aviso corre mientras siga encendiendo, aunque se reinicie el ciclo (p. ej. al abrir el chat). */
+  private trackSlowWarmUp(isWarmingUp: boolean): void {
+    if (!isWarmingUp) {
+      this.slowNotice?.unsubscribe();
+      this.slowNotice = undefined;
+      this.isTakingLong.set(false);
+      return;
+    }
+    this.slowNotice ??= timer(AI_STATUS_CONFIG.slowNoticeAfterMs).subscribe(() => this.isTakingLong.set(true));
   }
 
   private warmUpCycle(showWarmingUp: boolean): Observable<AiStatusReport> {

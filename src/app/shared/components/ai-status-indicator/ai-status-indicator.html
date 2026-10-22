@@ -3,7 +3,10 @@
     <span class="sticker" [attr.data-tone]="tone()" [attr.data-ai-status]="status">
       <span class="ai-status__label">{{ 'common.aiStatus.' + status | translate }}</span>
     </span>
-    @if (hintKey(); as hint) {
+    @if (showSlowNotice()) {
+      <!-- Visible en pantallas anchas: "encendiendo" ya lleva rato y conviene decir que se puede seguir usando la app. -->
+      <span class="ai-status__slow">{{ 'common.aiStatus.slowWarmUp' | translate }}</span>
+    } @else if (hintKey(); as hint) {
       <!-- El aviso del chat ya lo explica a la vista; aquí va para lectores de pantalla y al pasar el puntero. -->
       <span class="visually-hidden">{{ hint | translate }}</span>
     }

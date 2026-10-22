@@ -27,9 +27,14 @@ export class AiStatusIndicator {
     const status = this.aiStatus.status();
     return status === 'idle' ? null : status;
   });
-  protected readonly hintKey = computed(() =>
-    this.visibleStatus() === 'unavailable' ? `common.aiStatus.reason.${this.aiStatus.unavailableReason()}` : null
-  );
+  protected readonly hintKey = computed(() => {
+    const status = this.visibleStatus();
+    if (status === 'unavailable') {
+      return `common.aiStatus.reason.${this.aiStatus.unavailableReason()}`;
+    }
+    return status === 'warming_up' && this.aiStatus.isTakingLong() ? 'common.aiStatus.slowWarmUp' : null;
+  });
+  protected readonly showSlowNotice = computed(() => this.visibleStatus() === 'warming_up' && this.aiStatus.isTakingLong());
   protected readonly tone = computed(() => {
     const status = this.visibleStatus();
     return status ? TONE_BY_STATUS[status] : null;

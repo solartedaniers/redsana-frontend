@@ -17,6 +17,13 @@
   animation: heartbeat var(--motion-heartbeat) var(--motion-easing-standard) infinite;
 }
 
+.ai-status__slow {
+  max-width: 22rem;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-caption);
+  line-height: 1.3;
+}
+
 .ai-status__retry {
   padding: var(--space-1) var(--space-3);
   font-size: var(--font-size-caption);
@@ -24,7 +31,8 @@
 
 // En el celular queda solo el punto de color; el texto sigue para lectores de pantalla (como .visually-hidden).
 @media (max-width: 30rem) {
-  .ai-status__label {
+  .ai-status__label,
+  .ai-status__slow {
     position: absolute;
     width: 1px;
     height: 1px;

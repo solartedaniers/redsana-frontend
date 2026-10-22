@@ -220,6 +220,23 @@ describe('AiStatusService', () => {
     expect(repository.warmUp).toHaveBeenCalledTimes(2);
   });
 
+  it('si tarda más de lo normal en encender, avisa que puede tardar y lo quita al quedar lista', () => {
+    const { service, repository } = setup(['warming_up']);
+
+    vi.advanceTimersByTime(AI_STATUS_CONFIG.slowNoticeAfterMs - 1);
+    expect(service.isTakingLong()).toBe(false);
+    expect(service.notReadyKey()).toBe('warming_up');
+
+    vi.advanceTimersByTime(1);
+    expect(service.isTakingLong()).toBe(true);
+    expect(service.notReadyKey()).toBe('warming_up_slow');
+
+    repository.getStatus.mockImplementation(() => of(report('ready')));
+    vi.advanceTimersByTime(AI_STATUS_CONFIG.slowNoticeAfterMs);
+    expect(service.status()).toBe('ready');
+    expect(service.isTakingLong()).toBe(false);
+  });
+
   it('al prerenderizar no arranca nada', () => {
     const { service, repository } = setup(['ready'], { platform: 'server' });
 

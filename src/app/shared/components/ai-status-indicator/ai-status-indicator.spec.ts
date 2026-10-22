@@ -7,12 +7,15 @@ function render(initial: AiStatusState) {
   const status = signal<AiStatusState>(initial);
   const retry = vi.fn();
   const unavailableReason = signal('timed_out');
-  TestBed.configureTestingModule({ providers: [{ provide: AiStatusService, useValue: { status, retry, unavailableReason } }] });
+  const isTakingLong = signal(false);
+  TestBed.configureTestingModule({
+    providers: [{ provide: AiStatusService, useValue: { status, retry, unavailableReason, isTakingLong } }],
+  });
   const fixture = TestBed.createComponent(AiStatusIndicator);
   fixture.detectChanges();
   const element = fixture.nativeElement as HTMLElement;
   const refresh = () => fixture.detectChanges();
-  return { element, status, retry, refresh };
+  return { element, status, retry, refresh, isTakingLong };
 }
 
 describe('AiStatusIndicator', () => {
@@ -57,6 +60,17 @@ describe('AiStatusIndicator', () => {
 
     expect(element.querySelector('.visually-hidden')?.textContent?.trim()).toBe('common.aiStatus.reason.timed_out');
     expect(element.querySelector('.ai-status')?.getAttribute('title')).toBe('common.aiStatus.reason.timed_out');
+  });
+
+  it('si lleva rato encendiendo avisa que se puede seguir usando la app', () => {
+    const { element, isTakingLong, refresh } = render('warming_up');
+    expect(element.querySelector('.ai-status__slow')).toBeNull();
+
+    isTakingLong.set(true);
+    refresh();
+
+    expect(element.querySelector('.ai-status__slow')?.textContent?.trim()).toBe('common.aiStatus.slowWarmUp');
+    expect(element.querySelector('.ai-status')?.getAttribute('title')).toBe('common.aiStatus.slowWarmUp');
   });
 
   it('mientras enciende no muestra motivo', () => {

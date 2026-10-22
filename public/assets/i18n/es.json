@@ -47,7 +47,8 @@
       "reason": {
         "timed_out": "La IA tardó más de lo normal en encenderse. Puedes intentarlo de nuevo.",
         "service_error": "La IA tuvo un problema al encenderse. Puedes intentarlo de nuevo; si sigue pasando, avisa al administrador."
-      }
+      },
+      "slowWarmUp": "La primera vez del día puede tardar unos minutos. Puedes seguir usando RedSana mientras tanto."
     },
     "sessionRestore": {
       "wakingTitle": "Despertando el servidor…",
@@ -254,6 +255,7 @@
         "aiWarmingUpReply": "El asistente se estaba encendiendo y no alcanzó a responder. Vuelve a enviar tu pregunta cuando aparezca \"IA lista\" arriba.",
         "aiNotReady": {
           "warming_up": "El asistente se está encendiendo. Suele tardar uno o dos minutos; podrás escribir en cuanto aparezca \"IA lista\".",
+          "warming_up_slow": "El asistente sigue encendiéndose: la primera vez del día puede tardar unos minutos. Puedes seguir usando RedSana mientras tanto; podrás escribir en cuanto aparezca \"IA lista\".",
           "timed_out": "El asistente tardó más de lo normal en encenderse. Pulsa \"Reintentar\" en la barra superior para intentarlo de nuevo.",
           "service_error": "El asistente tuvo un problema al encenderse. Pulsa \"Reintentar\" en la barra superior; si sigue pasando, avísale al administrador.",
           "idle": "El asistente estará disponible cuando termine de cargar tu sesión."
