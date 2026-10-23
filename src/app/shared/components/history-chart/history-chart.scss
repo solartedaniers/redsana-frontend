@@ -132,6 +132,8 @@
   padding: 0;
   list-style: none;
 
+  li { cursor: help; }
+
   li::before {
     content: '';
     display: inline-block;

@@ -29,10 +29,16 @@
       "hint": "Hover or use ← → to read each measurement",
       "packetLoss": "{{value}} % packet loss",
       "legend": {
-        "healthy": "Healthy · < {{warning}} ms and < {{lossWarning}} % loss",
-        "warning": "Warning · {{warning}}–{{critical}} ms or ≥ {{lossWarning}} % loss",
-        "critical": "Critical · ≥ {{critical}} ms or ≥ {{lossCritical}} % loss",
-        "cut": "Outage"
+        "healthy": "Healthy · all good",
+        "warning": "Warning · may feel slow",
+        "critical": "Critical · very slow or failing",
+        "cut": "Outage · no connection"
+      },
+      "legendHint": {
+        "healthy": "Latency under {{warning}} ms and packet loss under {{lossWarning}} %",
+        "warning": "Latency from {{warning}} ms or packet loss from {{lossWarning}} %",
+        "critical": "Latency from {{critical}} ms or packet loss from {{lossCritical}} %",
+        "cut": "The measurement got no reply"
       }
     },
     "measurements": {

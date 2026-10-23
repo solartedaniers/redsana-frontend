@@ -97,12 +97,15 @@
       <time [attr.datetime]="data.points[data.points.length - 1].timestamp">{{ data.points[data.points.length - 1].timestamp | date: 'short' }}</time>
     </div>
 
-    @let limits = thresholds();
+    <!-- Frases simples a la vista; los umbrales exactos van en la ayuda (al pasar el cursor y para lectores de pantalla). -->
     <ul class="ecg__legend">
-      <li data-severity="healthy">{{ 'common.latencyChart.legend.healthy' | translate: { warning: limits.latencyWarningMs, lossWarning: limits.packetLossWarningPercent } }}</li>
-      <li data-severity="warning">{{ 'common.latencyChart.legend.warning' | translate: { warning: limits.latencyWarningMs, critical: limits.latencyCriticalMs, lossWarning: limits.packetLossWarningPercent } }}</li>
-      <li data-severity="critical">{{ 'common.latencyChart.legend.critical' | translate: { critical: limits.latencyCriticalMs, lossCritical: limits.packetLossCriticalPercent } }}</li>
-      <li data-severity="cut">{{ 'common.latencyChart.legend.cut' | translate }}</li>
+      @for (severity of legendSeverities; track severity) {
+        @let hint = 'common.latencyChart.legendHint.' + severity | translate: hintParams();
+        <li [attr.data-severity]="severity" [attr.title]="hint">
+          {{ 'common.latencyChart.legend.' + severity | translate }}
+          <span class="visually-hidden">{{ hint }}</span>
+        </li>
+      }
     </ul>
   </figure>
 }

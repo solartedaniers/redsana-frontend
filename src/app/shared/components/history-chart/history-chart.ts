@@ -1,5 +1,6 @@
 import { DatePipe, formatNumber } from '@angular/common';
 import { ChangeDetectionStrategy, Component, LOCALE_ID, computed, inject, input, signal } from '@angular/core';
+import { LatencySeverity } from '../../../core/domain/latency-severity';
 import { NetworkMetricSample } from '../../../core/models/network.model';
 import { NetworkThresholdsService } from '../../../core/network-thresholds/network-thresholds.service';
 import { TranslatePipe } from '../../../core/i18n/translate.pipe';
@@ -37,6 +38,18 @@ export class HistoryChart {
   protected readonly active = computed(() => {
     const index = this.activeIndex();
     return index === null ? null : (this.trace().points[index] ?? null);
+  });
+
+  protected readonly legendSeverities: readonly LatencySeverity[] = ['healthy', 'warning', 'critical', 'cut'];
+  /** Los números de la ayuda de la leyenda salen de los umbrales reales (backend o respaldo), nunca de los textos. */
+  protected readonly hintParams = computed(() => {
+    const limits = this.thresholds();
+    return {
+      warning: limits.latencyWarningMs,
+      critical: limits.latencyCriticalMs,
+      lossWarning: limits.packetLossWarningPercent,
+      lossCritical: limits.packetLossCriticalPercent,
+    };
   });
 
   protected readonly summaryParams = computed(() => {

@@ -29,10 +29,16 @@
       "hint": "Pasa el cursor o usa ← → para leer cada medición",
       "packetLoss": "{{value}} % de pérdida",
       "legend": {
-        "healthy": "Sana · < {{warning}} ms y < {{lossWarning}} % de pérdida",
-        "warning": "Alerta · {{warning}}–{{critical}} ms o ≥ {{lossWarning}} % de pérdida",
-        "critical": "Crítica · ≥ {{critical}} ms o ≥ {{lossCritical}} % de pérdida",
-        "cut": "Corte"
+        "healthy": "Sana · todo va bien",
+        "warning": "Alerta · puede notarse lento",
+        "critical": "Crítica · muy lento o con fallas",
+        "cut": "Corte · sin conexión"
+      },
+      "legendHint": {
+        "healthy": "Latencia menor a {{warning}} ms y pérdida de paquetes menor al {{lossWarning}} %",
+        "warning": "Latencia desde {{warning}} ms o pérdida de paquetes desde el {{lossWarning}} %",
+        "critical": "Latencia desde {{critical}} ms o pérdida de paquetes desde el {{lossCritical}} %",
+        "cut": "La medición no recibió ninguna respuesta"
       }
     },
     "measurements": {
