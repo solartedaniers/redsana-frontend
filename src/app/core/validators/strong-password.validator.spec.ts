@@ -5,7 +5,7 @@ describe('strongPasswordValidator', () => {
   const validate = (value: string) => new FormControl(value, strongPasswordValidator()).errors;
 
   it('acepta una contraseña que cumple los cinco criterios', () => {
-    expect(validate('Omaira25*')).toBeNull();
+    expect(validate('Trigal#47')).toBeNull();
   });
 
   it('rechaza indicando solo los criterios que faltan, sin repetir la contraseña', () => {

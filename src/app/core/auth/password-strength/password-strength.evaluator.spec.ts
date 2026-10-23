@@ -7,11 +7,11 @@ describe('PasswordStrengthEvaluator', () => {
     expect(evaluator.evaluate('')).toEqual({ level: null, metCount: 0, totalCriteria: 5, met: [] });
   });
 
-  it('"Omaira25*" cumple los cinco criterios y es óptima', () => {
-    const result = evaluator.evaluate('Omaira25*');
+  it('"Trigal#47" cumple los cinco criterios y es óptima', () => {
+    const result = evaluator.evaluate('Trigal#47');
     expect(result.metCount).toBe(5);
     expect(result.level).toBe('strong');
-    expect(evaluator.missing('Omaira25*')).toEqual([]);
+    expect(evaluator.missing('Trigal#47')).toEqual([]);
   });
 
   it('sin mayúscula o sin símbolo no llega a óptima', () => {
