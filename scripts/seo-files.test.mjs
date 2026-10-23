@@ -41,3 +41,11 @@ test('el sitemap solo lista la landing del dominio dado', () => {
   assert.deepEqual([...sitemap.matchAll(/<loc>([^<]+)<\/loc>/g)].map(([, loc]) => loc), [`${SITE}/`]);
   assert.match(sitemap, /xmlns="http:\/\/www\.sitemaps\.org\/schemas\/sitemap\/0\.9"/);
 });
+
+test('el service worker deja pasar la navegación: quien vuelve a / recibe la landing prerenderizada', () => {
+  // Con "performance" (el valor por defecto) el SW respondía toda navegación con index.csr.html desde su caché.
+  const config = JSON.parse(readFileSync(fileURLToPath(new URL('../ngsw-config.json', import.meta.url)), 'utf8'));
+
+  assert.equal(config.navigationRequestStrategy, 'freshness');
+  assert.equal(config.index, '/index.csr.html');
+});
