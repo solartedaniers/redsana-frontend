@@ -494,7 +494,8 @@
         "fullName": "Full name",
         "email": "Email",
         "role": "Role",
-        "status": "Status"
+        "status": "Status",
+        "ownRoleLocked": "You can't remove your own administrator role."
       },
       "actions": {
         "edit": "Edit",
@@ -503,7 +504,8 @@
       "deleteConfirm": "Delete this user? This action cannot be undone.",
       "errors": {
         "emailTaken": "This email is already registered",
-        "userNotFound": "User not found"
+        "userNotFound": "User not found",
+        "adminLockout": "You can't suspend yourself, remove your own administrator role or delete yourself, and at least one active administrator must remain."
       }
     }
   },

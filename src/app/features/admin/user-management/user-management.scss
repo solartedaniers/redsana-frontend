@@ -75,6 +75,8 @@
   }
 }
 
+.field-note { color: var(--color-text-secondary); font: 500 var(--font-size-caption) var(--font-mono); }
+
 .dialog-actions { display: flex; justify-content: flex-end; gap: var(--space-3); margin-top: var(--space-3); }
 
 @media (pointer: coarse) { .link-button { min-height: var(--touch-target-min); } }

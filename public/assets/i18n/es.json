@@ -494,7 +494,8 @@
         "fullName": "Nombre completo",
         "email": "Correo",
         "role": "Rol",
-        "status": "Estado"
+        "status": "Estado",
+        "ownRoleLocked": "No puedes quitarte tu propio rol de administrador."
       },
       "actions": {
         "edit": "Editar",
@@ -503,7 +504,8 @@
       "deleteConfirm": "¿Eliminar este usuario? Esta acción no se puede deshacer.",
       "errors": {
         "emailTaken": "Este correo ya está registrado",
-        "userNotFound": "Usuario no encontrado"
+        "userNotFound": "Usuario no encontrado",
+        "adminLockout": "No puedes suspenderte, quitarte el rol de administrador ni eliminarte, y siempre debe quedar al menos un administrador activo."
       }
     }
   },

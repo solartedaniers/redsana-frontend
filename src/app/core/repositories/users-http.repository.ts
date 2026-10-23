@@ -1,9 +1,12 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse, HttpStatusCode } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
-import { Observable, map } from 'rxjs';
+import { Observable, catchError, map, throwError } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { ManagedUser, ManagedUserCreatePayload, ManagedUserStatus, ManagedUserUpdatePayload, UserRole } from '../models/user.model';
 import { UsersRepository } from './users.repository';
+
+// El backend responde 409 si la operación dejaría al admin sin acceso o a la plataforma sin admin activo.
+export const ADMIN_LOCKOUT_ERROR_KEY = 'admin.userManagement.errors.adminLockout';
 
 interface BackendUser {
   id: string;
@@ -35,11 +38,19 @@ export class UsersHttpRepository extends UsersRepository {
       role: payload.role,
       status: payload.status,
     };
-    return this.http.patch<BackendUser>(`${this.baseUrl}/${id}`, body).pipe(map((user) => this.toManagedUser(user)));
+    return this.http.patch<BackendUser>(`${this.baseUrl}/${id}`, body).pipe(
+      map((user) => this.toManagedUser(user)),
+      catchError((error: unknown) => this.toLockoutError(error))
+    );
   }
 
   deleteUser(id: string): Observable<void> {
-    return this.http.delete<void>(`${this.baseUrl}/${id}`);
+    return this.http.delete<void>(`${this.baseUrl}/${id}`).pipe(catchError((error: unknown) => this.toLockoutError(error)));
+  }
+
+  private toLockoutError(error: unknown): Observable<never> {
+    const lockout = error instanceof HttpErrorResponse && error.status === HttpStatusCode.Conflict;
+    return throwError(() => (lockout ? new Error(ADMIN_LOCKOUT_ERROR_KEY) : error));
   }
 
   private toManagedUser(user: BackendUser): ManagedUser {

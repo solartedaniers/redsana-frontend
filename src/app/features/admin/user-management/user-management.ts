@@ -1,5 +1,6 @@
-import { ChangeDetectionStrategy, Component, ElementRef, inject, signal, viewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, ElementRef, computed, inject, signal, viewChild } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { AuthService } from '../../../core/auth/auth.service';
 import { UsersRepository } from '../../../core/repositories/users.repository';
 import { ManagedUser, UserRole } from '../../../core/models/user.model';
 import { PageHeader } from '../../../shared/components/page-header/page-header';
@@ -17,11 +18,14 @@ export class UserManagement {
   private readonly repository = inject(UsersRepository);
   private readonly formBuilder = inject(FormBuilder);
   private readonly i18n = inject(I18nService);
+  private readonly auth = inject(AuthService);
   private readonly dialogRef = viewChild.required<ElementRef<HTMLDialogElement>>('userDialog');
 
   protected readonly users = signal<ManagedUser[]>([]);
   protected readonly editingUserId = signal<string | null>(null);
   protected readonly errorKey = signal<string | null>(null);
+  // El backend rechaza que el admin se quite su propio acceso (409); aquí ni se ofrece.
+  protected readonly editingSelf = computed(() => this.editingUserId() === this.auth.currentUser()?.id);
 
   protected readonly form = this.formBuilder.nonNullable.group({
     fullName: ['', Validators.required],
@@ -37,6 +41,7 @@ export class UserManagement {
     this.editingUserId.set(null);
     this.errorKey.set(null);
     this.form.reset({ fullName: '', email: '', role: 'standard' });
+    this.form.controls.role.enable();
     this.dialogRef().nativeElement.showModal();
   }
 
@@ -44,7 +49,16 @@ export class UserManagement {
     this.editingUserId.set(user.id);
     this.errorKey.set(null);
     this.form.reset({ fullName: user.fullName, email: user.email, role: user.role });
+    if (this.isCurrentUser(user)) {
+      this.form.controls.role.disable();
+    } else {
+      this.form.controls.role.enable();
+    }
     this.dialogRef().nativeElement.showModal();
+  }
+
+  protected isCurrentUser(user: ManagedUser): boolean {
+    return user.id === this.auth.currentUser()?.id;
   }
 
   protected closeDialog(): void {
