@@ -3,12 +3,15 @@ import { authGuard } from './core/auth/auth.guard';
 import { roleGuard } from './core/auth/role.guard';
 import { webOnlyGuard } from './core/runtime/web-only.guard';
 import { APP_PATHS, ROUTE_SEGMENTS } from './core/routing/app-paths';
+import { SEO_CONFIG } from './core/i18n/seo.config';
 
 export const routes: Routes = [
   {
     path: '',
     pathMatch: 'full',
     canMatch: [webOnlyGuard],
+    // La única ruta pública con contenido propio: la que va a buscadores (ver DocumentMetadataService y robots.txt).
+    data: { [SEO_CONFIG.indexableRouteDataKey]: true },
     loadComponent: () => import('./layouts/auth-layout/auth-layout').then((m) => m.AuthLayout),
     children: [{ path: '', loadComponent: () => import('./features/landing/landing').then((m) => m.Landing) }],
   },

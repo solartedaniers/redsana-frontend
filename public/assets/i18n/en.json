@@ -65,6 +65,10 @@
       "retry": "Try again"
     },
     "documentTitle": "RedSana · Home network clinic",
+    "seo": {
+      "description": "RedSana watches your home WiFi network and explains its health and security in plain words: latency, stability, devices and alerts.",
+      "ogLocale": "en_US"
+    },
     "serverLatencyStatus": {
       "good": "Server latency normal",
       "warning": "Server latency high",

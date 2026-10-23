@@ -4,10 +4,10 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
-    "prebuild": "node scripts/generate-environment.mjs",
+    "prebuild": "node scripts/generate-environment.mjs && node scripts/generate-seo-files.mjs",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
-    "pretest": "node scripts/generate-environment.mjs && node --test scripts/brand-colors.test.mjs scripts/brand-assets.test.mjs scripts/i18n-legend.test.mjs scripts/route-names.test.mjs",
+    "pretest": "node scripts/generate-environment.mjs && node --test scripts/brand-colors.test.mjs scripts/brand-assets.test.mjs scripts/i18n-legend.test.mjs scripts/route-names.test.mjs scripts/seo-files.test.mjs",
     "test": "ng test"
   },
   "private": true,

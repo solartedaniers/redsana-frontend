@@ -65,6 +65,10 @@
       "retry": "Reintentar"
     },
     "documentTitle": "RedSana · Clínica de redes domésticas",
+    "seo": {
+      "description": "RedSana vigila tu red WiFi doméstica y te explica en palabras simples su salud y su seguridad: latencia, estabilidad, dispositivos y alertas.",
+      "ogLocale": "es_ES"
+    },
     "serverLatencyStatus": {
       "good": "Latencia al servidor normal",
       "warning": "Latencia al servidor alta",
