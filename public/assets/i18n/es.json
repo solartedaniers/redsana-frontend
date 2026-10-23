@@ -178,7 +178,8 @@
       "confirmationRequired": "Revisa tu correo para confirmar la cuenta antes de iniciar sesión.",
       "avatarUploadFailed": "No se pudo subir la imagen. Intenta con otro archivo.",
       "unknown": "Ocurrió un error inesperado. Intenta de nuevo.",
-      "passwordNotStrong": "La contraseña aún no cumple todos los requisitos de la lista."
+      "passwordNotStrong": "La contraseña aún no cumple todos los requisitos de la lista.",
+      "accountSuspended": "Tu cuenta está suspendida y por eso se cerró la sesión. Si crees que es un error, habla con el administrador de RedSana."
     },
     "passwordStrength": {
       "label": "Fortaleza de la contraseña",

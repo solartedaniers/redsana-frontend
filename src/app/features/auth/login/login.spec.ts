@@ -1,7 +1,9 @@
 import { provideHttpClient } from '@angular/common/http';
+import { signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { Router, provideRouter } from '@angular/router';
-import { of } from 'rxjs';
+import { of, throwError } from 'rxjs';
+import { ACCOUNT_SUSPENDED_ERROR_KEY, AccountSuspendedError } from '../../../core/auth/account-suspended.error';
 import { AuthService } from '../../../core/auth/auth.service';
 import { DEMO_LOGIN_CONFIG, DemoLoginConfig, readDemoLoginConfig } from '../../../core/auth/demo-login.config';
 import { BackendWakeUpService } from '../../../core/backend/backend-wake-up.service';
@@ -12,13 +14,17 @@ import { Login } from './login';
 const DEMO: DemoLoginConfig = { enabled: true, email: 'demo@example.invalid', password: 'Ejemplo-Clave-2026' };
 const OFF: DemoLoginConfig = { enabled: false, email: '', password: '' };
 
-async function render(demoLogin: DemoLoginConfig, signIn = vi.fn(() => of({ user: { role: 'user' } }))) {
+async function render(
+  demoLogin: DemoLoginConfig,
+  signIn: ReturnType<typeof vi.fn> = vi.fn(() => of({ user: { role: 'user' } })),
+  accountSuspended = false
+) {
   const wakeUp = vi.fn();
   TestBed.configureTestingModule({
     providers: [
       provideHttpClient(),
       provideRouter([]),
-      { provide: AuthService, useValue: { signIn } },
+      { provide: AuthService, useValue: { signIn, accountSuspended: signal(accountSuspended) } },
       { provide: DEMO_LOGIN_CONFIG, useValue: demoLogin },
       { provide: BackendWakeUpService, useValue: { wakeUp } },
     ],
@@ -31,7 +37,7 @@ async function render(demoLogin: DemoLoginConfig, signIn = vi.fn(() => of({ user
   fixture.detectChanges();
   const element = fixture.nativeElement as HTMLElement;
   const [email, password] = element.querySelectorAll<HTMLInputElement>('input');
-  return { element, email, password, signIn, navigateByUrl, wakeUp };
+  return { fixture, element, email, password, signIn, navigateByUrl, wakeUp };
 }
 
 describe('Login', () => {
@@ -76,6 +82,24 @@ describe('Login', () => {
     element.querySelector<HTMLFormElement>('form')!.dispatchEvent(new Event('submit'));
 
     expect(signIn).not.toHaveBeenCalled();
+  });
+
+  it('si la sesión guardada era de una cuenta suspendida, lo avisa al llegar', async () => {
+    const { element } = await render(OFF, undefined, true);
+
+    expect(element.querySelector('.form-error')?.textContent?.trim()).toBe(ACCOUNT_SUSPENDED_ERROR_KEY);
+  });
+
+  it('entrar con una cuenta suspendida muestra el aviso, no navega y no reintenta', async () => {
+    const signIn = vi.fn(() => throwError(() => new AccountSuspendedError()));
+    const { fixture, element, navigateByUrl } = await render(DEMO, signIn);
+
+    element.querySelector<HTMLFormElement>('form')!.dispatchEvent(new Event('submit'));
+    fixture.detectChanges();
+
+    expect(signIn).toHaveBeenCalledOnce();
+    expect(navigateByUrl).not.toHaveBeenCalled();
+    expect(element.querySelector('.form-error')?.textContent?.trim()).toBe(ACCOUNT_SUSPENDED_ERROR_KEY);
   });
 });
 

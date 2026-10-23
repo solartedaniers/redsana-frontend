@@ -1,7 +1,8 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
-import { Observable, from, map, of, switchMap, throwError } from 'rxjs';
+import { Observable, catchError, from, map, of, switchMap, throwError } from 'rxjs';
 import { environment } from '../../../environments/environment';
+import { AccountSuspendedError, isSuspendedProfileResponse } from './account-suspended.error';
 import {
   AuthSession,
   AuthUser,
@@ -167,7 +168,17 @@ export class SupabaseAuthRepository extends AuthRepository {
 
   private buildSession(accessToken: string, expiresAt: number | undefined): Observable<AuthSession> {
     return this.http.get<BackendUser>(this.currentUserUrl).pipe(
-      map((backendUser) => this.toSession(backendUser, accessToken, expiresAt))
+      map((backendUser) => this.toSession(backendUser, accessToken, expiresAt)),
+      catchError((error: unknown) =>
+        isSuspendedProfileResponse(error) ? this.endSuspendedSession() : throwError(() => error)
+      )
+    );
+  }
+
+  /** Cuenta suspendida: borro la sesión guardada en este equipo (sin pedir nada a la red) para no volver a intentarlo. */
+  private endSuspendedSession(): Observable<never> {
+    return from(supabaseClient.auth.signOut({ scope: 'local' })).pipe(
+      switchMap(() => throwError(() => new AccountSuspendedError()))
     );
   }
 

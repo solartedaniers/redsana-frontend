@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
+import { ACCOUNT_SUSPENDED_ERROR_KEY } from '../../../core/auth/account-suspended.error';
 import { AuthService } from '../../../core/auth/auth.service';
 import { TranslatePipe } from '../../../core/i18n/translate.pipe';
 import { Icon } from '../../../shared/components/icon/icon';
@@ -35,6 +36,10 @@ export class Login {
 
   constructor() {
     inject(BackendWakeUpService).wakeUp();
+    // Llegó aquí porque la sesión guardada era de una cuenta suspendida: lo digo en vez de un login vacío.
+    if (this.auth.accountSuspended()) {
+      this.errorKey.set(ACCOUNT_SUSPENDED_ERROR_KEY);
+    }
   }
 
   protected submit(): void {

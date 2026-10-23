@@ -17,6 +17,7 @@ import {
   timeout,
   timer,
 } from 'rxjs';
+import { AccountSuspendedError } from './account-suspended.error';
 import { AuthRepository } from './auth.repository';
 import { SESSION_RESTORE_CONFIG } from './session-restore.config';
 import {
@@ -47,6 +48,9 @@ export class AuthService {
   private readonly waitingGuards = signal(0);
   /** Hay una pantalla protegida esperando el perfil: la app muestra "Despertando el servidor…" o el fallo. */
   readonly isWaitingForSession = computed(() => this.waitingGuards() > 0);
+  private readonly suspended = signal(false);
+  /** La restauración encontró la cuenta suspendida: el login lo avisa al llegar. */
+  readonly accountSuspended = this.suspended.asReadonly();
 
   /**
    * Recupera la sesión guardada sin frenar el arranque: la app se pinta ya y solo las pantallas protegidas esperan.
@@ -66,8 +70,17 @@ export class AuthService {
       )
       .subscribe({
         next: (session) => this.settle(session),
-        // Sesión rechazada (usuario dado de baja o token inválido): es lo mismo que no tener sesión.
-        error: (error: unknown) => (isRejectedSession(error) ? this.settle(null) : this.restoreState.set('failed')),
+        // Sesión rechazada (cuenta suspendida, usuario dado de baja o token inválido): es lo mismo que no tener sesión.
+        error: (error: unknown) => {
+          if (error instanceof AccountSuspendedError) {
+            this.suspended.set(true);
+          }
+          if (isRejectedSession(error)) {
+            this.settle(null);
+          } else {
+            this.restoreState.set('failed');
+          }
+        },
       });
   }
 
@@ -137,6 +150,9 @@ export class AuthService {
   /** Un inicio de sesión manual también resuelve la espera: deja de importar la restauración pendiente. */
   private settle(session: AuthSession | null): void {
     this.restoreSubscription?.unsubscribe();
+    if (session) {
+      this.suspended.set(false);
+    }
     this.session.set(session);
     this.restoreState.set('restored');
   }
@@ -152,7 +168,8 @@ export class AuthService {
 
 function isRejectedSession(error: unknown): boolean {
   return (
-    error instanceof HttpErrorResponse &&
-    (error.status === HttpStatusCode.Unauthorized || error.status === HttpStatusCode.Forbidden)
+    error instanceof AccountSuspendedError ||
+    (error instanceof HttpErrorResponse &&
+      (error.status === HttpStatusCode.Unauthorized || error.status === HttpStatusCode.Forbidden))
   );
 }

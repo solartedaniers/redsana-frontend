@@ -3,6 +3,7 @@ import { TestBed } from '@angular/core/testing';
 import { ActivatedRouteSnapshot, RouterStateSnapshot, UrlTree, provideRouter } from '@angular/router';
 import { Observable, Subject, isObservable, of, throwError } from 'rxjs';
 import { AuthSession, UserRole } from '../models/user.model';
+import { AccountSuspendedError } from './account-suspended.error';
 import { APP_PATHS } from '../routing/app-paths';
 import { authGuard } from './auth.guard';
 import { AuthRepository } from './auth.repository';
@@ -122,6 +123,25 @@ describe('Restauración de la sesión y guards', () => {
     expect(repository.restoreSession).toHaveBeenCalledOnce();
     expect(auth.isAuthenticated()).toBe(false);
     expect(toLogin(runGuard(authGuard).result())).toBe(true);
+  });
+
+  it('una cuenta suspendida no se reintenta: queda sin sesión, va al login y deja el aviso', () => {
+    const { auth, repository } = setup(() => throwError(() => new AccountSuspendedError()));
+
+    vi.advanceTimersByTime(SESSION_RESTORE_CONFIG.profileTimeoutMs);
+    TestBed.tick();
+
+    expect(repository.restoreSession).toHaveBeenCalledOnce();
+    expect(auth.isAuthenticated()).toBe(false);
+    expect(auth.restoreState()).toBe('restored');
+    expect(auth.accountSuspended()).toBe(true);
+    expect(toLogin(runGuard(authGuard).result())).toBe(true);
+  });
+
+  it('sin suspensión el aviso queda apagado', () => {
+    const { auth } = setup(() => of(session('standard')));
+
+    expect(auth.accountSuspended()).toBe(false);
   });
 
   it('iniciar sesión a mano resuelve la espera aunque la restauración siga pendiente', () => {

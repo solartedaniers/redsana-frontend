@@ -178,7 +178,8 @@
       "confirmationRequired": "Check your email to confirm your account before signing in.",
       "avatarUploadFailed": "Could not upload the image. Try a different file.",
       "unknown": "Something went wrong. Please try again.",
-      "passwordNotStrong": "The password does not meet every requirement in the list yet."
+      "passwordNotStrong": "The password does not meet every requirement in the list yet.",
+      "accountSuspended": "Your account is suspended, so you were signed out. If you think this is a mistake, contact your RedSana administrator."
     },
     "passwordStrength": {
       "label": "Password strength",
