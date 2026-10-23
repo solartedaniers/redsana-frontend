@@ -22,6 +22,7 @@ import {
 import { AuthService } from '../auth/auth.service';
 import { AiAvailability, AiStatusReport, AiUnavailableReason } from '../models/ai.model';
 import { AiStatusRepository } from '../repositories/ai-status.repository';
+import { AiClientWakeUp } from './ai-client-wake-up';
 import { AI_STATUS_CONFIG, buildPollDelays } from './ai-status.config';
 
 /** idle: sin sesión no hay IA que mostrar. */
@@ -41,6 +42,7 @@ const DEFAULT_REASON: AiUnavailableReason = 'service_error';
 @Injectable({ providedIn: 'root' })
 export class AiStatusService {
   private readonly repository = inject(AiStatusRepository);
+  private readonly clientWakeUp = inject(AiClientWakeUp);
   private readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
   private readonly isAuthenticated$ = toObservable(inject(AuthService).isAuthenticated);
   /** Cada valor reinicia el ciclo; true muestra "encendiendo" de inmediato, false espera lo que diga el backend. */
@@ -117,6 +119,8 @@ export class AiStatusService {
   }
 
   private warmUpCycle(showWarmingUp: boolean): Observable<AiStatusReport> {
+    // Cada ciclo nace de una acción del usuario (sesión, chat, reintentar): también despierto la IA desde aquí.
+    this.clientWakeUp.wakeUp();
     const polls$ = from(this.pollDelays).pipe(
       concatMap((delayMs) => timer(delayMs).pipe(switchMap(() => this.orWarmingUp(this.repository.getStatus()))))
     );

@@ -18,6 +18,9 @@ export const AI_STATUS_CONFIG: AiStatusPollConfig = {
   maxPollDelayMs: 10_000,
 };
 
+/** Cuánto espera el GET directo al servicio de IA antes de soltarlo: basta con que la petición llegue a Render. */
+export const AI_CLIENT_WAKE_UP_TIMEOUT_MS = 10_000;
+
 /** Esperas entre consultas: crecen hasta maxPollDelayMs y su suma cubre maxWaitMs. Su largo es el tope de intentos;
  * el de tiempo lo corta AiStatusService con un reloj aparte. */
 export function buildPollDelays(config: AiStatusPollConfig): number[] {

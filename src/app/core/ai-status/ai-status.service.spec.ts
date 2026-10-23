@@ -4,6 +4,7 @@ import { Observable, defer, map, of, throwError, timer } from 'rxjs';
 import { AuthService } from '../auth/auth.service';
 import { AiAvailability, AiStatusReport } from '../models/ai.model';
 import { AiStatusRepository } from '../repositories/ai-status.repository';
+import { AiClientWakeUp } from './ai-client-wake-up';
 import { AI_STATUS_CONFIG, buildPollDelays } from './ai-status.config';
 import { AiStatusService } from './ai-status.service';
 
@@ -27,9 +28,11 @@ function setup(
       return of(typeof next === 'string' ? report(next) : next);
     }),
   };
+  const clientWakeUp = { wakeUp: vi.fn() };
   TestBed.configureTestingModule({
     providers: [
       { provide: AiStatusRepository, useValue: repository },
+      { provide: AiClientWakeUp, useValue: clientWakeUp },
       { provide: AuthService, useValue: { isAuthenticated } },
       { provide: PLATFORM_ID, useValue: options.platform ?? 'browser' },
     ],
@@ -37,7 +40,7 @@ function setup(
   const service = TestBed.inject(AiStatusService);
   service.start();
   TestBed.tick();
-  return { service, repository, isAuthenticated };
+  return { service, repository, isAuthenticated, clientWakeUp };
 }
 
 describe('AiStatusService', () => {
@@ -65,6 +68,32 @@ describe('AiStatusService', () => {
     expect(service.isReady()).toBe(true);
     vi.advanceTimersByTime(60_000);
     expect(repository.getStatus).toHaveBeenCalledTimes(2);
+  });
+
+  it('al iniciar o restaurar la sesión también despierta la IA desde el cliente, una sola vez', () => {
+    const { clientWakeUp } = setup(['warming_up', 'ready']);
+
+    vi.advanceTimersByTime(60_000);
+
+    expect(clientWakeUp.wakeUp).toHaveBeenCalledOnce();
+  });
+
+  it('sin sesión no despierta la IA desde el cliente', () => {
+    const { clientWakeUp } = setup(['ready'], { authenticated: false });
+
+    vi.advanceTimersByTime(60_000);
+
+    expect(clientWakeUp.wakeUp).not.toHaveBeenCalled();
+  });
+
+  it('reintentar y abrir el chat vuelven a despertarla desde el cliente', () => {
+    const { service, clientWakeUp } = setup(['unavailable']);
+
+    service.retry();
+    vi.advanceTimersByTime(60_000);
+    service.wakeUp();
+
+    expect(clientWakeUp.wakeUp).toHaveBeenCalledTimes(3);
   });
 
   it('si el calentamiento ya responde lista no consulta más', () => {

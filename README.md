@@ -130,6 +130,7 @@ Render apaga el backend y el servicio de IA tras un rato sin uso, y tardan cerca
 
 - Al abrir el login, un `GET /api/health` liviano despierta el backend mientras el usuario escribe (`BackendWakeUpService`).
 - Tras iniciar sesión, `AiStatusService` pide `POST /api/ai/warm-up` y consulta `GET /api/ai/status` con backoff y un tope de espera (`AI_STATUS_CONFIG`, 700 s por defecto, por encima de los 600 s del calentamiento del backend) hasta que la IA esté lista. Usa el mismo patrón de cancelación que las mediciones: al cerrar sesión o reintentar no quedan consultas vivas.
+- Además, cada vez que se pide el calentamiento (sesión, abrir el chat, reintentar) `AiClientWakeUp` hace un GET silencioso (`no-cors`, 10 s de tope) al `/health` público del servicio de IA, porque un GET desde el navegador lo despierta aunque el backend no lo logre. Se activa con `AI_SERVICE_PUBLIC_URL`; sin ella no hace nada. Nunca se dispara en segundo plano.
 - La barra superior muestra **"IA encendiendo… / IA lista"**; agotado el tope, **"IA no disponible"** con un botón de reintentar.
 - Mientras la IA no está lista el chat del asistente queda deshabilitado con un aviso, y el resumen de una evaluación se pide en cuanto esté lista (la evaluación se guarda igual, no usa IA). Si el backend responde "encendiendo" a un mensaje, se muestra como espera y no como fallo.
 - Con un backend anterior que no tiene estos endpoints (404) la IA se da por lista, así que el orden de despliegue no bloquea el chat.

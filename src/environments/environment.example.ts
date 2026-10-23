@@ -8,6 +8,8 @@ export const environment = {
   desktopReleaseRepo: 'solartedaniers/redsana-frontend',
   desktopInstallerAssetSuffix: '-setup.exe',
   webAppUrl: 'https://red-sana.vercel.app',
+  // /health público del servicio de IA, para despertarlo desde el cliente; vacío lo desactiva.
+  aiServicePublicUrl: '',
   // Credenciales de ejemplo del login (requisito académico); apagadas y vacías por defecto.
   demoLogin: { enabled: false, email: '', password: '' },
 };

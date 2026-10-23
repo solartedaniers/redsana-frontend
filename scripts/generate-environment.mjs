@@ -18,6 +18,8 @@ const OPTIONAL_VARIABLES = {
   githubApiUrl: { name: 'GITHUB_API_URL', fallback: 'https://api.github.com' },
   desktopReleaseRepo: { name: 'DESKTOP_RELEASE_REPO', fallback: 'solartedaniers/redsana-frontend' },
   desktopInstallerAssetSuffix: { name: 'DESKTOP_INSTALLER_ASSET_SUFFIX', fallback: '-setup.exe' },
+  // Vacía desactiva el despertar de la IA desde el cliente.
+  aiServicePublicUrl: { name: 'AI_SERVICE_PUBLIC_URL', fallback: '' },
 };
 
 // Requisito académico: credenciales de ejemplo precargadas en el login. Apagado por defecto y sin valores en
