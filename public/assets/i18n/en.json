@@ -393,6 +393,7 @@
       "offline": "Offline",
       "scanError": "The scan could not be completed. Try again.",
       "countUnavailable": "—",
+      "isolationHint": "Only your router and this computer are visible. Some public or university networks hide other devices for security (client isolation); in that case RedSana cannot see them, even if they are connected. On your home network you will be able to see them.",
       "scanDesktopOnly": "Device scanning requires the RedSana desktop app: browsers do not allow seeing the devices connected to your network.",
       "role": {
         "gateway": "Router (gateway)",

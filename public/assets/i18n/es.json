@@ -393,6 +393,7 @@
       "offline": "Sin conexión",
       "scanError": "No se pudo completar el escaneo. Intenta de nuevo.",
       "countUnavailable": "—",
+      "isolationHint": "Solo se ve tu router y este equipo. Algunas redes públicas o de universidades ocultan a los demás equipos por seguridad (aislamiento de clientes); en ese caso RedSana no puede verlos, aunque estén conectados. En la red de tu casa sí podrás verlos.",
       "scanDesktopOnly": "El escaneo de dispositivos requiere la app de escritorio de RedSana: los navegadores no permiten ver los equipos conectados a tu red.",
       "role": {
         "gateway": "Router (puerta de enlace)",

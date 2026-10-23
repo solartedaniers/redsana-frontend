@@ -129,10 +129,19 @@ RedSana usa **dos motores de IA distintos**, cada uno elegido para el problema q
 Render apaga el backend y el servicio de IA tras un rato sin uso, y tardan cerca de un minuto en volver. Para que el usuario no vea errores:
 
 - Al abrir el login, un `GET /api/health` liviano despierta el backend mientras el usuario escribe (`BackendWakeUpService`).
-- Tras iniciar sesión, `AiStatusService` pide `POST /api/ai/warm-up` y consulta `GET /api/ai/status` con backoff y un tope de espera (`AI_STATUS_CONFIG`, 150 s por defecto) hasta que la IA esté lista. Usa el mismo patrón de cancelación que las mediciones: al cerrar sesión o reintentar no quedan consultas vivas.
+- Tras iniciar sesión, `AiStatusService` pide `POST /api/ai/warm-up` y consulta `GET /api/ai/status` con backoff y un tope de espera (`AI_STATUS_CONFIG`, 700 s por defecto, por encima de los 600 s del calentamiento del backend) hasta que la IA esté lista. Usa el mismo patrón de cancelación que las mediciones: al cerrar sesión o reintentar no quedan consultas vivas.
 - La barra superior muestra **"IA encendiendo… / IA lista"**; agotado el tope, **"IA no disponible"** con un botón de reintentar.
 - Mientras la IA no está lista el chat del asistente queda deshabilitado con un aviso, y el resumen de una evaluación se pide en cuanto esté lista (la evaluación se guarda igual, no usa IA). Si el backend responde "encendiendo" a un mensaje, se muestra como espera y no como fallo.
 - Con un backend anterior que no tiene estos endpoints (404) la IA se da por lista, así que el orden de despliegue no bloquea el chat.
+
+#### 📶 Escaneo de dispositivos (app de escritorio)
+
+- **Al entrar a Dispositivos** se hace el escaneo de siempre (`scan_connected_devices`): ping a la subred y lectura de `arp -a`.
+- **El botón "Escanear en busca de intrusos"** usa `scan_present_devices` y cuenta solo a quien responde en ese momento: Windows deja por minutos en `arp -a` a un celular que ya se fue, así que cada equipo de la tabla se confirma con un ARP propio (`SendARP`, 2 intentos) y, si no contesta, con un ping directo. Un equipo que no responde a nada baja del conteo en ese mismo escaneo. Envía `manual: true` a `POST /api/devices/sync`.
+- **Redes grandes**: barre hasta 4096 direcciones (un /20; si la subred es mayor, las más cercanas a este equipo) con pings y ARP en paralelo pero acotados. Con ~450 equipos el escaneo manual tarda unos 14 s (simulado con los tiempos medidos en una red universitaria de ~290 equipos, donde tardó 12–22 s). Los límites se ajustan sin recompilar con `REDSANA_LAN_SCAN_MAX_HOSTS`, `REDSANA_LAN_SCAN_PING_CONCURRENCY`, `REDSANA_LAN_SCAN_ARP_CONCURRENCY` y `REDSANA_LAN_SCAN_ARP_ATTEMPTS`.
+- **Límite físico**: un celular con la radio dormida puede no contestar durante todo el escaneo y verse como desconectado hasta el siguiente. En la red universitaria medida, en un escaneo típico ~8 de ~250 equipos presentes no contestaron a tiempo.
+- **Redes con aislamiento de clientes** (algunas redes públicas o de campus): la red no deja que un equipo vea a los demás, así que el escaneo solo encuentra al router y a este equipo. La pantalla lo explica con un aviso; no es un fallo de RedSana.
+- **Diagnóstico en desarrollo**: con `REDSANA_LAN_SCAN_DIAGNOSTICS=1` y `npx tauri dev`, cada escaneo manual escribe en la terminal qué decidió con cada equipo y por qué (en el instalador no existe).
 
 ---
 

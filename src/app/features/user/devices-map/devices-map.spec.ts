@@ -106,6 +106,59 @@ describe('DevicesMap manual scan', () => {
   });
 });
 
+describe('DevicesMap client isolation', () => {
+  async function scanReturning(devices: NetworkDevice[]): Promise<HTMLElement> {
+    TestBed.configureTestingModule({
+      providers: [
+        provideHttpClient(),
+        { provide: DevicesRepository, useValue: { getDevices: () => of([]), syncDiscoveredDevices: () => of(devices) } },
+        { provide: LanScanGateway, useValue: { isAvailable: true, scan: () => Promise.resolve([]) } },
+      ],
+    });
+    const fixture = TestBed.createComponent(DevicesMap);
+    fixture.detectChanges();
+    await fixture.whenStable();
+    fixture.detectChanges();
+    return fixture.nativeElement as HTMLElement;
+  }
+
+  it('si el escaneo solo ve al router y a este equipo, explica que la red puede ocultar a los demás', async () => {
+    const element = await scanReturning([device(1, true, 'gateway'), device(52, true, 'this_device')]);
+
+    expect(element.querySelector('.scan-hint')?.textContent?.trim()).toBe('user.devicesMap.isolationHint');
+  });
+
+  it('con otros equipos a la vista no muestra el aviso', async () => {
+    const element = await scanReturning([device(1, true, 'gateway'), device(52, true, 'this_device'), device(60, true)]);
+
+    expect(element.querySelector('.scan-hint')).toBeNull();
+  });
+});
+
+describe('DevicesMap con cientos de equipos tras un escaneo manual', () => {
+  it('sincroniza 450, pinta una página de la lista y el mapa limitado con "X de Y"', async () => {
+    const scanned = [device(0, true, 'gateway'), device(1, true, 'this_device'), ...Array.from({ length: 448 }, (_, i) => device(i + 2, true))];
+    const repository = { getDevices: () => of([]), syncDiscoveredDevices: vi.fn(() => of(scanned)) };
+    TestBed.configureTestingModule({
+      providers: [
+        provideHttpClient(),
+        { provide: DevicesRepository, useValue: repository },
+        { provide: LanScanGateway, useValue: { isAvailable: true, scan: () => Promise.resolve([]) } },
+      ],
+    });
+    const fixture = TestBed.createComponent(DevicesMap);
+    fixture.detectChanges();
+    await fixture.whenStable();
+    fixture.detectChanges();
+    const element = fixture.nativeElement as HTMLElement;
+
+    expect(element.querySelector('.devices-hero .status-badge')?.textContent?.trim()).toBe('449');
+    expect(element.querySelectorAll('.device-card')).toHaveLength(50);
+    expect(element.querySelectorAll('.topology__node')).toHaveLength(70);
+    expect(element.querySelector('.topology__limit')?.textContent?.trim()).toBe('user.devicesMap.mapLimited');
+  });
+});
+
 describe('DevicesMap connected count', () => {
   // Caso real: router, celular y este PC en la tabla ARP; antes solo se contaba el router.
   it('cuenta este equipo y los demás, pero no el router, que es el hub del mapa', async () => {

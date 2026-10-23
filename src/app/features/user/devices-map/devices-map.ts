@@ -88,6 +88,8 @@ export class DevicesMap {
   protected readonly isScanning = signal(false);
   protected readonly lastScanFindings = signal<NetworkDevice[] | null>(null);
   protected readonly scanFailed = signal(false);
+  // El escaneo salió bien pero solo vio al router y a este equipo: puede ser una red que aísla a sus clientes.
+  protected readonly scanSawNoOtherDevices = signal(false);
 
   constructor() {
     this.repository.getDevices().subscribe((devices) => this.devices.set(devices));
@@ -102,6 +104,7 @@ export class DevicesMap {
     this.isScanning.set(true);
     this.lastScanFindings.set(null);
     this.scanFailed.set(false);
+    this.scanSawNoOtherDevices.set(false);
 
     try {
       // Primero descubro lo que hay en la red y luego lo sincronizo con el backend.
@@ -110,6 +113,7 @@ export class DevicesMap {
         next: (devices) => {
           this.isScanning.set(false);
           this.devices.set(devices);
+          this.scanSawNoOtherDevices.set(!devices.some((device) => device.isOnline && device.networkRole === 'other'));
           // El router y este equipo no pueden ser intrusos: solo reviso los demás.
           this.lastScanFindings.set(
             devices.filter((device) => device.isOnline && device.networkRole === 'other' && device.trust !== 'trusted')

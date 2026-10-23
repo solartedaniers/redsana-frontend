@@ -22,6 +22,9 @@
         {{ 'user.devicesMap.scanFindings' | translate: { count: findings.length } }}
       </p>
     }
+    @if (scanSawNoOtherDevices()) {
+      <p class="surface-panel__copy scan-hint">{{ 'user.devicesMap.isolationHint' | translate }}</p>
+    }
   }
 </div>
 
