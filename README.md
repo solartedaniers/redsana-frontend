@@ -24,6 +24,7 @@ RedSana es una aplicación de escritorio que vigila tu conexión a internet en s
 - [☁️ Arquitectura y despliegue](#️-arquitectura-y-despliegue)
 - [⚡ Event Loop: Tasks vs Microtasks](#-event-loop-tasks-vs-microtasks)
 - [🧵 Web Workers y trabajo en segundo plano](#-web-workers-y-trabajo-en-segundo-plano)
+- [🖼️ Patrones de renderizado](#️-patrones-de-renderizado)
 - [🧩 Patrones de diseño aplicados](#-patrones-de-diseño-aplicados)
 - [🗄️ Base de datos](#️-base-de-datos)
 - [🚀 Instalación y ejecución](#-instalación-y-ejecución)
@@ -187,6 +188,31 @@ Un Web Worker tiene sentido cuando hay **cálculo pesado corriendo en JavaScript
 | Lectura de configuración WiFi del sistema | 🦀 Rust |
 
 Es decir: **el patrón de "sacar el trabajo pesado del hilo principal" sí se aplica en todo el proyecto** — solo que el mecanismo correcto para este caso es Rust nativo (para acceso al sistema operativo) y tareas en segundo plano del backend (para el modelo de ML), no un Web Worker del navegador, que no tendría forma de hacer ping real ni leer el sistema operativo de todas formas.
+
+---
+
+## 🖼️ Patrones de renderizado
+
+**Uso dos patrones, cada uno donde tiene sentido, y descarto los demás por una razón concreta.**
+
+| Patrón | Dónde lo uso | Por qué |
+|---|---|---|
+| 🧭 **CSR** (render en el cliente) | Toda la app: login, registro, dashboard, asistente, alertas, dispositivos, administración y perfil | Son datos privados de cada usuario que llegan del backend después de iniciar sesión. Prerenderizarlos no aporta nada: no hay nada que indexar ni que compartir, y el HTML sería distinto para cada persona. Vercel sirve `index.csr.html` para cualquier ruta que no sea un archivo (`vercel.json`). |
+| 📄 **SSG** (prerender en el build) | Solo la landing (`/`), en `app.routes.server.ts` | Es pública e igual para todos. Al prerenderizarla, el HTML llega con el contenido, el título, la descripción, la URL canónica y las etiquetas Open Graph y Twitter Card, así que los buscadores y las vistas previas de redes la leen sin ejecutar JavaScript. |
+| 💧 **Hidratación** (complemento del SSG) | La landing, con `provideClientHydration` | El navegador reutiliza el HTML prerenderizado en vez de borrarlo y volver a pintarlo, así que no hay parpadeo y el fondo 3D no se reconstruye. La activo sin la caché de transferencia HTTP: el cliente pide el diccionario y el release del instalador igual que antes, y nada del build queda congelado en el HTML. En las rutas CSR no hay datos de hidratación y Angular simplemente la salta. |
+
+**Lo que no aplica, y por qué:**
+
+- **SSR** (render en el servidor por petición): necesitaría un servidor Node vivo. La web se publica en Vercel como archivos estáticos (`outputMode: static`) y la app de escritorio carga esos mismos archivos dentro de Tauri, sin servidor. Además, las pantallas que cambian por usuario son privadas: renderizarlas en el servidor no mejora el SEO y obligaría a manejar la sesión allí.
+- **ISR** (regenerar páginas estáticas cada cierto tiempo): solo existe con un servidor o con funciones de la plataforma que regeneren el HTML. La landing cambia únicamente cuando cambia el código, y cada despliegue ya la vuelve a prerenderizar.
+- **Streaming** (enviar el HTML por partes mientras se genera): es una optimización del SSR, así que sin SSR no hay nada que transmitir. Un archivo estático ya llega completo desde la CDN.
+
+**Detalles que cuido:**
+
+- **Escritorio (Tauri)**: carga el `index.html` prerenderizado, pero ahí la landing no existe (`webOnlyGuard`) y la app pasa al login. Por eso desactivo la hidratación cuando `isTauri()` es verdadero: el escritorio se comporta exactamente como antes.
+- **Navegador**: todo lo que toca `window`, `document` o WebGL corre en `afterNextRender` o detrás de `isPlatformBrowser` (por ejemplo el fondo de Three.js y el tema), así que el prerender no lo ejecuta.
+- **Buscadores**: `DocumentMetadataService` pone `index, follow` y la URL canónica solo en la landing; el resto de las rutas lleva `noindex`. `robots.txt` y `sitemap.xml` se generan en cada build (`scripts/generate-seo-files.mjs`) con el dominio de `WEB_APP_URL` y los segmentos de `app-paths.ts`, así que cambiar de dominio es cambiar esa variable. `robots.txt` cierra el rastreo de `/user/`, `/admin/` y `/account/`; `/auth/` queda abierta a propósito, porque un buscador solo respeta el `noindex` del login si puede entrar a leerlo.
+- **Service worker**: usa `navigationRequestStrategy: "freshness"`. Con la estrategia por defecto respondía toda navegación con `index.csr.html` desde su caché, y quien volvía a `/` recibía la landing sin prerender. Ahora la navegación va primero a la red y, sin conexión, cae en la copia guardada.
 
 ---
 
