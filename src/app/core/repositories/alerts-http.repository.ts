@@ -30,11 +30,11 @@ export class AlertsHttpRepository extends AlertsRepository {
   }
 
   watchNewAlerts(): Observable<NetworkAlert> {
-    // No hay push: consulto /new con un cursor "since" que avanza con la última alerta vista.
+    // No hay push: consulto /recent con un cursor "since" que avanza con la última alerta vista.
     let since = new Date().toISOString();
     return interval(NEW_ALERTS_POLL_INTERVAL_MS).pipe(
       // Si una consulta falla el cursor no avanza, así la siguiente lo vuelve a pedir y no se pierde nada.
-      switchMap(() => this.http.get<BackendAlert[]>(`${this.baseUrl}/new`, { params: { since } }).pipe(catchError(() => EMPTY))),
+      switchMap(() => this.http.get<BackendAlert[]>(`${this.baseUrl}/recent`, { params: { since } }).pipe(catchError(() => EMPTY))),
       tap((alerts) => {
         if (alerts.length > 0) {
           since = alerts[alerts.length - 1].timestamp;

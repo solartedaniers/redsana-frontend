@@ -15,7 +15,7 @@ describe('SecurityAssistantHttpRepository con la IA encendiendo', () => {
     let error: unknown;
 
     repository.sendMessage('c1', 'hola').subscribe({ error: (e) => (error = e) });
-    http.expectOne(() => true).flush({ detail: 'ai_warming_up' }, { status: 503, statusText: 'Service Unavailable' });
+    http.expectOne((req) => req.url.endsWith('/api/chat-conversations/c1/messages')).flush({ detail: 'ai_warming_up' }, { status: 503, statusText: 'Service Unavailable' });
 
     expect(error).toBeInstanceOf(AiWarmingUpError);
   });
@@ -25,7 +25,7 @@ describe('SecurityAssistantHttpRepository con la IA encendiendo', () => {
     let error: unknown;
 
     repository.startAssessmentBriefing('a1', 'es').subscribe({ error: (e) => (error = e) });
-    http.expectOne(() => true).flush({ detail: 'ai_warming_up' }, { status: 503, statusText: 'Service Unavailable' });
+    http.expectOne((req) => req.url.endsWith('/api/chat-conversations/briefings')).flush({ detail: 'ai_warming_up' }, { status: 503, statusText: 'Service Unavailable' });
 
     expect(error).toBeInstanceOf(AiWarmingUpError);
   });
@@ -35,7 +35,7 @@ describe('SecurityAssistantHttpRepository con la IA encendiendo', () => {
     let error: unknown;
 
     repository.sendMessage('c1', 'hola').subscribe({ error: (e) => (error = e) });
-    http.expectOne(() => true).flush({ detail: 'Chat engine unavailable' }, { status: 502, statusText: 'Bad Gateway' });
+    http.expectOne((req) => req.url.endsWith('/api/chat-conversations/c1/messages')).flush({ detail: 'Chat engine unavailable' }, { status: 502, statusText: 'Bad Gateway' });
 
     expect(error).not.toBeInstanceOf(AiWarmingUpError);
   });

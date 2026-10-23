@@ -6,7 +6,7 @@ import { environment } from '../../../environments/environment';
 import { AdminMetricsHttpRepository } from './admin-metrics-http.repository';
 
 describe('AdminMetricsHttpRepository', () => {
-  const url = `${environment.apiBaseUrl}/api/admin/metrics`;
+  const url = `${environment.apiBaseUrl}/api/admin/platform-metrics`;
   const legacy = { total_users: 2, monitored_households: 1, active_alerts: 0, average_security_score: 50 };
 
   function setup() {

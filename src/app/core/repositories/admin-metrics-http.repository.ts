@@ -18,7 +18,7 @@ interface BackendPlatformMetrics {
 @Injectable()
 export class AdminMetricsHttpRepository extends AdminMetricsRepository {
   private readonly http = inject(HttpClient);
-  private readonly baseUrl = `${environment.apiBaseUrl}/api/admin/metrics`;
+  private readonly baseUrl = `${environment.apiBaseUrl}/api/admin/platform-metrics`;
 
   getPlatformMetrics(): Observable<PlatformMetrics> {
     return this.http.get<BackendPlatformMetrics>(this.baseUrl).pipe(

@@ -122,6 +122,7 @@ RedSana usa **dos motores de IA distintos**, cada uno elegido para el problema q
 - **Frontend + capa nativa (Rust)**: se instalan en la máquina del usuario como una app de escritorio normal (vía Tauri). Es la única forma de que la app pueda medir la red *de verdad* — un navegador no tiene ese acceso.
 - **Backend (FastAPI)**: corre localmente junto a la app durante el desarrollo (`uvicorn`, puerto 8000). Es la pieza intermedia entre la medición local y la base de datos en la nube. *(Para producción, este backend puede desplegarse igual como servicio local que arranca junto con la app, o evaluarse su empaquetado dentro del propio instalador — queda como decisión de la etapa de distribución.)*
 - **Base de datos y autenticación**: viven en Supabase, en la nube — así los datos persisten entre sesiones y el panel de administración puede ver todos los usuarios desde cualquier lugar.
+- **Nombres de rutas**: el frontend usa solo los nombres actuales del backend (`/api/users/me`, `/api/chat-conversations`, `/api/alerts/recent`, `/api/admin/platform-metrics`). Los anteriores siguen vivos en el backend como alias ocultos para el instalador 0.1.5; `scripts/route-names.test.mjs` impide volver a escribirlos aquí.
 - **Servicio de IA**: el backend puede usar la IA en su propio proceso o llamar a [redsana-ai](https://github.com/solartedaniers/redsana-ai) desplegado aparte en Render (variable `AI_MODE` del backend).
 
 #### 💤 Arranque en frío (Render, plan gratuito)

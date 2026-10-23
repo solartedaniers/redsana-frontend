@@ -65,7 +65,7 @@ interface BackendChatMessage {
 export class SecurityAssistantHttpRepository extends SecurityAssistantRepository {
   private readonly http = inject(HttpClient);
   private readonly baseUrl = `${environment.apiBaseUrl}/api/security-assessments`;
-  private readonly conversationsUrl = `${environment.apiBaseUrl}/api/conversations`;
+  private readonly conversationsUrl = `${environment.apiBaseUrl}/api/chat-conversations`;
 
   getQuestionnaire(): Observable<SecurityQuestion[]> {
     return of(QUESTIONS);

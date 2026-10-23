@@ -27,6 +27,7 @@ interface BackendUser {
 @Injectable()
 export class SupabaseAuthRepository extends AuthRepository {
   private readonly http = inject(HttpClient);
+  private readonly currentUserUrl = `${environment.apiBaseUrl}/api/users/me`;
   private readonly isDesktop = inject(RuntimeEnvironmentService).isDesktop;
 
   signIn(email: string, password: string): Observable<AuthSession> {
@@ -93,7 +94,7 @@ export class SupabaseAuthRepository extends AuthRepository {
           return throwError(() => new Error(this.mapAuthError(error.message)));
         }
         // Supabase ya quedó actualizado; ahora sincronizo nuestra tabla para que no diverjan.
-        return this.http.patch<void>(`${environment.apiBaseUrl}/api/me`, {
+        return this.http.patch<void>(this.currentUserUrl, {
           full_name: payload.fullName,
         });
       }),
@@ -109,7 +110,7 @@ export class SupabaseAuthRepository extends AuthRepository {
 
   updateAvatar(_userId: string, avatarUrl: string): Observable<AuthSession> {
     // El archivo ya está en Storage; aquí solo guardo su URL pública, igual que con full_name.
-    return this.http.patch<void>(`${environment.apiBaseUrl}/api/me`, { avatar_url: avatarUrl }).pipe(
+    return this.http.patch<void>(this.currentUserUrl, { avatar_url: avatarUrl }).pipe(
       switchMap(() => from(supabaseClient.auth.getSession())),
       switchMap(({ data }) => {
         if (!data.session) {
@@ -165,7 +166,7 @@ export class SupabaseAuthRepository extends AuthRepository {
   }
 
   private buildSession(accessToken: string, expiresAt: number | undefined): Observable<AuthSession> {
-    return this.http.get<BackendUser>(`${environment.apiBaseUrl}/api/me`).pipe(
+    return this.http.get<BackendUser>(this.currentUserUrl).pipe(
       map((backendUser) => this.toSession(backendUser, accessToken, expiresAt))
     );
   }

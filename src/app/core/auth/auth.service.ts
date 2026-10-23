@@ -50,7 +50,7 @@ export class AuthService {
 
   /**
    * Recupera la sesión guardada sin frenar el arranque: la app se pinta ya y solo las pantallas protegidas esperan.
-   * Mientras Render despierta el backend, /api/me falla o tarda; insisto hasta el plazo y, si vence, queda "failed".
+   * Mientras Render despierta el backend, /api/users/me falla o tarda; insisto hasta el plazo y, si vence, queda "failed".
    */
   startRestore(): void {
     this.restoreSubscription?.unsubscribe();
