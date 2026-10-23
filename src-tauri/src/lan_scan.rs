@@ -73,9 +73,10 @@ struct PresenceScanLimits {
     ping_timeout: Duration,
     /// Tras el barrido espero a que Windows termine de resolver a los recién llegados (un celular dormido tardó 3,1 s).
     settle_delay: Duration,
-    /// Última oportunidad para quien no contestó el ARP: un ping directo, que el router guarda hasta que el
-    /// celular despierta la radio, en vez del ARP de difusión que un celular dormido puede ignorar.
-    recheck_ping_timeout: Duration,
+    /// Ping directo a cada equipo de la tabla, a la vez que su ARP: el router lo guarda hasta que el celular
+    /// despierta la radio, mientras que un celular dormido puede ignorar el ARP de difusión (en casa, 62 % de los
+    /// escaneos con la pantalla apagada).
+    direct_ping_timeout: Duration,
 }
 
 impl Default for PresenceScanLimits {
@@ -90,7 +91,7 @@ impl Default for PresenceScanLimits {
             arp_attempts: 2,
             ping_timeout: Duration::from_millis(1000),
             settle_delay: Duration::from_millis(3000),
-            recheck_ping_timeout: Duration::from_millis(3000),
+            direct_ping_timeout: Duration::from_millis(3000),
         }
     }
 }
@@ -304,8 +305,8 @@ async fn sweep_for_replies<P: PresenceProbe>(probe: Arc<P>, targets: Vec<Ipv4Add
     replied
 }
 
-/// Confirma cada IP con SendARP (hasta arp_attempts) y, si no contesta, con un ping directo; con tope de
-/// confirmaciones a la vez para no agotar hilos. table_macs da la MAC si solo contestó el ping.
+/// Confirma cada IP con SendARP (hasta arp_attempts) y a la vez con un ping directo; con tope de confirmaciones
+/// a la vez para no agotar hilos. table_macs da la MAC si solo contestó el ping.
 async fn verify_by_arp<P: PresenceProbe>(
     probe: Arc<P>,
     ips: Vec<Ipv4Addr>,
@@ -317,10 +318,12 @@ async fn verify_by_arp<P: PresenceProbe>(
     for ip in ips {
         let (probe, permits, table_macs) = (probe.clone(), permits.clone(), table_macs.clone());
         checks.spawn(async move {
-            let _permit = permits.acquire_owned().await.ok();
+            let permit = permits.acquire_owned().await.ok();
             let started = Instant::now();
             let arp_probe = probe.clone();
-            let (arp_mac, arp_attempts) = tokio::task::spawn_blocking(move || {
+            let arp = tokio::task::spawn_blocking(move || {
+                // El cupo dura lo que dure el ARP aunque el ping ya haya decidido: así el tope de hilos se respeta.
+                let _permit = permit;
                 let mut mac = None;
                 let mut attempts = 0;
                 while mac.is_none() && attempts < limits.arp_attempts {
@@ -328,16 +331,25 @@ async fn verify_by_arp<P: PresenceProbe>(
                     attempts += 1;
                 }
                 (mac, attempts)
-            })
-            .await
-            .unwrap_or((None, limits.arp_attempts));
+            });
 
+            let answered_ping = probe.ping(ip, limits.direct_ping_timeout).await;
+            let table_mac = table_macs.get(&ip).cloned();
+            if answered_ping && table_mac.is_some() && !arp.is_finished() {
+                // Ya contestó: no espero a que el ARP termine sus intentos.
+                return PresenceDecision {
+                    ip,
+                    mac: table_mac,
+                    evidence: Some(PresenceEvidence::DirectPing),
+                    arp_attempts: 0,
+                    elapsed: started.elapsed(),
+                };
+            }
+
+            let (arp_mac, arp_attempts) = arp.await.unwrap_or((None, limits.arp_attempts));
             let (mac, evidence) = match arp_mac {
                 Some(mac) => (Some(mac), Some(PresenceEvidence::Arp)),
-                None => {
-                    let answered = probe.ping(ip, limits.recheck_ping_timeout).await;
-                    (table_macs.get(&ip).cloned(), answered.then_some(PresenceEvidence::RecheckPing))
-                }
+                None => (table_mac, answered_ping.then_some(PresenceEvidence::DirectPing)),
             };
             PresenceDecision { ip, mac, evidence, arp_attempts, elapsed: started.elapsed() }
         });
@@ -409,7 +421,7 @@ enum PresenceEvidence {
     Arp,
     Ping,
     AppearedDuringScan,
-    RecheckPing,
+    DirectPing,
 }
 
 #[derive(Debug)]
@@ -433,7 +445,7 @@ impl PresenceDecision {
             (Some(PresenceEvidence::Arp), _) => "respondió el ARP de este escaneo",
             (Some(PresenceEvidence::Ping), true) => "respondió el ping",
             (Some(PresenceEvidence::AppearedDuringScan), _) => "apareció en la tabla durante este escaneo",
-            (Some(PresenceEvidence::RecheckPing), true) => "respondió el ping de última oportunidad",
+            (Some(PresenceEvidence::DirectPing), true) => "respondió el ping directo",
             (Some(_), false) => "respondió el ping pero no se obtuvo su MAC",
             (None, _) => "no respondió ni ARP ni ping: estaba en la tabla de antes",
         }
@@ -1056,7 +1068,7 @@ Wireless LAN adapter Wi-Fi:
             PresenceScanLimits {
                 ping_timeout: scaled(limits.ping_timeout),
                 settle_delay: scaled(limits.settle_delay),
-                recheck_ping_timeout: scaled(limits.recheck_ping_timeout),
+                direct_ping_timeout: scaled(limits.direct_ping_timeout),
                 ..limits
             }
         }
@@ -1139,6 +1151,34 @@ Wireless LAN adapter Wi-Fi:
         let (decisions, _) = simulated::run(network, ip("192.168.0.101"), ip("255.255.255.0"));
 
         assert_eq!(decisions[0].present_mac().as_deref(), Some("82-dc-10-19-ea-cf"));
+    }
+
+    // Mejora aprobada: el ping directo va a la vez que el ARP, así que un celular que ignora el ARP se decide en
+    // cuanto contesta el ping, sin esperar los intentos de ARP (~7,4 s reales).
+    #[test]
+    fn a_phone_that_only_answers_the_direct_ping_is_decided_without_waiting_for_arp() {
+        let phone = ip("192.168.0.100");
+        let table = HashMap::from([(phone, "82-dc-10-19-ea-cf".to_string())]);
+        let pings_only = Host { arp_delay: None, misses_first_attempts: 0, answers_ping: true };
+        let network = Arc::new(SimulatedNetwork::new(table.clone(), table, HashMap::from([(phone, pings_only)])));
+
+        let (decisions, _) = simulated::run(network, ip("192.168.0.101"), ip("255.255.255.0"));
+
+        assert_eq!(decisions[0].evidence, Some(PresenceEvidence::DirectPing));
+        assert!(decisions[0].elapsed < simulated::scaled(simulated::SENDARP_GIVE_UP), "{:?}", decisions[0].elapsed);
+    }
+
+    #[test]
+    fn a_device_that_answers_both_reports_the_mac_from_its_arp_answer() {
+        let device = ip("192.168.0.110");
+        let table = HashMap::from([(device, "aa-aa-aa-aa-aa-aa".to_string())]);
+        let fast_arp = Host { arp_delay: Some(Duration::from_millis(10)), misses_first_attempts: 0, answers_ping: false };
+        let network = Arc::new(SimulatedNetwork::new(table.clone(), table, HashMap::from([(device, fast_arp)])));
+
+        let (decisions, _) = simulated::run(network, ip("192.168.0.101"), ip("255.255.255.0"));
+
+        assert_eq!(decisions[0].evidence, Some(PresenceEvidence::Arp));
+        assert_eq!(decisions[0].present_mac(), Some(simulated::mac_for(device)));
     }
 
     #[test]
