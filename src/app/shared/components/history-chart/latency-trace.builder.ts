@@ -1,11 +1,13 @@
 import { NetworkMetricSample } from '../../../core/models/network.model';
-import { LATENCY_THRESHOLDS_MS, LatencySeverity, classifyLatency, worstSeverity } from '../../../core/domain/latency-severity';
+import { LatencySeverity, classifyMeasurement, severityRank, worstSeverity } from '../../../core/domain/latency-severity';
+import { NetworkStatusThresholds } from '../../../core/network-thresholds/network-thresholds.config';
 import { HISTORY_CHART_CONFIG } from './history-chart.config';
 
 export interface TracePoint {
   readonly x: number;
   readonly y: number;
   readonly latencyMs: number;
+  readonly packetLossPercent: number | undefined;
   readonly timestamp: string;
   readonly severity: LatencySeverity;
 }
@@ -38,14 +40,17 @@ export interface LatencyTrace {
 
 const { viewBoxWidth: WIDTH, viewBoxHeight: HEIGHT } = HISTORY_CHART_CONFIG;
 
+type Classifier = (sample: NetworkMetricSample) => LatencySeverity;
+
 /** Convierte las muestras reales en la geometría del ECG; es puro, el componente solo pinta lo que recibe. */
 export class LatencyTraceBuilder {
-  build(samples: readonly NetworkMetricSample[]): LatencyTrace {
-    const reduced = this.reduce(samples, HISTORY_CHART_CONFIG.maxTracePoints);
+  build(samples: readonly NetworkMetricSample[], thresholds: NetworkStatusThresholds): LatencyTrace {
+    const classify = (sample: NetworkMetricSample) => classifyMeasurement(sample.latencyMs, sample.packetLossPercent, thresholds);
+    const reduced = this.reduce(samples, HISTORY_CHART_CONFIG.maxTracePoints, classify);
     const answered = samples.map((sample) => sample.latencyMs).filter((latency) => latency > 0);
     const peak = answered.reduce((max, latency) => Math.max(max, latency), 0);
     // La escala siempre llega al umbral de alerta: así una red tranquila se ve tranquila y no como un zigzag alarmante.
-    const yMax = Math.max(peak * HISTORY_CHART_CONFIG.headroom, LATENCY_THRESHOLDS_MS.warning);
+    const yMax = Math.max(peak * HISTORY_CHART_CONFIG.headroom, thresholds.latencyWarningMs);
     const toY = (latencyMs: number): number => HEIGHT - (Math.max(latencyMs, 0) / yMax) * HEIGHT;
     const step = WIDTH / Math.max(reduced.length - 1, 1);
 
@@ -53,17 +58,18 @@ export class LatencyTraceBuilder {
       x: reduced.length === 1 ? WIDTH : index * step,
       y: toY(sample.latencyMs),
       latencyMs: sample.latencyMs,
+      packetLossPercent: sample.packetLossPercent,
       timestamp: sample.timestamp,
-      severity: classifyLatency(sample.latencyMs),
+      severity: classify(sample),
     }));
 
     return {
       points,
       path: points.map((point, index) => `${index === 0 ? 'M' : 'L'}${round(point.x)} ${round(point.y)}`).join(''),
-      warningY: this.thresholdY(LATENCY_THRESHOLDS_MS.warning, yMax, toY),
-      criticalY: this.thresholdY(LATENCY_THRESHOLDS_MS.critical, yMax, toY),
+      warningY: this.thresholdY(thresholds.latencyWarningMs, yMax, toY),
+      criticalY: this.thresholdY(thresholds.latencyCriticalMs, yMax, toY),
       markers: this.markers(points),
-      heatmap: this.heatmap(samples),
+      heatmap: this.heatmap(samples, classify),
       stats: answered.length === 0 ? null : {
         min: answered.reduce((min, latency) => Math.min(min, latency), Infinity),
         avg: answered.reduce((sum, latency) => sum + latency, 0) / answered.length,
@@ -96,30 +102,29 @@ export class LatencyTraceBuilder {
     return point.latencyMs >= previous && point.latencyMs > next;
   }
 
-  // Cada grupo se representa con su peor muestra (primero un corte, luego la latencia más alta) para no perder picos.
-  private reduce(samples: readonly NetworkMetricSample[], limit: number): NetworkMetricSample[] {
+  // Cada grupo se representa con su peor muestra (primero un corte, luego la peor severidad y, a igual severidad, la
+  // latencia más alta) para no perder picos ni mediciones con pérdida.
+  private reduce(samples: readonly NetworkMetricSample[], limit: number, classify: Classifier): NetworkMetricSample[] {
     if (samples.length <= limit) {
       return [...samples];
     }
     return this.buckets(samples, limit).map((bucket) =>
-      bucket.reduce((worst, sample) => (this.outranks(sample, worst) ? sample : worst))
+      bucket.reduce((worst, sample) => (this.outranks(sample, worst, classify) ? sample : worst))
     );
   }
 
-  private outranks(candidate: NetworkMetricSample, current: NetworkMetricSample): boolean {
-    if (candidate.latencyMs <= 0 || current.latencyMs <= 0) {
-      return candidate.latencyMs <= 0 && current.latencyMs > 0;
-    }
-    return candidate.latencyMs > current.latencyMs;
+  private outranks(candidate: NetworkMetricSample, current: NetworkMetricSample, classify: Classifier): boolean {
+    const rankDifference = severityRank(classify(candidate)) - severityRank(classify(current));
+    return rankDifference !== 0 ? rankDifference > 0 : candidate.latencyMs > current.latencyMs;
   }
 
-  private heatmap(samples: readonly NetworkMetricSample[]): HeatmapCell[] {
+  private heatmap(samples: readonly NetworkMetricSample[], classify: Classifier): HeatmapCell[] {
     const buckets = this.buckets(samples, HISTORY_CHART_CONFIG.heatmapCells);
     const width = WIDTH / Math.max(buckets.length, 1);
     return buckets.map((bucket, index) => ({
       x: index * width,
       width,
-      severity: bucket.map((sample) => classifyLatency(sample.latencyMs)).reduce(worstSeverity),
+      severity: bucket.map(classify).reduce(worstSeverity),
     }));
   }
 

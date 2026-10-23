@@ -13,6 +13,8 @@ export interface NetworkMetricSnapshot {
 export interface NetworkMetricSample {
   timestamp: string;
   latencyMs: number;
+  /** Falta si el backend es anterior a este campo: entonces el gráfico clasifica solo por latencia. */
+  packetLossPercent?: number;
 }
 
 /** Debe coincidir con MeasurementSource del backend: la latencia HTTP y el ping ICMP no se mezclan. */

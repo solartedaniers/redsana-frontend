@@ -3,6 +3,28 @@ import { HttpTestingController, provideHttpClientTesting } from '@angular/common
 import { TestBed } from '@angular/core/testing';
 import { NetworkMetricsHttpRepository } from './network-metrics-http.repository';
 
+describe('NetworkMetricsHttpRepository.getHistory', () => {
+  function history(body: object[]) {
+    TestBed.configureTestingModule({
+      providers: [NetworkMetricsHttpRepository, provideHttpClient(), provideHttpClientTesting()],
+    });
+    const samples: unknown[] = [];
+    TestBed.inject(NetworkMetricsHttpRepository).getHistory().subscribe((received) => samples.push(...received));
+    TestBed.inject(HttpTestingController).expectOne((req) => req.url.endsWith('/history')).flush(body);
+    return samples;
+  }
+
+  it('trae la pérdida de paquetes de cada muestra', () => {
+    expect(history([{ timestamp: 't', latency_ms: 50, packet_loss_percent: 3 }])).toEqual([
+      { timestamp: 't', latencyMs: 50, packetLossPercent: 3 },
+    ]);
+  });
+
+  it('con un backend anterior, sin pérdida, la deja sin definir', () => {
+    expect(history([{ timestamp: 't', latency_ms: 50 }])).toEqual([{ timestamp: 't', latencyMs: 50, packetLossPercent: undefined }]);
+  });
+});
+
 describe('NetworkMetricsHttpRepository.watchSnapshot', () => {
   afterEach(() => vi.useRealTimers());
 

@@ -77,6 +77,9 @@
               {{ format(point.latencyMs) }} ms
             }
           </strong>
+          @if (point.severity !== 'cut' && point.packetLossPercent) {
+            <span>{{ 'common.latencyChart.packetLoss' | translate: { value: point.packetLossPercent } }}</span>
+          }
           <time [attr.datetime]="point.timestamp">{{ point.timestamp | date: 'short' }}</time>
         </div>
       }
@@ -94,10 +97,11 @@
       <time [attr.datetime]="data.points[data.points.length - 1].timestamp">{{ data.points[data.points.length - 1].timestamp | date: 'short' }}</time>
     </div>
 
+    @let limits = thresholds();
     <ul class="ecg__legend">
-      <li data-severity="healthy">{{ 'common.latencyChart.legend.healthy' | translate: { warning: thresholds.warning } }}</li>
-      <li data-severity="warning">{{ 'common.latencyChart.legend.warning' | translate: { warning: thresholds.warning, critical: thresholds.critical } }}</li>
-      <li data-severity="critical">{{ 'common.latencyChart.legend.critical' | translate: { critical: thresholds.critical } }}</li>
+      <li data-severity="healthy">{{ 'common.latencyChart.legend.healthy' | translate: { warning: limits.latencyWarningMs, lossWarning: limits.packetLossWarningPercent } }}</li>
+      <li data-severity="warning">{{ 'common.latencyChart.legend.warning' | translate: { warning: limits.latencyWarningMs, critical: limits.latencyCriticalMs, lossWarning: limits.packetLossWarningPercent } }}</li>
+      <li data-severity="critical">{{ 'common.latencyChart.legend.critical' | translate: { critical: limits.latencyCriticalMs, lossCritical: limits.packetLossCriticalPercent } }}</li>
       <li data-severity="cut">{{ 'common.latencyChart.legend.cut' | translate }}</li>
     </ul>
   </figure>

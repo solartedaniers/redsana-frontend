@@ -26,6 +26,7 @@ interface BackendSnapshot {
 interface BackendSample {
   timestamp: string;
   latency_ms: number;
+  packet_loss_percent?: number | null;
 }
 
 interface BackendAnomalyStatus {
@@ -104,6 +105,6 @@ export class NetworkMetricsHttpRepository extends NetworkMetricsRepository {
   }
 
   private toSample(sample: BackendSample): NetworkMetricSample {
-    return { timestamp: sample.timestamp, latencyMs: sample.latency_ms };
+    return { timestamp: sample.timestamp, latencyMs: sample.latency_ms, packetLossPercent: sample.packet_loss_percent ?? undefined };
   }
 }

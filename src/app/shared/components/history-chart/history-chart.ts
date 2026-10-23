@@ -1,7 +1,7 @@
 import { DatePipe, formatNumber } from '@angular/common';
 import { ChangeDetectionStrategy, Component, LOCALE_ID, computed, inject, input, signal } from '@angular/core';
 import { NetworkMetricSample } from '../../../core/models/network.model';
-import { LATENCY_THRESHOLDS_MS } from '../../../core/domain/latency-severity';
+import { NetworkThresholdsService } from '../../../core/network-thresholds/network-thresholds.service';
 import { TranslatePipe } from '../../../core/i18n/translate.pipe';
 import { HISTORY_CHART_CONFIG } from './history-chart.config';
 import { LatencyTraceBuilder, TracePoint } from './latency-trace.builder';
@@ -28,10 +28,10 @@ export class HistoryChart {
   protected readonly viewBox = `0 0 ${HISTORY_CHART_CONFIG.viewBoxWidth} ${HISTORY_CHART_CONFIG.viewBoxHeight}`;
   protected readonly width = HISTORY_CHART_CONFIG.viewBoxWidth;
   protected readonly height = HISTORY_CHART_CONFIG.viewBoxHeight;
-  protected readonly thresholds = LATENCY_THRESHOLDS_MS;
+  protected readonly thresholds = inject(NetworkThresholdsService).thresholds;
   protected readonly clipId = `ecg-reveal-${nextChartId++}`;
 
-  protected readonly trace = computed(() => this.builder.build(this.samples()));
+  protected readonly trace = computed(() => this.builder.build(this.samples(), this.thresholds()));
   protected readonly head = computed(() => this.trace().points.at(-1) ?? null);
   protected readonly activeIndex = signal<number | null>(null);
   protected readonly active = computed(() => {

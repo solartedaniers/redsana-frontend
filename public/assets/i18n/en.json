@@ -27,10 +27,11 @@
       "summary": "{{count}} answered measurements: minimum {{min}} ms, average {{avg}} ms, maximum {{max}} ms.",
       "cut": "No reply",
       "hint": "Hover or use ← → to read each measurement",
+      "packetLoss": "{{value}} % packet loss",
       "legend": {
-        "healthy": "Healthy · < {{warning}} ms",
-        "warning": "Warning · {{warning}}–{{critical}} ms",
-        "critical": "Critical · ≥ {{critical}} ms",
+        "healthy": "Healthy · < {{warning}} ms and < {{lossWarning}} % loss",
+        "warning": "Warning · {{warning}}–{{critical}} ms or ≥ {{lossWarning}} % loss",
+        "critical": "Critical · ≥ {{critical}} ms or ≥ {{lossCritical}} % loss",
         "cut": "Outage"
       }
     },

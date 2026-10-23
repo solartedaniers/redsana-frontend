@@ -135,6 +135,12 @@ Render apaga el backend y el servicio de IA tras un rato sin uso, y tardan cerca
 - Mientras la IA no está lista el chat del asistente queda deshabilitado con un aviso, y el resumen de una evaluación se pide en cuanto esté lista (la evaluación se guarda igual, no usa IA). Si el backend responde "encendiendo" a un mensaje, se muestra como espera y no como fallo.
 - Con un backend anterior que no tiene estos endpoints (404) la IA se da por lista, así que el orden de despliegue no bloquea el chat.
 
+#### 🚦 Umbrales del estado de la red
+
+- El backend decide desde dónde una medición es **advertencia** o **crítica** (latencia o pérdida de paquetes; `NETWORK_STATUS_*` en su configuración) y los publica en `GET /api/network-metrics/thresholds`.
+- `NetworkThresholdsService` los pide una vez al iniciar o restaurar la sesión; el gráfico de historial clasifica con ellos por latencia **y** pérdida, así que coincide con el estado del dashboard.
+- Si el backend está dormido, falla o es anterior (404), se usan los de respaldo de `network-thresholds.config.ts`, el único lugar del frontend con esos números. Nunca bloquea la carga.
+
 #### 📶 Escaneo de dispositivos (app de escritorio)
 
 - **Al entrar a Dispositivos** se hace el escaneo de siempre (`scan_connected_devices`): ping a la subred y lectura de `arp -a`.

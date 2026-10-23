@@ -27,10 +27,11 @@
       "summary": "{{count}} mediciones con respuesta: mínimo {{min}} ms, promedio {{avg}} ms, máximo {{max}} ms.",
       "cut": "Sin respuesta",
       "hint": "Pasa el cursor o usa ← → para leer cada medición",
+      "packetLoss": "{{value}} % de pérdida",
       "legend": {
-        "healthy": "Sana · < {{warning}} ms",
-        "warning": "Alerta · {{warning}}–{{critical}} ms",
-        "critical": "Crítica · ≥ {{critical}} ms",
+        "healthy": "Sana · < {{warning}} ms y < {{lossWarning}} % de pérdida",
+        "warning": "Alerta · {{warning}}–{{critical}} ms o ≥ {{lossWarning}} % de pérdida",
+        "critical": "Crítica · ≥ {{critical}} ms o ≥ {{lossCritical}} % de pérdida",
         "cut": "Corte"
       }
     },
