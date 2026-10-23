@@ -29,8 +29,9 @@
   font-size: var(--font-size-caption);
 }
 
-// En el celular queda solo el punto de color; el texto sigue para lectores de pantalla (como .visually-hidden).
-@media (max-width: 30rem) {
+// En celulares y tabletas queda solo el punto de color, para que la cabecera no pase de dos filas; el texto sigue para
+// lectores de pantalla (como .visually-hidden) y al pasar el puntero.
+@media (max-width: 48rem) {
   .ai-status__label,
   .ai-status__slow {
     position: absolute;

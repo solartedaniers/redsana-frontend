@@ -1,5 +1,7 @@
+// Si las acciones no caben junto a la marca bajan a una segunda fila, en vez de taparla o desbordar la pantalla.
 .top-bar {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
   gap: var(--space-4);
@@ -23,8 +25,12 @@
 
 .actions {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
+  justify-content: flex-end;
   gap: var(--space-3);
+  min-width: 0;
+  margin-inline-start: auto;
 }
 
 .user-chip {
@@ -99,9 +105,9 @@
 
 .brand-group {
   display: flex;
+  flex-shrink: 0;
   align-items: center;
   gap: 0.5rem;
-  min-width: 0;
 }
 
 // Solo en pantallas angostas, donde el menú pasa a cajón (mismo corte que app-shell-layout). 44 px de toque.
