@@ -8,9 +8,11 @@ import {
   isDevMode,
   provideBrowserGlobalErrorListeners,
 } from '@angular/core';
+import { provideClientHydration, withNoHttpTransferCache } from '@angular/platform-browser';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import { provideRouter } from '@angular/router';
 import { SwRegistrationOptions, provideServiceWorker } from '@angular/service-worker';
+import { isTauri } from '@tauri-apps/api/core';
 import { routes } from './app.routes';
 import { I18nService } from './core/i18n/i18n.service';
 import { DocumentMetadataService } from './core/i18n/document-metadata.service';
@@ -67,6 +69,10 @@ export const appConfig: ApplicationConfig = {
     provideRouter(routes),
     provideHttpClient(withInterceptors([authInterceptor])),
     provideAnimationsAsync(),
+    // La landing prerenderizada se hidrata en vez de volver a pintarse. Las rutas CSR no traen datos de hidratación y
+    // Angular la salta solo. En Tauri no: carga ese mismo index.html pero redirige al login (la landing es solo web).
+    // Sin caché de transferencia: el cliente pide sus datos igual que antes y nada del build queda congelado en el HTML.
+    ...(isTauri() ? [] : [provideClientHydration(withNoHttpTransferCache())]),
 
     // Cada dominio depende de su clase abstracta: cambiar de proveedor es tocar solo el useClass de aquí.
     { provide: AuthRepository, useClass: SupabaseAuthRepository },
