@@ -98,32 +98,39 @@ RedSana usa **dos motores de IA distintos**, cada uno elegido para el problema q
 ## ☁️ Arquitectura y despliegue
 
 ```
-┌─────────────────────────────┐
-│   App de escritorio (Tauri) │
-│  ┌────────────────────────┐ │
-│  │   Angular (interfaz)   │ │
-│  └───────────┬────────────┘ │
-│  ┌───────────▼────────────┐ │        ┌──────────────────┐
-│  │  Rust (capa nativa):   │ │  HTTP  │  FastAPI backend  │
-│  │  ping ICMP, ARP, WiFi  │─┼───────▶│  (local, junto a  │
-│  └─────────────────────────┘ │        │  la app)          │
-└─────────────────────────────┘        └─────────┬─────────┘
-                                                    │
-                                          JWT + SQL │
-                                                    ▼
-                                         ┌───────────────────┐
-                                         │  Supabase (nube)   │
-                                         │  · PostgreSQL      │
-                                         │  · Auth            │
-                                         │  · Storage         │
-                                         └───────────────────┘
+┌─────────────────────────────┐   ┌─────────────────────────────┐
+│  App de escritorio (Tauri)  │   │        Web (Vercel)         │
+│  ┌───────────────────────┐  │   │  ┌───────────────────────┐  │
+│  │  Angular (interfaz)   │  │   │  │  Angular (interfaz)   │  │
+│  └───────────┬───────────┘  │   │  └───────────────────────┘  │
+│  ┌───────────▼───────────┐  │   │   Sin capa nativa: no mide  │
+│  │  Rust (capa nativa):  │  │   │   la red local de verdad    │
+│  │  ping ICMP, ARP, WiFi │  │   │                             │
+│  └───────────────────────┘  │   │                             │
+└──────────────┬──────────────┘   └──────────────┬──────────────┘
+               └────────────────┬────────────────┘
+                     ┌──────────┴────────────────────────────┐
+                     │ API: HTTPS + JWT                      │ Auth y Storage (directo)
+                     ▼                                       ▼
+          ┌─────────────────────┐   SQL + JWT    ┌─────────────────────┐
+          │   FastAPI backend   │───────────────▶│  Supabase (nube)    │
+          │   (Render, plan     │                │  · PostgreSQL       │
+          │   gratuito)         │                │  · Auth             │
+          └──────────┬──────────┘                │  · Storage          │
+                     │ HTTPS                     └─────────────────────┘
+                     ▼
+          ┌─────────────────────┐     HTTPS      ┌─────────────────────┐
+          │   Servicio de IA    │───────────────▶│  Groq (modelo de    │
+          │   (Render, plan     │                │  lenguaje)          │
+          │   gratuito)         │                └─────────────────────┘
+          └─────────────────────┘
 ```
 
-- **Frontend + capa nativa (Rust)**: se instalan en la máquina del usuario como una app de escritorio normal (vía Tauri). Es la única forma de que la app pueda medir la red *de verdad* — un navegador no tiene ese acceso.
-- **Backend (FastAPI)**: corre localmente junto a la app durante el desarrollo (`uvicorn`, puerto 8000). Es la pieza intermedia entre la medición local y la base de datos en la nube. *(Para producción, este backend puede desplegarse igual como servicio local que arranca junto con la app, o evaluarse su empaquetado dentro del propio instalador — queda como decisión de la etapa de distribución.)*
-- **Base de datos y autenticación**: viven en Supabase, en la nube — así los datos persisten entre sesiones y el panel de administración puede ver todos los usuarios desde cualquier lugar.
+- **Frontend + capa nativa (Rust)**: la misma app Angular se publica como web en Vercel y como app de escritorio (vía Tauri), que se instala en la máquina del usuario junto con la capa nativa en Rust. Solo el escritorio puede medir la red *de verdad* — un navegador no tiene ese acceso, así que la web mide la latencia al servidor.
+- **Backend (FastAPI)**: desplegado en Render (plan gratuito); en desarrollo corre local con `uvicorn` en el puerto 8000. Es la pieza intermedia entre las dos apps y la base de datos en la nube: verifica el JWT de Supabase y guarda mediciones, dispositivos, alertas y evaluaciones. Render lo apaga tras un rato sin uso (ver [Arranque en frío](#-arranque-en-frío-render-plan-gratuito)).
+- **Base de datos y autenticación**: viven en Supabase, en la nube — así los datos persisten entre sesiones y el panel de administración puede ver todos los usuarios desde cualquier lugar. Las dos apps usan Supabase Auth (login, registro y contraseña) y Storage (fotos de perfil) directamente; el resto de los datos pasa siempre por el backend.
 - **Nombres de rutas**: el frontend usa solo los nombres actuales del backend (`/api/users/me`, `/api/chat-conversations`, `/api/alerts/recent`, `/api/admin/platform-metrics`). Los anteriores siguen vivos en el backend como alias ocultos para el instalador 0.1.5; `scripts/route-names.test.mjs` impide volver a escribirlos aquí.
-- **Servicio de IA**: el backend puede usar la IA en su propio proceso o llamar a [redsana-ai](https://github.com/solartedaniers/redsana-ai) desplegado aparte en Render (variable `AI_MODE` del backend).
+- **Servicio de IA**: en producción el backend llama a [redsana-ai](https://github.com/solartedaniers/redsana-ai), desplegado aparte en Render (plan gratuito), que usa Groq para el asistente (`AI_MODE=remote` en el backend). En desarrollo el backend también puede usar la IA en su propio proceso (`AI_MODE=local`).
 
 #### 💤 Arranque en frío (Render, plan gratuito)
 
