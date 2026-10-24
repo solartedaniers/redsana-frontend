@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
+import { map, timer } from 'rxjs';
 import { NetworkMetricsRepository } from '../../../core/repositories/network-metrics.repository';
 import {
   AnomalyDetectionStatus,
@@ -19,7 +20,7 @@ import { MetricCard } from '../../../shared/components/metric-card/metric-card';
 import { HistoryChart } from '../../../shared/components/history-chart/history-chart';
 import { NetworkDiagnosisPanel } from '../../../shared/components/network-diagnosis-panel/network-diagnosis-panel';
 import { TranslatePipe } from '../../../core/i18n/translate.pipe';
-import { DatePipe } from '@angular/common';
+import { DatePipe, NgTemplateOutlet } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { APP_PATHS } from '../../../core/routing/app-paths';
 import { RuntimeEnvironmentService } from '../../../core/runtime/runtime-environment.service';
@@ -45,6 +46,7 @@ const STATUS_AURA: Record<NetworkStatus, LatencySeverity | null> = {
     MeasurementEmptyState,
     TranslatePipe,
     DatePipe,
+    NgTemplateOutlet,
     RouterLink,
   ],
   templateUrl: './dashboard.html',
@@ -68,20 +70,31 @@ export class Dashboard {
   protected readonly hasData = computed(() => hasMeasurement(this.snapshot()));
   protected readonly isLive = computed(() => isLiveMeasurement(this.snapshot(), Math.max(this.clock(), Date.now())));
   protected readonly aura = computed(() => STATUS_AURA[this.snapshot()?.status ?? 'unknown']);
-  /** Hora local de la última respuesta del servidor: se compara con la medición del equipo, que usa el mismo reloj. */
-  private readonly snapshotReceivedAt = signal(Date.now());
+  /** Hora local de la última respuesta del servidor (null si no llegó ninguna desde que se abrió esta pantalla): se
+   * compara con la medición del equipo, que usa el mismo reloj. */
+  private readonly snapshotReceivedAt = signal<number | null>(null);
+  private readonly openedAt = Date.now();
+  /** Solo escritorio: vuelve a evaluar el diagnóstico local cuando se cumple el silencio tras abrir la pantalla (el
+   * reloj de medición avanza cada minuto). */
+  private readonly silenceSinceOpening = this.isDesktop
+    ? toSignal(timer(LOCAL_DIAGNOSIS_CONFIG.serverSilentAfterMs).pipe(map(() => true)), { initialValue: false })
+    : signal(false);
   /**
    * Solo escritorio: con el servidor sin responder (internet caído o backend caído) el panel usa el diagnóstico hecho
-   * en el equipo con su última medición. Las tarjetas siguen mostrando lo último que guardó el servidor.
+   * en el equipo con su última medición, aunque desde que se abrió la pantalla no haya llegado ninguna respuesta del
+   * servidor (se abrió durante el corte). Las tarjetas siguen mostrando lo último que guardó el servidor.
    */
   protected readonly offlineDiagnosis = computed(() => {
     const local = this.isDesktop ? this.localDiagnosis.current() : null;
     if (!local) {
       return null;
     }
+    this.silenceSinceOpening();
     const receivedAt = this.snapshotReceivedAt();
-    const serverSilent = Math.max(this.clock(), Date.now()) - receivedAt >= LOCAL_DIAGNOSIS_CONFIG.serverSilentAfterMs;
-    return serverSilent && Date.parse(local.recordedAt) > receivedAt ? local : null;
+    const silentSince = receivedAt ?? this.openedAt;
+    const serverSilent = Math.max(this.clock(), Date.now()) - silentSince >= LOCAL_DIAGNOSIS_CONFIG.serverSilentAfterMs;
+    const newerThanServer = receivedAt === null || Date.parse(local.recordedAt) > receivedAt;
+    return serverSilent && newerThanServer ? local : null;
   });
 
   constructor() {

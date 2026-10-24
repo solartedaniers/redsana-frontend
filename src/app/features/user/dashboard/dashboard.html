@@ -35,12 +35,7 @@
   </div>
 
   @if (offlineDiagnosis(); as local) {
-    <app-network-diagnosis-panel
-      class="diagnosis-section"
-      [diagnosis]="local.diagnosis"
-      [gatewayLatencyMs]="local.gatewayLatencyMs ?? 0"
-      [offlineMeasuredAt]="local.recordedAt"
-    />
+    <ng-container *ngTemplateOutlet="localDiagnosisPanel; context: { $implicit: local }" />
   } @else if (data.diagnosis; as diagnosis) {
     <app-network-diagnosis-panel
       class="diagnosis-section"
@@ -59,6 +54,9 @@
   </section>
   } @else {
     <app-measurement-empty-state />
+    @if (offlineDiagnosis(); as local) {
+      <ng-container *ngTemplateOutlet="localDiagnosisPanel; context: { $implicit: local }" />
+    }
   }
 } @else {
   <div class="vitals" aria-busy="true">
@@ -67,4 +65,17 @@
     <div class="skeleton vitals__jitter"></div>
     <div class="skeleton vitals__loss"></div>
   </div>
+  <!-- Abierta durante el corte: no llegó ningún snapshot, pero el equipo ya midió. -->
+  @if (offlineDiagnosis(); as local) {
+    <ng-container *ngTemplateOutlet="localDiagnosisPanel; context: { $implicit: local }" />
+  }
 }
+
+<ng-template #localDiagnosisPanel let-local>
+  <app-network-diagnosis-panel
+    class="diagnosis-section"
+    [diagnosis]="local.diagnosis"
+    [gatewayLatencyMs]="local.gatewayLatencyMs ?? 0"
+    [offlineMeasuredAt]="local.recordedAt"
+  />
+</ng-template>

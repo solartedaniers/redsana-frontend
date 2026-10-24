@@ -5,6 +5,7 @@ import { NEVER, Subject, config, of, throwError } from 'rxjs';
 import { NetworkMetricSnapshot } from '../../../core/models/network.model';
 import { NetworkMetricsRepository } from '../../../core/repositories/network-metrics.repository';
 import { Dashboard } from './dashboard';
+import { LOCAL_DIAGNOSIS_CONFIG } from '../../../core/local-diagnosis/local-diagnosis.config';
 import { signal } from '@angular/core';
 import { RuntimeEnvironmentService } from '../../../core/runtime/runtime-environment.service';
 import {
@@ -269,5 +270,113 @@ describe('Dashboard sin conexión con el servidor (escritorio)', () => {
 
     expect(panel(element)?.getAttribute('data-diagnosis')).toBe('ok');
     expect(element.querySelector('.diagnosis__offline')).toBeNull();
+  });
+});
+
+describe('Dashboard abierto durante el corte (escritorio, sin ningún snapshot del servidor)', () => {
+  const T0 = Date.parse('2026-10-24T12:00:00Z');
+  // La app ya medía desde la bandeja: internet caído, el router responde.
+  const MEASURED_BEFORE_OPENING = {
+    diagnosis: 'provider' as const,
+    gatewayLatencyMs: 4,
+    recordedAt: new Date(T0 - 30_000).toISOString(),
+  };
+
+  beforeEach(() =>
+    vi.useFakeTimers({ toFake: ['Date', 'setTimeout', 'setInterval', 'clearTimeout', 'clearInterval'] }),
+  );
+  afterEach(() => vi.useRealTimers());
+
+  function open(isDesktop: boolean, snapshots = new Subject<NetworkMetricSnapshot>()) {
+    vi.setSystemTime(T0);
+    const local = signal<LocalDiagnosis | null>(MEASURED_BEFORE_OPENING);
+    TestBed.configureTestingModule({
+      providers: [
+        provideHttpClient(),
+        provideRouter([]),
+        { provide: RuntimeEnvironmentService, useValue: { isDesktop } },
+        { provide: LocalNetworkDiagnosisService, useValue: { current: local } },
+        {
+          provide: NetworkMetricsRepository,
+          // El servidor no responde: ni snapshot ni historial.
+          useValue: { watchSnapshot: () => snapshots, getHistory: () => NEVER, getAnomalyStatus: () => NEVER },
+        },
+      ],
+    });
+    const fixture = TestBed.createComponent(Dashboard);
+    fixture.detectChanges();
+    return { fixture, local, snapshots, element: fixture.nativeElement as HTMLElement };
+  }
+
+  const panel = (element: HTMLElement) => element.querySelector('app-network-diagnosis-panel');
+  const waitSilence = (fixture: { detectChanges(): void }) => {
+    vi.advanceTimersByTime(LOCAL_DIAGNOSIS_CONFIG.serverSilentAfterMs);
+    fixture.detectChanges();
+  };
+
+  it('al cumplirse el silencio muestra el diagnóstico del equipo con la nota, sin esperar otra medición', () => {
+    const { fixture, element } = open(true);
+
+    expect(panel(element)).toBeNull();
+    waitSilence(fixture);
+
+    expect(panel(element)?.getAttribute('data-diagnosis')).toBe('provider');
+    expect(element.querySelector('.diagnosis__offline')?.textContent).toContain('user.dashboard.diagnosis.offlineNote');
+    // Las tarjetas siguen cargando: no hay datos del servidor que mostrar.
+    expect(element.querySelector('.vitals[aria-busy="true"]')).not.toBeNull();
+    expect(element.querySelector('app-metric-card')).toBeNull();
+  });
+
+  it('una medición nueva del equipo durante el corte actualiza el panel', () => {
+    const { fixture, local, element } = open(true);
+    waitSilence(fixture);
+
+    local.set({
+      diagnosis: 'router_unreachable',
+      gatewayLatencyMs: null,
+      recordedAt: new Date(Date.now()).toISOString(),
+    });
+    fixture.detectChanges();
+
+    expect(panel(element)?.getAttribute('data-diagnosis')).toBe('router_unreachable');
+  });
+
+  it('entrar al panel desde otra pantalla durante el corte también lo muestra', () => {
+    const first = open(true);
+    waitSilence(first.fixture);
+    first.fixture.destroy();
+    TestBed.resetTestingModule();
+
+    const { fixture, element } = open(true);
+    waitSilence(fixture);
+
+    expect(panel(element)?.getAttribute('data-diagnosis')).toBe('provider');
+  });
+
+  it('cuando el servidor vuelve, manda su diagnóstico y desaparece la nota', () => {
+    const { fixture, snapshots, element } = open(true);
+    waitSilence(fixture);
+
+    snapshots.next({
+      status: 'good',
+      latencyMs: 14.8,
+      jitterMs: 1,
+      packetLossPercent: 0,
+      updatedAt: new Date(Date.now()).toISOString(),
+      source: 'native',
+      gatewayLatencyMs: 4,
+      diagnosis: 'ok',
+    });
+    fixture.detectChanges();
+
+    expect(panel(element)?.getAttribute('data-diagnosis')).toBe('ok');
+    expect(element.querySelector('.diagnosis__offline')).toBeNull();
+  });
+
+  it('la web abierta sin servidor no muestra ningún diagnóstico', () => {
+    const { fixture, element } = open(false);
+    waitSilence(fixture);
+
+    expect(panel(element)).toBeNull();
   });
 });
