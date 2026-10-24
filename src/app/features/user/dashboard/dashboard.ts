@@ -68,8 +68,16 @@ export class Dashboard {
       .watchSnapshot()
       .pipe(takeUntilDestroyed())
       .subscribe((snapshot) => this.snapshot.set(snapshot));
-    this.metricsRepository.getHistory().subscribe((history) => this.history.set(history));
+    // Si fallan, el panel queda como sin datos (gráfico vacío, sin aviso de calibración) en vez de dejar un error sin
+    // manejar; el snapshot sigue sondeando por su cuenta.
+    this.metricsRepository.getHistory().subscribe({
+      next: (history) => this.history.set(history),
+      error: () => this.history.set([]),
+    });
     // Lo consulto una sola vez: el conteo solo importa mientras calibra.
-    this.metricsRepository.getAnomalyStatus().subscribe((status) => this.anomalyStatus.set(status));
+    this.metricsRepository.getAnomalyStatus().subscribe({
+      next: (status) => this.anomalyStatus.set(status),
+      error: () => this.anomalyStatus.set(null),
+    });
   }
 }

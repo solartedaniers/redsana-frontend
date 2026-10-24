@@ -1,7 +1,7 @@
 import { provideHttpClient } from '@angular/common/http';
 import { TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
-import { NEVER, Subject, of } from 'rxjs';
+import { NEVER, Subject, config, of, throwError } from 'rxjs';
 import { NetworkMetricSnapshot } from '../../../core/models/network.model';
 import { NetworkMetricsRepository } from '../../../core/repositories/network-metrics.repository';
 import { Dashboard } from './dashboard';
@@ -94,5 +94,47 @@ describe('Dashboard sin mediciones', () => {
       'common.serverLatencyStatus.critical',
     );
     expect(element.querySelector('.vitals__latency')?.textContent).toContain('user.dashboard.serverLatency');
+  });
+});
+
+describe('Dashboard con errores del historial o del estado de calibración', () => {
+  it('maneja el error: no queda sin manejar, el gráfico sale vacío y el snapshot se sigue mostrando', async () => {
+    const unhandled = vi.fn();
+    const previous = config.onUnhandledError;
+    config.onUnhandledError = unhandled;
+    try {
+      TestBed.configureTestingModule({
+        providers: [
+          provideHttpClient(),
+          provideRouter([]),
+          {
+            provide: NetworkMetricsRepository,
+            useValue: {
+              watchSnapshot: () =>
+                of({
+                  status: 'good',
+                  latencyMs: 20,
+                  jitterMs: 2,
+                  packetLossPercent: 0,
+                  updatedAt: new Date().toISOString(),
+                }),
+              getHistory: () => throwError(() => new Error('502')),
+              getAnomalyStatus: () => throwError(() => new Error('502')),
+            },
+          },
+        ],
+      });
+      const fixture = TestBed.createComponent(Dashboard);
+      fixture.detectChanges();
+      await new Promise((resolve) => setTimeout(resolve));
+      const element = fixture.nativeElement as HTMLElement;
+
+      expect(unhandled).not.toHaveBeenCalled();
+      expect(element.querySelector('app-history-chart')).not.toBeNull();
+      expect(element.querySelector('app-metric-card')).not.toBeNull();
+      expect(element.querySelector('.anomaly-calibrating-banner')).toBeNull();
+    } finally {
+      config.onUnhandledError = previous;
+    }
   });
 });
