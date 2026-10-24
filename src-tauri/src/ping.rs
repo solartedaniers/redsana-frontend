@@ -43,19 +43,37 @@ pub async fn measure_network_quality(host: Option<String>) -> Result<NetworkQual
     let address = resolve_host(&target).await?;
     let client = new_client(address)?;
 
-    let mut latencies_ms: Vec<f64> = Vec::with_capacity(QUALITY_SAMPLE_COUNT as usize);
+    let mut results = Vec::with_capacity(QUALITY_SAMPLE_COUNT as usize);
     for sequence in 0..QUALITY_SAMPLE_COUNT {
-        match ping_once(&client, address, sequence).await {
-            Ok(Some(latency_ms)) => latencies_ms.push(latency_ms),
-            Ok(None) => {}
-            // Sin red el envío falla al instante ("red inalcanzable"): es un ping perdido, no un error. Así una caída
-            // total se registra como 100 % de pérdida (un corte real) en vez de no registrarse.
-            Err(e) => log::warn!("{e}"),
-        }
+        results.push(ping_once(&client, address, sequence).await);
         tokio::time::sleep(QUALITY_SAMPLE_INTERVAL).await;
     }
 
-    Ok(aggregate_samples(&latencies_ms, QUALITY_SAMPLE_COUNT))
+    summarize_pings(results)
+}
+
+/// Si todos los envíos fallan (el PC sin red local: al despertar o al cambiar de WiFi) es un error y no se guarda nada,
+/// como en el 0.1.5: no es un corte del proveedor. Un ping agotado por tiempo, o un envío fallido suelto, sí cuenta
+/// como perdido; así un corte real con el WiFi conectado sigue siendo 100 % de pérdida.
+fn summarize_pings(
+    results: Vec<Result<Option<f64>, String>>,
+) -> Result<NetworkQualityMeasurement, String> {
+    let expected_samples = results.len() as u16;
+    if let Some(Err(first_error)) = results.first() {
+        if results.iter().all(Result::is_err) {
+            return Err(first_error.clone());
+        }
+    }
+    let latencies_ms: Vec<f64> = results
+        .into_iter()
+        .filter_map(|result| {
+            result.unwrap_or_else(|e| {
+                log::warn!("{e}");
+                None
+            })
+        })
+        .collect();
+    Ok(aggregate_samples(&latencies_ms, expected_samples))
 }
 
 /// Crea el cliente ICMP según la familia de la dirección; lan_scan.rs también lo reutiliza.
@@ -160,6 +178,41 @@ mod tests {
         assert_eq!(result.packet_loss_percent, 100.0);
         assert_eq!(result.latency_ms, 0.0);
         assert_eq!(result.jitter_ms, 0.0);
+    }
+
+    fn send_failed() -> Result<Option<f64>, String> {
+        Err("ping falló: red inalcanzable".to_string())
+    }
+
+    #[test]
+    fn every_ping_failing_to_send_is_an_error_and_nothing_is_saved() {
+        let results = (0..QUALITY_SAMPLE_COUNT).map(|_| send_failed()).collect();
+        assert_eq!(
+            summarize_pings(results).err().as_deref(),
+            Some("ping falló: red inalcanzable")
+        );
+    }
+
+    #[test]
+    fn every_ping_timing_out_still_counts_as_total_loss() {
+        let results = (0..QUALITY_SAMPLE_COUNT).map(|_| Ok(None)).collect();
+        let measurement =
+            summarize_pings(results).expect("un agotamiento por tiempo es una medición");
+        assert_eq!(measurement.packet_loss_percent, 100.0);
+    }
+
+    #[test]
+    fn a_single_failed_send_counts_as_a_lost_ping() {
+        let results = vec![
+            Ok(Some(10.0)),
+            send_failed(),
+            Ok(Some(20.0)),
+            Ok(None),
+            Ok(Some(30.0)),
+        ];
+        let measurement = summarize_pings(results).expect("hubo respuestas");
+        assert_eq!(measurement.packet_loss_percent, 40.0);
+        assert_eq!(measurement.latency_ms, 20.0);
     }
 
     #[test]

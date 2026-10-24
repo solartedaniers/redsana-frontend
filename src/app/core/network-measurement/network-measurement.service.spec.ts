@@ -24,9 +24,11 @@ function fakeLockManager() {
   };
 }
 
-function createTab(): { service: NetworkMeasurementService; measure: ReturnType<typeof vi.fn> } {
+function createTab(
+  measure = vi.fn(() => Promise.resolve({ latencyMs: 10, jitterMs: 1, packetLossPercent: 0 })),
+  deliver = vi.fn(() => Promise.resolve()),
+): { service: NetworkMeasurementService; measure: ReturnType<typeof vi.fn> } {
   TestBed.resetTestingModule();
-  const measure = vi.fn(() => Promise.resolve({ latencyMs: 10, jitterMs: 1, packetLossPercent: 0 }));
   TestBed.configureTestingModule({
     providers: [
       NetworkMeasurementService,
@@ -34,7 +36,7 @@ function createTab(): { service: NetworkMeasurementService; measure: ReturnType<
       { provide: AuthService, useValue: { isAuthenticated: signal(true), currentUser: signal({ id: 'owner-1' }) } },
       { provide: NetworkMeasurementGateway, useValue: { measure, source: 'web' } },
       { provide: NetworkIdentityGateway, useValue: { currentNetworkFingerprint: () => Promise.resolve(null) } },
-      { provide: MeasurementDelivery, useValue: { deliver: () => Promise.resolve() } },
+      { provide: MeasurementDelivery, useValue: { deliver } },
     ],
   });
   return { service: TestBed.inject(NetworkMeasurementService), measure };
@@ -70,5 +72,27 @@ describe('NetworkMeasurementService con varias pestañas', () => {
     await Promise.resolve();
 
     expect(tab.measure).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe('NetworkMeasurementService cuando la medición falla', () => {
+  afterEach(() => vi.unstubAllGlobals());
+
+  it('si el escritorio no pudo medir (PC sin red local) no envía ni guarda nada', async () => {
+    vi.stubGlobal('navigator', { ...navigator, locks: undefined });
+    vi.spyOn(console, 'error').mockImplementation(() => undefined);
+    const deliver = vi.fn(() => Promise.resolve());
+    const tab = createTab(
+      vi.fn(() => Promise.reject(new Error('ping falló: red inalcanzable'))),
+      deliver,
+    );
+
+    tab.service.start();
+    TestBed.tick();
+    await Promise.resolve();
+    await Promise.resolve();
+
+    expect(tab.measure).toHaveBeenCalledTimes(1);
+    expect(deliver).not.toHaveBeenCalled();
   });
 });
