@@ -1,6 +1,7 @@
 import { Routes } from '@angular/router';
 import { authGuard } from './core/auth/auth.guard';
 import { roleGuard } from './core/auth/role.guard';
+import { sessionHomeRedirect } from './core/auth/session-home.redirect';
 import { webOnlyGuard } from './core/runtime/web-only.guard';
 import { APP_PATHS, ROUTE_SEGMENTS } from './core/routing/app-paths';
 import { SEO_CONFIG } from './core/i18n/seo.config';
@@ -38,6 +39,6 @@ export const routes: Routes = [
     canActivate: [authGuard],
     children: [{ path: '', loadComponent: () => import('./features/auth/profile/profile').then((m) => m.Profile) }],
   },
-  { path: '', redirectTo: APP_PATHS.login, pathMatch: 'full' },
+  { path: '', redirectTo: sessionHomeRedirect, pathMatch: 'full' },
   { path: '**', redirectTo: APP_PATHS.login },
 ];
