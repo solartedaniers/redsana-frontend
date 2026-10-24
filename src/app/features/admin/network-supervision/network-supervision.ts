@@ -7,6 +7,7 @@ import { PageHeader } from '../../../shared/components/page-header/page-header';
 import { NetworkStatusLight } from '../../../shared/components/network-status-light/network-status-light';
 import { TranslatePipe } from '../../../core/i18n/translate.pipe';
 import { SecurityScoreBand, getSecurityScoreBand } from '../../../core/domain/security-score.calculator';
+import { SecurityScoreConfigService } from '../../../core/security-score-config/security-score-config.service';
 
 @Component({
   selector: 'app-network-supervision',
@@ -17,6 +18,7 @@ import { SecurityScoreBand, getSecurityScoreBand } from '../../../core/domain/se
 })
 export class NetworkSupervision {
   private readonly repository = inject(NetworkSupervisionRepository);
+  private readonly scoreConfig = inject(SecurityScoreConfigService).config;
 
   protected readonly households = signal<MonitoredHousehold[]>([]);
 
@@ -25,6 +27,6 @@ export class NetworkSupervision {
   }
 
   protected bandOf(score: number): SecurityScoreBand {
-    return getSecurityScoreBand(score);
+    return getSecurityScoreBand(score, this.scoreConfig());
   }
 }

@@ -58,6 +58,7 @@ import { SupabaseAvatarStorageGateway } from './core/avatar-storage/avatar-stora
 import { RuntimeEnvironmentService } from './core/runtime/runtime-environment.service';
 import { AiStatusService } from './core/ai-status/ai-status.service';
 import { NetworkThresholdsService } from './core/network-thresholds/network-thresholds.service';
+import { SecurityScoreConfigService } from './core/security-score-config/security-score-config.service';
 
 // Cada gateway del sistema operativo tiene versión Tauri y de navegador; aquí elijo una sola vez.
 function provideByRuntime<T>(token: abstract new () => T, desktop: Type<T>, web: Type<T>): Provider {
@@ -108,6 +109,8 @@ export const appConfig: ApplicationConfig = {
     provideAppInitializer(() => inject(AiStatusService).start()),
     // Los umbrales del estado llegan con la sesión; hasta entonces, y si fallan, valen los de respaldo.
     provideAppInitializer(() => inject(NetworkThresholdsService).start()),
+    // Igual con los rangos y pesos del puntaje de seguridad.
+    provideAppInitializer(() => inject(SecurityScoreConfigService).start()),
 
     // En Tauri los archivos ya vienen en el instalador; un service worker solo duplicaría la caché.
     provideServiceWorker('ngsw-worker.js'),

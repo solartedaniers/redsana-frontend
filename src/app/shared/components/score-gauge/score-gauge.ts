@@ -1,5 +1,6 @@
-import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
-import { SECURITY_SCORE_WEIGHTS, getSecurityScoreBand } from '../../../core/domain/security-score.calculator';
+import { ChangeDetectionStrategy, Component, computed, inject, input } from '@angular/core';
+import { getSecurityScoreBand } from '../../../core/domain/security-score.calculator';
+import { SecurityScoreConfigService } from '../../../core/security-score-config/security-score-config.service';
 import { TranslatePipe } from '../../../core/i18n/translate.pipe';
 import { MetricValue } from '../metric-value/metric-value';
 
@@ -20,9 +21,14 @@ export class ScoreGauge {
   readonly questionnaireScore = input<number | null>(null);
   readonly technicalScore = input<number | null>(null);
 
-  protected readonly weights = SECURITY_SCORE_WEIGHTS;
+  private readonly config = inject(SecurityScoreConfigService).config;
+
+  protected readonly weights = computed(() => ({
+    questionnaire: this.config().questionnaireWeightPercent,
+    technical: this.config().technicalWeightPercent,
+  }));
   protected readonly ticks = Array.from({ length: MAX_SCORE / TICK_STEP + 1 }, (_, i) => i * TICK_STEP);
-  protected readonly band = computed(() => getSecurityScoreBand(this.score()));
+  protected readonly band = computed(() => getSecurityScoreBand(this.score(), this.config()));
   protected readonly needleAngle = computed(() => `${(this.clamp(this.score()) / MAX_SCORE) * SWEEP_DEGREES}deg`);
 
   /** Rellenos de cada tramo en unidades del arco (pathLength 100); null si es un medidor simple. */
@@ -35,8 +41,8 @@ export class ScoreGauge {
     return {
       questionnaire,
       technical,
-      questionnaireFill: (this.clamp(questionnaire) / MAX_SCORE) * SECURITY_SCORE_WEIGHTS.questionnaire,
-      technicalFill: (this.clamp(technical) / MAX_SCORE) * SECURITY_SCORE_WEIGHTS.technical,
+      questionnaireFill: (this.clamp(questionnaire) / MAX_SCORE) * this.weights().questionnaire,
+      technicalFill: (this.clamp(technical) / MAX_SCORE) * this.weights().technical,
     };
   });
 

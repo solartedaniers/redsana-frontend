@@ -6,12 +6,12 @@
         <path class="segment segment--questionnaire" pathLength="100" d="M20 100a80 80 0 0 1 160 0"
           [attr.stroke-dasharray]="p.questionnaireFill + ' 100'" />
         <path class="segment segment--technical" pathLength="100" d="M20 100a80 80 0 0 1 160 0"
-          [attr.stroke-dasharray]="'0 ' + weights.questionnaire + ' ' + p.technicalFill + ' 100'" />
+          [attr.stroke-dasharray]="'0 ' + weights().questionnaire + ' ' + p.technicalFill + ' 100'" />
       } @else {
         <path class="segment" pathLength="100" d="M20 100a80 80 0 0 1 160 0" [attr.stroke-dasharray]="score() + ' 100'" />
       }
       @for (tick of ticks; track tick) {
-        <line class="tick" [class.tick--split]="parts() && tick === weights.questionnaire" x1="4" y1="100" x2="12" y2="100"
+        <line class="tick" [class.tick--split]="parts() && tick === weights().questionnaire" x1="4" y1="100" x2="12" y2="100"
           [style.rotate]="tickAngle(tick)" />
       }
     </svg>

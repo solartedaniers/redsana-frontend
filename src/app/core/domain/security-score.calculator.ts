@@ -1,13 +1,14 @@
 import { WifiEncryptionStatus } from '../models/security.model';
+import { SecurityScoreConfig } from '../security-score-config/security-score-config.config';
 
 export type SecurityScoreBand = 'good' | 'warning' | 'critical';
 
-// Umbrales únicos para todo lugar que pinte el puntaje de seguridad.
-export function getSecurityScoreBand(score: number): SecurityScoreBand {
-  if (score >= 80) {
+// Los rangos son los del backend (SecurityScoreConfigService), para todo lugar que pinte el puntaje de seguridad.
+export function getSecurityScoreBand(score: number, config: SecurityScoreConfig): SecurityScoreBand {
+  if (score >= config.goodMin) {
     return 'good';
   }
-  if (score >= 50) {
+  if (score >= config.warningMin) {
     return 'warning';
   }
   return 'critical';
@@ -24,12 +25,6 @@ export function evaluateWifiEncryption(raw: string | null): WifiEncryptionStatus
   const upper = raw.toUpperCase();
   return STRONG_WIFI_ENCRYPTION_PREFIXES.some((prefix) => upper.startsWith(prefix)) ? 'secure' : 'weak';
 }
-
-// Copia a propósito de los pesos de app/services/network_security_score_service.py del repo del backend.
-export const SECURITY_SCORE_WEIGHTS = {
-  questionnaire: 30,
-  technical: 70,
-} as const;
 
 export type RecommendationUrgency = 'high' | 'medium' | 'low';
 
