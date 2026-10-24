@@ -5,6 +5,8 @@ use serde::Serialize;
 use surge_ping::{Client, Config, PingIdentifier, PingSequence, SurgeError, ICMP};
 use tokio::net::lookup_host;
 
+use crate::lan_scan::current_gateway;
+
 /// Host de referencia cuando el llamador no indica uno.
 const DEFAULT_PING_TARGET: &str = "1.1.1.1";
 /// Pings por medición: suficientes para estimar el jitter sin tardar demasiado.
@@ -15,6 +17,9 @@ const QUALITY_SAMPLE_INTERVAL: Duration = Duration::from_millis(200);
 const PING_TIMEOUT: Duration = Duration::from_secs(1);
 /// Tamaño del payload ICMP en bytes (relleno, sin datos reales).
 const PING_PAYLOAD_SIZE: usize = 8;
+/// Espera por ping al router, en ms; se cambia con esta variable de entorno para routers lentos.
+const GATEWAY_PING_TIMEOUT_ENV: &str = "REDSANA_GATEWAY_PING_TIMEOUT_MS";
+const DEFAULT_GATEWAY_PING_TIMEOUT: Duration = Duration::from_millis(1000);
 
 /// Resultado agregado de una medición con varios pings reales.
 #[derive(Serialize)]
@@ -23,6 +28,8 @@ pub struct NetworkQualityMeasurement {
     pub latency_ms: f64,
     pub jitter_ms: f64,
     pub packet_loss_percent: f64,
+    /// Latencia al router; None sin router o si no respondió a ningún ping (no es un error de la medición).
+    pub gateway_latency_ms: Option<f64>,
 }
 
 /// Envía un ICMP echo real y devuelve la latencia en ms; acepta IPs y nombres (los resuelve por DNS).
@@ -31,7 +38,7 @@ pub async fn measure_latency(host: String) -> Result<f64, String> {
     let address = resolve_host(&host).await?;
     let client = new_client(address)?;
 
-    ping_once(&client, address, 0)
+    ping_once(&client, address, 0, PING_TIMEOUT)
         .await?
         .ok_or_else(|| format!("ping a {host} superó el tiempo de espera"))
 }
@@ -43,13 +50,51 @@ pub async fn measure_network_quality(host: Option<String>) -> Result<NetworkQual
     let address = resolve_host(&target).await?;
     let client = new_client(address)?;
 
+    // Router e internet en el mismo ciclo y en paralelo: la medición no tarda más que antes.
+    let gateway = tokio::spawn(measure_gateway_latency());
+    let internet = ping_series(&client, address, PING_TIMEOUT).await;
+    let gateway_latency_ms = gateway.await.unwrap_or_default();
+    let mut measurement = summarize_pings(internet)?;
+    measurement.gateway_latency_ms = gateway_latency_ms;
+    Ok(measurement)
+}
+
+async fn ping_series(
+    client: &Client,
+    address: IpAddr,
+    timeout: Duration,
+) -> Vec<Result<Option<f64>, String>> {
     let mut results = Vec::with_capacity(QUALITY_SAMPLE_COUNT as usize);
     for sequence in 0..QUALITY_SAMPLE_COUNT {
-        results.push(ping_once(&client, address, sequence).await);
+        results.push(ping_once(client, address, sequence, timeout).await);
         tokio::time::sleep(QUALITY_SAMPLE_INTERVAL).await;
     }
+    results
+}
 
-    summarize_pings(results)
+/// Sin router o sin respuesta no falla: la latencia al router queda ausente y el backend no diagnostica.
+async fn measure_gateway_latency() -> Option<f64> {
+    let gateway = IpAddr::V4(current_gateway().await?);
+    let client = new_client(gateway).map_err(|e| log::warn!("{e}")).ok()?;
+    let timeout = gateway_ping_timeout(std::env::var(GATEWAY_PING_TIMEOUT_ENV).ok().as_deref());
+    average_latency(&ping_series(&client, gateway, timeout).await)
+}
+
+/// Milisegundos positivos de la variable; vacía, cero o inválida deja el valor por defecto.
+fn gateway_ping_timeout(raw: Option<&str>) -> Duration {
+    raw.and_then(|value| value.trim().parse::<u64>().ok())
+        .filter(|ms| *ms > 0)
+        .map(Duration::from_millis)
+        .unwrap_or(DEFAULT_GATEWAY_PING_TIMEOUT)
+}
+
+/// Promedio de las respuestas; None si ningún ping respondió.
+fn average_latency(results: &[Result<Option<f64>, String>]) -> Option<f64> {
+    let replies: Vec<f64> = results
+        .iter()
+        .filter_map(|result| result.as_ref().ok().copied().flatten())
+        .collect();
+    (!replies.is_empty()).then(|| replies.iter().sum::<f64>() / replies.len() as f64)
 }
 
 /// Si todos los envíos fallan (el PC sin red local: al despertar o al cambiar de WiFi) es un error y no se guarda nada,
@@ -86,9 +131,14 @@ pub(crate) fn new_client(address: IpAddr) -> Result<Client, String> {
 }
 
 /// Envía un ping y devuelve la latencia, o None si se agotó el timeout.
-async fn ping_once(client: &Client, address: IpAddr, sequence: u16) -> Result<Option<f64>, String> {
+async fn ping_once(
+    client: &Client,
+    address: IpAddr,
+    sequence: u16,
+    timeout: Duration,
+) -> Result<Option<f64>, String> {
     let mut pinger = client.pinger(address, PingIdentifier(sequence)).await;
-    pinger.timeout(PING_TIMEOUT);
+    pinger.timeout(timeout);
     let payload = [0u8; PING_PAYLOAD_SIZE];
 
     match pinger.ping(PingSequence(sequence), &payload).await {
@@ -112,6 +162,7 @@ fn aggregate_samples(latencies_ms: &[f64], expected_samples: u16) -> NetworkQual
             latency_ms: 0.0,
             jitter_ms: 0.0,
             packet_loss_percent,
+            gateway_latency_ms: None,
         };
     }
 
@@ -128,6 +179,7 @@ fn aggregate_samples(latencies_ms: &[f64], expected_samples: u16) -> NetworkQual
         latency_ms,
         jitter_ms,
         packet_loss_percent,
+        gateway_latency_ms: None,
     }
 }
 
@@ -213,6 +265,37 @@ mod tests {
         let measurement = summarize_pings(results).expect("hubo respuestas");
         assert_eq!(measurement.packet_loss_percent, 40.0);
         assert_eq!(measurement.latency_ms, 20.0);
+    }
+
+    #[test]
+    fn gateway_latency_is_the_average_of_the_replies() {
+        let results = vec![Ok(Some(2.0)), Ok(None), send_failed(), Ok(Some(4.0))];
+        assert_eq!(average_latency(&results), Some(3.0));
+    }
+
+    #[test]
+    fn a_gateway_that_never_answers_is_absent_not_an_error() {
+        let results = vec![Ok(None), send_failed(), Ok(None)];
+        assert_eq!(average_latency(&results), None);
+    }
+
+    #[test]
+    fn gateway_timeout_comes_from_the_variable_or_the_default() {
+        let cases = [
+            (Some("250"), Duration::from_millis(250)),
+            (Some(" 0 "), DEFAULT_GATEWAY_PING_TIMEOUT),
+            (Some("abc"), DEFAULT_GATEWAY_PING_TIMEOUT),
+            (None, DEFAULT_GATEWAY_PING_TIMEOUT),
+        ];
+        for (raw, expected) in cases {
+            assert_eq!(gateway_ping_timeout(raw), expected);
+        }
+    }
+
+    #[test]
+    fn a_missing_gateway_latency_serializes_as_null() {
+        let json = serde_json::to_value(aggregate_samples(&[10.0], 1)).expect("serializa");
+        assert_eq!(json["gatewayLatencyMs"], serde_json::Value::Null);
     }
 
     #[test]

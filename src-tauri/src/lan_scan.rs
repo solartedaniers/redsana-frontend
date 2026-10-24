@@ -522,6 +522,14 @@ pub async fn current_gateway_mac() -> Result<Option<String>, String> {
     gateway_mac_from_arp(gateway).await
 }
 
+/// Router del adaptador activo; None sin red o sin router. ping.rs lo mide en cada ciclo.
+pub(crate) async fn current_gateway() -> Option<Ipv4Addr> {
+    match tokio::task::spawn_blocking(local_interface).await {
+        Ok(Ok(interface)) => interface.gateway,
+        _ => None,
+    }
+}
+
 async fn gateway_mac_from_arp(gateway: Ipv4Addr) -> Result<Option<String>, String> {
     let arp_output = tokio::task::spawn_blocking(run_arp_a)
         .await
