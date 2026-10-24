@@ -185,6 +185,7 @@ export class SecurityAssistantHttpRepository extends SecurityAssistantRepository
       id: recommendation.id,
       titleKey: recommendation.title_key,
       descriptionKey: recommendation.description_key,
+      howKey: recommendation.description_key.replace(/\.description$/, '.how'),
       priority: recommendation.priority,
     };
   }

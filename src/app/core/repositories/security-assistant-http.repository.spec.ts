@@ -48,3 +48,34 @@ describe('SecurityAssistantHttpRepository con la IA encendiendo', () => {
     expect(error).not.toBeInstanceOf(AiWarmingUpError);
   });
 });
+
+describe('SecurityAssistantHttpRepository: recomendaciones', () => {
+  it('cada recomendación trae la clave de "cómo hacerlo" junto a su descripción', () => {
+    const { repository, http } = setup();
+    let howKeys: string[] = [];
+
+    repository.getLatest().subscribe((result) => (howKeys = result?.recommendations.map((r) => r.howKey) ?? []));
+    http
+      .expectOne((req) => req.url.endsWith('/api/security-assessments/latest'))
+      .flush({
+        id: 'a1',
+        score: 40,
+        questionnaire_score: 40,
+        technical_score: null,
+        is_partial: true,
+        technical_measured_at: null,
+        technical_evidence_reused: false,
+        submitted_at: '2026-10-24T00:00:00Z',
+        recommendations: [
+          {
+            id: 'change-default-password',
+            title_key: 'user.securityAssistant.recommendations.changeDefaultPassword.title',
+            description_key: 'user.securityAssistant.recommendations.changeDefaultPassword.description',
+            priority: 1,
+          },
+        ],
+      });
+
+    expect(howKeys).toEqual(['user.securityAssistant.recommendations.changeDefaultPassword.how']);
+  });
+});

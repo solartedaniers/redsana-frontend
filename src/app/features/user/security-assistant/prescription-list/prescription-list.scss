@@ -53,13 +53,13 @@
 
   &::before {
     content: counter(dose);
-    grid-row: span 3;
+    grid-row: span 4;
     font: 800 var(--font-size-heading) var(--font-mono);
     line-height: 1;
     color: var(--color-text-primary);
   }
 
-  strong {
+  > strong {
     font-family: var(--font-display);
     font-size: var(--font-size-body);
   }

@@ -10,6 +10,8 @@ export interface SecurityRecommendation {
   id: string;
   titleKey: string;
   descriptionKey: string;
+  /** Pasos simples para aplicarla; la clave sale de la descripción (….description → ….how). */
+  howKey: string;
   priority: number;
 }
 

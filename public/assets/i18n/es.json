@@ -244,6 +244,7 @@
       "submit": "Ver mi puntaje",
       "restart": "Responder de nuevo",
       "recommendationsTitle": "Guía priorizada",
+      "howLabel": "Cómo hacerlo:",
       "allGood": "¡Excelente! No hay recomendaciones pendientes.",
       "lastSubmittedAt": "Última evaluación:",
       "chat": {
@@ -278,59 +279,73 @@
       "recommendations": {
         "changeDefaultPassword": {
           "title": "Cambia la clave de fábrica de tu router",
-          "description": "Las claves de fábrica son públicas y son la vía de entrada más fácil para un atacante."
+          "description": "Las claves de fábrica son públicas y son la vía de entrada más fácil para un atacante.",
+          "how": "1) Escribe en el navegador la dirección que trae la etiqueta del router y entra con el usuario y la clave de esa etiqueta. 2) Busca la opción para cambiar la contraseña del router y pon una larga que solo tú conozcas."
         },
         "checkDefaultPassword": {
           "title": "Ve a revisar la clave de tu router",
-          "description": "Si no recuerdas haberla cambiado, es probable que siga siendo la de fábrica: entra a la configuración de tu router y verifícalo."
+          "description": "Si no recuerdas haberla cambiado, es probable que siga siendo la de fábrica: entra a la configuración de tu router y verifícalo.",
+          "how": "1) Escribe en el navegador la dirección que trae la etiqueta del router e intenta entrar con el usuario y la clave de esa etiqueta. 2) Si te deja entrar, la clave sigue siendo la de fábrica: cámbiala ahí mismo."
         },
         "updateFirmware": {
           "title": "Actualiza tu router",
-          "description": "Los fabricantes corrigen fallas de seguridad conocidas en cada actualización."
+          "description": "Los fabricantes corrigen fallas de seguridad conocidas en cada actualización.",
+          "how": "1) Entra a la configuración del router con la dirección de su etiqueta. 2) Busca la opción de actualizar y sigue los pasos, sin apagar el router hasta que termine."
         },
         "checkFirmware": {
           "title": "Ve a revisar si tu router está actualizado",
-          "description": "Entra a la configuración de tu router y busca la opción de buscar actualizaciones."
+          "description": "Entra a la configuración de tu router y busca la opción de buscar actualizaciones.",
+          "how": "1) Entra a la configuración del router con la dirección de su etiqueta. 2) Busca la opción de actualizaciones: si avisa que hay una nueva, instálala sin apagar el router."
         },
         "enableWifiEncryption": {
           "title": "Activa un cifrado WiFi más fuerte (WPA2 o WPA3)",
-          "description": "Un cifrado más fuerte dificulta mucho más interceptar tu tráfico."
+          "description": "Un cifrado más fuerte dificulta mucho más interceptar tu tráfico.",
+          "how": "1) Entra a la configuración del router y abre la parte del WiFi. 2) En el tipo de seguridad elige WPA2 o WPA3, guarda y vuelve a conectar tus equipos con la clave del WiFi."
         },
         "enableGuestNetwork": {
           "title": "Configura una red para tus visitas",
-          "description": "Mantiene los dispositivos de tus visitas separados de los tuyos."
+          "description": "Mantiene los dispositivos de tus visitas separados de los tuyos.",
+          "how": "1) Entra a la configuración del router y busca la opción de red de invitados. 2) Actívala con un nombre y una clave distintos a los de tu WiFi, y compártela solo con tus visitas."
         },
         "checkGuestNetwork": {
           "title": "Ve a revisar si tu router permite una red de invitados",
-          "description": "Muchos routers ya traen esta opción lista para activar, solo hay que buscarla en su configuración."
+          "description": "Muchos routers ya traen esta opción lista para activar, solo hay que buscarla en su configuración.",
+          "how": "1) Entra a la configuración del router con la dirección de su etiqueta. 2) Busca una opción llamada red de invitados: si aparece, tu router la permite."
         },
         "disableRemoteManagement": {
           "title": "Desactiva la administración remota",
-          "description": "Evita que alguien pueda entrar a configurar tu router desde fuera de tu casa."
+          "description": "Evita que alguien pueda entrar a configurar tu router desde fuera de tu casa.",
+          "how": "1) Entra a la configuración del router y busca la opción de administración remota o acceso remoto. 2) Apágala y guarda los cambios."
         },
         "checkRemoteManagement": {
           "title": "Ve a revisar la configuración remota de tu router",
-          "description": "Busca la opción de administración remota en la configuración de tu router y confirma que esté apagada."
+          "description": "Busca la opción de administración remota en la configuración de tu router y confirma que esté apagada.",
+          "how": "1) Entra a la configuración del router con la dirección de su etiqueta. 2) Busca la administración remota o el acceso remoto y confirma que esté apagado."
         },
         "closeTelnet": {
           "title": "Desactiva Telnet en tu router",
-          "description": "Tu router tiene Telnet abierto: es un acceso de administración sin cifrar que los atacantes buscan primero. Desactívalo en la configuración del router."
+          "description": "Tu router tiene Telnet abierto: es un acceso de administración sin cifrar que los atacantes buscan primero. Desactívalo en la configuración del router.",
+          "how": "1) Entra a la configuración del router y busca Telnet en la parte de administración. 2) Desactívalo y guarda; si no encuentras la opción, pídeselo a tu proveedor de internet."
         },
         "closeFtp": {
           "title": "Desactiva el servidor FTP del router",
-          "description": "El FTP envía usuarios y archivos sin cifrar. Si no compartes archivos desde el router, apágalo."
+          "description": "El FTP envía usuarios y archivos sin cifrar. Si no compartes archivos desde el router, apágalo.",
+          "how": "1) Entra a la configuración del router y busca la opción de FTP o de compartir archivos. 2) Si no la usas, apágala y guarda."
         },
         "closeFileSharing": {
           "title": "Revisa el uso compartido de archivos del router",
-          "description": "Tu router comparte archivos en la red (SMB). Si no lo usas, desactívalo; si lo usas, protégelo con contraseña."
+          "description": "Tu router comparte archivos en la red (SMB). Si no lo usas, desactívalo; si lo usas, protégelo con contraseña.",
+          "how": "1) Entra a la configuración del router y busca la opción de compartir archivos o USB. 2) Si no la usas, apágala; si la usas, ponle una contraseña."
         },
         "closeRemoteProvisioning": {
           "title": "Pregunta a tu proveedor por la gestión remota (TR-069)",
-          "description": "El router acepta administración remota del proveedor, un servicio muy atacado. Pide a tu proveedor que lo restrinja o actualice el firmware."
+          "description": "El router acepta administración remota del proveedor, un servicio muy atacado. Pide a tu proveedor que lo restrinja o actualice el firmware.",
+          "how": "1) Llama a tu proveedor de internet y dile que tu router tiene abierta su gestión remota (TR-069). 2) Pídele que la limite o que actualice el router."
         },
         "closeSsh": {
           "title": "Desactiva SSH si no lo usas",
-          "description": "El router tiene una puerta de administración por SSH abierta. Si no la usas, ciérrala."
+          "description": "El router tiene una puerta de administración por SSH abierta. Si no la usas, ciérrala.",
+          "how": "1) Entra a la configuración del router y busca SSH en la parte de administración. 2) Si no lo usas, desactívalo y guarda."
         }
       },
       "score": {

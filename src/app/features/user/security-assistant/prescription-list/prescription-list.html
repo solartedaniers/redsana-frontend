@@ -12,6 +12,9 @@
         <span class="dose__urgency">{{ 'user.securityAssistant.urgency.' + urgency | translate }}</span>
         <strong>{{ recommendation.titleKey | translate }}</strong>
         <p>{{ recommendation.descriptionKey | translate }}</p>
+        <p class="dose__how">
+          <strong>{{ 'user.securityAssistant.howLabel' | translate }}</strong> {{ recommendation.howKey | translate }}
+        </p>
       </li>
     }
   </ol>
