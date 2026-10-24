@@ -326,6 +326,17 @@ npx tauri build
 
 Esto genera el instalador nativo (`.exe`/`.msi` en Windows, `.dmg` en macOS, `.deb`/`.AppImage` en Linux) dentro de `src-tauri/target/release/bundle/`. El instalador de Windows (`*-setup.exe`) se publica en los Releases de este repositorio: el botón de descarga de la web lo busca en el repo indicado por `DESKTOP_RELEASE_REPO`.
 
+### 4️⃣ Instalar la app de escritorio (Windows)
+
+Descarga `RedSana_0.1.6_x64-setup.exe` desde [Releases](https://github.com/solartedaniers/redsana-frontend/releases/latest) (o con el botón de descarga de la web). Para comprobar que el archivo es el publicado, compara su SHA-256 en PowerShell:
+
+```powershell
+Get-FileHash .\RedSana_0.1.6_x64-setup.exe -Algorithm SHA256
+# Debe dar: EE0F8E7FF240841D119F207201E6BD9B1CD041325F9CD0C023FFBBFDA62996EE
+```
+
+El instalador no está firmado con un certificado de código, así que Windows SmartScreen puede mostrar «Windows protegió su PC». Para instalarlo, pulsa **Más información → Ejecutar de todas formas**. Instalarlo encima de una versión anterior la actualiza y conserva la sesión iniciada.
+
 ---
 
 ## ✅ Pruebas
