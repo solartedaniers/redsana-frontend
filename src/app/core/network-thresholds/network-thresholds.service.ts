@@ -5,6 +5,7 @@ import { toObservable } from '@angular/core/rxjs-interop';
 import { EMPTY, catchError, filter, map, switchMap } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { AuthService } from '../auth/auth.service';
+import { NetworkMeasurementGateway } from '../network-measurement/network-measurement.gateway';
 import { FALLBACK_NETWORK_STATUS_THRESHOLDS, NetworkStatusThresholds } from './network-thresholds.config';
 
 interface BackendThresholds {
@@ -15,7 +16,8 @@ interface BackendThresholds {
 }
 
 // Los umbrales vienen del backend, que calcula el estado de cada medición: así el gráfico colorea igual que el
-// dashboard. Una vez por sesión; mientras tanto o si fallan, quedan los de respaldo.
+// dashboard. Se piden los de la fuente con que mide esta app (la web tiene su propia escala de latencia). Una vez por
+// sesión; mientras tanto o si fallan, quedan los de respaldo.
 @Injectable({ providedIn: 'root' })
 export class NetworkThresholdsService {
   private readonly http = inject(HttpClient);
@@ -31,11 +33,13 @@ export class NetworkThresholdsService {
     if (!this.isBrowser) {
       return;
     }
+    // Un backend anterior ignora source y responde los del escritorio, como antes.
+    const params = { source: this.injector.get(NetworkMeasurementGateway).source };
     toObservable(this.injector.get(AuthService).isAuthenticated, { injector: this.injector })
       .pipe(
         filter(Boolean),
         // Un 404 (backend anterior), un 50x (dormido) o un error de red dejan el respaldo, sin reintentos ni avisos.
-        switchMap(() => this.http.get<BackendThresholds>(this.url).pipe(catchError(() => EMPTY))),
+        switchMap(() => this.http.get<BackendThresholds>(this.url, { params }).pipe(catchError(() => EMPTY))),
         map((response) => toThresholds(response)),
         filter((thresholds): thresholds is NetworkStatusThresholds => thresholds !== null),
       )

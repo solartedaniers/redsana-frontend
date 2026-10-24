@@ -3,6 +3,8 @@ import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 import { AuthService } from '../auth/auth.service';
+import { MeasurementSource } from '../models/network.model';
+import { NetworkMeasurementGateway } from '../network-measurement/network-measurement.gateway';
 import { FALLBACK_NETWORK_STATUS_THRESHOLDS } from './network-thresholds.config';
 import { NetworkThresholdsService } from './network-thresholds.service';
 
@@ -14,7 +16,7 @@ const BACKEND = {
   packet_loss_critical_percent: 8,
 };
 
-function setup(options: { authenticated?: boolean; platform?: 'browser' | 'server' } = {}) {
+function setup(options: { authenticated?: boolean; platform?: 'browser' | 'server'; source?: MeasurementSource } = {}) {
   const isAuthenticated = signal(options.authenticated ?? true);
   TestBed.configureTestingModule({
     providers: [
@@ -22,6 +24,7 @@ function setup(options: { authenticated?: boolean; platform?: 'browser' | 'serve
       provideHttpClientTesting(),
       { provide: AuthService, useValue: { isAuthenticated } },
       { provide: PLATFORM_ID, useValue: options.platform ?? 'browser' },
+      { provide: NetworkMeasurementGateway, useValue: { source: options.source ?? 'web' } },
     ],
   });
   const service = TestBed.inject(NetworkThresholdsService);
@@ -31,6 +34,18 @@ function setup(options: { authenticated?: boolean; platform?: 'browser' | 'serve
 }
 
 describe('NetworkThresholdsService', () => {
+  it('la web pide los umbrales de sus propias mediciones (source=web)', () => {
+    const { http } = setup({ source: 'web' });
+
+    expect(http.expectOne((req) => req.url.endsWith(URL_SUFFIX)).request.params.get('source')).toBe('web');
+  });
+
+  it('el escritorio pide los del ping nativo (source=native)', () => {
+    const { http } = setup({ source: 'native' });
+
+    expect(http.expectOne((req) => req.url.endsWith(URL_SUFFIX)).request.params.get('source')).toBe('native');
+  });
+
   it('antes de responder el backend usa los de respaldo', () => {
     const { service } = setup();
 
