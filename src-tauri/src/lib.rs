@@ -3,11 +3,20 @@ mod lan_scan;
 mod pending_measurements;
 mod ping;
 mod router_ports;
+mod tray;
 mod wifi;
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
   tauri::Builder::default()
+    // Primero: abrir la app otra vez muestra la ventana que ya está en la bandeja, sin otra copia que mida doble.
+    .plugin(tauri_plugin_single_instance::init(|app, _args, _cwd| tray::show_main_window(app)))
+    .manage(tray::TrayState::default())
+    .on_window_event(|window, event| {
+      if let tauri::WindowEvent::CloseRequested { api, .. } = event {
+        tray::on_close_requested(window, api);
+      }
+    })
     .setup(|app| {
       if cfg!(debug_assertions) {
         app.handle().plugin(
@@ -27,7 +36,8 @@ pub fn run() {
       lan_scan::scan_connected_devices,
       lan_scan::scan_present_devices,
       lan_scan::current_gateway_mac,
-      router_ports::scan_router_open_ports
+      router_ports::scan_router_open_ports,
+      tray::install_tray
     ])
     .run(tauri::generate_context!())
     .expect("error while running tauri application");

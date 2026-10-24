@@ -575,5 +575,12 @@
     },
     "downloadPreparing": "Preparando la descarga…",
     "downloadFallback": "No pudimos iniciar la descarga directa; te abrimos la página de la versión para que descargues el instalador desde allí."
+  },
+  "desktopTray": {
+    "open": "Abrir RedSana",
+    "quit": "Salir",
+    "tooltip": "RedSana: midiendo tu red",
+    "noticeTitle": "RedSana sigue midiendo",
+    "noticeBody": "Cerraste la ventana, pero RedSana sigue en la bandeja del sistema (junto al reloj) midiendo tu red cada minuto. Para volver, haz clic en su icono. Para cerrarla del todo, haz clic derecho en el icono y elige «Salir»."
   }
 }

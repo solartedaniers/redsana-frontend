@@ -1,6 +1,7 @@
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import {
   ApplicationConfig,
+  Injector,
   Provider,
   Type,
   inject,
@@ -118,6 +119,15 @@ export const appConfig: ApplicationConfig = {
     provideAppInitializer(() => inject(NetworkThresholdsService).start()),
     // Igual con los rangos y pesos del puntaje de seguridad.
     provideAppInitializer(() => inject(SecurityScoreConfigService).start()),
+    // Bandeja del sistema, solo escritorio: import() la deja en un archivo aparte que la web nunca descarga.
+    provideAppInitializer(() => {
+      if (inject(RuntimeEnvironmentService).isDesktop) {
+        const injector = inject(Injector);
+        void import('./core/desktop-tray/desktop-tray.service')
+          .then(({ DesktopTrayService }) => injector.get(DesktopTrayService))
+          .catch((error: unknown) => console.error(error));
+      }
+    }),
 
     // En Tauri los archivos ya vienen en el instalador; un service worker solo duplicaría la caché.
     provideServiceWorker('ngsw-worker.js'),

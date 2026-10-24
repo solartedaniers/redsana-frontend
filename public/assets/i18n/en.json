@@ -575,5 +575,12 @@
     },
     "downloadPreparing": "Preparing the download…",
     "downloadFallback": "We could not start the direct download; we opened the release page so you can get the installer there."
+  },
+  "desktopTray": {
+    "open": "Open RedSana",
+    "quit": "Quit",
+    "tooltip": "RedSana: measuring your network",
+    "noticeTitle": "RedSana keeps measuring",
+    "noticeBody": "You closed the window, but RedSana is still in the system tray (next to the clock), measuring your network every minute. Click its icon to come back. To close it completely, right-click the icon and choose \"Quit\"."
   }
 }

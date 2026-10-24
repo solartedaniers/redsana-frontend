@@ -2,7 +2,7 @@
 
 > **Diagnóstico inteligente de salud y seguridad para tu red WiFi doméstica.**
 
-RedSana es una aplicación web (instalable como PWA) y de escritorio que mide tu conexión a internet cada minuto mientras está abierta y te dice, en palabras simples, qué está pasando cuando algo anda mal, sin necesitar conocimientos técnicos.
+RedSana es una aplicación web (instalable como PWA) y de escritorio que mide tu conexión a internet cada minuto (la web, mientras está abierta; la de escritorio, también con la ventana cerrada, desde la bandeja del sistema) y te dice, en palabras simples, qué está pasando cuando algo anda mal, sin necesitar conocimientos técnicos.
 
 ---
 
@@ -48,7 +48,7 @@ Y aunque quisiera revisar la seguridad de su router (¿tiene la contraseña de f
 
 ### 1️⃣ Monitoreo preventivo de la red
 
-La app mide tu conexión de verdad (latencia, jitter, pérdida de paquetes) cada minuto mientras está abierta, **aprende cuál es el comportamiento normal de tu propia red** y te avisa cuando las mediciones se salen de ese comportamiento normal. Cuando hay un corte total (100 % de pérdida) seguido de la recuperación, registra una alerta con la duración del corte. En la app de escritorio, lo que se mide sin conexión se guarda en el equipo y se envía en orden al volver la conexión, así que el corte queda registrado con su duración real aunque el servidor no lo haya recibido en su momento. En la web solo cuentan las mediciones que llegan al servidor en el momento. La app de escritorio mide además la latencia hasta tu router y, con ella, el panel te dice en palabras simples si el problema parece estar en tu WiFi o router o en tu proveedor de internet, qué revisar antes de reiniciar el router y, si hay muchos dispositivos conectados, que posiblemente uno está usando mucha red (solo como posibilidad). La web no puede medir el router y no muestra este diagnóstico.
+La app mide tu conexión de verdad (latencia, jitter, pérdida de paquetes) cada minuto, **aprende cuál es el comportamiento normal de tu propia red** y te avisa cuando las mediciones se salen de ese comportamiento normal. Cuando hay un corte total (100 % de pérdida) seguido de la recuperación, registra una alerta con la duración del corte. En la app de escritorio, lo que se mide sin conexión se guarda en el equipo y se envía en orden al volver la conexión, así que el corte queda registrado con su duración real aunque el servidor no lo haya recibido en su momento. En la web solo cuentan las mediciones que llegan al servidor en el momento. La app de escritorio mide además la latencia hasta tu router y, con ella, el panel te dice en palabras simples si el problema parece estar en tu WiFi o router o en tu proveedor de internet, qué revisar antes de reiniciar el router y, si hay muchos dispositivos conectados, que posiblemente uno está usando mucha red (solo como posibilidad). La web no puede medir el router y no muestra este diagnóstico. La web mide mientras está abierta. En la app de escritorio, cerrar la ventana la deja en la bandeja del sistema (junto al reloj) y sigue midiendo cada minuto; la primera vez avisa una sola vez. Desde el icono, «Abrir» vuelve a mostrarla y «Salir» la cierra del todo. Abrirla de nuevo con la app ya en la bandeja muestra esa misma ventana, sin otra copia.
 
 ### 2️⃣ Auditoría de seguridad guiada
 
@@ -130,7 +130,7 @@ RedSana usa **dos motores de IA distintos**, cada uno elegido para el problema q
 ```
 
 - **Frontend + capa nativa (Rust)**: la misma app Angular se publica como web en Vercel y como app de escritorio (vía Tauri), que se instala en la máquina del usuario junto con la capa nativa en Rust. Solo el escritorio puede medir la red _de verdad_ — un navegador no tiene ese acceso, así que la web mide la latencia al servidor.
-- **Web instalable (PWA)**: la web trae manifest y service worker (`ngsw-config.json`), así que se puede instalar desde el navegador y abrir en su propia ventana: en Chrome o Edge, con el botón de instalar de la barra de direcciones (o menú → Instalar RedSana); en Android, menú → Agregar a la pantalla principal; en iPhone, Safari → Compartir → Agregar a inicio. Instalada o no, mide mientras está abierta.
+- **Web instalable (PWA)**: la web trae manifest y service worker (`ngsw-config.json`), así que se puede instalar desde el navegador y abrir en su propia ventana: en Chrome o Edge, con el botón de instalar de la barra de direcciones (o menú → Instalar RedSana); en Android, menú → Agregar a la pantalla principal; en iPhone, Safari → Compartir → Agregar a inicio. Instalada o no, mide mientras está abierta (a diferencia de la app de escritorio, que sigue midiendo desde la bandeja).
 - **Backend (FastAPI)**: desplegado en Render (plan gratuito); en desarrollo corre local con `uvicorn` en el puerto 8000. Es la pieza intermedia entre las dos apps y la base de datos en la nube: verifica el JWT de Supabase y guarda mediciones, dispositivos, alertas y evaluaciones. Render lo apaga tras un rato sin uso (ver [Arranque en frío](#-arranque-en-frío-render-plan-gratuito)).
 - **Base de datos y autenticación**: viven en Supabase, en la nube — así los datos persisten entre sesiones y el panel de administración puede ver todos los usuarios desde cualquier lugar. Las dos apps usan Supabase Auth (login, registro y contraseña) y Storage (fotos de perfil) directamente; el resto de los datos pasa siempre por el backend.
 - **Nombres de rutas**: el frontend usa solo los nombres actuales del backend (`/api/users/me`, `/api/chat-conversations`, `/api/alerts/recent`, `/api/admin/platform-metrics`). Los anteriores siguen vivos en el backend como alias ocultos para el instalador 0.1.5; `scripts/route-names.test.mjs` impide volver a escribirlos aquí.
@@ -354,6 +354,7 @@ redsana-frontend/
 │       ├── ping.rs         # Medición ICMP real (internet y router)
 │       ├── lan_scan.rs     # Escaneo ARP de dispositivos
 │       ├── router_ports.rs # Puertos de riesgo del router
+│       ├── tray.rs         # Bandeja del sistema (cerrar = ocultar, Abrir / Salir)
 │       └── wifi.rs         # Detección de cifrado WiFi
 ├── public/                 # Íconos, manifest e i18n (assets/i18n/es.json, en.json)
 ├── scripts/                # Generación de environment.ts y de la tabla de fabricantes
