@@ -138,3 +138,47 @@ describe('Dashboard con errores del historial o del estado de calibración', () 
     }
   });
 });
+
+describe('Dashboard diagnóstico router / proveedor', () => {
+  function render(snapshot: Partial<NetworkMetricSnapshot>) {
+    TestBed.configureTestingModule({
+      providers: [
+        provideHttpClient(),
+        provideRouter([]),
+        {
+          provide: NetworkMetricsRepository,
+          useValue: {
+            watchSnapshot: () =>
+              of({
+                status: 'critical',
+                latencyMs: 300,
+                jitterMs: 2,
+                packetLossPercent: 0,
+                updatedAt: new Date().toISOString(),
+                ...snapshot,
+              }),
+            getHistory: () => of([]),
+            getAnomalyStatus: () => NEVER,
+          },
+        },
+      ],
+    });
+    const fixture = TestBed.createComponent(Dashboard);
+    fixture.detectChanges();
+    return fixture.nativeElement as HTMLElement;
+  }
+
+  it('con dato del router (escritorio 0.1.6) muestra el diagnóstico', () => {
+    const element = render({ source: 'native', gatewayLatencyMs: 4, diagnosis: 'provider', possibleBusyDevice: false });
+
+    expect(element.querySelector('app-network-diagnosis-panel')?.getAttribute('data-diagnosis')).toBe('provider');
+  });
+
+  it('desde la web no muestra diagnóstico', () => {
+    expect(render({ source: 'web' }).querySelector('app-network-diagnosis-panel')).toBeNull();
+  });
+
+  it('con el instalador 0.1.5 (sin dato del router) no muestra diagnóstico', () => {
+    expect(render({ source: 'native', diagnosis: null }).querySelector('app-network-diagnosis-panel')).toBeNull();
+  });
+});

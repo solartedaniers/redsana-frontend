@@ -84,6 +84,10 @@
   transform: rotate(var(--sticker-tilt-alt));
 }
 
+.diagnosis-section {
+  margin-bottom: var(--space-6);
+}
+
 .history-section app-history-chart {
   padding: var(--space-5);
 }

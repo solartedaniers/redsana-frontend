@@ -220,7 +220,24 @@
       "anomalyCalibrating": "We're learning how this network normally behaves ({{collected}}/{{required}} measurements) — anomaly detection will turn on soon. Each network is learned separately.",
       "anomalyUnknownNetwork": "We couldn't identify the network you're connected to, so these measurements don't count toward learning any network. Check that you're connected to your router.",
       "lastMeasurement": "Last recorded measurement",
-      "serverLatency": "Server latency"
+      "serverLatency": "Server latency",
+      "diagnosis": {
+        "title": "Your connection diagnosis",
+        "routerLatency": "This device takes {{ms}} ms to reach your router.",
+        "restartLabel": "Before restarting the router:",
+        "router": {
+          "verdict": "The problem seems to be your WiFi or your router: the connection between this device and the router is slow.",
+          "restart": "move closer to the router or connect with a cable to check. If it is still slow, restarting the router may help."
+        },
+        "provider": {
+          "verdict": "Your router responds fine, but the internet does not: the problem seems to be your internet provider.",
+          "restart": "restarting it probably won't help. First check whether your provider reports an outage, or call them."
+        },
+        "ok": {
+          "verdict": "All good: your router and your internet are responding normally."
+        },
+        "possibleBusyDevice": "Possibly a device is using a lot of the network, because many are connected. This is only a possibility: check which ones are connected in Devices."
+      }
     },
     "securityAssistant": {
       "title": "Security assistant",

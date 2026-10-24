@@ -34,6 +34,15 @@
     </article>
   </div>
 
+  @if (data.diagnosis; as diagnosis) {
+    <app-network-diagnosis-panel
+      class="diagnosis-section"
+      [diagnosis]="diagnosis"
+      [gatewayLatencyMs]="data.gatewayLatencyMs ?? 0"
+      [possibleBusyDevice]="data.possibleBusyDevice ?? false"
+    />
+  }
+
   <section class="history-section surface-panel">
     <div class="surface-panel__header">
       <h2 class="surface-panel__title">{{ 'user.dashboard.historyTitle' | translate }}</h2>

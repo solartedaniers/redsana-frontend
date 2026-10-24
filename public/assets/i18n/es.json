@@ -220,7 +220,24 @@
       "anomalyCalibrating": "Estamos aprendiendo el comportamiento normal de esta red ({{collected}}/{{required}} mediciones) — la detección de anomalías se activará pronto. Cada red se aprende por separado.",
       "anomalyUnknownNetwork": "No pudimos identificar la red a la que estás conectado, así que estas mediciones no cuentan para el aprendizaje de ninguna red. Revisa que estés conectado a tu router.",
       "lastMeasurement": "Última medición registrada",
-      "serverLatency": "Latencia al servidor"
+      "serverLatency": "Latencia al servidor",
+      "diagnosis": {
+        "title": "Diagnóstico de tu conexión",
+        "routerLatency": "Este equipo tarda {{ms}} ms en llegar a tu router.",
+        "restartLabel": "Antes de reiniciar el router:",
+        "router": {
+          "verdict": "El problema parece estar en tu WiFi o en tu router: la conexión entre este equipo y el router está lenta.",
+          "restart": "acércate al router o conéctate con un cable para comprobarlo. Si sigue lento, reiniciar el router puede ayudar."
+        },
+        "provider": {
+          "verdict": "Tu router responde bien, pero internet no: el problema parece ser de tu proveedor de internet.",
+          "restart": "reiniciarlo probablemente no ayude. Revisa primero si tu proveedor anuncia una falla o llámalo."
+        },
+        "ok": {
+          "verdict": "Todo bien: tu router y tu internet responden con normalidad."
+        },
+        "possibleBusyDevice": "Posiblemente un dispositivo está usando mucha red, porque hay muchos conectados. Es solo una posibilidad: revisa en Dispositivos cuáles están conectados."
+      }
     },
     "securityAssistant": {
       "title": "Asistente de seguridad",

@@ -86,3 +86,43 @@ describe('NetworkMetricsHttpRepository.record', () => {
     expect(body).not.toHaveProperty('sent_at');
   });
 });
+
+describe('NetworkMetricsHttpRepository: latencia al router y diagnóstico', () => {
+  function setup() {
+    TestBed.configureTestingModule({
+      providers: [NetworkMetricsHttpRepository, provideHttpClient(), provideHttpClientTesting()],
+    });
+    return { repository: TestBed.inject(NetworkMetricsHttpRepository), http: TestBed.inject(HttpTestingController) };
+  }
+
+  it('el escritorio manda la latencia al router; la web no manda el campo', () => {
+    const { repository, http } = setup();
+    repository
+      .record({ latencyMs: 20, jitterMs: 1, packetLossPercent: 0, gatewayLatencyMs: 3.5 }, 'native', null)
+      .subscribe();
+    repository.record({ latencyMs: 200, jitterMs: 9, packetLossPercent: 0 }, 'web', null).subscribe();
+
+    const [desktop, web] = http
+      .match((req) => req.method === 'POST')
+      .map((req) => JSON.parse(JSON.stringify(req.request.body)));
+
+    expect(desktop['gateway_latency_ms']).toBe(3.5);
+    expect(web).not.toHaveProperty('gateway_latency_ms');
+  });
+
+  it('lee el diagnóstico de /latest y, con un backend anterior, lo deja en null', () => {
+    const { repository, http } = setup();
+    const received: unknown[] = [];
+    repository.getSnapshot().subscribe((snapshot) => received.push(snapshot));
+    repository.getSnapshot().subscribe((snapshot) => received.push(snapshot));
+    const [withDiagnosis, older] = http.match((req) => req.url.endsWith('/latest'));
+    const base = { status: 'critical', latency_ms: 300, jitter_ms: 2, packet_loss_percent: 0, updated_at: 't' };
+    withDiagnosis.flush({ ...base, gateway_latency_ms: 4, diagnosis: 'provider', possible_busy_device: false });
+    older.flush(base);
+
+    expect(received).toMatchObject([
+      { gatewayLatencyMs: 4, diagnosis: 'provider', possibleBusyDevice: false },
+      { gatewayLatencyMs: null, diagnosis: null, possibleBusyDevice: null },
+    ]);
+  });
+});

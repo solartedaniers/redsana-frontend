@@ -1,0 +1,17 @@
+<section class="surface-panel">
+  <div class="surface-panel__header">
+    <h2 class="surface-panel__title">{{ 'user.dashboard.diagnosis.title' | translate }}</h2>
+    <p class="surface-panel__copy">{{ 'user.dashboard.diagnosis.routerLatency' | translate: { ms: latency() } }}</p>
+  </div>
+  <div class="diagnosis__body">
+    <p class="diagnosis__verdict">{{ verdictKey() | translate }}</p>
+    @if (restartKey(); as key) {
+      <p class="diagnosis__restart">
+        <strong>{{ 'user.dashboard.diagnosis.restartLabel' | translate }}</strong> {{ key | translate }}
+      </p>
+    }
+    @if (possibleBusyDevice()) {
+      <p class="diagnosis__hint">{{ 'user.dashboard.diagnosis.possibleBusyDevice' | translate }}</p>
+    }
+  </div>
+</section>

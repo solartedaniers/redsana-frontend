@@ -7,6 +7,7 @@ import {
   NetworkMetricSample,
   NetworkMetricSnapshot,
   MeasurementSource,
+  NetworkDiagnosis,
   NetworkQualityMeasurement,
   NetworkStatus,
 } from '../models/network.model';
@@ -21,6 +22,9 @@ interface BackendSnapshot {
   packet_loss_percent: number;
   updated_at: string;
   source?: MeasurementSource | null;
+  gateway_latency_ms?: number | null;
+  diagnosis?: NetworkDiagnosis | null;
+  possible_busy_device?: boolean | null;
 }
 
 interface BackendSample {
@@ -72,6 +76,8 @@ export class NetworkMetricsHttpRepository extends NetworkMetricsRepository {
       latency_ms: measurement.latencyMs,
       jitter_ms: measurement.jitterMs,
       packet_loss_percent: measurement.packetLossPercent,
+      // Solo la mide el escritorio; undefined no viaja, así la web manda lo mismo que antes.
+      gateway_latency_ms: measurement.gatewayLatencyMs ?? undefined,
       source,
       network_fingerprint: networkFingerprint,
       recorded_at: recordedAt,
@@ -105,6 +111,9 @@ export class NetworkMetricsHttpRepository extends NetworkMetricsRepository {
       packetLossPercent: snapshot.packet_loss_percent,
       updatedAt: snapshot.updated_at,
       source: snapshot.source ?? undefined,
+      gatewayLatencyMs: snapshot.gateway_latency_ms ?? null,
+      diagnosis: snapshot.diagnosis ?? null,
+      possibleBusyDevice: snapshot.possible_busy_device ?? null,
     };
   }
 

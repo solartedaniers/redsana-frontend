@@ -1,0 +1,23 @@
+:host {
+  display: block;
+}
+
+.diagnosis__body {
+  display: grid;
+  gap: var(--space-3);
+  padding: var(--space-4) var(--space-5);
+}
+
+.diagnosis__body p {
+  margin: 0;
+}
+
+.diagnosis__verdict {
+  color: var(--color-text-primary);
+}
+
+.diagnosis__restart,
+.diagnosis__hint {
+  font-size: var(--font-size-caption);
+  color: var(--color-text-secondary);
+}

@@ -17,6 +17,7 @@ import { NetworkStatusLight } from '../../../shared/components/network-status-li
 import { NetworkStatusBadge } from '../../../shared/components/network-status-badge/network-status-badge';
 import { MetricCard } from '../../../shared/components/metric-card/metric-card';
 import { HistoryChart } from '../../../shared/components/history-chart/history-chart';
+import { NetworkDiagnosisPanel } from '../../../shared/components/network-diagnosis-panel/network-diagnosis-panel';
 import { TranslatePipe } from '../../../core/i18n/translate.pipe';
 import { DatePipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
@@ -37,6 +38,7 @@ const STATUS_AURA: Record<NetworkStatus, LatencySeverity | null> = {
     NetworkStatusBadge,
     MetricCard,
     HistoryChart,
+    NetworkDiagnosisPanel,
     MeasurementEmptyState,
     TranslatePipe,
     DatePipe,
