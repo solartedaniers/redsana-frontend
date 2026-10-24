@@ -12,3 +12,5 @@ src-tauri/
 src/environments/environment.ts
 src/app/core/domain/oui-device-kinds.generated.ts
 package-lock.json
+# Tabla de paridad del diagnóstico: debe quedar byte a byte igual a la del backend (scripts/diagnosis-parity.test.mjs).
+src/app/core/domain/network-diagnosis-cases.json

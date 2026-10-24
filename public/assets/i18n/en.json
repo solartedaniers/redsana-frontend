@@ -168,7 +168,13 @@
       "changePassword": "Update password",
       "changeAvatar": "Change photo",
       "savedMessage": "Profile updated successfully.",
-      "passwordChangedMessage": "Password updated successfully."
+      "passwordChangedMessage": "Password updated successfully.",
+      "autostart": {
+        "title": "Start with Windows",
+        "label": "Start RedSana with Windows",
+        "hint": "When the computer starts, RedSana opens in the system tray and starts measuring, without opening the window.",
+        "error": "Could not change the start with Windows setting. Please try again."
+      }
     },
     "errors": {
       "required": "This field is required.",
@@ -236,7 +242,13 @@
         "ok": {
           "verdict": "All good: your router and your internet are responding normally."
         },
-        "possibleBusyDevice": "Possibly a device is using a lot of the network, because many are connected. This is only a possibility: check which ones are connected in Devices."
+        "possibleBusyDevice": "Possibly a device is using a lot of the network, because many are connected. This is only a possibility: check which ones are connected in Devices.",
+        "router_unreachable": {
+          "verdict": "The problem seems to be your WiFi or your router: the internet is not responding and neither is your router, although it was responding a short while ago.",
+          "restart": "check that this computer is still connected to your WiFi and that the router lights look as usual. If everything looks normal and it still does not respond, restart it: turn it off, wait 30 seconds and turn it back on."
+        },
+        "routerNoReply": "Your router did not respond in this measurement.",
+        "offlineNote": "No connection to the server: diagnosis made on this computer with the {{time}} measurement."
       }
     },
     "securityAssistant": {

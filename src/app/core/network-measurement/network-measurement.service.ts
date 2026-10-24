@@ -7,6 +7,7 @@ import { MeasurementDelivery } from '../pending-measurements/measurement-deliver
 import { NetworkMeasurementGateway } from './network-measurement.gateway';
 import { NetworkIdentityGateway } from '../network-identity/network-identity.gateway';
 import { MEASUREMENT_CONFIG } from '../domain/measurement-freshness';
+import { LocalNetworkDiagnosisService } from '../local-diagnosis/local-network-diagnosis.service';
 
 const MEASUREMENT_INTERVAL_MS = MEASUREMENT_CONFIG.intervalMs;
 /** Candado entre pestañas (Web Locks): sin él, cada pestaña guardaba su medición y sesgaba la calibración. */
@@ -19,6 +20,7 @@ export class NetworkMeasurementService {
   private readonly gateway = inject(NetworkMeasurementGateway);
   private readonly delivery = inject(MeasurementDelivery);
   private readonly networkIdentity = inject(NetworkIdentityGateway);
+  private readonly localDiagnosis = inject(LocalNetworkDiagnosisService);
   private readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
   // Las mediciones van a nombre del usuario: sin sesión no hay a quién atribuirlas.
   private readonly auth = inject(AuthService);
@@ -64,15 +66,19 @@ export class NetworkMeasurementService {
     const recordedAt = new Date().toISOString();
     // Identifico la red en cada ciclo: si el equipo cambió de red, la medición cuenta para la nueva.
     return from(Promise.all([this.gateway.measure(), this.networkIdentity.currentNetworkFingerprint()])).pipe(
-      switchMap(([measurement, fingerprint]) =>
-        this.delivery.deliver({
+      switchMap(([measurement, fingerprint]) => {
+        // Solo el escritorio diagnostica en el equipo: la web mide hasta el servidor, no el router ni internet.
+        if (this.gateway.source === 'native') {
+          this.localDiagnosis.record(recordedAt, measurement);
+        }
+        return this.delivery.deliver({
           ownerId,
           recordedAt,
           measurement,
           source: this.gateway.source,
           networkFingerprint: fingerprint,
-        }),
-      ),
+        });
+      }),
       catchError((error) => {
         console.error('No se pudo registrar la medición de red', error);
         return EMPTY;

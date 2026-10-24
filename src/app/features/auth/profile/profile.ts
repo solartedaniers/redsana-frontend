@@ -7,10 +7,12 @@ import { PageHeader } from '../../../shared/components/page-header/page-header';
 import { Icon } from '../../../shared/components/icon/icon';
 import { passwordsMatchValidator } from '../../../core/validators/passwords-match.validator';
 import { MIN_PASSWORD_LENGTH } from '../../../core/auth/password-policy';
+import { RuntimeEnvironmentService } from '../../../core/runtime/runtime-environment.service';
+import { AutostartToggle } from '../../../shared/components/autostart-toggle/autostart-toggle';
 
 @Component({
   selector: 'app-profile',
-  imports: [ReactiveFormsModule, TranslatePipe, PageHeader, Icon],
+  imports: [ReactiveFormsModule, TranslatePipe, PageHeader, Icon, AutostartToggle],
   templateUrl: './profile.html',
   styleUrl: './profile.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -19,6 +21,8 @@ export class Profile {
   private readonly fb = inject(FormBuilder);
   private readonly avatarStorage = inject(AvatarStorageGateway);
   protected readonly auth = inject(AuthService);
+  /** El inicio con Windows solo existe en el escritorio. */
+  protected readonly isDesktop = inject(RuntimeEnvironmentService).isDesktop;
 
   protected readonly isSavingProfile = signal(false);
   protected readonly profileErrorKey = signal<string | null>(null);

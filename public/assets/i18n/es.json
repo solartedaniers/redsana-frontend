@@ -168,7 +168,13 @@
       "changePassword": "Actualizar contraseña",
       "changeAvatar": "Cambiar foto",
       "savedMessage": "Perfil actualizado correctamente.",
-      "passwordChangedMessage": "Contraseña actualizada correctamente."
+      "passwordChangedMessage": "Contraseña actualizada correctamente.",
+      "autostart": {
+        "title": "Inicio con Windows",
+        "label": "Iniciar RedSana con Windows",
+        "hint": "Al encender el equipo, RedSana arranca en la bandeja del sistema y empieza a medir, sin abrir la ventana.",
+        "error": "No se pudo cambiar el inicio con Windows. Inténtalo de nuevo."
+      }
     },
     "errors": {
       "required": "Este campo es obligatorio.",
@@ -236,7 +242,13 @@
         "ok": {
           "verdict": "Todo bien: tu router y tu internet responden con normalidad."
         },
-        "possibleBusyDevice": "Posiblemente un dispositivo está usando mucha red, porque hay muchos conectados. Es solo una posibilidad: revisa en Dispositivos cuáles están conectados."
+        "possibleBusyDevice": "Posiblemente un dispositivo está usando mucha red, porque hay muchos conectados. Es solo una posibilidad: revisa en Dispositivos cuáles están conectados.",
+        "router_unreachable": {
+          "verdict": "El problema parece estar en tu WiFi o en tu router: internet no responde y tu router tampoco, aunque hace poco sí respondía.",
+          "restart": "comprueba que este equipo siga conectado a tu WiFi y que las luces del router estén como siempre. Si todo parece normal y sigue sin responder, reinícialo: apágalo, espera 30 segundos y vuelve a encenderlo."
+        },
+        "routerNoReply": "Tu router no respondió en esta medición.",
+        "offlineNote": "Sin conexión con el servidor: diagnóstico hecho en este equipo con la medición de las {{time}}."
       }
     },
     "securityAssistant": {

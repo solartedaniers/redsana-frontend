@@ -1,0 +1,15 @@
+<label class="autostart">
+  <input
+    #toggle
+    type="checkbox"
+    role="switch"
+    [checked]="enabled() === true"
+    [disabled]="enabled() === null || busy()"
+    (change)="change(toggle)"
+  />
+  <span class="autostart__label">{{ 'auth.profile.autostart.label' | translate }}</span>
+</label>
+<p class="autostart__hint">{{ 'auth.profile.autostart.hint' | translate }}</p>
+@if (errorKey(); as key) {
+  <p class="form-error">{{ key | translate }}</p>
+}

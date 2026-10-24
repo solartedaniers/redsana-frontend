@@ -15,11 +15,14 @@ const diagnosis = (lang) =>
 for (const [lang, possibility] of Object.entries(POSSIBILITY_WORDS)) {
   test(`${lang}: cada diagnóstico tiene su texto y el de "antes de reiniciar" cuando hay problema`, () => {
     const texts = diagnosis(lang);
-    for (const key of ['title', 'routerLatency', 'restartLabel', 'possibleBusyDevice'])
+    for (const key of ['title', 'routerLatency', 'routerNoReply', 'offlineNote', 'restartLabel', 'possibleBusyDevice'])
       assert.ok(texts[key]?.trim(), key);
-    for (const kind of ['router', 'provider', 'ok']) assert.ok(texts[kind]?.verdict?.trim(), `${kind}.verdict`);
-    for (const kind of ['router', 'provider']) assert.ok(texts[kind]?.restart?.trim(), `${kind}.restart`);
+    for (const kind of ['router', 'router_unreachable', 'provider', 'ok'])
+      assert.ok(texts[kind]?.verdict?.trim(), `${kind}.verdict`);
+    for (const kind of ['router', 'router_unreachable', 'provider'])
+      assert.ok(texts[kind]?.restart?.trim(), `${kind}.restart`);
     assert.match(texts.routerLatency, /\{\{ms\}\}/);
+    assert.match(texts.offlineNote, /\{\{time\}\}/);
   });
 
   test(`${lang}: la pista de dispositivo saturando se presenta como posible, nunca como hecho`, () => {

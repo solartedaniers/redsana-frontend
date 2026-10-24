@@ -1,3 +1,4 @@
+mod autostart;
 mod console_command;
 mod lan_scan;
 mod pending_measurements;
@@ -11,6 +12,11 @@ pub fn run() {
   tauri::Builder::default()
     // Primero: abrir la app otra vez muestra la ventana que ya está en la bandeja, sin otra copia que mida doble.
     .plugin(tauri_plugin_single_instance::init(|app, _args, _cwd| tray::show_main_window(app)))
+    // Apagado por defecto: no escribe nada en Windows hasta que el interruptor del perfil llame a set_autostart.
+    .plugin(tauri_plugin_autostart::init(
+      tauri_plugin_autostart::MacosLauncher::LaunchAgent,
+      Some(vec![autostart::AUTOSTART_ARG]),
+    ))
     .manage(tray::TrayState::default())
     .on_window_event(|window, event| {
       if let tauri::WindowEvent::CloseRequested { api, .. } = event {
@@ -25,6 +31,7 @@ pub fn run() {
             .build(),
         )?;
       }
+      autostart::show_window_unless_autostart(app.handle());
       Ok(())
     })
     .invoke_handler(tauri::generate_handler![
@@ -37,7 +44,10 @@ pub fn run() {
       lan_scan::scan_present_devices,
       lan_scan::current_gateway_mac,
       router_ports::scan_router_open_ports,
-      tray::install_tray
+      tray::install_tray,
+      autostart::is_autostart_launch,
+      autostart::autostart_enabled,
+      autostart::set_autostart
     ])
     .run(tauri::generate_context!())
     .expect("error while running tauri application");

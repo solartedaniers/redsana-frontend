@@ -22,6 +22,9 @@ import { TranslatePipe } from '../../../core/i18n/translate.pipe';
 import { DatePipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { APP_PATHS } from '../../../core/routing/app-paths';
+import { RuntimeEnvironmentService } from '../../../core/runtime/runtime-environment.service';
+import { LocalNetworkDiagnosisService } from '../../../core/local-diagnosis/local-network-diagnosis.service';
+import { LOCAL_DIAGNOSIS_CONFIG } from '../../../core/local-diagnosis/local-diagnosis.config';
 
 const STATUS_AURA: Record<NetworkStatus, LatencySeverity | null> = {
   good: 'healthy',
@@ -53,6 +56,8 @@ export class Dashboard {
   protected readonly paths = APP_PATHS;
   protected readonly latencyLabelKey = latencyLabelKey;
   private readonly metricsRepository = inject(NetworkMetricsRepository);
+  private readonly isDesktop = inject(RuntimeEnvironmentService).isDesktop;
+  private readonly localDiagnosis = inject(LocalNetworkDiagnosisService);
 
   protected readonly snapshot = signal<NetworkMetricSnapshot | null>(null);
   protected readonly history = signal<NetworkMetricSample[]>([]);
@@ -63,13 +68,31 @@ export class Dashboard {
   protected readonly hasData = computed(() => hasMeasurement(this.snapshot()));
   protected readonly isLive = computed(() => isLiveMeasurement(this.snapshot(), Math.max(this.clock(), Date.now())));
   protected readonly aura = computed(() => STATUS_AURA[this.snapshot()?.status ?? 'unknown']);
+  /** Hora local de la última respuesta del servidor: se compara con la medición del equipo, que usa el mismo reloj. */
+  private readonly snapshotReceivedAt = signal(Date.now());
+  /**
+   * Solo escritorio: con el servidor sin responder (internet caído o backend caído) el panel usa el diagnóstico hecho
+   * en el equipo con su última medición. Las tarjetas siguen mostrando lo último que guardó el servidor.
+   */
+  protected readonly offlineDiagnosis = computed(() => {
+    const local = this.isDesktop ? this.localDiagnosis.current() : null;
+    if (!local) {
+      return null;
+    }
+    const receivedAt = this.snapshotReceivedAt();
+    const serverSilent = Math.max(this.clock(), Date.now()) - receivedAt >= LOCAL_DIAGNOSIS_CONFIG.serverSilentAfterMs;
+    return serverSilent && Date.parse(local.recordedAt) > receivedAt ? local : null;
+  });
 
   constructor() {
     // watchSnapshot ya reconsulta solo; takeUntilDestroyed evita que cada visita deje otro sondeo vivo para siempre.
     this.metricsRepository
       .watchSnapshot()
       .pipe(takeUntilDestroyed())
-      .subscribe((snapshot) => this.snapshot.set(snapshot));
+      .subscribe((snapshot) => {
+        this.snapshot.set(snapshot);
+        this.snapshotReceivedAt.set(Date.now());
+      });
     // Si fallan, el panel queda como sin datos (gráfico vacío, sin aviso de calibración) en vez de dejar un error sin
     // manejar; el snapshot sigue sondeando por su cuenta.
     this.metricsRepository.getHistory().subscribe({

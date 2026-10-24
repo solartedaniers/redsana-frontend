@@ -89,4 +89,14 @@
       </button>
     </form>
   </section>
+
+  @if (isDesktop) {
+    <section class="profile-section">
+      <h2>{{ 'auth.profile.autostart.title' | translate }}</h2>
+      <!-- @defer: el interruptor queda en un archivo aparte que la web nunca descarga. -->
+      @defer {
+        <app-autostart-toggle />
+      }
+    </section>
+  }
 </div>

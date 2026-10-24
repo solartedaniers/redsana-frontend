@@ -5,6 +5,12 @@ import { NEVER, Subject, config, of, throwError } from 'rxjs';
 import { NetworkMetricSnapshot } from '../../../core/models/network.model';
 import { NetworkMetricsRepository } from '../../../core/repositories/network-metrics.repository';
 import { Dashboard } from './dashboard';
+import { signal } from '@angular/core';
+import { RuntimeEnvironmentService } from '../../../core/runtime/runtime-environment.service';
+import {
+  LocalDiagnosis,
+  LocalNetworkDiagnosisService,
+} from '../../../core/local-diagnosis/local-network-diagnosis.service';
 
 describe('Dashboard live snapshot', () => {
   it('deja de sondear al salir de la pantalla (no acumula intervals entre visitas)', () => {
@@ -180,5 +186,88 @@ describe('Dashboard diagnóstico router / proveedor', () => {
 
   it('con el instalador 0.1.5 (sin dato del router) no muestra diagnóstico', () => {
     expect(render({ source: 'native', diagnosis: null }).querySelector('app-network-diagnosis-panel')).toBeNull();
+  });
+});
+
+describe('Dashboard sin conexión con el servidor (escritorio)', () => {
+  const T0 = Date.parse('2026-10-24T12:00:00Z');
+  const LOCAL_INTERNET_DOWN = {
+    diagnosis: 'provider' as const,
+    gatewayLatencyMs: 4,
+    recordedAt: new Date(T0 + 60_000).toISOString(),
+  };
+
+  beforeEach(() => vi.useFakeTimers({ toFake: ['Date'] }));
+  afterEach(() => vi.useRealTimers());
+
+  function render(isDesktop: boolean) {
+    vi.setSystemTime(T0);
+    const local = signal<LocalDiagnosis | null>(null);
+    TestBed.configureTestingModule({
+      providers: [
+        provideHttpClient(),
+        provideRouter([]),
+        { provide: RuntimeEnvironmentService, useValue: { isDesktop } },
+        { provide: LocalNetworkDiagnosisService, useValue: { current: local } },
+        {
+          provide: NetworkMetricsRepository,
+          useValue: {
+            // Lo último que llegó del servidor antes del corte: todo bien.
+            watchSnapshot: () =>
+              of({
+                status: 'good',
+                latencyMs: 20,
+                jitterMs: 1,
+                packetLossPercent: 0,
+                updatedAt: new Date(T0).toISOString(),
+                source: 'native',
+                gatewayLatencyMs: 4,
+                diagnosis: 'ok',
+              }),
+            getHistory: () => of([]),
+            getAnomalyStatus: () => NEVER,
+          },
+        },
+      ],
+    });
+    const fixture = TestBed.createComponent(Dashboard);
+    fixture.detectChanges();
+    return { fixture, local, element: fixture.nativeElement as HTMLElement };
+  }
+
+  const panel = (element: HTMLElement) => element.querySelector('app-network-diagnosis-panel');
+
+  it('con el servidor callado, el panel usa la última medición del equipo y lo dice; las tarjetas no cambian', () => {
+    const { fixture, local, element } = render(true);
+
+    vi.setSystemTime(T0 + 60_000);
+    local.set(LOCAL_INTERNET_DOWN);
+    fixture.detectChanges();
+
+    expect(panel(element)?.getAttribute('data-diagnosis')).toBe('provider');
+    expect(element.querySelector('.diagnosis__offline')?.textContent).toContain('user.dashboard.diagnosis.offlineNote');
+    expect(element.querySelector('app-metric-card')?.textContent).toContain('20');
+  });
+
+  it('si el servidor respondió hace poco, manda el diagnóstico del servidor', () => {
+    const { fixture, local, element } = render(true);
+
+    vi.setSystemTime(T0 + 5_000);
+    local.set({ ...LOCAL_INTERNET_DOWN, recordedAt: new Date(T0 + 5_000).toISOString() });
+    fixture.detectChanges();
+
+    expect(panel(element)?.getAttribute('data-diagnosis')).toBe('ok');
+    expect(element.querySelector('.diagnosis__offline')).toBeNull();
+  });
+
+  it('la web nunca usa el diagnóstico del equipo', () => {
+    const { fixture, local, element } = render(false);
+
+    vi.setSystemTime(T0 + 60_000);
+    local.set(LOCAL_INTERNET_DOWN);
+    fixture.detectChanges();
+
+    expect(panel(element)?.getAttribute('data-diagnosis')).toBe('ok');
+    expect(element.querySelector('.diagnosis__offline')).toBeNull();
   });
 });

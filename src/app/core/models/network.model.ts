@@ -17,7 +17,7 @@ export interface NetworkMetricSnapshot {
 }
 
 /** Debe coincidir con NetworkDiagnosis del backend. */
-export type NetworkDiagnosis = 'router' | 'provider' | 'ok';
+export type NetworkDiagnosis = 'router' | 'router_unreachable' | 'provider' | 'ok';
 
 export interface NetworkMetricSample {
   timestamp: string;

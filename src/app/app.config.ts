@@ -119,12 +119,19 @@ export const appConfig: ApplicationConfig = {
     provideAppInitializer(() => inject(NetworkThresholdsService).start()),
     // Igual con los rangos y pesos del puntaje de seguridad.
     provideAppInitializer(() => inject(SecurityScoreConfigService).start()),
-    // Bandeja del sistema, solo escritorio: import() la deja en un archivo aparte que la web nunca descarga.
+    // Bandeja del sistema y reintento de sesión al arrancar con Windows, solo escritorio: import() los deja en archivos
+    // aparte que la web nunca descarga.
     provideAppInitializer(() => {
       if (inject(RuntimeEnvironmentService).isDesktop) {
         const injector = inject(Injector);
-        void import('./core/desktop-tray/desktop-tray.service')
-          .then(({ DesktopTrayService }) => injector.get(DesktopTrayService))
+        void Promise.all([
+          import('./core/desktop-tray/desktop-tray.service'),
+          import('./core/desktop-autostart/autostart-session-retry.service'),
+        ])
+          .then(([{ DesktopTrayService }, { AutostartSessionRetry }]) => {
+            injector.get(DesktopTrayService);
+            injector.get(AutostartSessionRetry);
+          })
           .catch((error: unknown) => console.error(error));
       }
     }),

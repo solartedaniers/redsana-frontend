@@ -34,7 +34,14 @@
     </article>
   </div>
 
-  @if (data.diagnosis; as diagnosis) {
+  @if (offlineDiagnosis(); as local) {
+    <app-network-diagnosis-panel
+      class="diagnosis-section"
+      [diagnosis]="local.diagnosis"
+      [gatewayLatencyMs]="local.gatewayLatencyMs ?? 0"
+      [offlineMeasuredAt]="local.recordedAt"
+    />
+  } @else if (data.diagnosis; as diagnosis) {
     <app-network-diagnosis-panel
       class="diagnosis-section"
       [diagnosis]="diagnosis"

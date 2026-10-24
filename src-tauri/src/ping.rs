@@ -7,8 +7,10 @@ use tokio::net::lookup_host;
 
 use crate::lan_scan::current_gateway;
 
-/// Host de referencia cuando el llamador no indica uno.
+/// Host de referencia cuando el llamador no indica uno; se cambia con esta variable de entorno (por ejemplo, para
+/// simular un corte de internet en pruebas con una dirección que no responde).
 const DEFAULT_PING_TARGET: &str = "1.1.1.1";
+const PING_TARGET_ENV: &str = "REDSANA_PING_TARGET";
 /// Pings por medición: suficientes para estimar el jitter sin tardar demasiado.
 const QUALITY_SAMPLE_COUNT: u16 = 5;
 /// Espera entre pings para no saturar la red ni el hilo.
@@ -46,7 +48,7 @@ pub async fn measure_latency(host: String) -> Result<f64, String> {
 /// Mide latencia, jitter y pérdida reales con varios pings en una ventana corta.
 #[tauri::command]
 pub async fn measure_network_quality(host: Option<String>) -> Result<NetworkQualityMeasurement, String> {
-    let target = host.unwrap_or_else(|| DEFAULT_PING_TARGET.to_string());
+    let target = ping_target(host, std::env::var(PING_TARGET_ENV).ok());
     let address = resolve_host(&target).await?;
     let client = new_client(address)?;
 
@@ -78,6 +80,12 @@ async fn measure_gateway_latency() -> Option<f64> {
     let client = new_client(gateway).map_err(|e| log::warn!("{e}")).ok()?;
     let timeout = gateway_ping_timeout(std::env::var(GATEWAY_PING_TIMEOUT_ENV).ok().as_deref());
     average_latency(&ping_series(&client, gateway, timeout).await)
+}
+
+/// El host que pide el llamador; si no pide ninguno, el de la variable; vacía o sin definir, el de referencia.
+fn ping_target(host: Option<String>, raw: Option<String>) -> String {
+    host.or_else(|| raw.map(|value| value.trim().to_string()).filter(|value| !value.is_empty()))
+        .unwrap_or_else(|| DEFAULT_PING_TARGET.to_string())
 }
 
 /// Milisegundos positivos de la variable; vacía, cero o inválida deja el valor por defecto.
@@ -277,6 +285,15 @@ mod tests {
     fn a_gateway_that_never_answers_is_absent_not_an_error() {
         let results = vec![Ok(None), send_failed(), Ok(None)];
         assert_eq!(average_latency(&results), None);
+    }
+
+    #[test]
+    fn the_ping_target_comes_from_the_caller_the_variable_or_the_default() {
+        let some = |text: &str| Some(text.to_string());
+        assert_eq!(ping_target(some("8.8.8.8"), some("192.0.2.1")), "8.8.8.8");
+        assert_eq!(ping_target(None, some(" 192.0.2.1 ")), "192.0.2.1");
+        assert_eq!(ping_target(None, some("  ")), DEFAULT_PING_TARGET);
+        assert_eq!(ping_target(None, None), DEFAULT_PING_TARGET);
     }
 
     #[test]

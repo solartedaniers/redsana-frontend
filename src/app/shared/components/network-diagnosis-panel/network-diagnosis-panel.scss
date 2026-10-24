@@ -21,3 +21,9 @@
   font-size: var(--font-size-caption);
   color: var(--color-text-secondary);
 }
+
+.diagnosis__offline {
+  margin: 0;
+  font-size: var(--font-size-caption);
+  color: var(--color-status-warning);
+}

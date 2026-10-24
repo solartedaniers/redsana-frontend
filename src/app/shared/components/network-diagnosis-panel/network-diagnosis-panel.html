@@ -1,7 +1,14 @@
 <section class="surface-panel">
   <div class="surface-panel__header">
     <h2 class="surface-panel__title">{{ 'user.dashboard.diagnosis.title' | translate }}</h2>
-    <p class="surface-panel__copy">{{ 'user.dashboard.diagnosis.routerLatency' | translate: { ms: latency() } }}</p>
+    @if (routerUnreachable()) {
+      <p class="surface-panel__copy">{{ 'user.dashboard.diagnosis.routerNoReply' | translate }}</p>
+    } @else {
+      <p class="surface-panel__copy">{{ 'user.dashboard.diagnosis.routerLatency' | translate: { ms: latency() } }}</p>
+    }
+    @if (offlineTime(); as time) {
+      <p class="diagnosis__offline">{{ 'user.dashboard.diagnosis.offlineNote' | translate: { time } }}</p>
+    }
   </div>
   <div class="diagnosis__body">
     <p class="diagnosis__verdict">{{ verdictKey() | translate }}</p>

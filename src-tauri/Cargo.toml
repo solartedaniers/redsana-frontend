@@ -26,3 +26,4 @@ tauri-plugin-log = "2"
 tauri-plugin-single-instance = "2"
 surge-ping = "0.9"
 tokio = { version = "1", features = ["net", "rt", "time", "sync"] }
+tauri-plugin-autostart = "2"
