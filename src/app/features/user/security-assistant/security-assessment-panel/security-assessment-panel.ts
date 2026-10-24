@@ -11,6 +11,7 @@ import {
 } from '../../../../core/models/security.model';
 import { SecurityAssistantRepository } from '../../../../core/repositories/security-assistant.repository';
 import { SecurityEvidenceCollector } from '../../../../core/security-evidence/security-evidence.collector';
+import { SecurityScoreConfigService } from '../../../../core/security-score-config/security-score-config.service';
 import { WifiEncryptionGateway } from '../../../../core/wifi-encryption/wifi-encryption.gateway';
 import { ScoreGauge } from '../../../../shared/components/score-gauge/score-gauge';
 import { PrescriptionList } from '../prescription-list/prescription-list';
@@ -27,6 +28,7 @@ export class SecurityAssessmentPanel {
   private readonly repository = inject(SecurityAssistantRepository);
   private readonly wifiGateway = inject(WifiEncryptionGateway);
   private readonly evidenceCollector = inject(SecurityEvidenceCollector);
+  private readonly scoreConfig = inject(SecurityScoreConfigService).config;
 
   /** Id de la evaluación recién guardada. */
   readonly assessed = output<string>();
@@ -38,6 +40,7 @@ export class SecurityAssessmentPanel {
   protected readonly isLoadingLatest = signal(true);
   protected readonly wifiEncryptionRaw = signal<string | null>(null);
   protected readonly isWifiDetectionAvailable = this.wifiGateway.isAvailable;
+  protected readonly technicalWeight = computed(() => this.scoreConfig().technicalWeightPercent);
 
   protected readonly wifiEncryptionStatus = computed(() => evaluateWifiEncryption(this.wifiEncryptionRaw()));
   protected readonly allAnswered = computed(

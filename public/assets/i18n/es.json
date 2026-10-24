@@ -379,9 +379,9 @@
       },
       "score": {
         "partialLabel": "Parcial · solo cuestionario",
-        "partialNotice": "El 70 % del puntaje sale del análisis técnico de tu red (cifrado WiFi y puertos del router), que solo puede hacer la app de escritorio.",
-        "questionnaire": "Cuestionario: {{score}}/100 (30 %)",
-        "technical": "Análisis técnico: {{score}}/100 (70 %)",
+        "partialNotice": "El {{weight}} % del puntaje sale del análisis técnico de tu red (cifrado WiFi y puertos del router), que solo puede hacer la app de escritorio.",
+        "questionnaire": "Cuestionario: {{score}}/100 ({{weight}} %)",
+        "technical": "Análisis técnico: {{score}}/100 ({{weight}} %)",
         "reusedTechnicalAnalysis": "Análisis técnico del {{date}}, hecho desde la app de escritorio."
       },
       "urgency": {

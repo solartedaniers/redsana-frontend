@@ -379,9 +379,9 @@
       },
       "score": {
         "partialLabel": "Partial · questionnaire only",
-        "partialNotice": "70% of the score comes from the technical analysis of your network (WiFi encryption and router ports), which only the desktop app can perform.",
-        "questionnaire": "Questionnaire: {{score}}/100 (30%)",
-        "technical": "Technical analysis: {{score}}/100 (70%)",
+        "partialNotice": "{{weight}}% of the score comes from the technical analysis of your network (WiFi encryption and router ports), which only the desktop app can perform.",
+        "questionnaire": "Questionnaire: {{score}}/100 ({{weight}}%)",
+        "technical": "Technical analysis: {{score}}/100 ({{weight}}%)",
         "reusedTechnicalAnalysis": "Technical analysis from {{date}}, done from the desktop app."
       },
       "urgency": {

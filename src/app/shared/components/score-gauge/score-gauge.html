@@ -22,10 +22,10 @@
   @if (parts(); as p) {
     <figcaption class="legend">
       <span class="legend__item legend__item--questionnaire">
-        {{ 'user.securityAssistant.score.questionnaire' | translate: { score: p.questionnaire } }}
+        {{ 'user.securityAssistant.score.questionnaire' | translate: { score: p.questionnaire, weight: weights().questionnaire } }}
       </span>
       <span class="legend__item legend__item--technical">
-        {{ 'user.securityAssistant.score.technical' | translate: { score: p.technical } }}
+        {{ 'user.securityAssistant.score.technical' | translate: { score: p.technical, weight: weights().technical } }}
       </span>
     </figcaption>
   }

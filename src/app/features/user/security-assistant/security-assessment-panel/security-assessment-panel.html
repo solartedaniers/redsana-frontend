@@ -10,7 +10,7 @@
       />
       @if (data.isPartial) {
         <span class="status-badge">{{ 'user.securityAssistant.score.partialLabel' | translate }}</span>
-        <p>{{ 'user.securityAssistant.score.partialNotice' | translate }}</p>
+        <p>{{ 'user.securityAssistant.score.partialNotice' | translate: { weight: technicalWeight() } }}</p>
       } @else if (data.technicalEvidenceReused) {
         <p>{{ 'user.securityAssistant.score.reusedTechnicalAnalysis' | translate: { date: (data.technicalMeasuredAt | date: 'shortDate') ?? '' } }}</p>
       }
