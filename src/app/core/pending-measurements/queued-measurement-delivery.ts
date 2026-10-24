@@ -62,8 +62,10 @@ export class QueuedMeasurementDelivery extends MeasurementDelivery {
 
   private async send(item: PendingMeasurement): Promise<SendOutcome> {
     try {
+      // sentAt sale del mismo reloj que recordedAt: el backend solo usa la diferencia y un reloj mal puesto no afecta.
+      const sentAt = new Date().toISOString();
       await firstValueFrom(
-        this.metrics.record(item.measurement, item.source, item.networkFingerprint, item.recordedAt),
+        this.metrics.record(item.measurement, item.source, item.networkFingerprint, item.recordedAt, sentAt),
       );
       return 'done';
     } catch (error) {

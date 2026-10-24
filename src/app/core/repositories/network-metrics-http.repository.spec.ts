@@ -62,23 +62,27 @@ describe('NetworkMetricsHttpRepository.watchSnapshot', () => {
 });
 
 describe('NetworkMetricsHttpRepository.record', () => {
-  function sentBody(recordedAt?: string) {
+  function sentBody(recordedAt?: string, sentAt?: string) {
     TestBed.configureTestingModule({
       providers: [NetworkMetricsHttpRepository, provideHttpClient(), provideHttpClientTesting()],
     });
     TestBed.inject(NetworkMetricsHttpRepository)
-      .record({ latencyMs: 20, jitterMs: 1, packetLossPercent: 0 }, 'native', null, recordedAt)
+      .record({ latencyMs: 20, jitterMs: 1, packetLossPercent: 0 }, 'native', null, recordedAt, sentAt)
       .subscribe();
     const request = TestBed.inject(HttpTestingController).expectOne((req) => req.method === 'POST');
     // HttpClient serializa con JSON.stringify: un campo undefined no viaja.
     return JSON.parse(JSON.stringify(request.request.body)) as Record<string, unknown>;
   }
 
-  it('lo que sale de la cola lleva su hora original', () => {
-    expect(sentBody('2026-10-24T12:00:00.000Z')['recorded_at']).toBe('2026-10-24T12:00:00.000Z');
+  it('lo que sale de la cola lleva su hora original y la hora de envío', () => {
+    const body = sentBody('2026-10-24T12:00:00.000Z', '2026-10-24T12:05:00.000Z');
+    expect(body['recorded_at']).toBe('2026-10-24T12:00:00.000Z');
+    expect(body['sent_at']).toBe('2026-10-24T12:05:00.000Z');
   });
 
   it('sin hora no manda el campo y el backend usa la suya, como antes', () => {
-    expect(sentBody()).not.toHaveProperty('recorded_at');
+    const body = sentBody();
+    expect(body).not.toHaveProperty('recorded_at');
+    expect(body).not.toHaveProperty('sent_at');
   });
 });

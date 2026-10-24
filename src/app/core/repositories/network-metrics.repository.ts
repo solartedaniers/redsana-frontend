@@ -16,11 +16,13 @@ export abstract class NetworkMetricsRepository {
   /** networkFingerprint: hash de la red actual (solo escritorio); null si no se pudo identificar. */
   /** recordedAt: hora en que se tomó (ISO), para lo que llega tarde; el backend la usa para no guardar dos veces un
    * reenvío. Sin ella el backend usa su propia hora. */
+  /** sentAt: hora del reloj del equipo al enviar; con ella el backend corrige recordedAt si el reloj está mal puesto. */
   abstract record(
     measurement: NetworkQualityMeasurement,
     source: MeasurementSource,
     networkFingerprint: string | null,
     recordedAt?: string,
+    sentAt?: string,
   ): Observable<NetworkMetricSnapshot>;
   abstract getAnomalyStatus(householdId?: string): Observable<AnomalyDetectionStatus>;
 }

@@ -34,7 +34,8 @@ class FakeBackend {
   online = true;
   rejects = new Set<string>();
   received: string[] = [];
-  record = (_m: unknown, _s: unknown, _f: unknown, recordedAt: string): Observable<object> => {
+  sentAts: string[] = [];
+  record = (_m: unknown, _s: unknown, _f: unknown, recordedAt: string, sentAt: string): Observable<object> => {
     if (!this.online) {
       return throwError(() => OFFLINE);
     }
@@ -42,6 +43,7 @@ class FakeBackend {
       return throwError(() => new HttpErrorResponse({ status: HttpStatusCode.UnprocessableEntity }));
     }
     this.received.push(recordedAt);
+    this.sentAts.push(sentAt);
     return of({});
   };
 }
@@ -111,6 +113,20 @@ describe('QueuedMeasurementDelivery (cola local del escritorio)', () => {
 
     expect(backend.received).toEqual([0, 1, 2, 3].map((m) => at(m).recordedAt));
     expect(storage.saved).toEqual([]);
+  });
+
+  it('cada envío lleva la hora del equipo al enviar, para que el backend corrija un reloj mal puesto', async () => {
+    vi.setSystemTime(START);
+    backend.online = false;
+    const delivery = openApp(storage, backend);
+    await settle(delivery.deliver(at(0)));
+
+    vi.setSystemTime(START + 5 * 60_000);
+    backend.online = true;
+    await settle(delivery.deliver(at(5)));
+
+    expect(backend.received[0]).toBe(at(0).recordedAt);
+    expect(Date.parse(backend.sentAts[0])).toBeGreaterThanOrEqual(START + 5 * 60_000);
   });
 
   it('sobrevive a cerrar la app: otra instancia envía lo que quedó guardado', async () => {
