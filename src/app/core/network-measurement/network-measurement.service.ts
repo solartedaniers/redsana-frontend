@@ -12,10 +12,7 @@ const MEASUREMENT_INTERVAL_MS = MEASUREMENT_CONFIG.intervalMs;
 /** Candado entre pestañas (Web Locks): sin él, cada pestaña guardaba su medición y sesgaba la calibración. */
 const MEASUREMENT_LOCK_NAME = 'redsana-network-measurement';
 
-/**
- * Mide a intervalos y guarda cada resultado sin bloquear el hilo de JS. switchMap evita
- * que dos ciclos se pisen y catchError por ciclo evita que un fallo mate la suscripción.
- */
+// switchMap evita que dos ciclos se pisen y catchError por ciclo evita que un fallo mate la suscripción.
 @Injectable({ providedIn: 'root' })
 export class NetworkMeasurementService {
   private readonly gateway = inject(NetworkMeasurementGateway);

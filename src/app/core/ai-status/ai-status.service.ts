@@ -34,11 +34,8 @@ const TIMED_OUT: AiStatusReport = { status: 'unavailable', reason: 'timed_out' }
 // Un backend anterior responde "unavailable" sin motivo: lo trato como problema del servicio.
 const DEFAULT_REASON: AiUnavailableReason = 'service_error';
 
-/**
- * Tras iniciar sesión despierto la IA y consulto su estado con backoff hasta que esté lista o se agote el tope.
- * El calentamiento lo hace el backend en segundo plano; aquí solo se pide y se lee su estado.
- * Como las mediciones, switchMap corta el ciclo al cerrar sesión o al reintentar, sin dejar consultas vivas.
- */
+// El calentamiento lo hace el backend; aquí solo se pide y se consulta el estado con backoff. switchMap corta el ciclo
+// al cerrar sesión o reintentar, sin dejar consultas vivas.
 @Injectable({ providedIn: 'root' })
 export class AiStatusService {
   private readonly repository = inject(AiStatusRepository);

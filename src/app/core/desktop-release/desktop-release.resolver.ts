@@ -14,10 +14,7 @@ interface GitHubRelease {
   readonly assets: readonly ReleaseAsset[];
 }
 
-/**
- * Busca el instalador de Windows del último release de GitHub. Nunca falla: si algo sale mal
- * devuelvo la página del release. Solo guardo en memoria los enlaces buenos.
- */
+// Nunca falla: si algo sale mal devuelve la página del release. Solo se guardan en memoria los enlaces buenos.
 @Injectable({ providedIn: 'root' })
 export class DesktopReleaseResolver {
   private readonly http = inject(HttpClient);

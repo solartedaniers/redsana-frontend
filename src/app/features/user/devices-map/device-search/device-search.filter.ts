@@ -1,10 +1,7 @@
 import { NetworkDevice } from '../../../../core/models/device.model';
 import { DEVICE_SEARCH_FIELDS, DeviceSearchField, DeviceSearchNormalization, MAC_SEPARATORS } from './device-search.config';
 
-/**
- * Filtra dispositivos por coincidencia parcial en los campos configurados. Es puro: no guarda
- * la búsqueda ni llama al backend, solo decide qué dispositivos ya cargados coinciden.
- */
+// Puro: no guarda la búsqueda ni llama al backend, solo filtra los dispositivos ya cargados.
 export class DeviceSearchFilter {
   constructor(private readonly fields: readonly DeviceSearchField[] = DEVICE_SEARCH_FIELDS) {}
 

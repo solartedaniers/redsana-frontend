@@ -1,7 +1,6 @@
 export interface AiStatusPollConfig {
-  /** Red de seguridad por si el backend nunca contesta: quien decide "no disponible" es el calentamiento del backend
-   * (AI_SERVICE_WARM_UP_TIMEOUT_SECONDS, 600 s en producción), así que debe superarlo más el arranque en frío del propio
-   * backend (~75 s medidos en Render). */
+  // Por si el backend nunca contesta: debe superar su AI_SERVICE_WARM_UP_TIMEOUT_SECONDS (600 s en producción) más
+  // su arranque en frío (~75 s en Render).
   readonly maxWaitMs: number;
   /** Desde cuándo "encendiendo" va acompañado del aviso de que puede tardar unos minutos. */
   readonly slowNoticeAfterMs: number;

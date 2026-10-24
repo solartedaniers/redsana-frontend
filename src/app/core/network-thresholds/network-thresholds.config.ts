@@ -6,10 +6,7 @@ export interface NetworkStatusThresholds {
   readonly packetLossCriticalPercent: number;
 }
 
-/**
- * Respaldo mientras no llegan los del backend (dormido, caído o anterior a ese endpoint): los valores por defecto del
- * backend (NETWORK_STATUS_* en su Settings). Es el único lugar del frontend con estos números.
- */
+// Respaldo mientras no llegan los del backend (dormido, caído o anterior al endpoint): sus valores por defecto.
 export const FALLBACK_NETWORK_STATUS_THRESHOLDS: NetworkStatusThresholds = {
   latencyWarningMs: 80,
   latencyCriticalMs: 150,

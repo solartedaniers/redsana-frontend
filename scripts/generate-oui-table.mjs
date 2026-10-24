@@ -1,5 +1,4 @@
-// Regenera src/app/core/domain/oui-device-kinds.generated.ts a partir del
-// registro de fabricantes (OUI) de la IEEE, vía el espejo que publica Wireshark.
+// Regenera oui-device-kinds.generated.ts desde el registro OUI de la IEEE (espejo de Wireshark).
 // Uso: node scripts/generate-oui-table.mjs
 import { writeFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
@@ -7,9 +6,8 @@ import { fileURLToPath } from 'node:url';
 const MANUF_URL = 'https://www.wireshark.org/download/automated/data/manuf';
 const TARGET_FILE = fileURLToPath(new URL('../src/app/core/domain/oui-device-kinds.generated.ts', import.meta.url));
 
-// Solo fabricantes cuyos prefijos corresponden casi siempre a un mismo tipo de
-// equipo. Marcas que fabrican de todo (Apple, Samsung, Xiaomi, Huawei, HP,
-// Foxconn...) quedan fuera a propósito: su MAC no dice si es PC o celular.
+// Solo fabricantes de un único tipo de equipo; los que fabrican de todo (Apple, Samsung...) quedan fuera porque su MAC
+// no dice si es PC o celular.
 const COMPUTER_VENDORS = [
   /^Intel Corporate$/, // tarjetas WiFi/Ethernet de laptops y PCs
   /^Compal Information/, // fabricante de laptops (ODM)

@@ -52,10 +52,8 @@ export class AuthService {
   /** La restauración encontró la cuenta suspendida: el login lo avisa al llegar. */
   readonly accountSuspended = this.suspended.asReadonly();
 
-  /**
-   * Recupera la sesión guardada sin frenar el arranque: la app se pinta ya y solo las pantallas protegidas esperan.
-   * Mientras Render despierta el backend, /api/users/me falla o tarda; insisto hasta el plazo y, si vence, queda "failed".
-   */
+  // No frena el arranque: solo las pantallas protegidas esperan. Mientras Render despierta, /api/users/me falla o
+  // tarda; insisto hasta el plazo y, si vence, queda "failed".
   startRestore(): void {
     this.restoreSubscription?.unsubscribe();
     this.restoreState.set('pending');

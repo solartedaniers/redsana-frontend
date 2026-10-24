@@ -70,9 +70,8 @@ export const appConfig: ApplicationConfig = {
     provideRouter(routes),
     provideHttpClient(withInterceptors([authInterceptor, pageExitInterceptor])),
     provideAnimationsAsync(),
-    // La landing prerenderizada se hidrata en vez de volver a pintarse. Las rutas CSR no traen datos de hidratación y
-    // Angular la salta solo. En Tauri no: carga ese mismo index.html pero redirige al login (la landing es solo web).
-    // Sin caché de transferencia: el cliente pide sus datos igual que antes y nada del build queda congelado en el HTML.
+    // Solo la landing prerenderizada se hidrata; en Tauri no (redirige al login). Sin caché de transferencia para que
+    // nada del build quede congelado en el HTML.
     ...(isTauri() ? [] : [provideClientHydration(withNoHttpTransferCache())]),
 
     // Cada dominio depende de su clase abstracta: cambiar de proveedor es tocar solo el useClass de aquí.

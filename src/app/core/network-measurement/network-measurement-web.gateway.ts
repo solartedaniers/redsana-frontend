@@ -11,10 +11,7 @@ const SAMPLE_COUNT = 5;
 const SAMPLE_INTERVAL_MS = 200;
 const SAMPLE_TIMEOUT_MS = 1000;
 
-/**
- * El navegador no puede enviar ICMP: mido peticiones HTTP al backend desde un Web Worker.
- * Ojo: incluye lo que tarda el servidor, por eso sale más alta que el ping nativo.
- */
+// El navegador no puede enviar ICMP: mide HTTP al backend, que incluye lo que tarda el servidor (más que un ping).
 @Injectable()
 export class NetworkMeasurementWebGateway extends NetworkMeasurementGateway {
   readonly source = 'web';

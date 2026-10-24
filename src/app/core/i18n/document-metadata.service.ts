@@ -13,10 +13,8 @@ const APP_NAME_KEY = 'common.appName';
 const DESCRIPTION_KEY = 'common.seo.description';
 const OG_LOCALE_KEY = 'common.seo.ogLocale';
 
-/**
- * Mantiene en el idioma activo el título, el lang de <html> (lectores de pantalla y traductores lo leen) y las
- * etiquetas para buscadores y redes. Corre también al prerenderizar, así que la landing sale con todo en el HTML.
- */
+// El lang de <html> lo leen lectores de pantalla y traductores. Corre también al prerenderizar, así que la landing
+// sale con todo en el HTML.
 @Injectable({ providedIn: 'root' })
 export class DocumentMetadataService {
   private readonly i18n = inject(I18nService);

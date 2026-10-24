@@ -2,10 +2,7 @@ import { ChangeDetectionStrategy, Component, input, model } from '@angular/core'
 import { TranslatePipe } from '../../../../core/i18n/translate.pipe';
 import { Icon } from '../../../../shared/components/icon/icon';
 
-/**
- * Campo de búsqueda de la lista de dispositivos: solo maneja el texto (limpiar, Escape) y
- * muestra el conteo. Quién coincide lo decide DeviceSearchFilter en la pantalla.
- */
+// Solo maneja el texto y el conteo; quién coincide lo decide DeviceSearchFilter.
 @Component({
   selector: 'app-device-search-box',
   imports: [TranslatePipe, Icon],

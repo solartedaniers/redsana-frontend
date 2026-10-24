@@ -4,10 +4,8 @@ import { Injectable, PLATFORM_ID, inject } from '@angular/core';
 import { EMPTY, catchError } from 'rxjs';
 import { BACKEND_HEALTH_URL } from './backend-endpoints';
 
-/**
- * Render apaga el backend gratuito tras un rato sin uso y tarda cerca de un minuto en volver. Lo despierto apenas se
- * abre el login, mientras el usuario escribe, para que iniciar sesión no cargue con esa espera.
- */
+// Render duerme el backend gratuito y tarda cerca de un minuto en volver: lo despierto al abrir el login, mientras el
+// usuario escribe.
 @Injectable({ providedIn: 'root' })
 export class BackendWakeUpService {
   private readonly http = inject(HttpClient);

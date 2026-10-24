@@ -11,10 +11,8 @@ import { AuthRepository } from './auth.repository';
 import { SupabaseAuthRepository } from './auth-supabase.repository';
 import { supabaseClient } from './supabase-client';
 
-/**
- * Fija lo que hace hoy la autenticación con Supabase, vista desde AuthRepository: el cliente de Supabase está simulado
- * método a método y el backend con HttpTestingController. Ninguna prueba sale a la red (fetch queda vigilado).
- */
+// Fija el comportamiento de AuthRepository con Supabase y el backend simulados; fetch queda vigilado para que nada
+// salga a la red.
 
 const ME_URL = `${environment.apiBaseUrl}/api/users/me`;
 const EXPIRES_AT = 1_800_000_000;

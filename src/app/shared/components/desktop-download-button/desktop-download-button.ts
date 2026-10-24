@@ -5,10 +5,7 @@ import { DesktopInstallerLink, DesktopReleaseResolver } from '../../../core/desk
 import { TranslatePipe } from '../../../core/i18n/translate.pipe';
 import { RuntimeEnvironmentService } from '../../../core/runtime/runtime-environment.service';
 
-/**
- * Único punto de descarga: pide el instalador del último release y navega a él; si falla, abre la
- * página del release y lo avisa. El href conserva esa página para que funcione sin scripts.
- */
+// Si no encuentra el instalador abre la página del release; el href la conserva para que funcione sin scripts.
 @Component({
   selector: 'app-desktop-download-button',
   imports: [TranslatePipe],

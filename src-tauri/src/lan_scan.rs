@@ -718,7 +718,7 @@ fn decode_console_output(bytes: &[u8]) -> String {
         return String::new();
     }
 
-    // ponytail: solo cubre la página de códigos activa al arrancar; si cambia en caliente habría que releer GetOEMCP.
+    // Solo cubre la página de códigos activa al arrancar; si cambia en caliente habría que releer GetOEMCP.
     unsafe {
         let code_page = GetOEMCP();
         let len = MultiByteToWideChar(code_page, 0, bytes.as_ptr(), bytes.len() as i32, ptr::null_mut(), 0);

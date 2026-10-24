@@ -14,11 +14,8 @@ interface BackendThresholds {
   packet_loss_critical_percent: number;
 }
 
-/**
- * Los umbrales del estado de la red vienen del backend, que es quien calcula el estado de cada medición: así el
- * gráfico colorea igual que el dashboard. Los pide una vez por sesión (al iniciarla o restaurarla) y, mientras tanto o
- * si fallan, quedan los de respaldo. Nunca bloquea la carga.
- */
+// Los umbrales vienen del backend, que calcula el estado de cada medición: así el gráfico colorea igual que el
+// dashboard. Una vez por sesión; mientras tanto o si fallan, quedan los de respaldo.
 @Injectable({ providedIn: 'root' })
 export class NetworkThresholdsService {
   private readonly http = inject(HttpClient);

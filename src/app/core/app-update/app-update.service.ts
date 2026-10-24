@@ -4,10 +4,7 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { SwUpdate } from '@angular/service-worker';
 import { EMPTY, filter, map } from 'rxjs';
 
-/**
- * Solo aviso que hay versión nueva; recargar lo decide el usuario para no perder
- * un formulario o un chat a medio escribir. En escritorio el SW está apagado.
- */
+// Solo aviso: recargar lo decide el usuario para no perder un formulario o un chat a medio escribir.
 @Injectable({ providedIn: 'root' })
 export class AppUpdateService {
   private readonly swUpdate = inject(SwUpdate);

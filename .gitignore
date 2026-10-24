@@ -56,7 +56,7 @@ __screenshots__/
 Thumbs.db
 *.log
 
-# Herramientas locales (Claude Code, graphify)
+# Herramientas locales
 .claude/
 .claudeignore
 graphify-out/

@@ -5,10 +5,8 @@ export type LatencySeverity = 'healthy' | 'warning' | 'critical' | 'cut';
 
 const SEVERITY_RANK: Record<LatencySeverity, number> = { healthy: 0, warning: 1, critical: 2, cut: 3 };
 
-/**
- * La misma regla que compute_network_status del backend (latencia o pérdida de paquetes), con sus mismos umbrales,
- * para que el gráfico y el estado del dashboard coincidan. Sin pérdida (backend anterior) clasifica solo por latencia.
- */
+// La misma regla que compute_network_status del backend, para que el gráfico y el dashboard coincidan. Sin pérdida
+// (backend anterior) clasifica solo por latencia.
 export function classifyMeasurement(
   latencyMs: number,
   packetLossPercent: number | undefined,

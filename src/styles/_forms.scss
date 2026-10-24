@@ -230,10 +230,8 @@
   }
 }
 
-// Ventanas bajas y anchas (laptops con escalado de Windows): reparto las columnas por igual y los
-// hallazgos van lado a lado en vez de apilados, para que la hoja quepa sin scroll y sin esconder nada.
-// Por debajo de 60rem de ancho las columnas quedarían tan angostas que la hoja crecería en vez de
-// encogerse. Las media queries no aceptan variables, por eso los cortes van aquí.
+// Ventanas bajas y anchas (laptops con escalado): columnas iguales para que la hoja quepa sin scroll. Bajo 60rem
+// crecería en vez de encogerse; las media queries no aceptan variables, por eso los cortes van aquí.
 @media (min-width: 60rem) and (max-height: 42rem) {
   .auth-split { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
 

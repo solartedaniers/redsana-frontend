@@ -4,10 +4,7 @@ import { PasswordStrengthEvaluator } from '../auth/password-strength/password-st
 /** Clave del error en el control; su valor lista los criterios que faltan. */
 export const STRONG_PASSWORD_ERROR = 'passwordStrength';
 
-/**
- * Exige todos los criterios del medidor, solo donde se elige una contraseña nueva (registro y
- * restablecimiento). En el login no se usa para no dejar fuera contraseñas viejas.
- */
+// Solo donde se elige una contraseña nueva: en el login dejaría fuera contraseñas viejas.
 export function strongPasswordValidator(evaluator = new PasswordStrengthEvaluator()): ValidatorFn {
   return (control: AbstractControl<string | null>): ValidationErrors | null => {
     const password = control.value ?? '';

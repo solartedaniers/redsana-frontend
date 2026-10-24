@@ -7,10 +7,7 @@ const MAX_SCORE = 100;
 const SWEEP_DEGREES = 180;
 const TICK_STEP = 10;
 
-/**
- * Puntaje de seguridad como dial de signos vitales. Si conozco las dos partes, el arco se divide
- * en cuestionario (30 %) y técnico (70 %), cada tramo lleno según su propio puntaje.
- */
+// Con las dos partes, el arco se divide según los pesos del cuestionario y del análisis técnico.
 @Component({
   selector: 'app-score-gauge',
   imports: [TranslatePipe, MetricValue],

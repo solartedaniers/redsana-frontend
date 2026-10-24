@@ -1,10 +1,8 @@
 import { DOCUMENT } from '@angular/common';
 import { Injectable, inject } from '@angular/core';
 
-/**
- * Controla el scroll de la página completa. Lo usa una vista que ocupa la pantalla (el chat ampliado): la llevo arriba
- * para que la barra superior quede visible y bloqueo el scroll de fondo hasta que la vista se cierre.
- */
+// Para vistas a pantalla completa (el chat ampliado): sube la página para que se vea la barra superior y bloquea el
+// scroll de fondo hasta que se cierre.
 @Injectable({ providedIn: 'root' })
 export class PageScrollController {
   private readonly document = inject(DOCUMENT);

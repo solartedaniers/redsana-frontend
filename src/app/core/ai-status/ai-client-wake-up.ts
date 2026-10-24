@@ -8,11 +8,8 @@ export const AI_SERVICE_HEALTH_URL = new InjectionToken<string>('AI_SERVICE_HEAL
   factory: () => (environment.aiServicePublicUrl ? `${environment.aiServicePublicUrl}/health` : ''),
 });
 
-/**
- * Un GET desde el navegador despierta en segundos al servicio de IA dormido en Render, cosa que el calentamiento del
- * backend no siempre logra. Se suma a ese calentamiento: solo se dispara cuando el usuario lo pide (sesión, chat,
- * reintentar), nunca en segundo plano. Silencioso: la respuesta no se lee (no-cors) y los errores se ignoran.
- */
+// Un GET del navegador despierta a la IA de Render más rápido que el calentamiento del backend. Solo ante una acción
+// del usuario, nunca en segundo plano; silencioso (no-cors, errores ignorados).
 @Injectable({ providedIn: 'root' })
 export class AiClientWakeUp {
   private readonly healthUrl = inject(AI_SERVICE_HEALTH_URL);
