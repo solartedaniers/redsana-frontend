@@ -19,6 +19,7 @@ import { DocumentMetadataService } from './core/i18n/document-metadata.service';
 import { AuthRepository } from './core/auth/auth.repository';
 import { SupabaseAuthRepository } from './core/auth/auth-supabase.repository';
 import { authInterceptor } from './core/auth/auth.interceptor';
+import { pageExitInterceptor } from './core/runtime/page-exit.interceptor';
 import { AuthService } from './core/auth/auth.service';
 import { NetworkMetricsRepository } from './core/repositories/network-metrics.repository';
 import { NetworkMetricsHttpRepository } from './core/repositories/network-metrics-http.repository';
@@ -67,7 +68,7 @@ export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
     provideRouter(routes),
-    provideHttpClient(withInterceptors([authInterceptor])),
+    provideHttpClient(withInterceptors([authInterceptor, pageExitInterceptor])),
     provideAnimationsAsync(),
     // La landing prerenderizada se hidrata en vez de volver a pintarse. Las rutas CSR no traen datos de hidratación y
     // Angular la salta solo. En Tauri no: carga ese mismo index.html pero redirige al login (la landing es solo web).
