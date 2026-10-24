@@ -122,6 +122,20 @@ describe('Iniciar sesión', () => {
     expect(error).toEqual(new Error('auth.errors.invalidCredentials'));
   });
 
+  it('con credenciales malas reconoce el código de Supabase aunque el texto sea otro', async () => {
+    const { repository } = setup();
+    vi.spyOn(auth, 'signInWithPassword').mockResolvedValue(
+      answer('signInWithPassword', {
+        data: { session: null },
+        error: { code: 'invalid_credentials', message: 'Credenciales no válidas' },
+      }),
+    );
+
+    const { error } = await settle(firstValueFrom(repository.signIn('demo@example.invalid', 'mala')));
+
+    expect(error).toEqual(new Error('auth.errors.invalidCredentials'));
+  });
+
   it('un error de red de Supabase se traduce como error desconocido', async () => {
     const { repository } = setup();
     vi.spyOn(auth, 'signInWithPassword').mockResolvedValue(
@@ -209,6 +223,17 @@ describe('Registrarse', () => {
     const { repository } = setup();
     vi.spyOn(auth, 'signUp').mockResolvedValue(
       answer('signUp', { data: { session: null }, error: { message: 'User already registered' } }),
+    );
+
+    expect((await settle(firstValueFrom(repository.signUp(payload)))).error).toEqual(
+      new Error('auth.errors.emailTaken'),
+    );
+  });
+
+  it('un correo ya registrado se reconoce por el código de Supabase aunque el texto sea otro', async () => {
+    const { repository } = setup();
+    vi.spyOn(auth, 'signUp').mockResolvedValue(
+      answer('signUp', { data: { session: null }, error: { code: 'user_already_exists', message: 'Ya existe' } }),
     );
 
     expect((await settle(firstValueFrom(repository.signUp(payload)))).error).toEqual(
@@ -403,6 +428,17 @@ describe('Perfil', () => {
     );
   });
 
+  it('al rechazar el nombre también reconoce el código de Supabase', async () => {
+    const { repository } = setup();
+    vi.spyOn(auth, 'updateUser').mockResolvedValue(
+      answer('updateUser', { data: {}, error: { code: 'user_already_exists', message: 'Ya existe' } }),
+    );
+
+    expect((await settle(firstValueFrom(repository.updateProfile('u1', { fullName: 'X' })))).error).toEqual(
+      new Error('auth.errors.emailTaken'),
+    );
+  });
+
   it('si al final no hay sesión, el usuario no existe', async () => {
     const { repository, http } = setup();
     vi.spyOn(auth, 'updateUser').mockResolvedValue(answer('updateUser', { data: {}, error: null }));
@@ -495,6 +531,21 @@ describe('Cambiar la contraseña desde el perfil', () => {
 
     expect((await settle(firstValueFrom(repository.changePassword('u1', payload)))).error).toEqual(
       new Error('auth.errors.unknown'),
+    );
+  });
+
+  it('al rechazar la nueva contraseña también traduce por el código de Supabase', async () => {
+    const { repository } = setup();
+    withUser();
+    vi.spyOn(auth, 'signInWithPassword').mockResolvedValue(
+      answer('signInWithPassword', { data: { session: SUPABASE_SESSION }, error: null }),
+    );
+    vi.spyOn(auth, 'updateUser').mockResolvedValue(
+      answer('updateUser', { data: {}, error: { code: 'invalid_credentials', message: 'Otro texto' } }),
+    );
+
+    expect((await settle(firstValueFrom(repository.changePassword('u1', payload)))).error).toEqual(
+      new Error('auth.errors.invalidCredentials'),
     );
   });
 });

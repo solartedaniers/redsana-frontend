@@ -17,7 +17,7 @@ export class SupabaseCredentials {
   signIn(email: string, password: string): Observable<SupabaseSessionTokens> {
     return from(supabaseClient.auth.signInWithPassword({ email, password })).pipe(
       switchMap(({ data, error }) =>
-        error || !data.session ? throwError(() => new Error(this.errors.toKey(error?.message))) : of(data.session),
+        error || !data.session ? throwError(() => new Error(this.errors.toKey(error))) : of(data.session),
       ),
     );
   }
@@ -32,7 +32,7 @@ export class SupabaseCredentials {
     ).pipe(
       switchMap(({ data, error }) => {
         if (error) {
-          return throwError(() => new Error(this.errors.toKey(error.message)));
+          return throwError(() => new Error(this.errors.toKey(error)));
         }
         if (!data.session) {
           // Con confirmación de correo activa en Supabase no hay sesión hasta que el usuario confirme.
@@ -58,7 +58,7 @@ export class SupabaseCredentials {
   /** Con la sesión actual (la de recuperación o la normal), sin pedir la contraseña anterior. */
   updatePassword(newPassword: string): Observable<void> {
     return from(supabaseClient.auth.updateUser({ password: newPassword })).pipe(
-      switchMap(({ error }) => (error ? throwError(() => new Error(this.errors.toKey(error.message))) : of(undefined))),
+      switchMap(({ error }) => (error ? throwError(() => new Error(this.errors.toKey(error))) : of(undefined))),
     );
   }
 
@@ -86,7 +86,7 @@ export class SupabaseCredentials {
 
   updateFullName(fullName: string): Observable<void> {
     return from(supabaseClient.auth.updateUser({ data: { full_name: fullName } })).pipe(
-      switchMap(({ error }) => (error ? throwError(() => new Error(this.errors.toKey(error.message))) : of(undefined))),
+      switchMap(({ error }) => (error ? throwError(() => new Error(this.errors.toKey(error))) : of(undefined))),
     );
   }
 
