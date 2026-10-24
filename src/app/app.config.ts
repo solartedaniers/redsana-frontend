@@ -56,6 +56,10 @@ import { RouterPortScanWebGateway } from './core/router-port-scan/router-port-sc
 import { AvatarStorageGateway } from './core/avatar-storage/avatar-storage.gateway';
 import { SupabaseAvatarStorageGateway } from './core/avatar-storage/avatar-storage-supabase.gateway';
 import { RuntimeEnvironmentService } from './core/runtime/runtime-environment.service';
+import { MeasurementDelivery, DirectMeasurementDelivery } from './core/pending-measurements/measurement-delivery';
+import { QueuedMeasurementDelivery } from './core/pending-measurements/queued-measurement-delivery';
+import { PendingMeasurementRepository } from './core/pending-measurements/pending-measurement.repository';
+import { PendingMeasurementTauriRepository } from './core/pending-measurements/pending-measurement-tauri.repository';
 import { AiStatusService } from './core/ai-status/ai-status.service';
 import { NetworkThresholdsService } from './core/network-thresholds/network-thresholds.service';
 import { SecurityScoreConfigService } from './core/security-score-config/security-score-config.service';
@@ -90,6 +94,9 @@ export const appConfig: ApplicationConfig = {
     provideByRuntime(LanScanGateway, LanScanTauriGateway, LanScanWebGateway),
     provideByRuntime(RouterPortScanGateway, RouterPortScanTauriGateway, RouterPortScanWebGateway),
     provideByRuntime(NetworkIdentityGateway, NetworkIdentityTauriGateway, NetworkIdentityWebGateway),
+    provideByRuntime(MeasurementDelivery, QueuedMeasurementDelivery, DirectMeasurementDelivery),
+    // Solo la usa la entrega con cola del escritorio; la web no guarda mediciones (ver DirectMeasurementDelivery).
+    { provide: PendingMeasurementRepository, useClass: PendingMeasurementTauriRepository },
     { provide: AvatarStorageGateway, useClass: SupabaseAvatarStorageGateway },
 
     // Cargo el idioma antes de pintar para no mostrar claves crudas; si el diccionario no llega, la app arranca igual.

@@ -65,6 +65,7 @@ export class NetworkMetricsHttpRepository extends NetworkMetricsRepository {
     measurement: NetworkQualityMeasurement,
     source: MeasurementSource,
     networkFingerprint: string | null,
+    recordedAt?: string,
   ): Observable<NetworkMetricSnapshot> {
     const body = {
       latency_ms: measurement.latencyMs,
@@ -72,6 +73,7 @@ export class NetworkMetricsHttpRepository extends NetworkMetricsRepository {
       packet_loss_percent: measurement.packetLossPercent,
       source,
       network_fingerprint: networkFingerprint,
+      recorded_at: recordedAt,
     };
     return this.http.post<BackendSnapshot>(this.baseUrl, body).pipe(map((snapshot) => this.toSnapshot(snapshot)));
   }

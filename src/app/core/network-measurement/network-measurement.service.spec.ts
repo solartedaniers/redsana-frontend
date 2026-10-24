@@ -1,9 +1,8 @@
 import { PLATFORM_ID, signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
-import { of } from 'rxjs';
 import { AuthService } from '../auth/auth.service';
 import { NetworkIdentityGateway } from '../network-identity/network-identity.gateway';
-import { NetworkMetricsRepository } from '../repositories/network-metrics.repository';
+import { MeasurementDelivery } from '../pending-measurements/measurement-delivery';
 import { NetworkMeasurementGateway } from './network-measurement.gateway';
 import { NetworkMeasurementService } from './network-measurement.service';
 
@@ -32,10 +31,10 @@ function createTab(): { service: NetworkMeasurementService; measure: ReturnType<
     providers: [
       NetworkMeasurementService,
       { provide: PLATFORM_ID, useValue: 'browser' },
-      { provide: AuthService, useValue: { isAuthenticated: signal(true) } },
+      { provide: AuthService, useValue: { isAuthenticated: signal(true), currentUser: signal({ id: 'owner-1' }) } },
       { provide: NetworkMeasurementGateway, useValue: { measure, source: 'web' } },
       { provide: NetworkIdentityGateway, useValue: { currentNetworkFingerprint: () => Promise.resolve(null) } },
-      { provide: NetworkMetricsRepository, useValue: { record: () => of({}) } },
+      { provide: MeasurementDelivery, useValue: { deliver: () => Promise.resolve() } },
     ],
   });
   return { service: TestBed.inject(NetworkMeasurementService), measure };
