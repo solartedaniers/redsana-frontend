@@ -1,6 +1,6 @@
 import { HttpErrorResponse, provideHttpClient } from '@angular/common/http';
 import { TestBed } from '@angular/core/testing';
-import { Router, provideRouter } from '@angular/router';
+import { Route, Router, provideRouter } from '@angular/router';
 import { Observable, of, throwError } from 'rxjs';
 import { routes } from '../../app.routes';
 import tauriConfig from '../../../../src-tauri/tauri.conf.json';
@@ -18,6 +18,20 @@ const session = (role: UserRole): AuthSession => ({
 
 // Lo que abre cada uno al arrancar: la ventana de Tauri carga index.csr.html (tauri.conf.json); el navegador, "/".
 const DESKTOP_START_URL = '/index.csr.html';
+
+// Compilar en frío las pantallas perezosas (shell, rutas de usuario y admin, dashboard…) puede pasar de los 5 s de una
+// prueba; las cargo una vez antes, con su propio plazo, y cada prueba mide solo la navegación.
+const LAZY_PRELOAD_TIMEOUT_MS = 60_000;
+
+async function preloadLazyRoutes(routeList: Route[]): Promise<void> {
+  await Promise.all(
+    routeList.map(async (route) => {
+      await route.loadComponent?.();
+      const lazyChildren = (await route.loadChildren?.()) as Route[] | undefined;
+      await preloadLazyRoutes([...(route.children ?? []), ...(Array.isArray(lazyChildren) ? lazyChildren : [])]);
+    }),
+  );
+}
 
 /** Abre la app con las rutas reales, como lo hace la ventana del escritorio o el navegador al entrar. */
 async function openRoot(
@@ -41,6 +55,8 @@ async function openRoot(
 }
 
 describe('Al abrir la app', () => {
+  beforeAll(() => preloadLazyRoutes(routes), LAZY_PRELOAD_TIMEOUT_MS);
+
   it('escritorio con sesión: abre en el panel', async () => {
     const { router, navigation } = await openRoot(true, () => of(session('standard')));
 
