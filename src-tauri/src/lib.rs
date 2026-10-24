@@ -1,5 +1,6 @@
 mod console_command;
 mod lan_scan;
+mod pending_measurements;
 mod ping;
 mod router_ports;
 mod wifi;
@@ -20,6 +21,8 @@ pub fn run() {
     .invoke_handler(tauri::generate_handler![
       ping::measure_latency,
       ping::measure_network_quality,
+      pending_measurements::load_pending_measurements,
+      pending_measurements::save_pending_measurements,
       wifi::get_wifi_encryption,
       lan_scan::scan_connected_devices,
       lan_scan::scan_present_devices,

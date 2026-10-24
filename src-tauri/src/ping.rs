@@ -45,8 +45,12 @@ pub async fn measure_network_quality(host: Option<String>) -> Result<NetworkQual
 
     let mut latencies_ms: Vec<f64> = Vec::with_capacity(QUALITY_SAMPLE_COUNT as usize);
     for sequence in 0..QUALITY_SAMPLE_COUNT {
-        if let Some(latency_ms) = ping_once(&client, address, sequence).await? {
-            latencies_ms.push(latency_ms);
+        match ping_once(&client, address, sequence).await {
+            Ok(Some(latency_ms)) => latencies_ms.push(latency_ms),
+            Ok(None) => {}
+            // Sin red el envío falla al instante ("red inalcanzable"): es un ping perdido, no un error. Así una caída
+            // total se registra como 100 % de pérdida (un corte real) en vez de no registrarse.
+            Err(e) => log::warn!("{e}"),
         }
         tokio::time::sleep(QUALITY_SAMPLE_INTERVAL).await;
     }
