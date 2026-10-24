@@ -48,7 +48,7 @@ Y aunque quisiera revisar la seguridad de su router (¿tiene la contraseña de f
 
 ### 1️⃣ Monitoreo preventivo de la red
 
-La app mide tu conexión de verdad (latencia, jitter, pérdida de paquetes) cada minuto mientras está abierta, **aprende cuál es el comportamiento normal de tu propia red** y te avisa cuando las mediciones se salen de ese comportamiento normal. Cuando hay un corte total (100 % de pérdida) seguido de la recuperación, registra una alerta con la duración del corte. En la app de escritorio, lo que se mide sin conexión se guarda en el equipo y se envía en orden al volver la conexión, así que el corte queda registrado con su duración real aunque el servidor no lo haya recibido en su momento. En la web solo cuentan las mediciones que llegan al servidor en el momento.
+La app mide tu conexión de verdad (latencia, jitter, pérdida de paquetes) cada minuto mientras está abierta, **aprende cuál es el comportamiento normal de tu propia red** y te avisa cuando las mediciones se salen de ese comportamiento normal. Cuando hay un corte total (100 % de pérdida) seguido de la recuperación, registra una alerta con la duración del corte. En la app de escritorio, lo que se mide sin conexión se guarda en el equipo y se envía en orden al volver la conexión, así que el corte queda registrado con su duración real aunque el servidor no lo haya recibido en su momento. En la web solo cuentan las mediciones que llegan al servidor en el momento. La app de escritorio mide además la latencia hasta tu router y, con ella, el panel te dice en palabras simples si el problema parece estar en tu WiFi o router o en tu proveedor de internet, qué revisar antes de reiniciar el router y, si hay muchos dispositivos conectados, que posiblemente uno está usando mucha red (solo como posibilidad). La web no puede medir el router y no muestra este diagnóstico.
 
 ### 2️⃣ Auditoría de seguridad guiada
 
@@ -351,7 +351,7 @@ redsana-frontend/
 │   └── environments/       # environment.ts generado desde .env (ignorado por git)
 ├── src-tauri/              # Capa nativa en Rust
 │   └── src/
-│       ├── ping.rs         # Medición ICMP real
+│       ├── ping.rs         # Medición ICMP real (internet y router)
 │       ├── lan_scan.rs     # Escaneo ARP de dispositivos
 │       ├── router_ports.rs # Puertos de riesgo del router
 │       └── wifi.rs         # Detección de cifrado WiFi
