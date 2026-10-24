@@ -1,6 +1,7 @@
 import { HttpErrorResponse, provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, TestRequest, provideHttpClientTesting } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
+import { AuthRetryableFetchError } from '@supabase/supabase-js';
 import { firstValueFrom } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { AuthSession } from '../models/user.model';
@@ -300,6 +301,14 @@ describe('Restaurar la sesión al abrir la app', () => {
     );
 
     expect(await firstValueFrom(repository.restoreSession())).toBeNull();
+  });
+
+  it('una sesión vencida que no se pudo renovar por falta de red es un error (se reintenta), no "sin sesión"', async () => {
+    const { repository } = setup();
+    const offline = new AuthRetryableFetchError('Failed to fetch', 0);
+    vi.spyOn(auth, 'getSession').mockResolvedValue(answer('getSession', { data: { session: null }, error: offline }));
+
+    await expect(firstValueFrom(repository.restoreSession())).rejects.toBe(offline);
   });
 
   it('un token vencido que el backend rechaza (401) llega como error HTTP sin cerrar la sesión', async () => {
