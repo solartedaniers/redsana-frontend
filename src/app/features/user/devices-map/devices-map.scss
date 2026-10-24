@@ -74,12 +74,12 @@
   place-items: center;
   overflow: hidden;
   background:
-    linear-gradient(var(--color-border), var(--color-border)) center / 100% 1px no-repeat,
-    linear-gradient(var(--color-border), var(--color-border)) center / 1px 100% no-repeat,
+    linear-gradient(var(--color-border), var(--color-border)) center / 100% var(--border-width-hairline) no-repeat,
+    linear-gradient(var(--color-border), var(--color-border)) center / var(--border-width-hairline) 100% no-repeat,
     repeating-radial-gradient(
       circle,
-      transparent 0 calc(4.25rem - 1px),
-      var(--color-border) calc(4.25rem - 1px) 4.25rem
+      transparent 0 calc(4.25rem - var(--border-width-hairline)),
+      var(--color-border) calc(4.25rem - var(--border-width-hairline)) 4.25rem
     ),
     var(--color-bg-surface);
 }

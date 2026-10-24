@@ -72,6 +72,7 @@
   // Líneas de escaneo del osciloscopio (solo en oscuro; transparentes en claro).
   --color-scanline: transparent;
   --scanline-gap: 3px;
+  --scanline-width: 1px;
 
   // Alias heredados: los mantengo para que todas las pantallas adopten el concepto.
   --color-surface-glass: #fffdf8;
@@ -97,6 +98,8 @@
   --sticker-tilt: -2deg;
   --sticker-tilt-alt: 1.5deg;
   --focus-ring-width: 3px;
+  // Más fino en los botones pequeños sin borde (barra superior, mostrar contraseña).
+  --focus-ring-width-compact: 2px;
   --focus-ring-offset: 2px;
   --touch-target-min: 2.75rem;
 

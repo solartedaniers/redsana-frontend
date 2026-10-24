@@ -22,7 +22,7 @@ body::after {
     repeating-linear-gradient(
       to bottom,
       transparent 0 var(--scanline-gap),
-      var(--color-scanline) var(--scanline-gap) calc(var(--scanline-gap) + 1px)
+      var(--color-scanline) var(--scanline-gap) calc(var(--scanline-gap) + var(--scanline-width))
     ),
     var(--texture-grain);
   opacity: var(--texture-grain-opacity);
@@ -33,7 +33,7 @@ body::after {
   background: repeating-linear-gradient(
     to bottom,
     transparent 0 var(--scanline-gap),
-    var(--color-scanline) var(--scanline-gap) calc(var(--scanline-gap) + 1px)
+    var(--color-scanline) var(--scanline-gap) calc(var(--scanline-gap) + var(--scanline-width))
   );
 }
 
