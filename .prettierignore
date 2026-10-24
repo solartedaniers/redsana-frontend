@@ -1,0 +1,14 @@
+# Se sirven tal cual en el build: formatearlos cambiaría lo publicado.
+public/
+src/index.html
+# En las plantillas, Prettier mueve espacios entre texto e interpolaciones y eso cambia lo que se ve.
+**/*.html
+# Generados o de otras herramientas.
+dist/
+.angular/
+coverage/
+node_modules/
+src-tauri/
+src/environments/environment.ts
+src/app/core/domain/oui-device-kinds.generated.ts
+package-lock.json
