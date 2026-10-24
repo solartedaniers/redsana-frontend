@@ -29,7 +29,14 @@ function render(source: MonitoredHousehold['securityScoreSource']): HTMLElement 
       {
         provide: NetworkMetricsRepository,
         useValue: {
-          getSnapshot: () => of({ status: 'unknown', latencyMs: 0, jitterMs: 0, packetLossPercent: 0, updatedAt: '2026-10-05T12:00:00Z' }),
+          getSnapshot: () =>
+            of({
+              status: 'unknown',
+              latencyMs: 0,
+              jitterMs: 0,
+              packetLossPercent: 0,
+              updatedAt: '2026-10-05T12:00:00Z',
+            }),
           getHistory: () => of([]),
         },
       },

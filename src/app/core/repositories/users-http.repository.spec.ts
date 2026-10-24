@@ -17,7 +17,7 @@ function failWith(status: HttpStatusCode, call: (repository: UsersHttpRepository
 describe('UsersHttpRepository', () => {
   it('un 409 al editar se traduce a la clave de i18n del bloqueo del admin', () => {
     const error = failWith(HttpStatusCode.Conflict, (repository) =>
-      repository.updateUser('me', { fullName: 'Yo', email: 'yo@example.invalid', role: 'standard' })
+      repository.updateUser('me', { fullName: 'Yo', email: 'yo@example.invalid', role: 'standard' }),
     );
 
     expect((error as Error).message).toBe(ADMIN_LOCKOUT_ERROR_KEY);

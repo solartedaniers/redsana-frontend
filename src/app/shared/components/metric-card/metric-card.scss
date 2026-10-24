@@ -44,7 +44,9 @@
   color: var(--color-text-secondary);
 }
 
-:host { display: block; }
+:host {
+  display: block;
+}
 
 :host([data-variant='hero']) {
   .metric-card {
@@ -53,7 +55,9 @@
   }
 
   .label,
-  .unit { color: var(--color-hero-muted); }
+  .unit {
+    color: var(--color-hero-muted);
+  }
 
   .value {
     font-size: calc(var(--font-size-metric-xl) * 1.45);

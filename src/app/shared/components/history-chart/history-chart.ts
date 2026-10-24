@@ -54,12 +54,14 @@ export class HistoryChart {
 
   protected readonly summaryParams = computed(() => {
     const stats = this.trace().stats;
-    return stats && {
-      count: stats.count,
-      min: this.format(stats.min),
-      avg: this.format(stats.avg),
-      max: this.format(stats.max),
-    };
+    return (
+      stats && {
+        count: stats.count,
+        min: this.format(stats.min),
+        avg: this.format(stats.avg),
+        max: this.format(stats.max),
+      }
+    );
   });
 
   protected format(latencyMs: number): string {

@@ -17,8 +17,8 @@ export class SupabaseCredentials {
   signIn(email: string, password: string): Observable<SupabaseSessionTokens> {
     return from(supabaseClient.auth.signInWithPassword({ email, password })).pipe(
       switchMap(({ data, error }) =>
-        error || !data.session ? throwError(() => new Error(this.errors.toKey(error?.message))) : of(data.session)
-      )
+        error || !data.session ? throwError(() => new Error(this.errors.toKey(error?.message))) : of(data.session),
+      ),
     );
   }
 
@@ -28,7 +28,7 @@ export class SupabaseCredentials {
         email: payload.email,
         password: payload.password,
         options: { data: { full_name: payload.fullName } },
-      })
+      }),
     ).pipe(
       switchMap(({ data, error }) => {
         if (error) {
@@ -39,7 +39,7 @@ export class SupabaseCredentials {
           return throwError(() => new Error('auth.errors.confirmationRequired'));
         }
         return of(data.session);
-      })
+      }),
     );
   }
 
@@ -51,14 +51,14 @@ export class SupabaseCredentials {
     return from(
       supabaseClient.auth.resetPasswordForEmail(email, {
         redirectTo: `${this.recoveryOrigin()}${APP_PATHS.resetPassword}`,
-      })
+      }),
     ).pipe(map(() => undefined));
   }
 
   /** Con la sesión actual (la de recuperación o la normal), sin pedir la contraseña anterior. */
   updatePassword(newPassword: string): Observable<void> {
     return from(supabaseClient.auth.updateUser({ password: newPassword })).pipe(
-      switchMap(({ error }) => (error ? throwError(() => new Error(this.errors.toKey(error.message))) : of(undefined)))
+      switchMap(({ error }) => (error ? throwError(() => new Error(this.errors.toKey(error.message))) : of(undefined))),
     );
   }
 
@@ -73,18 +73,20 @@ export class SupabaseCredentials {
           supabaseClient.auth.signInWithPassword({
             email: data.user.email,
             password: payload.currentPassword,
-          })
+          }),
         );
       }),
       switchMap(({ error }) =>
-        error ? throwError(() => new Error('auth.errors.wrongCurrentPassword')) : this.updatePassword(payload.newPassword)
-      )
+        error
+          ? throwError(() => new Error('auth.errors.wrongCurrentPassword'))
+          : this.updatePassword(payload.newPassword),
+      ),
     );
   }
 
   updateFullName(fullName: string): Observable<void> {
     return from(supabaseClient.auth.updateUser({ data: { full_name: fullName } })).pipe(
-      switchMap(({ error }) => (error ? throwError(() => new Error(this.errors.toKey(error.message))) : of(undefined)))
+      switchMap(({ error }) => (error ? throwError(() => new Error(this.errors.toKey(error.message))) : of(undefined))),
     );
   }
 

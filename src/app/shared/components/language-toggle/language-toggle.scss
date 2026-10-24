@@ -20,9 +20,13 @@
     cursor: pointer;
     transition: background-color var(--motion-duration-fast) var(--motion-easing-standard);
 
-    &:hover:not(.active) { color: var(--color-text-primary); }
+    &:hover:not(.active) {
+      color: var(--color-text-primary);
+    }
 
-    &:focus-visible { outline-offset: calc(var(--focus-ring-width) * -1); }
+    &:focus-visible {
+      outline-offset: calc(var(--focus-ring-width) * -1);
+    }
 
     &.active {
       background: var(--color-fill-healthy);

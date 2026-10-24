@@ -32,8 +32,8 @@ export class BackendProfileLoader {
     return this.http.get<BackendUser>(this.currentUserUrl).pipe(
       map((backendUser) => this.toSession(backendUser, tokens)),
       catchError((error: unknown) =>
-        isSuspendedProfileResponse(error) ? this.endSuspendedSession() : throwError(() => error)
-      )
+        isSuspendedProfileResponse(error) ? this.endSuspendedSession() : throwError(() => error),
+      ),
     );
   }
 

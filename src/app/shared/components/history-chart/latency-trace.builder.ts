@@ -1,5 +1,10 @@
 import { NetworkMetricSample } from '../../../core/models/network.model';
-import { LatencySeverity, classifyMeasurement, severityRank, worstSeverity } from '../../../core/domain/latency-severity';
+import {
+  LatencySeverity,
+  classifyMeasurement,
+  severityRank,
+  worstSeverity,
+} from '../../../core/domain/latency-severity';
 import { NetworkStatusThresholds } from '../../../core/network-thresholds/network-thresholds.config';
 import { HISTORY_CHART_CONFIG } from './history-chart.config';
 
@@ -45,7 +50,8 @@ type Classifier = (sample: NetworkMetricSample) => LatencySeverity;
 /** Convierte las muestras reales en la geometría del ECG; es puro, el componente solo pinta lo que recibe. */
 export class LatencyTraceBuilder {
   build(samples: readonly NetworkMetricSample[], thresholds: NetworkStatusThresholds): LatencyTrace {
-    const classify = (sample: NetworkMetricSample) => classifyMeasurement(sample.latencyMs, sample.packetLossPercent, thresholds);
+    const classify = (sample: NetworkMetricSample) =>
+      classifyMeasurement(sample.latencyMs, sample.packetLossPercent, thresholds);
     const reduced = this.reduce(samples, HISTORY_CHART_CONFIG.maxTracePoints, classify);
     const answered = samples.map((sample) => sample.latencyMs).filter((latency) => latency > 0);
     const peak = answered.reduce((max, latency) => Math.max(max, latency), 0);
@@ -70,12 +76,15 @@ export class LatencyTraceBuilder {
       criticalY: this.thresholdY(thresholds.latencyCriticalMs, yMax, toY),
       markers: this.markers(points),
       heatmap: this.heatmap(samples, classify),
-      stats: answered.length === 0 ? null : {
-        min: answered.reduce((min, latency) => Math.min(min, latency), Infinity),
-        avg: answered.reduce((sum, latency) => sum + latency, 0) / answered.length,
-        max: peak,
-        count: answered.length,
-      },
+      stats:
+        answered.length === 0
+          ? null
+          : {
+              min: answered.reduce((min, latency) => Math.min(min, latency), Infinity),
+              avg: answered.reduce((sum, latency) => sum + latency, 0) / answered.length,
+              max: peak,
+              count: answered.length,
+            },
     };
   }
 
@@ -109,7 +118,7 @@ export class LatencyTraceBuilder {
       return [...samples];
     }
     return this.buckets(samples, limit).map((bucket) =>
-      bucket.reduce((worst, sample) => (this.outranks(sample, worst, classify) ? sample : worst))
+      bucket.reduce((worst, sample) => (this.outranks(sample, worst, classify) ? sample : worst)),
     );
   }
 

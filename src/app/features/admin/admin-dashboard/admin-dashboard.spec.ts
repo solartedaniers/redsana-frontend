@@ -7,15 +7,26 @@ import { AdminDashboard } from './admin-dashboard';
 
 function render(metrics: PlatformMetrics): HTMLElement {
   TestBed.configureTestingModule({
-    providers: [provideHttpClient(), { provide: AdminMetricsRepository, useValue: { getPlatformMetrics: () => of(metrics) } }],
+    providers: [
+      provideHttpClient(),
+      { provide: AdminMetricsRepository, useValue: { getPlatformMetrics: () => of(metrics) } },
+    ],
   });
   const fixture = TestBed.createComponent(AdminDashboard);
   fixture.detectChanges();
   return fixture.nativeElement as HTMLElement;
 }
 
-const base: PlatformMetrics = { totalUsers: 4, monitoredHouseholds: 3, activeAlerts: 0, averageSecurityScore: 0, realScoredHouseholds: 0, unevaluatedHouseholds: 3 };
-const heroValue = (element: HTMLElement) => element.querySelector('.metrics-grid__hero .value')?.textContent?.replace(/\s+/g, '');
+const base: PlatformMetrics = {
+  totalUsers: 4,
+  monitoredHouseholds: 3,
+  activeAlerts: 0,
+  averageSecurityScore: 0,
+  realScoredHouseholds: 0,
+  unevaluatedHouseholds: 3,
+};
+const heroValue = (element: HTMLElement) =>
+  element.querySelector('.metrics-grid__hero .value')?.textContent?.replace(/\s+/g, '');
 const note = (element: HTMLElement) => element.querySelector('.metrics-grid__note')?.textContent?.trim();
 
 describe('AdminDashboard promedio de seguridad', () => {

@@ -31,7 +31,12 @@ async function setup(initial: AppLanguage, url = '/') {
     providers: [
       { provide: I18nService, useValue: { language, translate: (key: string) => TEXTS[language()][key] ?? key } },
       provideRouter([
-        { path: '', pathMatch: 'full', data: { [SEO_CONFIG.indexableRouteDataKey]: true }, children: [{ path: '', component: Page }] },
+        {
+          path: '',
+          pathMatch: 'full',
+          data: { [SEO_CONFIG.indexableRouteDataKey]: true },
+          children: [{ path: '', component: Page }],
+        },
         { path: 'auth/login', component: Page },
       ]),
     ],
@@ -44,10 +49,13 @@ async function setup(initial: AppLanguage, url = '/') {
 }
 
 const meta = (selector: string) => document.head.querySelector<HTMLMetaElement>(`meta[${selector}]`)?.content ?? null;
-const canonical = () => document.head.querySelector<HTMLLinkElement>('link[rel="canonical"]')?.getAttribute('href') ?? null;
+const canonical = () =>
+  document.head.querySelector<HTMLLinkElement>('link[rel="canonical"]')?.getAttribute('href') ?? null;
 
 describe('DocumentMetadataService', () => {
-  afterEach(() => document.head.querySelectorAll('meta[name], meta[property], link[rel="canonical"]').forEach((tag) => tag.remove()));
+  afterEach(() =>
+    document.head.querySelectorAll('meta[name], meta[property], link[rel="canonical"]').forEach((tag) => tag.remove()),
+  );
 
   it('toma el título de la pestaña de i18n y el lang del idioma activo', async () => {
     const { title } = await setup('es');
@@ -97,7 +105,10 @@ describe('DocumentMetadataService', () => {
     prerendered.setAttribute('href', 'https://prerenderizado.invalid/');
     document.head.appendChild(prerendered);
     TestBed.configureTestingModule({
-      providers: [{ provide: I18nService, useValue: { language: signal<AppLanguage>('es'), translate: (key: string) => key } }, provideRouter([])],
+      providers: [
+        { provide: I18nService, useValue: { language: signal<AppLanguage>('es'), translate: (key: string) => key } },
+        provideRouter([]),
+      ],
     });
 
     TestBed.inject(DocumentMetadataService);

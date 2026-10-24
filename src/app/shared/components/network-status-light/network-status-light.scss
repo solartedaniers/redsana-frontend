@@ -14,8 +14,14 @@
   box-shadow: calc(var(--shadow-offset) / 2) calc(var(--shadow-offset) / 2) 0 var(--color-shadow);
 }
 
-.status-light[data-status='good'] { --light-tone: var(--color-status-success); --light-fill: var(--color-fill-healthy); }
-.status-light[data-status='warning'] { --light-tone: var(--color-status-warning); --light-fill: var(--color-fill-warning); }
+.status-light[data-status='good'] {
+  --light-tone: var(--color-status-success);
+  --light-fill: var(--color-fill-healthy);
+}
+.status-light[data-status='warning'] {
+  --light-tone: var(--color-status-warning);
+  --light-fill: var(--color-fill-warning);
+}
 .status-light[data-status='critical'] {
   --light-tone: var(--color-status-danger);
   --light-fill: var(--color-fill-critical);
@@ -44,7 +50,9 @@
 .status-light:not([data-status='unknown']) .dot {
   animation: heartbeat var(--light-rate) var(--motion-easing-standard) infinite;
 
-  &::after { animation: status-ripple var(--light-rate) var(--motion-easing-decelerate) infinite; }
+  &::after {
+    animation: status-ripple var(--light-rate) var(--motion-easing-decelerate) infinite;
+  }
 }
 
 .label {
@@ -61,6 +69,12 @@
 }
 
 @keyframes status-ripple {
-  from { transform: scale(1); opacity: 0.6; }
-  to { transform: scale(2.6); opacity: 0; }
+  from {
+    transform: scale(1);
+    opacity: 0.6;
+  }
+  to {
+    transform: scale(2.6);
+    opacity: 0;
+  }
 }

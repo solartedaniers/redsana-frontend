@@ -58,7 +58,23 @@ async function render(initial: AiStatusState) {
     element.querySelector<HTMLFormElement>('form.chat-input-row')!.dispatchEvent(new Event('submit'));
     await refresh();
   };
-  return { fixture, element, input, list, panel, toggle, status, isReady, wakeUp, session, pageScroll, scrollAnchor, reply, ask, refresh };
+  return {
+    fixture,
+    element,
+    input,
+    list,
+    panel,
+    toggle,
+    status,
+    isReady,
+    wakeUp,
+    session,
+    pageScroll,
+    scrollAnchor,
+    reply,
+    ask,
+    refresh,
+  };
 }
 
 describe('SecurityChatPanel', () => {
@@ -67,7 +83,7 @@ describe('SecurityChatPanel', () => {
 
     expect(input.disabled).toBe(true);
     expect(element.querySelector('.chat-ai-notice')?.textContent?.trim()).toBe(
-      'user.securityAssistant.chat.aiNotReady.warming_up'
+      'user.securityAssistant.chat.aiNotReady.warming_up',
     );
   });
 
@@ -75,7 +91,7 @@ describe('SecurityChatPanel', () => {
     const { element } = await render('unavailable');
 
     expect(element.querySelector('.chat-ai-notice')?.textContent?.trim()).toBe(
-      'user.securityAssistant.chat.aiNotReady.service_error'
+      'user.securityAssistant.chat.aiNotReady.service_error',
     );
   });
 

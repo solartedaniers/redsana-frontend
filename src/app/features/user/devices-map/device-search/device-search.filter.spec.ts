@@ -3,7 +3,17 @@ import { DeviceSearchField } from './device-search.config';
 import { DeviceSearchFilter } from './device-search.filter';
 
 function device(id: string, ipAddress: string, name = '', macAddress = 'aa-bb-cc-00-00-01'): NetworkDevice {
-  return { id, name, macAddress, ipAddress, trust: 'unknown', firstSeen: '', lastSeen: '', isOnline: true, networkRole: 'other' };
+  return {
+    id,
+    name,
+    macAddress,
+    ipAddress,
+    trust: 'unknown',
+    firstSeen: '',
+    lastSeen: '',
+    isOnline: true,
+    networkRole: 'other',
+  };
 }
 
 describe('DeviceSearchFilter', () => {
@@ -46,7 +56,9 @@ describe('DeviceSearchFilter', () => {
   });
 
   it('busca en los campos que diga la configuración, también uno como el fabricante', () => {
-    const withVendor: DeviceSearchField[] = [{ key: 'vendor', read: (d) => (d.id === 'b' ? 'Samsung' : null), normalization: 'text' }];
+    const withVendor: DeviceSearchField[] = [
+      { key: 'vendor', read: (d) => (d.id === 'b' ? 'Samsung' : null), normalization: 'text' },
+    ];
     expect(new DeviceSearchFilter(withVendor).filter(devices, 'samsung').map((d) => d.id)).toEqual(['b']);
   });
 });

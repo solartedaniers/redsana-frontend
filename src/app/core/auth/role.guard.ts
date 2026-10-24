@@ -14,7 +14,7 @@ export function roleGuard(allowedRoles: UserRole[]): CanActivateFn {
       map(() => {
         const role = auth.role();
         return role !== null && allowedRoles.includes(role) ? true : router.createUrlTree([APP_PATHS.login]);
-      })
+      }),
     );
   };
 }

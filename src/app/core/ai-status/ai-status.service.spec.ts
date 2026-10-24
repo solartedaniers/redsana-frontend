@@ -14,7 +14,7 @@ const report = (status: AiAvailability, reason?: AiStatusReport['reason']): AiSt
 
 function setup(
   statuses: Array<AiAvailability | AiStatusReport | Error>,
-  options: { warmUp?: () => Observable<AiStatusReport>; platform?: 'browser' | 'server'; authenticated?: boolean } = {}
+  options: { warmUp?: () => Observable<AiStatusReport>; platform?: 'browser' | 'server'; authenticated?: boolean } = {},
 ) {
   const isAuthenticated = signal(options.authenticated ?? true);
   let call = 0;
@@ -137,7 +137,9 @@ describe('AiStatusService', () => {
     vi.advanceTimersByTime(AI_STATUS_CONFIG.maxWaitMs + 60_000);
 
     // Solo las consultas que caben antes del tope de reloj; después ya no consulta más.
-    const pollsWithinCap = DELAYS.filter((_, i) => DELAYS.slice(0, i + 1).reduce((a, b) => a + b, 0) < AI_STATUS_CONFIG.maxWaitMs).length;
+    const pollsWithinCap = DELAYS.filter(
+      (_, i) => DELAYS.slice(0, i + 1).reduce((a, b) => a + b, 0) < AI_STATUS_CONFIG.maxWaitMs,
+    ).length;
     expect(service.status()).toBe('unavailable');
     expect(repository.getStatus).toHaveBeenCalledTimes(pollsWithinCap);
   });

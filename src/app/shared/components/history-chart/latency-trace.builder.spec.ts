@@ -28,7 +28,7 @@ describe('LatencyTraceBuilder', () => {
 
   it('clasifica latencia y pérdida con los mismos umbrales y bordes que el backend', () => {
     expect(BACKEND_CASES.map(([latency, loss]) => classifyMeasurement(latency, loss, DEFAULTS))).toEqual(
-      BACKEND_CASES.map(([, , expected]) => expected)
+      BACKEND_CASES.map(([, , expected]) => expected),
     );
   });
 
@@ -45,7 +45,12 @@ describe('LatencyTraceBuilder', () => {
   });
 
   it('usa los umbrales que recibe: con otros valores del backend cambian la clasificación y las líneas', () => {
-    const custom = { latencyWarningMs: 40, latencyCriticalMs: 60, packetLossWarningPercent: 10, packetLossCriticalPercent: 20 };
+    const custom = {
+      latencyWarningMs: 40,
+      latencyCriticalMs: 60,
+      packetLossWarningPercent: 10,
+      packetLossCriticalPercent: 20,
+    };
     const withDefaults = builder.build([sample(50, 0, 3)], DEFAULTS);
     const withCustom = builder.build([sample(50, 0, 3)], custom);
 

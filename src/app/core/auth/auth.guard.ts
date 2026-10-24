@@ -8,7 +8,5 @@ import { APP_PATHS } from '../routing/app-paths';
 export const authGuard: CanActivateFn = () => {
   const auth = inject(AuthService);
   const router = inject(Router);
-  return auth
-    .whenRestored()
-    .pipe(map(() => (auth.isAuthenticated() ? true : router.createUrlTree([APP_PATHS.login]))));
+  return auth.whenRestored().pipe(map(() => (auth.isAuthenticated() ? true : router.createUrlTree([APP_PATHS.login]))));
 };

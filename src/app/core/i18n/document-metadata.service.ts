@@ -61,7 +61,10 @@ export class DocumentMetadataService {
   /** La URL canónica solo existe en lo indexable: en el resto diría "esta página es la landing". */
   private applyIndexing(indexable: boolean): void {
     const siteUrl = `${environment.webAppUrl}${APP_PATHS.root}`;
-    this.meta.updateTag({ name: 'robots', content: indexable ? SEO_CONFIG.robots.indexable : SEO_CONFIG.robots.private });
+    this.meta.updateTag({
+      name: 'robots',
+      content: indexable ? SEO_CONFIG.robots.indexable : SEO_CONFIG.robots.private,
+    });
     if (indexable) {
       this.meta.updateTag({ property: 'og:url', content: siteUrl });
     } else {

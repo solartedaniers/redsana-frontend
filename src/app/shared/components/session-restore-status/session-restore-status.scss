@@ -23,10 +23,15 @@
 
 // Con el backend despierto el perfil llega antes de este retraso y el texto ni se asoma.
 .session-status--waking {
-  animation: session-status-appear var(--motion-duration-slow) var(--motion-easing-decelerate) var(--motion-notice-delay) both;
+  animation: session-status-appear var(--motion-duration-slow) var(--motion-easing-decelerate)
+    var(--motion-notice-delay) both;
 }
 
 @keyframes session-status-appear {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }

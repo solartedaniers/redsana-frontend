@@ -73,9 +73,7 @@ export class UserManagement {
     const payload = this.form.getRawValue();
     const editingId = this.editingUserId();
 
-    const request = editingId
-      ? this.repository.updateUser(editingId, payload)
-      : this.repository.createUser(payload);
+    const request = editingId ? this.repository.updateUser(editingId, payload) : this.repository.createUser(payload);
 
     request.subscribe({
       next: () => {

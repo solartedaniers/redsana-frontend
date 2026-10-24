@@ -10,9 +10,17 @@ const SAMPLES = [
 ];
 
 // El traductor de prueba deja ver la clave y los parámetros con que se pidió cada texto.
-const translate = (key: string, params?: Record<string, string | number>) => (params ? `${key} ${JSON.stringify(params)}` : key);
+const translate = (key: string, params?: Record<string, string | number>) =>
+  params ? `${key} ${JSON.stringify(params)}` : key;
 
-function legendItems(thresholds = { latencyWarningMs: 100, latencyCriticalMs: 250, packetLossWarningPercent: 2, packetLossCriticalPercent: 9 }) {
+function legendItems(
+  thresholds = {
+    latencyWarningMs: 100,
+    latencyCriticalMs: 250,
+    packetLossWarningPercent: 2,
+    packetLossCriticalPercent: 9,
+  },
+) {
   TestBed.configureTestingModule({
     providers: [
       { provide: I18nService, useValue: { translate, language: signal('es') } },

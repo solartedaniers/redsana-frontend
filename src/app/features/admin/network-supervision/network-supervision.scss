@@ -18,11 +18,17 @@
   background: var(--color-bg-surface);
   box-shadow: var(--shadow-hard);
 
-  &[data-band='good'] { --severity-fill: var(--color-fill-healthy); }
-  &[data-band='warning'] { --severity-fill: var(--color-fill-warning); }
+  &[data-band='good'] {
+    --severity-fill: var(--color-fill-healthy);
+  }
+  &[data-band='warning'] {
+    --severity-fill: var(--color-fill-warning);
+  }
 }
 
-.household-info { min-width: 0; }
+.household-info {
+  min-width: 0;
+}
 
 .owner {
   margin: 0;
@@ -33,31 +39,66 @@
 }
 
 .label,
-.meta { margin: var(--space-1) 0 0; font: 500 var(--font-size-caption) var(--font-mono); color: var(--color-text-secondary); overflow-wrap: anywhere; }
+.meta {
+  margin: var(--space-1) 0 0;
+  font: 500 var(--font-size-caption) var(--font-mono);
+  color: var(--color-text-secondary);
+  overflow-wrap: anywhere;
+}
 
-.score-block { display: grid; justify-items: end; gap: var(--space-1); }
+.score-block {
+  display: grid;
+  justify-items: end;
+  gap: var(--space-1);
+}
 
-.score { font: 800 var(--font-size-heading) var(--font-mono); font-variant-numeric: tabular-nums; line-height: 1; }
+.score {
+  font: 800 var(--font-size-heading) var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
 
 .score-source {
   font: 700 var(--font-size-caption) var(--font-mono);
   text-transform: uppercase;
   color: var(--color-text-secondary);
 
-  &[data-source='real'] { color: var(--color-status-success); }
+  &[data-source='real'] {
+    color: var(--color-status-success);
+  }
 }
 
 // Fecha de una medición técnica reutilizada: dato secundario y discreto.
-.score-date { max-width: 12rem; font-size: var(--font-size-caption); color: var(--color-text-secondary); text-align: right; }
+.score-date {
+  max-width: 12rem;
+  font-size: var(--font-size-caption);
+  color: var(--color-text-secondary);
+  text-align: right;
+}
 
 @media (max-width: 48rem) {
-  .household-card { grid-template-columns: minmax(0, 1fr) auto; }
-  .view-button { grid-column: 1 / -1; justify-self: start; }
+  .household-card {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+  .view-button {
+    grid-column: 1 / -1;
+    justify-self: start;
+  }
 }
 
 @media (max-width: 30rem) {
-  .household-card { grid-template-columns: minmax(0, 1fr); justify-items: start; }
-  .score-block { justify-items: start; }
-  .score-block .status-badge { max-width: 100%; white-space: normal; }
-  .score-date { text-align: left; }
+  .household-card {
+    grid-template-columns: minmax(0, 1fr);
+    justify-items: start;
+  }
+  .score-block {
+    justify-items: start;
+  }
+  .score-block .status-badge {
+    max-width: 100%;
+    white-space: normal;
+  }
+  .score-date {
+    text-align: left;
+  }
 }

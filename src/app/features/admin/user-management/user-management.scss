@@ -1,4 +1,6 @@
-.new-user-button { margin-bottom: var(--space-5); }
+.new-user-button {
+  margin-bottom: var(--space-5);
+}
 
 // Registro con encabezado de tinta; en el celular la tabla se desplaza dentro de esta caja.
 .table-scroll {
@@ -29,15 +31,27 @@
     text-transform: uppercase;
   }
 
-  td:first-child { font-family: var(--font-display); font-weight: 700; }
-  td:nth-child(2) { font: 500 var(--font-size-caption) var(--font-mono); }
-  tr:last-child td { border-bottom: none; }
+  td:first-child {
+    font-family: var(--font-display);
+    font-weight: 700;
+  }
+  td:nth-child(2) {
+    font: 500 var(--font-size-caption) var(--font-mono);
+  }
+  tr:last-child td {
+    border-bottom: none;
+  }
 }
 
 // Sin inclinación para que las filas de la tabla queden alineadas.
-.status-badge { transform: none; }
+.status-badge {
+  transform: none;
+}
 
-.actions-cell { display: flex; gap: var(--space-2); }
+.actions-cell {
+  display: flex;
+  gap: var(--space-2);
+}
 
 .link-button {
   min-height: 2.25rem;
@@ -49,8 +63,13 @@
   font: 700 var(--font-size-caption) var(--font-display);
   cursor: pointer;
 
-  &:hover { background: var(--color-fill-healthy); color: var(--color-on-fill); }
-  &.danger:hover { background: var(--color-fill-critical); }
+  &:hover {
+    background: var(--color-fill-healthy);
+    color: var(--color-on-fill);
+  }
+  &.danger:hover {
+    background: var(--color-fill-critical);
+  }
 }
 
 .user-dialog {
@@ -62,7 +81,9 @@
   color: var(--color-text-primary);
   box-shadow: var(--shadow-hard-lg);
 
-  &::backdrop { background: color-mix(in srgb, var(--color-ink) 45%, transparent); }
+  &::backdrop {
+    background: color-mix(in srgb, var(--color-ink) 45%, transparent);
+  }
 
   select {
     min-height: var(--touch-target-min);
@@ -75,8 +96,20 @@
   }
 }
 
-.field-note { color: var(--color-text-secondary); font: 500 var(--font-size-caption) var(--font-mono); }
+.field-note {
+  color: var(--color-text-secondary);
+  font: 500 var(--font-size-caption) var(--font-mono);
+}
 
-.dialog-actions { display: flex; justify-content: flex-end; gap: var(--space-3); margin-top: var(--space-3); }
+.dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-3);
+  margin-top: var(--space-3);
+}
 
-@media (pointer: coarse) { .link-button { min-height: var(--touch-target-min); } }
+@media (pointer: coarse) {
+  .link-button {
+    min-height: var(--touch-target-min);
+  }
+}

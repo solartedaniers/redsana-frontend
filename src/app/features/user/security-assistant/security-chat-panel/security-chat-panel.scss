@@ -1,4 +1,6 @@
-:host { display: block; }
+:host {
+  display: block;
+}
 
 .chat-panel {
   max-width: 72rem;
@@ -12,16 +14,28 @@
     gap: var(--space-4);
   }
 
-  &__actions { display: flex; gap: var(--space-2); flex-shrink: 0; }
+  &__actions {
+    display: flex;
+    gap: var(--space-2);
+    flex-shrink: 0;
+  }
 
   // En el celular los tres botones le quitaban medio ancho al título y lo partían en tres líneas:
   // los paso a su propia fila, arriba a la derecha, y el título usa todo el ancho.
   @media (max-width: 30rem) {
-    &__header { flex-direction: column-reverse; gap: var(--space-2); }
-    &__actions { align-self: flex-end; }
+    &__header {
+      flex-direction: column-reverse;
+      gap: var(--space-2);
+    }
+    &__actions {
+      align-self: flex-end;
+    }
   }
 
-  h2 { margin: 0 0 var(--space-2); font-size: var(--font-size-heading); }
+  h2 {
+    margin: 0 0 var(--space-2);
+    font-size: var(--font-size-heading);
+  }
 }
 
 .chat-scope-hint {
@@ -41,9 +55,17 @@
   color: var(--color-text-primary);
   cursor: pointer;
 
-  &:hover { background: var(--color-fill-healthy); color: var(--color-on-fill); }
+  &:hover {
+    background: var(--color-fill-healthy);
+    color: var(--color-on-fill);
+  }
 
-  &--ghost { width: 2rem; height: 2rem; border-color: transparent; background: transparent; }
+  &--ghost {
+    width: 2rem;
+    height: 2rem;
+    border-color: transparent;
+    background: transparent;
+  }
 }
 
 .chat-history {
@@ -56,7 +78,12 @@
   border: var(--border-width-ink) dashed var(--color-card-border);
   border-radius: var(--radius-sm);
 
-  &__empty { margin: 0; padding: var(--space-2); font-size: var(--font-size-caption); color: var(--color-text-secondary); }
+  &__empty {
+    margin: 0;
+    padding: var(--space-2);
+    font-size: var(--font-size-caption);
+    color: var(--color-text-secondary);
+  }
 
   &__item {
     display: flex;
@@ -67,8 +94,13 @@
     border-radius: var(--radius-sm);
     cursor: pointer;
 
-    &:hover { background: var(--color-bg-surface-alt); }
-    &--active { background: var(--color-fill-healthy); color: var(--color-on-fill); }
+    &:hover {
+      background: var(--color-bg-surface-alt);
+    }
+    &--active {
+      background: var(--color-fill-healthy);
+      color: var(--color-on-fill);
+    }
 
     input {
       flex: 1;
@@ -80,7 +112,13 @@
     }
   }
 
-  &__title { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: var(--font-size-caption); font-weight: 700; }
+  &__title {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: var(--font-size-caption);
+    font-weight: 700;
+  }
 }
 
 // Notas de consulta: el asistente escribe en papel y el usuario responde en tinta violeta.
@@ -134,10 +172,15 @@
     color: var(--color-text-primary);
     font-size: var(--font-size-body);
 
-    &::placeholder { color: var(--color-text-secondary); }
+    &::placeholder {
+      color: var(--color-text-secondary);
+    }
 
     // Igual que los botones deshabilitados: se nota que no se puede escribir mientras la IA no esté lista.
-    &:disabled { cursor: not-allowed; opacity: 0.55; }
+    &:disabled {
+      cursor: not-allowed;
+      opacity: 0.55;
+    }
   }
 }
 

@@ -8,8 +8,7 @@ export const ADMIN_ROUTES: Routes = [
   },
   {
     path: ROUTE_SEGMENTS.networkSupervision,
-    loadComponent: () =>
-      import('./network-supervision/network-supervision').then((m) => m.NetworkSupervision),
+    loadComponent: () => import('./network-supervision/network-supervision').then((m) => m.NetworkSupervision),
   },
   {
     path: `${ROUTE_SEGMENTS.networkSupervision}/:id`,

@@ -8,7 +8,8 @@ import { ChatConversationSummary } from '../../../core/models/security.model';
 import { SecurityAssistantRepository } from '../../../core/repositories/security-assistant.repository';
 import { SecurityChatSession } from './security-chat-session.service';
 
-const conversation = (id: string): ChatConversationSummary => ({ id, title: null, topic: null }) as ChatConversationSummary;
+const conversation = (id: string): ChatConversationSummary =>
+  ({ id, title: null, topic: null }) as ChatConversationSummary;
 
 function setup(overrides: Partial<Record<keyof SecurityAssistantRepository, unknown>> = {}, aiReady = true) {
   const aiStatus = { isReady: signal(aiReady), reportWarmingUp: vi.fn() };
@@ -45,14 +46,21 @@ describe('SecurityChatSession', () => {
 
   it('si el backend no guardó el mensaje (traía una contraseña) lo quita y muestra el aviso', () => {
     const { session } = setup({
-      sendMessage: vi.fn(() => of({ reply: null, noticeKey: 'user.securityAssistant.chat.sensitiveRemoved', noticeParams: null })),
+      sendMessage: vi.fn(() =>
+        of({ reply: null, noticeKey: 'user.securityAssistant.chat.sensitiveRemoved', noticeParams: null }),
+      ),
     });
     session.currentConversationId.set('c1');
 
     session.send('mi clave es 1234');
 
     expect(session.messages()).toEqual([
-      { role: 'assistant', text: 'user.securityAssistant.chat.sensitiveRemoved', isTranslationKey: true, translationParams: undefined },
+      {
+        role: 'assistant',
+        text: 'user.securityAssistant.chat.sensitiveRemoved',
+        isTranslationKey: true,
+        translationParams: undefined,
+      },
     ]);
   });
 
@@ -79,7 +87,9 @@ describe('SecurityChatSession', () => {
   it('el resumen de una evaluación abre su conversación sin duplicarla en la lista', () => {
     const briefing = conversation('b1');
     const { session } = setup({
-      startAssessmentBriefing: vi.fn(() => of({ conversation: briefing, messages: [{ role: 'assistant', text: 'resumen' }] })),
+      startAssessmentBriefing: vi.fn(() =>
+        of({ conversation: briefing, messages: [{ role: 'assistant', text: 'resumen' }] }),
+      ),
     });
     session.conversations.set([briefing, conversation('old')]);
 

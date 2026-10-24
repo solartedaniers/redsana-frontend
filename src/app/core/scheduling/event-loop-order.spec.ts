@@ -10,12 +10,7 @@ describe('Event Loop: microtasks antes que tasks', () => {
 
     await new Promise((resolve) => setTimeout(resolve, 0));
 
-    expect(order).toEqual([
-      'call stack: síncrono',
-      'microtask: then',
-      'microtask: queueMicrotask',
-      'task: setTimeout',
-    ]);
+    expect(order).toEqual(['call stack: síncrono', 'microtask: then', 'microtask: queueMicrotask', 'task: setTimeout']);
   });
 
   it('una microtask encolada desde otra microtask también corre antes de la task pendiente', async () => {

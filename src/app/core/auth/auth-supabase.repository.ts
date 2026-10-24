@@ -1,11 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { Observable, map, of, switchMap, throwError } from 'rxjs';
-import {
-  AuthSession,
-  PasswordChangePayload,
-  ProfileUpdatePayload,
-  RegisterPayload,
-} from '../models/user.model';
+import { AuthSession, PasswordChangePayload, ProfileUpdatePayload, RegisterPayload } from '../models/user.model';
 import { AuthRepository } from './auth.repository';
 import { BackendProfileLoader } from './backend-profile-loader';
 import { SupabaseCredentials } from './supabase-credentials';
@@ -46,7 +41,7 @@ export class SupabaseAuthRepository extends AuthRepository {
     return this.credentials.updateFullName(payload.fullName).pipe(
       // Supabase ya quedó actualizado; ahora sincronizo nuestra tabla para que no diverjan.
       switchMap(() => this.profile.update({ full_name: payload.fullName })),
-      switchMap(() => this.reloadSession())
+      switchMap(() => this.reloadSession()),
     );
   }
 
@@ -64,10 +59,12 @@ export class SupabaseAuthRepository extends AuthRepository {
   }
 
   private reloadSession(): Observable<AuthSession> {
-    return this.sessions.current().pipe(
-      switchMap((tokens) =>
-        tokens ? this.profile.load(tokens) : throwError(() => new Error('auth.errors.userNotFound'))
-      )
-    );
+    return this.sessions
+      .current()
+      .pipe(
+        switchMap((tokens) =>
+          tokens ? this.profile.load(tokens) : throwError(() => new Error('auth.errors.userNotFound')),
+        ),
+      );
   }
 }

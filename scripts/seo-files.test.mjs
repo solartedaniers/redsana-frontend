@@ -23,9 +23,9 @@ test('robots.txt deja la landing, saca las rutas privadas y apunta al sitemap de
 
 test('cada ruta de primer nivel con guarda de sesión está en la lista privada', () => {
   // Bloques de primer nivel de app.routes.ts que llevan authGuard: su primer segmento debe ser privado.
-  const guarded = [...APP_ROUTES.matchAll(/path: `?\$?\{?ROUTE_SEGMENTS\.(\w+)[^\n]*\n(?:(?!\n  \{)[\s\S])*?authGuard/g)].map(
-    ([, key]) => key
-  );
+  const guarded = [
+    ...APP_ROUTES.matchAll(/path: `?\$?\{?ROUTE_SEGMENTS\.(\w+)[^\n]*\n(?:(?!\n  \{)[\s\S])*?authGuard/g),
+  ].map(([, key]) => key);
 
   assert.ok(guarded.length >= 3, `rutas con guarda encontradas: ${guarded}`);
   assert.deepEqual([...new Set(guarded)].sort(), [...PRIVATE_SEGMENT_KEYS].sort());
@@ -38,7 +38,10 @@ test('un segmento que ya no existe rompe el build en vez de dejar un robots.txt 
 test('el sitemap solo lista la landing del dominio dado', () => {
   const sitemap = buildSitemap(SITE);
 
-  assert.deepEqual([...sitemap.matchAll(/<loc>([^<]+)<\/loc>/g)].map(([, loc]) => loc), [`${SITE}/`]);
+  assert.deepEqual(
+    [...sitemap.matchAll(/<loc>([^<]+)<\/loc>/g)].map(([, loc]) => loc),
+    [`${SITE}/`],
+  );
   assert.match(sitemap, /xmlns="http:\/\/www\.sitemaps\.org\/schemas\/sitemap\/0\.9"/);
 });
 

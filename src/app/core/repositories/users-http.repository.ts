@@ -2,7 +2,13 @@ import { HttpClient, HttpErrorResponse, HttpStatusCode } from '@angular/common/h
 import { Injectable, inject } from '@angular/core';
 import { Observable, catchError, map, throwError } from 'rxjs';
 import { environment } from '../../../environments/environment';
-import { ManagedUser, ManagedUserCreatePayload, ManagedUserStatus, ManagedUserUpdatePayload, UserRole } from '../models/user.model';
+import {
+  ManagedUser,
+  ManagedUserCreatePayload,
+  ManagedUserStatus,
+  ManagedUserUpdatePayload,
+  UserRole,
+} from '../models/user.model';
 import { UsersRepository } from './users.repository';
 
 // El backend responde 409 si la operación dejaría al admin sin acceso o a la plataforma sin admin activo.
@@ -23,7 +29,9 @@ export class UsersHttpRepository extends UsersRepository {
   private readonly baseUrl = `${environment.apiBaseUrl}/api/admin/users`;
 
   getUsers(): Observable<ManagedUser[]> {
-    return this.http.get<BackendUser[]>(this.baseUrl).pipe(map((users) => users.map((user) => this.toManagedUser(user))));
+    return this.http
+      .get<BackendUser[]>(this.baseUrl)
+      .pipe(map((users) => users.map((user) => this.toManagedUser(user))));
   }
 
   createUser(payload: ManagedUserCreatePayload): Observable<ManagedUser> {
@@ -40,12 +48,14 @@ export class UsersHttpRepository extends UsersRepository {
     };
     return this.http.patch<BackendUser>(`${this.baseUrl}/${id}`, body).pipe(
       map((user) => this.toManagedUser(user)),
-      catchError((error: unknown) => this.toLockoutError(error))
+      catchError((error: unknown) => this.toLockoutError(error)),
     );
   }
 
   deleteUser(id: string): Observable<void> {
-    return this.http.delete<void>(`${this.baseUrl}/${id}`).pipe(catchError((error: unknown) => this.toLockoutError(error)));
+    return this.http
+      .delete<void>(`${this.baseUrl}/${id}`)
+      .pipe(catchError((error: unknown) => this.toLockoutError(error)));
   }
 
   private toLockoutError(error: unknown): Observable<never> {

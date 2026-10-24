@@ -36,9 +36,7 @@ export const routes: Routes = [
     path: `${ROUTE_SEGMENTS.account}/${ROUTE_SEGMENTS.profile}`,
     loadComponent: () => import('./layouts/app-shell-layout/app-shell-layout').then((m) => m.AppShellLayout),
     canActivate: [authGuard],
-    children: [
-      { path: '', loadComponent: () => import('./features/auth/profile/profile').then((m) => m.Profile) },
-    ],
+    children: [{ path: '', loadComponent: () => import('./features/auth/profile/profile').then((m) => m.Profile) }],
   },
   { path: '', redirectTo: APP_PATHS.login, pathMatch: 'full' },
   { path: '**', redirectTo: APP_PATHS.login },

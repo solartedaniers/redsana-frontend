@@ -20,7 +20,10 @@ function render(getAlerts: ReturnType<typeof vi.fn>) {
 
 describe('AlertsCenter', () => {
   it('si la consulta falla no afirma que no hay alertas y ofrece reintentar', () => {
-    const getAlerts = vi.fn().mockReturnValueOnce(throwError(() => new Error('offline'))).mockReturnValueOnce(of([]));
+    const getAlerts = vi
+      .fn()
+      .mockReturnValueOnce(throwError(() => new Error('offline')))
+      .mockReturnValueOnce(of([]));
     const { fixture, element } = render(getAlerts);
 
     expect(element.querySelector('.alerts-error')?.textContent).toContain('user.alertsCenter.loadError');

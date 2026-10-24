@@ -2,7 +2,13 @@ import { AI_STATUS_CONFIG, buildPollDelays } from './ai-status.config';
 
 describe('buildPollDelays', () => {
   it('crece con backoff y se queda en el máximo', () => {
-    const delays = buildPollDelays({ ...AI_STATUS_CONFIG, maxWaitMs: 20_000, initialPollDelayMs: 2_000, backoffFactor: 2, maxPollDelayMs: 5_000 });
+    const delays = buildPollDelays({
+      ...AI_STATUS_CONFIG,
+      maxWaitMs: 20_000,
+      initialPollDelayMs: 2_000,
+      backoffFactor: 2,
+      maxPollDelayMs: 5_000,
+    });
 
     expect(delays).toEqual([2_000, 4_000, 5_000, 5_000, 5_000]);
   });

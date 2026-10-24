@@ -6,17 +6,35 @@ import { AuthUser, ManagedUser } from '../../../core/models/user.model';
 import { UsersRepository } from '../../../core/repositories/users.repository';
 import { UserManagement } from './user-management';
 
-const ME: ManagedUser = { id: 'me', fullName: 'Yo', email: 'yo@example.invalid', role: 'admin', status: 'active', createdAt: '2026-10-01T00:00:00Z' };
+const ME: ManagedUser = {
+  id: 'me',
+  fullName: 'Yo',
+  email: 'yo@example.invalid',
+  role: 'admin',
+  status: 'active',
+  createdAt: '2026-10-01T00:00:00Z',
+};
 const OTHER: ManagedUser = { ...ME, id: 'other', fullName: 'Otra', email: 'otra@example.invalid', role: 'standard' };
 
 async function render() {
   // jsdom no implementa <dialog>: basta con que abrirlo no falle.
-  HTMLDialogElement.prototype.showModal ??= function (this: HTMLDialogElement) { this.open = true; };
-  const currentUser = signal<AuthUser | null>({ id: ME.id, email: ME.email, fullName: ME.fullName, avatarUrl: null, role: 'admin' });
+  HTMLDialogElement.prototype.showModal ??= function (this: HTMLDialogElement) {
+    this.open = true;
+  };
+  const currentUser = signal<AuthUser | null>({
+    id: ME.id,
+    email: ME.email,
+    fullName: ME.fullName,
+    avatarUrl: null,
+    role: 'admin',
+  });
   TestBed.configureTestingModule({
     providers: [
       { provide: AuthService, useValue: { currentUser: computed(() => currentUser()) } },
-      { provide: UsersRepository, useValue: { getUsers: vi.fn(() => of([ME, OTHER])), deleteUser: vi.fn(() => of(undefined)) } },
+      {
+        provide: UsersRepository,
+        useValue: { getUsers: vi.fn(() => of([ME, OTHER])), deleteUser: vi.fn(() => of(undefined)) },
+      },
     ],
   });
   const fixture = TestBed.createComponent(UserManagement);

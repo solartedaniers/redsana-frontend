@@ -46,9 +46,9 @@ export class NetworkMeasurementService {
       .pipe(
         // Al iniciar sesión mido enseguida; al cerrarla, switchMap corta el ciclo.
         switchMap((isAuthenticated) =>
-          isAuthenticated ? interval(MEASUREMENT_INTERVAL_MS).pipe(startWith(0)) : EMPTY
+          isAuthenticated ? interval(MEASUREMENT_INTERVAL_MS).pipe(startWith(0)) : EMPTY,
         ),
-        switchMap(() => this.runCycle())
+        switchMap(() => this.runCycle()),
       )
       .subscribe();
   }
@@ -60,7 +60,7 @@ export class NetworkMeasurementService {
       catchError((error) => {
         console.error('No se pudo registrar la medición de red', error);
         return EMPTY;
-      })
+      }),
     );
   }
 }

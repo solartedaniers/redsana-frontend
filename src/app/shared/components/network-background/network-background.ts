@@ -180,7 +180,11 @@ export class NetworkBackground {
     this.hub = new THREE.Mesh(this.hubGeometry, this.hubMaterial);
     this.group.add(this.hub);
 
-    this.nodeMaterials.push(new THREE.MeshBasicMaterial(), new THREE.MeshBasicMaterial(), new THREE.MeshBasicMaterial());
+    this.nodeMaterials.push(
+      new THREE.MeshBasicMaterial(),
+      new THREE.MeshBasicMaterial(),
+      new THREE.MeshBasicMaterial(),
+    );
     for (let i = 0; i < SCENE.nodeCount; i++) {
       this.group.add(this.createNode(this.nodeMaterials[i % this.nodeMaterials.length]));
     }
@@ -195,7 +199,7 @@ export class NetworkBackground {
           transparent: true,
           opacity: SCENE.ringBaseOpacity - i * SCENE.ringOpacityStep,
           side: THREE.DoubleSide,
-        })
+        }),
       );
       ring.rotation.x = SCENE.ringTilt;
       this.group.add(ring);
@@ -214,7 +218,7 @@ export class NetworkBackground {
     const origin = new THREE.Vector3(
       radius * Math.sin(phi) * Math.cos(theta),
       radius * Math.sin(phi) * Math.sin(theta) * SCENE.shellSquashY,
-      radius * Math.cos(phi) * SCENE.shellSquashZ
+      radius * Math.cos(phi) * SCENE.shellSquashZ,
     );
     node.position.copy(origin);
     const userData: NodeUserData = {

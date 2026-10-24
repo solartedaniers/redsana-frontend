@@ -1,6 +1,10 @@
-:host { display: block; }
+:host {
+  display: block;
+}
 
-.ecg { margin: 0; }
+.ecg {
+  margin: 0;
+}
 
 .ecg-empty {
   margin: 0;
@@ -22,9 +26,17 @@
   touch-action: pan-y;
 }
 
-.ecg__plot { display: block; width: 100%; height: 100%; overflow: visible; }
+.ecg__plot {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
 
-.ecg__band { fill: var(--severity-fill); opacity: 0.14; }
+.ecg__band {
+  fill: var(--severity-fill);
+  opacity: 0.14;
+}
 
 .ecg__threshold {
   stroke: var(--severity-ink);
@@ -41,8 +53,15 @@
   vector-effect: non-scaling-stroke;
 }
 
-.ecg__trace { stroke: var(--color-text-primary); stroke-width: 2.5; }
-.ecg__glow { stroke: var(--color-fill-healthy); stroke-width: 8; opacity: 0.45; }
+.ecg__trace {
+  stroke: var(--color-text-primary);
+  stroke-width: 2.5;
+}
+.ecg__glow {
+  stroke: var(--color-fill-healthy);
+  stroke-width: 8;
+  opacity: 0.45;
+}
 
 // Se dibuja una vez de izquierda a derecha; con movimiento reducido aparece completo.
 .ecg__reveal {
@@ -51,7 +70,11 @@
   animation: ecg-reveal calc(var(--motion-heartbeat) * 1.5) var(--motion-easing-decelerate) both;
 }
 
-.ecg__cursor { stroke: var(--color-accent); stroke-width: 1.5; vector-effect: non-scaling-stroke; }
+.ecg__cursor {
+  stroke: var(--color-accent);
+  stroke-width: 1.5;
+  vector-effect: non-scaling-stroke;
+}
 
 .ecg__marker,
 .ecg__head {
@@ -68,13 +91,18 @@
   background: var(--severity-fill);
 }
 
-.ecg__marker[data-severity='cut'] { border-radius: 0; rotate: 45deg; }
+.ecg__marker[data-severity='cut'] {
+  border-radius: 0;
+  rotate: 45deg;
+}
 
 .ecg__head {
   width: 0.85rem;
   height: 0.85rem;
   background: var(--severity-fill);
-  box-shadow: 0 0 0 0.25rem color-mix(in srgb, var(--severity-fill) 35%, transparent), 0 0 1rem var(--severity-fill);
+  box-shadow:
+    0 0 0 0.25rem color-mix(in srgb, var(--severity-fill) 35%, transparent),
+    0 0 1rem var(--severity-fill);
   animation: heartbeat var(--motion-heartbeat) var(--motion-easing-standard) infinite;
 }
 
@@ -94,12 +122,21 @@
   pointer-events: none;
   translate: var(--tip-x, 0) var(--tip-y, 0);
 
-  strong { font: 800 var(--font-size-body) var(--font-mono); }
-  time { font: 600 var(--font-size-caption) var(--font-mono); color: var(--color-text-secondary); }
+  strong {
+    font: 800 var(--font-size-body) var(--font-mono);
+  }
+  time {
+    font: 600 var(--font-size-caption) var(--font-mono);
+    color: var(--color-text-secondary);
+  }
 }
 
-.ecg__tooltip--flip { --tip-x: calc(-100% - 2 * var(--space-3)); }
-.ecg__tooltip--above { --tip-y: calc(-100% - 2 * var(--space-3)); }
+.ecg__tooltip--flip {
+  --tip-x: calc(-100% - 2 * var(--space-3));
+}
+.ecg__tooltip--above {
+  --tip-y: calc(-100% - 2 * var(--space-3));
+}
 
 .ecg__heatmap {
   display: block;
@@ -109,7 +146,9 @@
   border: var(--border-width-ink) solid var(--color-card-border);
   border-radius: var(--radius-sm);
 
-  rect { fill: var(--severity-fill); }
+  rect {
+    fill: var(--severity-fill);
+  }
 }
 
 .ecg__axis,
@@ -123,8 +162,13 @@
   color: var(--color-text-secondary);
 }
 
-.ecg__axis { margin-top: var(--space-2); }
-.ecg__hint { flex: 1; text-align: center; }
+.ecg__axis {
+  margin-top: var(--space-2);
+}
+.ecg__hint {
+  flex: 1;
+  text-align: center;
+}
 
 .ecg__legend {
   justify-content: flex-start;
@@ -132,7 +176,9 @@
   padding: 0;
   list-style: none;
 
-  li { cursor: help; }
+  li {
+    cursor: help;
+  }
 
   li::before {
     content: '';
@@ -146,6 +192,14 @@
   }
 }
 
-@media (pointer: coarse) { .ecg__hint { display: none; } }
+@media (pointer: coarse) {
+  .ecg__hint {
+    display: none;
+  }
+}
 
-@keyframes ecg-reveal { from { transform: scaleX(0); } }
+@keyframes ecg-reveal {
+  from {
+    transform: scaleX(0);
+  }
+}

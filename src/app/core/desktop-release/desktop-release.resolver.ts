@@ -27,13 +27,15 @@ export class DesktopReleaseResolver {
     }
     return this.http.get<GitHubRelease>(this.config.latestReleaseUrl).pipe(
       map((release) => selectInstallerAsset(release.assets ?? [], this.config.installerAssetSuffix)),
-      map((asset): DesktopInstallerLink => (asset ? { kind: 'installer', url: asset.browser_download_url } : this.fallback())),
+      map((asset): DesktopInstallerLink =>
+        asset ? { kind: 'installer', url: asset.browser_download_url } : this.fallback(),
+      ),
       catchError(() => of(this.fallback())),
       tap((link) => {
         if (link.kind === 'installer') {
           this.cached = link;
         }
-      })
+      }),
     );
   }
 

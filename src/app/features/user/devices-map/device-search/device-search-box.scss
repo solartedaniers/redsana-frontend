@@ -1,7 +1,14 @@
-:host { display: block; grid-column: 1 / -1; }
+:host {
+  display: block;
+  grid-column: 1 / -1;
+}
 
 // minmax(0, 1fr): sin esto el ancho intrínseco del input estiraba la columna y desbordaba a 320 px.
-.search { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--space-2); }
+.search {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-2);
+}
 
 .search__field {
   display: flex;
@@ -13,9 +20,14 @@
   border-radius: var(--radius-sm);
   background: var(--color-bg-surface);
 
-  &:focus-within { border-color: var(--color-accent); box-shadow: var(--shadow-offset) var(--shadow-offset) 0 var(--color-accent); }
+  &:focus-within {
+    border-color: var(--color-accent);
+    box-shadow: var(--shadow-offset) var(--shadow-offset) 0 var(--color-accent);
+  }
 
-  app-icon { color: var(--icon-tone); }
+  app-icon {
+    color: var(--icon-tone);
+  }
 
   input {
     flex: 1;
@@ -27,10 +39,16 @@
     color: var(--color-text-primary);
     font: 500 var(--font-size-form-input) var(--font-mono);
 
-    &::placeholder { color: var(--color-text-secondary); }
-    &:focus-visible { outline: none; }
+    &::placeholder {
+      color: var(--color-text-secondary);
+    }
+    &:focus-visible {
+      outline: none;
+    }
     // Uso mi propio botón de limpiar; oculto el del navegador para no tener dos.
-    &::-webkit-search-cancel-button { appearance: none; }
+    &::-webkit-search-cancel-button {
+      appearance: none;
+    }
   }
 }
 
@@ -67,9 +85,16 @@
   border: var(--border-width-ink) dashed var(--color-card-border);
   border-radius: var(--radius-sm);
 
-  p { margin: 0; font-weight: 600; overflow-wrap: anywhere; }
+  p {
+    margin: 0;
+    font-weight: 600;
+    overflow-wrap: anywhere;
+  }
 }
 
 @media (pointer: coarse) {
-  .search__clear { width: var(--touch-target-min); height: var(--touch-target-min); }
+  .search__clear {
+    width: var(--touch-target-min);
+    height: var(--touch-target-min);
+  }
 }

@@ -17,7 +17,7 @@ const OFF: DemoLoginConfig = { enabled: false, email: '', password: '' };
 async function render(
   demoLogin: DemoLoginConfig,
   signIn: ReturnType<typeof vi.fn> = vi.fn(() => of({ user: { role: 'user' } })),
-  accountSuspended = false
+  accountSuspended = false,
 ) {
   const wakeUp = vi.fn();
   TestBed.configureTestingModule({
@@ -109,7 +109,9 @@ describe('readDemoLoginConfig', () => {
   });
 
   it('queda apagado si falta el correo o la contraseña aunque el interruptor esté encendido', () => {
-    expect(readDemoLoginConfig({ demoLogin: { enabled: true, email: 'demo@example.invalid', password: '' } })).toEqual(OFF);
+    expect(readDemoLoginConfig({ demoLogin: { enabled: true, email: 'demo@example.invalid', password: '' } })).toEqual(
+      OFF,
+    );
   });
 
   it('respeta las credenciales cuando el interruptor está encendido', () => {

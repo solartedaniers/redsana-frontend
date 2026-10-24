@@ -7,7 +7,13 @@ import { test } from 'node:test';
 import { fileURLToPath } from 'node:url';
 
 const SRC_DIR = resolve(dirname(fileURLToPath(import.meta.url)), '../src');
-const LEGACY_ROUTES = [/\/api\/me\b/, /\/api\/conversations\b/, /\/api\/admin\/metrics\b/, /\/api\/alerts\/new\b/, /baseUrl\}\/new\b/];
+const LEGACY_ROUTES = [
+  /\/api\/me\b/,
+  /\/api\/conversations\b/,
+  /\/api\/admin\/metrics\b/,
+  /\/api\/alerts\/new\b/,
+  /baseUrl\}\/new\b/,
+];
 
 function* sourceFiles(dir) {
   for (const entry of readdirSync(dir, { withFileTypes: true })) {

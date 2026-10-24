@@ -28,7 +28,16 @@ function render(queryParams: Record<string, string> = {}, networkStatus: 'good' 
       { provide: NetworkMetricsRepository, useValue: { getSnapshot: () => of({ status: networkStatus }) } },
       { provide: WifiEncryptionGateway, useValue: { isAvailable: false, detect: () => Promise.resolve(null) } },
       { provide: SecurityEvidenceCollector, useValue: { collect: () => Promise.resolve({}) } },
-      { provide: AiStatusService, useValue: { status: signal('ready'), isReady: signal(true), notReadyKey: signal('ready'), reportWarmingUp: vi.fn(), wakeUp: vi.fn() } },
+      {
+        provide: AiStatusService,
+        useValue: {
+          status: signal('ready'),
+          isReady: signal(true),
+          notReadyKey: signal('ready'),
+          reportWarmingUp: vi.fn(),
+          wakeUp: vi.fn(),
+        },
+      },
     ],
   });
   const fixture = TestBed.createComponent(SecurityAssistant);
@@ -48,13 +57,17 @@ describe('SecurityAssistant', () => {
     const { repository, element } = render({ topic: 'family_mode' });
 
     expect(repository.createConversation).toHaveBeenCalledExactlyOnceWith('family_mode');
-    expect(element.querySelector('.chat-bubble')?.textContent?.trim()).toBe('user.securityAssistant.chat.familyModeIntro');
+    expect(element.querySelector('.chat-bubble')?.textContent?.trim()).toBe(
+      'user.securityAssistant.chat.familyModeIntro',
+    );
   });
 
   it('una evaluación nueva pide su resumen en el chat', () => {
     const { fixture, repository } = render();
 
-    fixture.debugElement.query((el) => el.name === 'app-security-assessment-panel').triggerEventHandler('assessed', 'a1');
+    fixture.debugElement
+      .query((el) => el.name === 'app-security-assessment-panel')
+      .triggerEventHandler('assessed', 'a1');
 
     expect(repository.startAssessmentBriefing).toHaveBeenCalledWith('a1', expect.any(String));
   });
@@ -64,6 +77,8 @@ describe('SecurityAssistant badge de red', () => {
   it('muestra el estado de la última medición, no "Red saludable" fijo', () => {
     const { element } = render({}, 'warning');
 
-    expect(element.querySelector('.assistant-hero .status-badge')?.textContent?.trim()).toBe('common.networkStatus.warning');
+    expect(element.querySelector('.assistant-hero .status-badge')?.textContent?.trim()).toBe(
+      'common.networkStatus.warning',
+    );
   });
 });

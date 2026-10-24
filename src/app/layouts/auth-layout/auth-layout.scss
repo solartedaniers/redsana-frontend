@@ -47,7 +47,9 @@
   text-transform: uppercase;
   color: var(--color-text-secondary);
 
-  @media (min-width: 48rem) { display: block; }
+  @media (min-width: 48rem) {
+    display: block;
+  }
 }
 
 .header-actions {
@@ -87,7 +89,9 @@
     padding: 0;
   }
 
-  @media (max-width: 30rem) { padding: var(--space-5); }
+  @media (max-width: 30rem) {
+    padding: var(--space-5);
+  }
 }
 
 .auth-card__sticker {
@@ -98,5 +102,7 @@
 }
 
 @media (max-width: 44rem) {
-  .auth-card:has(.auth-split) { max-width: 28rem; }
+  .auth-card:has(.auth-split) {
+    max-width: 28rem;
+  }
 }

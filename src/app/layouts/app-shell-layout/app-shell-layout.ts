@@ -62,7 +62,10 @@ export class AppShellLayout {
   constructor() {
     // Al elegir una sección cierro el cajón para que se vea la pantalla elegida.
     this.router.events
-      .pipe(filter((event) => event instanceof NavigationEnd), takeUntilDestroyed())
+      .pipe(
+        filter((event) => event instanceof NavigationEnd),
+        takeUntilDestroyed(),
+      )
       .subscribe(() => this.isNavOpen.set(false));
   }
 

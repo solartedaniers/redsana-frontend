@@ -55,7 +55,13 @@ describe('FamilyMode', () => {
     fixture.detectChanges();
     const element = fixture.nativeElement as HTMLElement;
 
-    expect([...element.querySelectorAll('.step-number')].map((n) => n.textContent?.trim())).toEqual(['1', '2', '3', '4', '5']);
+    expect([...element.querySelectorAll('.step-number')].map((n) => n.textContent?.trim())).toEqual([
+      '1',
+      '2',
+      '3',
+      '4',
+      '5',
+    ]);
     expect([...element.querySelectorAll('.dns-chip')].map((c) => c.textContent?.trim())).toEqual([
       FAMILY_DNS.primary,
       FAMILY_DNS.secondary,

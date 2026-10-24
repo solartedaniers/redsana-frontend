@@ -14,10 +14,10 @@ export class AppUpdateService {
     this.swUpdate.isEnabled
       ? this.swUpdate.versionUpdates.pipe(
           filter((event) => event.type === 'VERSION_READY'),
-          map(() => true)
+          map(() => true),
         )
       : EMPTY,
-    { initialValue: false }
+    { initialValue: false },
   );
 
   /** La versión nueva ya está descargada: recargar la activa. */

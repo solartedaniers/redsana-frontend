@@ -36,7 +36,7 @@ export class ResetPassword {
       password: ['', [Validators.required, Validators.minLength(MIN_PASSWORD_LENGTH), strongPasswordValidator()]],
       confirmPassword: ['', [Validators.required]],
     },
-    { validators: passwordsMatchValidator('password', 'confirmPassword') }
+    { validators: passwordsMatchValidator('password', 'confirmPassword') },
   );
 
   constructor() {

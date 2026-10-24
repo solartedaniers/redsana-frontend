@@ -3,8 +3,15 @@ import { DeviceTrust, NetworkDevice } from '../../../../core/models/device.model
 import { DeviceCard } from './device-card';
 
 const ROUTER: NetworkDevice = {
-  id: 'r1', name: '', macAddress: '3c-6a-d2-c8-5a-ec', ipAddress: '192.168.0.1', trust: 'unknown',
-  firstSeen: '2026-10-01T00:00:00Z', lastSeen: '2026-10-01T00:00:00Z', isOnline: true, networkRole: 'gateway',
+  id: 'r1',
+  name: '',
+  macAddress: '3c-6a-d2-c8-5a-ec',
+  ipAddress: '192.168.0.1',
+  trust: 'unknown',
+  firstSeen: '2026-10-01T00:00:00Z',
+  lastSeen: '2026-10-01T00:00:00Z',
+  isOnline: true,
+  networkRole: 'gateway',
 };
 
 function render(device: NetworkDevice) {
@@ -23,7 +30,9 @@ describe('DeviceCard', () => {
   it('muestra el papel del router en su propia línea y pide los cambios de confianza al padre', () => {
     const { element, emitted } = render(ROUTER);
 
-    expect(element.querySelector('.device-info > .device-role')?.textContent?.trim()).toBe('user.devicesMap.role.gateway');
+    expect(element.querySelector('.device-info > .device-role')?.textContent?.trim()).toBe(
+      'user.devicesMap.role.gateway',
+    );
     button(element, 'user.devicesMap.block')!.click();
     button(element, 'user.devicesMap.markTrusted')!.click();
 

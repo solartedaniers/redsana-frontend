@@ -18,7 +18,10 @@ export class AiClientWakeUp {
     if (!this.healthUrl || typeof fetch !== 'function') {
       return;
     }
-    fetch(this.healthUrl, { mode: 'no-cors', cache: 'no-store', signal: AbortSignal.timeout(AI_CLIENT_WAKE_UP_TIMEOUT_MS) })
-      .catch(() => undefined);
+    fetch(this.healthUrl, {
+      mode: 'no-cors',
+      cache: 'no-store',
+      signal: AbortSignal.timeout(AI_CLIENT_WAKE_UP_TIMEOUT_MS),
+    }).catch(() => undefined);
   }
 }

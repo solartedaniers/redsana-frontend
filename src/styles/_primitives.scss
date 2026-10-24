@@ -1,8 +1,15 @@
 // Primitivas compartidas del lenguaje "Hoja Clínica": superficie, contorno, sombra y estados viven aquí.
 
-.workspace-grid { display: grid; gap: var(--space-5); }
-.workspace-grid--two { grid-template-columns: minmax(0, 1.15fr) minmax(18rem, 0.85fr); }
-.workspace-grid--aside { grid-template-columns: minmax(15rem, 0.55fr) minmax(0, 1.45fr); }
+.workspace-grid {
+  display: grid;
+  gap: var(--space-5);
+}
+.workspace-grid--two {
+  grid-template-columns: minmax(0, 1.15fr) minmax(18rem, 0.85fr);
+}
+.workspace-grid--aside {
+  grid-template-columns: minmax(15rem, 0.55fr) minmax(0, 1.45fr);
+}
 
 // Panel: una hoja de papel prendida al tablero.
 .surface-panel {
@@ -81,14 +88,18 @@
   background: var(--color-fill-brand);
   color: var(--color-on-fill-brand);
 
-  &:hover:not(:disabled) { background: var(--color-accent-hover); }
+  &:hover:not(:disabled) {
+    background: var(--color-accent-hover);
+  }
 }
 
 .subtle-button {
   background: var(--color-bg-surface);
   color: var(--color-text-primary);
 
-  &:hover:not(:disabled) { background: var(--color-bg-surface-alt); }
+  &:hover:not(:disabled) {
+    background: var(--color-bg-surface-alt);
+  }
 }
 
 // La elevación solo con puntero real; en táctil queda la pulsación fija.
@@ -96,7 +107,9 @@
   .action-button,
   .submit-button,
   .subtle-button {
-    &:hover:not(:disabled):not(:active) { transform: translate(var(--motion-lift), var(--motion-lift)); }
+    &:hover:not(:disabled):not(:active) {
+      transform: translate(var(--motion-lift), var(--motion-lift));
+    }
   }
 }
 
@@ -121,7 +134,9 @@
   box-shadow: calc(var(--shadow-offset) / 2) calc(var(--shadow-offset) / 2) 0 var(--color-shadow);
 }
 
-.sticker--alt { transform: rotate(var(--sticker-tilt-alt)); }
+.sticker--alt {
+  transform: rotate(var(--sticker-tilt-alt));
+}
 
 .status-badge::before {
   content: '';
@@ -136,10 +151,22 @@
   animation: heartbeat var(--motion-heartbeat) var(--motion-easing-standard) infinite;
 }
 
-.sticker[data-tone='healthy'], .status-badge[data-status='good'] { background: var(--color-fill-healthy); }
-.sticker[data-tone='warning'], .status-badge[data-status='warning'] { background: var(--color-fill-warning); }
-.sticker[data-tone='critical'], .status-badge[data-status='critical'] { background: var(--color-fill-critical); }
-.sticker[data-tone='brand'] { background: var(--color-fill-brand); color: var(--color-on-fill-brand); }
+.sticker[data-tone='healthy'],
+.status-badge[data-status='good'] {
+  background: var(--color-fill-healthy);
+}
+.sticker[data-tone='warning'],
+.status-badge[data-status='warning'] {
+  background: var(--color-fill-warning);
+}
+.sticker[data-tone='critical'],
+.status-badge[data-status='critical'] {
+  background: var(--color-fill-critical);
+}
+.sticker[data-tone='brand'] {
+  background: var(--color-fill-brand);
+  color: var(--color-on-fill-brand);
+}
 
 // En el tema oscuro los stickers pasan a contornos que brillan en vez de rellenos.
 :root[data-theme='dark'] {
@@ -152,22 +179,52 @@
     box-shadow: 0 0 1rem -0.25rem var(--sticker-tone);
   }
 
-  .sticker[data-tone='healthy'], .status-badge[data-status='good'] { --sticker-tone: var(--color-fill-healthy); }
-  .sticker[data-tone='warning'], .status-badge[data-status='warning'] { --sticker-tone: var(--color-fill-warning); }
-  .sticker[data-tone='critical'], .status-badge[data-status='critical'] { --sticker-tone: var(--color-fill-critical); }
-  .sticker[data-tone='brand'] { --sticker-tone: var(--color-fill-brand); }
+  .sticker[data-tone='healthy'],
+  .status-badge[data-status='good'] {
+    --sticker-tone: var(--color-fill-healthy);
+  }
+  .sticker[data-tone='warning'],
+  .status-badge[data-status='warning'] {
+    --sticker-tone: var(--color-fill-warning);
+  }
+  .sticker[data-tone='critical'],
+  .status-badge[data-status='critical'] {
+    --sticker-tone: var(--color-fill-critical);
+  }
+  .sticker[data-tone='brand'] {
+    --sticker-tone: var(--color-fill-brand);
+  }
 }
 
 @keyframes heartbeat {
-  0%, 40%, 100% { transform: scale(1); opacity: 1; }
-  10% { transform: scale(1.45); opacity: 0.85; }
-  20% { transform: scale(1); }
-  28% { transform: scale(1.25); opacity: 0.9; }
+  0%,
+  40%,
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  10% {
+    transform: scale(1.45);
+    opacity: 0.85;
+  }
+  20% {
+    transform: scale(1);
+  }
+  28% {
+    transform: scale(1.25);
+    opacity: 0.9;
+  }
 }
 
 // Lecturas métricas: números tabulares gigantes.
-.metric-strip { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--space-5); }
-.metric-tile { padding: var(--space-4) var(--space-5); }
+.metric-strip {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--space-5);
+}
+.metric-tile {
+  padding: var(--space-4) var(--space-5);
+}
 
 .metric-tile__label {
   margin: 0;
@@ -196,23 +253,40 @@
 }
 
 // Una medición vieja no se pinta como "en vivo": va en gris.
-.metric-tile__detail.is-stale { color: var(--color-text-secondary); }
+.metric-tile__detail.is-stale {
+  color: var(--color-text-secondary);
+}
 
 @media (max-width: 64rem) {
   .workspace-grid--two,
-  .workspace-grid--aside { grid-template-columns: minmax(0, 1fr); }
-  .metric-strip { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .workspace-grid--aside {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .metric-strip {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
 
 @media (max-width: 28rem) {
-  .metric-strip { grid-template-columns: 1fr; }
+  .metric-strip {
+    grid-template-columns: 1fr;
+  }
 }
 
 // Severidad: un atributo y dos tonos (relleno para bloques y tinta para texto).
-[data-severity='healthy'] { --severity-fill: var(--color-fill-healthy); --severity-ink: var(--color-status-success); }
-[data-severity='warning'] { --severity-fill: var(--color-fill-warning); --severity-ink: var(--color-status-warning); }
+[data-severity='healthy'] {
+  --severity-fill: var(--color-fill-healthy);
+  --severity-ink: var(--color-status-success);
+}
+[data-severity='warning'] {
+  --severity-fill: var(--color-fill-warning);
+  --severity-ink: var(--color-status-warning);
+}
 [data-severity='critical'],
-[data-severity='cut'] { --severity-fill: var(--color-fill-critical); --severity-ink: var(--color-status-danger); }
+[data-severity='cut'] {
+  --severity-fill: var(--color-fill-critical);
+  --severity-ink: var(--color-status-danger);
+}
 
 // Skeleton: un hueco de la hoja barrido por el haz del monitor.
 .skeleton {
@@ -234,6 +308,11 @@
 }
 
 @keyframes skeleton-scan {
-  to { transform: translateX(100%); }
+  to {
+    transform: translateX(100%);
+  }
 }
-[data-severity='info'] { --severity-fill: var(--color-fill-brand); --severity-ink: var(--color-accent); }
+[data-severity='info'] {
+  --severity-fill: var(--color-fill-brand);
+  --severity-ink: var(--color-accent);
+}

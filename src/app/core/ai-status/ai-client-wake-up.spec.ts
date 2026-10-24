@@ -18,7 +18,10 @@ describe('AiClientWakeUp', () => {
     wakeUp.wakeUp();
 
     expect(fetchMock).toHaveBeenCalledOnce();
-    expect(fetchMock).toHaveBeenCalledWith(HEALTH_URL, expect.objectContaining({ mode: 'no-cors', signal: expect.any(AbortSignal) }));
+    expect(fetchMock).toHaveBeenCalledWith(
+      HEALTH_URL,
+      expect.objectContaining({ mode: 'no-cors', signal: expect.any(AbortSignal) }),
+    );
   });
 
   it('sin la dirección configurada no hace nada', () => {

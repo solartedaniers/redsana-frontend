@@ -50,7 +50,7 @@ export class AlertsCenter {
   protected onAcknowledge(alertId: string): void {
     this.repository.acknowledge(alertId).subscribe(() => {
       this.alerts.update((current) =>
-        current.map((alert) => (alert.id === alertId ? { ...alert, acknowledged: true } : alert))
+        current.map((alert) => (alert.id === alertId ? { ...alert, acknowledged: true } : alert)),
       );
     });
   }

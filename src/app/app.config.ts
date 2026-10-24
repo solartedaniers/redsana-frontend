@@ -92,7 +92,11 @@ export const appConfig: ApplicationConfig = {
     { provide: AvatarStorageGateway, useClass: SupabaseAvatarStorageGateway },
 
     // Cargo el idioma antes de pintar para no mostrar claves crudas; si el diccionario no llega, la app arranca igual.
-    provideAppInitializer(() => inject(I18nService).load().catch((error: unknown) => console.error(error))),
+    provideAppInitializer(() =>
+      inject(I18nService)
+        .load()
+        .catch((error: unknown) => console.error(error)),
+    ),
     // Título de la pestaña y lang de <html> desde i18n, en el idioma activo.
     provideAppInitializer(() => void inject(DocumentMetadataService)),
     // La sesión se recupera en segundo plano: el backend dormido en Render tardaba más de un minuto y dejaba la página

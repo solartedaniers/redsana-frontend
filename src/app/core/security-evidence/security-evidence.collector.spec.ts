@@ -9,7 +9,10 @@ describe('SecurityEvidenceCollector', () => {
   it('junta el cifrado y los puertos medidos por el escritorio', async () => {
     TestBed.configureTestingModule({
       providers: [
-        { provide: WifiEncryptionGateway, useValue: { isAvailable: true, detect: () => Promise.resolve('WPA2-Personal') } },
+        {
+          provide: WifiEncryptionGateway,
+          useValue: { isAvailable: true, detect: () => Promise.resolve('WPA2-Personal') },
+        },
         { provide: RouterPortScanGateway, useValue: { isAvailable: true, scanOpenPorts: () => Promise.resolve([23]) } },
       ],
     });

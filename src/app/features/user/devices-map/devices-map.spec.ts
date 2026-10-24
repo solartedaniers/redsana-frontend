@@ -111,7 +111,10 @@ describe('DevicesMap client isolation', () => {
     TestBed.configureTestingModule({
       providers: [
         provideHttpClient(),
-        { provide: DevicesRepository, useValue: { getDevices: () => of([]), syncDiscoveredDevices: () => of(devices) } },
+        {
+          provide: DevicesRepository,
+          useValue: { getDevices: () => of([]), syncDiscoveredDevices: () => of(devices) },
+        },
         { provide: LanScanGateway, useValue: { isAvailable: true, scan: () => Promise.resolve([]) } },
       ],
     });
@@ -129,7 +132,11 @@ describe('DevicesMap client isolation', () => {
   });
 
   it('con otros equipos a la vista no muestra el aviso', async () => {
-    const element = await scanReturning([device(1, true, 'gateway'), device(52, true, 'this_device'), device(60, true)]);
+    const element = await scanReturning([
+      device(1, true, 'gateway'),
+      device(52, true, 'this_device'),
+      device(60, true),
+    ]);
 
     expect(element.querySelector('.scan-hint')).toBeNull();
   });
@@ -137,7 +144,11 @@ describe('DevicesMap client isolation', () => {
 
 describe('DevicesMap con cientos de equipos tras un escaneo manual', () => {
   it('sincroniza 450, pinta una página de la lista y el mapa limitado con "X de Y"', async () => {
-    const scanned = [device(0, true, 'gateway'), device(1, true, 'this_device'), ...Array.from({ length: 448 }, (_, i) => device(i + 2, true))];
+    const scanned = [
+      device(0, true, 'gateway'),
+      device(1, true, 'this_device'),
+      ...Array.from({ length: 448 }, (_, i) => device(i + 2, true)),
+    ];
     const repository = { getDevices: () => of([]), syncDiscoveredDevices: vi.fn(() => of(scanned)) };
     TestBed.configureTestingModule({
       providers: [
@@ -170,7 +181,9 @@ describe('DevicesMap connected count', () => {
     expect(element.querySelectorAll('.topology__node')).toHaveLength(2);
     // El router sigue en la lista, marcado como tal.
     expect(element.querySelectorAll('.device-card')).toHaveLength(3);
-    expect(element.querySelector('.device-card .status-badge')?.textContent?.trim()).toBe('user.devicesMap.role.gateway');
+    expect(element.querySelector('.device-card .status-badge')?.textContent?.trim()).toBe(
+      'user.devicesMap.role.gateway',
+    );
   });
 });
 
@@ -182,7 +195,10 @@ describe('DevicesMap failed scan', () => {
       providers: [
         provideHttpClient(),
         { provide: DevicesRepository, useValue: { getDevices: () => of(devices) } },
-        { provide: LanScanGateway, useValue: { isAvailable: true, scan: () => Promise.reject(new Error('arp failed')) } },
+        {
+          provide: LanScanGateway,
+          useValue: { isAvailable: true, scan: () => Promise.reject(new Error('arp failed')) },
+        },
       ],
     });
     const fixture = TestBed.createComponent(DevicesMap);
@@ -191,7 +207,9 @@ describe('DevicesMap failed scan', () => {
     fixture.detectChanges();
     const element = fixture.nativeElement as HTMLElement;
 
-    expect(element.querySelector('.devices-hero .status-badge')?.textContent?.trim()).toBe('user.devicesMap.countUnavailable');
+    expect(element.querySelector('.devices-hero .status-badge')?.textContent?.trim()).toBe(
+      'user.devicesMap.countUnavailable',
+    );
     expect(element.querySelector('.scan-result.error')?.textContent?.trim()).toBe('user.devicesMap.scanError');
   });
 });
@@ -213,7 +231,7 @@ describe('DevicesMap trust marks', () => {
     const element = fixture.nativeElement as HTMLElement;
 
     const clear = [...element.querySelectorAll<HTMLButtonElement>('.device-actions button')].find(
-      (button) => button.textContent?.trim() === 'user.devicesMap.clearTrust'
+      (button) => button.textContent?.trim() === 'user.devicesMap.clearTrust',
     );
     clear!.click();
 
@@ -223,7 +241,11 @@ describe('DevicesMap trust marks', () => {
 });
 
 describe('DevicesMap con una red de campus (~900 equipos)', () => {
-  const campus = () => [device(0, true, 'gateway'), device(1, true, 'this_device'), ...Array.from({ length: 898 }, (_, i) => device(i + 2, true))];
+  const campus = () => [
+    device(0, true, 'gateway'),
+    device(1, true, 'this_device'),
+    ...Array.from({ length: 898 }, (_, i) => device(i + 2, true)),
+  ];
 
   it('pinta una página de la lista, el mapa limitado y el contador con el total real', async () => {
     const element = await renderWith(campus());
@@ -275,7 +297,10 @@ describe('DevicesMap search', () => {
       input().dispatchEvent(new Event('input'));
       fixture.detectChanges();
     };
-    const ips = () => [...element.querySelectorAll('.device-card')].map((card) => card.querySelector('.device-meta')?.textContent?.split('·')[1]?.trim());
+    const ips = () =>
+      [...element.querySelectorAll('.device-card')].map((card) =>
+        card.querySelector('.device-meta')?.textContent?.split('·')[1]?.trim(),
+      );
     return { fixture, element, input, type, ips, devices$ };
   }
 
@@ -298,7 +323,19 @@ describe('DevicesMap search', () => {
     devices$.next(campus());
     fixture.detectChanges();
 
-    expect(ips()).toEqual(['192.168.0.11', '192.168.0.110', '192.168.0.111', '192.168.0.112', '192.168.0.113', '192.168.0.114', '192.168.0.115', '192.168.0.116', '192.168.0.117', '192.168.0.118', '192.168.0.119']);
+    expect(ips()).toEqual([
+      '192.168.0.11',
+      '192.168.0.110',
+      '192.168.0.111',
+      '192.168.0.112',
+      '192.168.0.113',
+      '192.168.0.114',
+      '192.168.0.115',
+      '192.168.0.116',
+      '192.168.0.117',
+      '192.168.0.118',
+      '192.168.0.119',
+    ]);
 
     input().dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }));
     fixture.detectChanges();
@@ -324,7 +361,10 @@ describe('DevicesMap presence filter', () => {
     TestBed.configureTestingModule({
       providers: [
         provideHttpClient(),
-        { provide: DevicesRepository, useValue: { getDevices: () => of([device(1, true), device(2, true), device(50, false)]) } },
+        {
+          provide: DevicesRepository,
+          useValue: { getDevices: () => of([device(1, true), device(2, true), device(50, false)]) },
+        },
         { provide: LanScanGateway, useValue: { isAvailable: false } },
       ],
     });

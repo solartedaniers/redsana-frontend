@@ -17,11 +17,22 @@
   }
 }
 
-.content { flex: 1; min-width: 0; }
+.content {
+  flex: 1;
+  min-width: 0;
+}
 
-.message { margin: 0; color: var(--color-text-primary); font-size: var(--font-size-body); font-weight: 600; }
+.message {
+  margin: 0;
+  color: var(--color-text-primary);
+  font-size: var(--font-size-body);
+  font-weight: 600;
+}
 
-time { font: 600 var(--font-size-caption) var(--font-mono); color: var(--color-text-secondary); }
+time {
+  font: 600 var(--font-size-caption) var(--font-mono);
+  color: var(--color-text-secondary);
+}
 
 .ack-button {
   display: inline-grid;
@@ -35,5 +46,8 @@ time { font: 600 var(--font-size-caption) var(--font-mono); color: var(--color-t
   color: var(--color-text-primary);
   cursor: pointer;
 
-  &:hover { background: var(--color-fill-healthy); color: var(--color-on-fill); }
+  &:hover {
+    background: var(--color-fill-healthy);
+    color: var(--color-on-fill);
+  }
 }

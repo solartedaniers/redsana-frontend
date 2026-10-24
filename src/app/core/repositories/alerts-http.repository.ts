@@ -26,7 +26,9 @@ export class AlertsHttpRepository extends AlertsRepository {
   private readonly baseUrl = `${environment.apiBaseUrl}/api/alerts`;
 
   getAlerts(): Observable<NetworkAlert[]> {
-    return this.http.get<BackendAlert[]>(this.baseUrl).pipe(map((alerts) => alerts.map((alert) => this.toAlert(alert))));
+    return this.http
+      .get<BackendAlert[]>(this.baseUrl)
+      .pipe(map((alerts) => alerts.map((alert) => this.toAlert(alert))));
   }
 
   watchNewAlerts(): Observable<NetworkAlert> {
@@ -34,13 +36,15 @@ export class AlertsHttpRepository extends AlertsRepository {
     let since = new Date().toISOString();
     return interval(NEW_ALERTS_POLL_INTERVAL_MS).pipe(
       // Si una consulta falla el cursor no avanza, así la siguiente lo vuelve a pedir y no se pierde nada.
-      switchMap(() => this.http.get<BackendAlert[]>(`${this.baseUrl}/recent`, { params: { since } }).pipe(catchError(() => EMPTY))),
+      switchMap(() =>
+        this.http.get<BackendAlert[]>(`${this.baseUrl}/recent`, { params: { since } }).pipe(catchError(() => EMPTY)),
+      ),
       tap((alerts) => {
         if (alerts.length > 0) {
           since = alerts[alerts.length - 1].timestamp;
         }
       }),
-      mergeMap((alerts) => from(alerts.map((alert) => this.toAlert(alert))))
+      mergeMap((alerts) => from(alerts.map((alert) => this.toAlert(alert)))),
     );
   }
 

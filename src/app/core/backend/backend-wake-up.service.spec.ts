@@ -27,7 +27,9 @@ describe('BackendWakeUpService', () => {
 
     service.wakeUp();
 
-    expect(() => http.expectOne(BACKEND_HEALTH_URL).flush('', { status: 502, statusText: 'Bad Gateway' })).not.toThrow();
+    expect(() =>
+      http.expectOne(BACKEND_HEALTH_URL).flush('', { status: 502, statusText: 'Bad Gateway' }),
+    ).not.toThrow();
     http.verify();
   });
 

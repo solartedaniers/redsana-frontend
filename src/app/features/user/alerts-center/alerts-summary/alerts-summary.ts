@@ -17,7 +17,10 @@ export class AlertsSummary {
   readonly alerts = input.required<NetworkAlert[]>();
 
   protected readonly counts = computed(() =>
-    SEVERITIES.map((severity) => ({ severity, count: this.alerts().filter((alert) => alert.severity === severity).length }))
+    SEVERITIES.map((severity) => ({
+      severity,
+      count: this.alerts().filter((alert) => alert.severity === severity).length,
+    })),
   );
   protected readonly pending = computed(() => this.alerts().filter((alert) => !alert.acknowledged).length);
 

@@ -7,10 +7,15 @@
   margin-bottom: var(--space-5);
 }
 
-.devices-hero .page-header { margin: 0; }
+.devices-hero .page-header {
+  margin: 0;
+}
 
 // El contador de dispositivos es el número protagonista de esta hoja.
-.devices-hero .status-badge { font-size: var(--font-size-heading-sm); padding: var(--space-2) var(--space-4); }
+.devices-hero .status-badge {
+  font-size: var(--font-size-heading-sm);
+  padding: var(--space-2) var(--space-4);
+}
 
 .scan-bar {
   display: flex;
@@ -24,15 +29,26 @@
   margin: 0;
   font: 700 var(--font-size-body) var(--font-mono);
 
-  &.ok { color: var(--color-status-success); }
-  &.warning { color: var(--color-status-warning); }
-  &.error { color: var(--color-status-danger); }
+  &.ok {
+    color: var(--color-status-success);
+  }
+  &.warning {
+    color: var(--color-status-warning);
+  }
+  &.error {
+    color: var(--color-status-danger);
+  }
 }
 
-.trust-note { margin: 0 0 var(--space-5); max-width: 70ch; }
+.trust-note {
+  margin: 0 0 var(--space-5);
+  max-width: 70ch;
+}
 
 // El radar ocupa todo el ancho y las tarjetas van en una cuadrícula debajo, para que una red grande no sea una columna eterna.
-.devices-workspace { grid-template-columns: minmax(0, 1fr); }
+.devices-workspace {
+  grid-template-columns: minmax(0, 1fr);
+}
 
 .devices-list {
   display: grid;
@@ -42,10 +58,15 @@
   padding: var(--space-4);
 }
 
-.show-more-button { grid-column: 1 / -1; justify-self: center; }
+.show-more-button {
+  grid-column: 1 / -1;
+  justify-self: center;
+}
 
 // Radar: el router al centro; el barrido solo gira durante un escaneo real, nunca finge escanear.
-.radar { overflow: hidden; }
+.radar {
+  overflow: hidden;
+}
 
 .topology {
   position: relative;
@@ -55,7 +76,11 @@
   background:
     linear-gradient(var(--color-border), var(--color-border)) center / 100% 1px no-repeat,
     linear-gradient(var(--color-border), var(--color-border)) center / 1px 100% no-repeat,
-    repeating-radial-gradient(circle, transparent 0 calc(4.25rem - 1px), var(--color-border) calc(4.25rem - 1px) 4.25rem),
+    repeating-radial-gradient(
+      circle,
+      transparent 0 calc(4.25rem - 1px),
+      var(--color-border) calc(4.25rem - 1px) 4.25rem
+    ),
     var(--color-bg-surface);
 }
 
@@ -63,7 +88,11 @@
   position: absolute;
   width: 200%;
   aspect-ratio: 1;
-  background: conic-gradient(from 0deg, color-mix(in srgb, var(--color-fill-healthy) 45%, transparent), transparent 18%);
+  background: conic-gradient(
+    from 0deg,
+    color-mix(in srgb, var(--color-fill-healthy) 45%, transparent),
+    transparent 18%
+  );
   opacity: 0;
 }
 
@@ -87,7 +116,11 @@
 }
 
 // La confianza se distingue por forma y color; la forma va en ::before para que su giro no mueva la posición.
-.topology__node { position: absolute; width: 0.9rem; height: 0.9rem; }
+.topology__node {
+  position: absolute;
+  width: 0.9rem;
+  height: 0.9rem;
+}
 
 .topology__node::before,
 .radar__legend i {
@@ -102,16 +135,32 @@
 }
 
 [data-trust='unknown'] > i,
-.topology__node[data-trust='unknown']::before { border-radius: 0; background: var(--color-fill-warning); rotate: 45deg; }
+.topology__node[data-trust='unknown']::before {
+  border-radius: 0;
+  background: var(--color-fill-warning);
+  rotate: 45deg;
+}
 
 [data-trust='blocked'] > i,
-.topology__node[data-trust='blocked']::before { border-radius: 0; background: var(--color-fill-critical); }
+.topology__node[data-trust='blocked']::before {
+  border-radius: 0;
+  background: var(--color-fill-critical);
+}
 
 // Con una búsqueda activa atenúo los puntos que no coinciden y resalto los que sí.
-.topology--searching .topology__node:not(.topology__node--match) { opacity: 0.2; }
-.topology__node--match::before { box-shadow: 0 0 0 0.25rem var(--color-accent); }
+.topology--searching .topology__node:not(.topology__node--match) {
+  opacity: 0.2;
+}
+.topology__node--match::before {
+  box-shadow: 0 0 0 0.25rem var(--color-accent);
+}
 
-.topology__limit { position: absolute; bottom: var(--space-3); inset-inline: var(--space-4); text-align: center; }
+.topology__limit {
+  position: absolute;
+  bottom: var(--space-3);
+  inset-inline: var(--space-4);
+  text-align: center;
+}
 
 .radar__legend {
   display: flex;
@@ -123,8 +172,15 @@
   list-style: none;
   font: 600 var(--font-size-caption) var(--font-mono);
 
-  li { display: inline-flex; align-items: center; gap: var(--space-2); }
+  li {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+  }
 }
 
-
-@keyframes radar-sweep { to { transform: rotate(1turn); } }
+@keyframes radar-sweep {
+  to {
+    transform: rotate(1turn);
+  }
+}

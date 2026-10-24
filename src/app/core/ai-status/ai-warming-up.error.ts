@@ -22,8 +22,8 @@ export function mapAiWarmingUp<T>() {
           error.status === HttpStatusCode.ServiceUnavailable &&
           error.error?.detail === AI_WARMING_UP_DETAIL
             ? new AiWarmingUpError()
-            : error
-        )
-      )
+            : error,
+        ),
+      ),
     );
 }

@@ -14,7 +14,7 @@ export class SupabaseAvatarStorageGateway extends AvatarStorageGateway {
     const path = `${userId}/avatar.${extension}`;
 
     return from(
-      supabaseClient.storage.from(AVATARS_BUCKET).upload(path, file, { upsert: true, contentType: file.type })
+      supabaseClient.storage.from(AVATARS_BUCKET).upload(path, file, { upsert: true, contentType: file.type }),
     ).pipe(
       switchMap(({ error }) => {
         if (error) {
@@ -25,7 +25,7 @@ export class SupabaseAvatarStorageGateway extends AvatarStorageGateway {
         const { data } = supabaseClient.storage.from(AVATARS_BUCKET).getPublicUrl(path);
         // La ruta es siempre la misma por el upsert: sin este parámetro el navegador mostraría la foto vieja.
         return from([`${data.publicUrl}?t=${Date.now()}`]);
-      })
+      }),
     );
   }
 }

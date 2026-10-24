@@ -94,8 +94,12 @@ data {
 }
 
 @keyframes startup-breathe {
-  from { opacity: 1; }
-  to { opacity: 0.55; }
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0.55;
+  }
 }
 
 // Oculto a la vista pero leído por los lectores de pantalla.

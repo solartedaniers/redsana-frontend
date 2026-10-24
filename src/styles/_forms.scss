@@ -233,7 +233,9 @@
 // Ventanas bajas y anchas (laptops con escalado): columnas iguales para que la hoja quepa sin scroll. Bajo 60rem
 // crecería en vez de encogerse; las media queries no aceptan variables, por eso los cortes van aquí.
 @media (min-width: 60rem) and (max-height: 42rem) {
-  .auth-split { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+  .auth-split {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
 
   .side-panel-features {
     display: grid;
@@ -245,7 +247,9 @@
     grid-template-columns: auto 1fr;
     align-content: start;
 
-    > div { grid-column: 1 / -1; }
+    > div {
+      grid-column: 1 / -1;
+    }
   }
 }
 
@@ -295,7 +299,7 @@
     input {
       flex: 1;
       min-width: 0;
-    padding: var(--form-control-pad-y) 0;
+      padding: var(--form-control-pad-y) 0;
       border: none;
       background: transparent;
     }
@@ -342,14 +346,29 @@
   font-family: var(--font-mono);
   font-size: var(--font-size-caption);
 
-  .icon { width: 1rem; height: 1rem; flex-shrink: 0; color: var(--icon-tone); }
+  .icon {
+    width: 1rem;
+    height: 1rem;
+    flex-shrink: 0;
+    color: var(--icon-tone);
+  }
 }
 
 // "¿Olvidaste tu contraseña?" va en su propia línea bajo el medidor.
-.forgot-link { align-self: flex-start; }
+.forgot-link {
+  align-self: flex-start;
+}
 
 // En pantallas táctiles el ojo y los enlaces llegan a 44 px sin cambiar cómo se ven.
 @media (pointer: coarse) {
-  .password-toggle { min-width: 2.75rem; min-height: 2.75rem; }
-  .form-links a, .field-hint-link { display: inline-flex; align-items: center; min-height: 2.75rem; }
+  .password-toggle {
+    min-width: 2.75rem;
+    min-height: 2.75rem;
+  }
+  .form-links a,
+  .field-hint-link {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.75rem;
+  }
 }

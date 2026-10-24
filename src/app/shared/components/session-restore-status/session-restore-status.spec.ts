@@ -22,14 +22,18 @@ describe('SessionRestoreStatus', () => {
     const { element } = render(true, 'pending');
 
     expect(element.querySelector('.startup-screen__symbol')).not.toBeNull();
-    expect(element.querySelector('.session-status__title')?.textContent?.trim()).toBe('common.sessionRestore.wakingTitle');
+    expect(element.querySelector('.session-status__title')?.textContent?.trim()).toBe(
+      'common.sessionRestore.wakingTitle',
+    );
     expect(element.querySelector('button')).toBeNull();
   });
 
   it('si vence la espera explica el fallo y reintentar vuelve a pedir el perfil', () => {
     const { element, auth } = render(true, 'failed');
 
-    expect(element.querySelector('.session-status__title')?.textContent?.trim()).toBe('common.sessionRestore.failedTitle');
+    expect(element.querySelector('.session-status__title')?.textContent?.trim()).toBe(
+      'common.sessionRestore.failedTitle',
+    );
     element.querySelector<HTMLButtonElement>('button')!.click();
 
     expect(auth.retryRestore).toHaveBeenCalledOnce();

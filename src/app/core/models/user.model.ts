@@ -47,6 +47,4 @@ export interface ManagedUserCreatePayload {
   role: UserRole;
 }
 
-export type ManagedUserUpdatePayload = Partial<
-  Pick<ManagedUser, 'fullName' | 'email' | 'role' | 'status'>
->;
+export type ManagedUserUpdatePayload = Partial<Pick<ManagedUser, 'fullName' | 'email' | 'role' | 'status'>>;

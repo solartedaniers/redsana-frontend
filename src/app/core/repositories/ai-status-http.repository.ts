@@ -15,7 +15,9 @@ export class AiStatusHttpRepository extends AiStatusRepository {
   }
 
   warmUp(): Observable<AiStatusReport> {
-    return this.http.post<AiStatusReport>(`${this.baseUrl}/warm-up`, null).pipe(catchError(readyWithoutStatusEndpoints));
+    return this.http
+      .post<AiStatusReport>(`${this.baseUrl}/warm-up`, null)
+      .pipe(catchError(readyWithoutStatusEndpoints));
   }
 }
 

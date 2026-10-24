@@ -1,13 +1,25 @@
-:host { display: block; }
+:host {
+  display: block;
+}
 
 .questionnaire,
-.result-panel { max-width: 72rem; }
+.result-panel {
+  max-width: 72rem;
+}
 
 // La columna del puntaje deja que el dial y su leyenda de dos partes quepan lado a lado.
-.result-panel { grid-template-columns: minmax(22rem, 0.6fr) minmax(0, 1.4fr); }
-@media (max-width: 64rem) { .result-panel { grid-template-columns: 1fr; } }
+.result-panel {
+  grid-template-columns: minmax(22rem, 0.6fr) minmax(0, 1.4fr);
+}
+@media (max-width: 64rem) {
+  .result-panel {
+    grid-template-columns: 1fr;
+  }
+}
 
-.loading-state { min-height: 18rem; }
+.loading-state {
+  min-height: 18rem;
+}
 
 .assessment-card {
   display: grid;
@@ -17,7 +29,12 @@
   padding: var(--space-6) var(--space-5);
   text-align: center;
 
-  p { margin: 0; max-width: 34ch; color: var(--color-text-secondary); font-size: var(--font-size-caption); }
+  p {
+    margin: 0;
+    max-width: 34ch;
+    color: var(--color-text-secondary);
+    font-size: var(--font-size-caption);
+  }
 }
 
 .assessment-card--intro p {
@@ -27,23 +44,41 @@
   color: var(--color-text-primary);
 }
 
-.submitted-at { font-family: var(--font-mono); }
+.submitted-at {
+  font-family: var(--font-mono);
+}
 
-.prescription { display: grid; gap: var(--space-5); padding: var(--space-5); }
-.prescription .subtle-button { justify-self: start; }
+.prescription {
+  display: grid;
+  gap: var(--space-5);
+  padding: var(--space-5);
+}
+.prescription .subtle-button {
+  justify-self: start;
+}
 
 // Cuestionario
-.questions-panel { display: grid; gap: var(--space-3); padding: var(--space-5); }
+.questions-panel {
+  display: grid;
+  gap: var(--space-3);
+  padding: var(--space-5);
+}
 
 .question {
   padding: var(--space-4);
   border: var(--border-width-ink) dashed var(--color-border-strong);
   border-radius: var(--radius-sm);
 
-  p { margin: 0 0 var(--space-3); font-weight: 600; color: var(--color-text-primary); }
+  p {
+    margin: 0 0 var(--space-3);
+    font-weight: 600;
+    color: var(--color-text-primary);
+  }
 }
 
-.question--answered { border-style: solid; }
+.question--answered {
+  border-style: solid;
+}
 
 .answer-toggle {
   display: flex;
@@ -74,7 +109,11 @@
   justify-content: space-between;
   gap: var(--space-3);
 
-  p { margin: 0; }
+  p {
+    margin: 0;
+  }
 }
 
-.questions-panel .action-button { justify-self: start; }
+.questions-panel .action-button {
+  justify-self: start;
+}

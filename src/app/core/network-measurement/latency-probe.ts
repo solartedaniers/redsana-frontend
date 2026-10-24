@@ -30,7 +30,10 @@ async function probeOnce(config: LatencyProbeConfig): Promise<LatencySample> {
   const startedAt = performance.now();
   try {
     // no-store: una respuesta de caché daría ~0 ms falsos.
-    const response = await fetch(config.probeUrl, { cache: 'no-store', signal: AbortSignal.timeout(config.sampleTimeoutMs) });
+    const response = await fetch(config.probeUrl, {
+      cache: 'no-store',
+      signal: AbortSignal.timeout(config.sampleTimeoutMs),
+    });
     return response.ok ? performance.now() - startedAt : null;
   } catch {
     return null;

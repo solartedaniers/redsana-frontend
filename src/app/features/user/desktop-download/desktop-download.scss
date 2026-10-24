@@ -1,5 +1,9 @@
-.download-hero { margin-bottom: var(--space-5); }
-.download-hero .page-header { margin: 0; }
+.download-hero {
+  margin-bottom: var(--space-5);
+}
+.download-hero .page-header {
+  margin: 0;
+}
 
 // Una boleta de remisión: bloque violeta con el sello del computador y una sola acción.
 .download-card {
@@ -22,10 +26,24 @@
   }
 
   // El svg vive dentro de <app-icon> (encapsulado): lo agrando solo en esta tarjeta.
-  app-icon ::ng-deep .icon { width: 2.5rem; height: 2.5rem; }
-  p { margin: 0; font-family: var(--font-display); font-size: var(--font-size-heading-sm); font-weight: var(--font-display-weight); line-height: 1.2; }
+  app-icon ::ng-deep .icon {
+    width: 2.5rem;
+    height: 2.5rem;
+  }
+  p {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: var(--font-size-heading-sm);
+    font-weight: var(--font-display-weight);
+    line-height: 1.2;
+  }
 }
 
 // Sobre el bloque violeta la acción principal pasa a lima para que se siga viendo.
-.download-card ::ng-deep .submit-button { background: var(--color-fill-healthy); color: var(--color-on-fill); }
-.download-card ::ng-deep .download-notice { color: var(--color-hero-text); }
+.download-card ::ng-deep .submit-button {
+  background: var(--color-fill-healthy);
+  color: var(--color-on-fill);
+}
+.download-card ::ng-deep .download-notice {
+  color: var(--color-hero-text);
+}

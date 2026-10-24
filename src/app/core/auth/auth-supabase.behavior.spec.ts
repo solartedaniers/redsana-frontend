@@ -25,7 +25,13 @@ const BACKEND_USER = {
   is_active: true,
 };
 const EXPECTED_SESSION: AuthSession = {
-  user: { id: 'u1', email: 'demo@example.invalid', fullName: 'Demo', avatarUrl: 'https://cdn.example.invalid/a.png', role: 'standard' },
+  user: {
+    id: 'u1',
+    email: 'demo@example.invalid',
+    fullName: 'Demo',
+    avatarUrl: 'https://cdn.example.invalid/a.png',
+    role: 'standard',
+  },
   token: 'access-token',
   expiresAt: new Date(EXPIRES_AT * 1000).toISOString(),
 };
@@ -63,7 +69,7 @@ async function nextRequest(http: HttpTestingController, method: string, url = ME
 async function settle<T>(result: Promise<T>): Promise<{ value?: T; error?: unknown }> {
   return result.then(
     (value) => ({ value }),
-    (error: unknown) => ({ error })
+    (error: unknown) => ({ error }),
   );
 }
 
@@ -96,7 +102,7 @@ describe('Iniciar sesión', () => {
   it('un perfil sin nombre queda con nombre vacío', async () => {
     const { repository, http } = setup();
     vi.spyOn(auth, 'signInWithPassword').mockResolvedValue(
-      answer('signInWithPassword', { data: { session: SUPABASE_SESSION }, error: null })
+      answer('signInWithPassword', { data: { session: SUPABASE_SESSION }, error: null }),
     );
 
     const result = firstValueFrom(repository.signIn('demo@example.invalid', 'secreto'));
@@ -108,7 +114,7 @@ describe('Iniciar sesión', () => {
   it('con credenciales malas da la clave de credenciales inválidas y no pide el perfil', async () => {
     const { repository } = setup();
     vi.spyOn(auth, 'signInWithPassword').mockResolvedValue(
-      answer('signInWithPassword', { data: { session: null }, error: { message: 'Invalid login credentials' } })
+      answer('signInWithPassword', { data: { session: null }, error: { message: 'Invalid login credentials' } }),
     );
 
     const { error } = await settle(firstValueFrom(repository.signIn('demo@example.invalid', 'mala')));
@@ -119,7 +125,7 @@ describe('Iniciar sesión', () => {
   it('un error de red de Supabase se traduce como error desconocido', async () => {
     const { repository } = setup();
     vi.spyOn(auth, 'signInWithPassword').mockResolvedValue(
-      answer('signInWithPassword', { data: { session: null }, error: { message: 'Failed to fetch' } })
+      answer('signInWithPassword', { data: { session: null }, error: { message: 'Failed to fetch' } }),
     );
 
     const { error } = await settle(firstValueFrom(repository.signIn('demo@example.invalid', 'secreto')));
@@ -130,7 +136,7 @@ describe('Iniciar sesión', () => {
   it('sin error pero sin sesión también es un error desconocido', async () => {
     const { repository } = setup();
     vi.spyOn(auth, 'signInWithPassword').mockResolvedValue(
-      answer('signInWithPassword', { data: { session: null }, error: null })
+      answer('signInWithPassword', { data: { session: null }, error: null }),
     );
 
     const { error } = await settle(firstValueFrom(repository.signIn('demo@example.invalid', 'secreto')));
@@ -151,7 +157,7 @@ describe('Iniciar sesión', () => {
   it('con la cuenta suspendida (403 del perfil) borra la sesión local y avisa', async () => {
     const { repository, http } = setup();
     vi.spyOn(auth, 'signInWithPassword').mockResolvedValue(
-      answer('signInWithPassword', { data: { session: SUPABASE_SESSION }, error: null })
+      answer('signInWithPassword', { data: { session: SUPABASE_SESSION }, error: null }),
     );
     const signOut = signOutSpy();
 
@@ -165,7 +171,7 @@ describe('Iniciar sesión', () => {
   it('un error inesperado del perfil (500) sigue siendo un error HTTP y no cierra la sesión', async () => {
     const { repository, http } = setup();
     vi.spyOn(auth, 'signInWithPassword').mockResolvedValue(
-      answer('signInWithPassword', { data: { session: SUPABASE_SESSION }, error: null })
+      answer('signInWithPassword', { data: { session: SUPABASE_SESSION }, error: null }),
     );
     const signOut = signOutSpy();
 
@@ -202,16 +208,18 @@ describe('Registrarse', () => {
   it('un correo ya registrado da la clave de correo ocupado', async () => {
     const { repository } = setup();
     vi.spyOn(auth, 'signUp').mockResolvedValue(
-      answer('signUp', { data: { session: null }, error: { message: 'User already registered' } })
+      answer('signUp', { data: { session: null }, error: { message: 'User already registered' } }),
     );
 
-    expect((await settle(firstValueFrom(repository.signUp(payload)))).error).toEqual(new Error('auth.errors.emailTaken'));
+    expect((await settle(firstValueFrom(repository.signUp(payload)))).error).toEqual(
+      new Error('auth.errors.emailTaken'),
+    );
   });
 
   it('otro error de Supabase es desconocido', async () => {
     const { repository } = setup();
     vi.spyOn(auth, 'signUp').mockResolvedValue(
-      answer('signUp', { data: { session: null }, error: { message: 'Signups not allowed' } })
+      answer('signUp', { data: { session: null }, error: { message: 'Signups not allowed' } }),
     );
 
     expect((await settle(firstValueFrom(repository.signUp(payload)))).error).toEqual(new Error('auth.errors.unknown'));
@@ -222,7 +230,7 @@ describe('Registrarse', () => {
     vi.spyOn(auth, 'signUp').mockResolvedValue(answer('signUp', { data: { session: null }, error: null }));
 
     expect((await settle(firstValueFrom(repository.signUp(payload)))).error).toEqual(
-      new Error('auth.errors.confirmationRequired')
+      new Error('auth.errors.confirmationRequired'),
     );
   });
 });
@@ -240,7 +248,9 @@ describe('Cerrar sesión', () => {
 describe('Restaurar la sesión al abrir la app', () => {
   it('con una sesión guardada la completa con el perfil del backend', async () => {
     const { repository, http } = setup();
-    vi.spyOn(auth, 'getSession').mockResolvedValue(answer('getSession', { data: { session: SUPABASE_SESSION }, error: null }));
+    vi.spyOn(auth, 'getSession').mockResolvedValue(
+      answer('getSession', { data: { session: SUPABASE_SESSION }, error: null }),
+    );
 
     const result = firstValueFrom(repository.restoreSession());
     (await nextRequest(http, 'GET')).flush(BACKEND_USER);
@@ -258,7 +268,10 @@ describe('Restaurar la sesión al abrir la app', () => {
   it('una sesión vencida que Supabase no pudo renovar cuenta como sin sesión', async () => {
     const { repository } = setup();
     vi.spyOn(auth, 'getSession').mockResolvedValue(
-      answer('getSession', { data: { session: null }, error: { message: 'Invalid Refresh Token: Refresh Token Not Found' } })
+      answer('getSession', {
+        data: { session: null },
+        error: { message: 'Invalid Refresh Token: Refresh Token Not Found' },
+      }),
     );
 
     expect(await firstValueFrom(repository.restoreSession())).toBeNull();
@@ -266,7 +279,9 @@ describe('Restaurar la sesión al abrir la app', () => {
 
   it('un token vencido que el backend rechaza (401) llega como error HTTP sin cerrar la sesión', async () => {
     const { repository, http } = setup();
-    vi.spyOn(auth, 'getSession').mockResolvedValue(answer('getSession', { data: { session: SUPABASE_SESSION }, error: null }));
+    vi.spyOn(auth, 'getSession').mockResolvedValue(
+      answer('getSession', { data: { session: SUPABASE_SESSION }, error: null }),
+    );
     const signOut = signOutSpy();
 
     const result = settle(firstValueFrom(repository.restoreSession()));
@@ -279,7 +294,7 @@ describe('Restaurar la sesión al abrir la app', () => {
   it('sin fecha de vencimiento usa la hora actual', async () => {
     const { repository, http } = setup();
     vi.spyOn(auth, 'getSession').mockResolvedValue(
-      answer('getSession', { data: { session: { access_token: 'access-token' } }, error: null })
+      answer('getSession', { data: { session: { access_token: 'access-token' } }, error: null }),
     );
     const before = Date.now();
 
@@ -350,11 +365,11 @@ describe('Recuperar la contraseña', () => {
   it('si Supabase rechaza la nueva contraseña traduce el error', async () => {
     const { repository } = setup();
     vi.spyOn(auth, 'updateUser').mockResolvedValue(
-      answer('updateUser', { data: {}, error: { message: 'New password should be different' } })
+      answer('updateUser', { data: {}, error: { message: 'New password should be different' } }),
     );
 
     expect((await settle(firstValueFrom(repository.resetPassword('Nueva-Clave-123')))).error).toEqual(
-      new Error('auth.errors.unknown')
+      new Error('auth.errors.unknown'),
     );
   });
 });
@@ -363,7 +378,9 @@ describe('Perfil', () => {
   it('actualizar el nombre lo cambia en Supabase, sincroniza el backend y vuelve a leer el perfil', async () => {
     const { repository, http } = setup();
     const update = vi.spyOn(auth, 'updateUser').mockResolvedValue(answer('updateUser', { data: {}, error: null }));
-    vi.spyOn(auth, 'getSession').mockResolvedValue(answer('getSession', { data: { session: SUPABASE_SESSION }, error: null }));
+    vi.spyOn(auth, 'getSession').mockResolvedValue(
+      answer('getSession', { data: { session: SUPABASE_SESSION }, error: null }),
+    );
 
     const result = firstValueFrom(repository.updateProfile('u1', { fullName: 'Otro Nombre' }));
     const patch = await nextRequest(http, 'PATCH');
@@ -378,11 +395,11 @@ describe('Perfil', () => {
   it('si Supabase rechaza el nombre no toca el backend', async () => {
     const { repository } = setup();
     vi.spyOn(auth, 'updateUser').mockResolvedValue(
-      answer('updateUser', { data: {}, error: { message: 'User already registered' } })
+      answer('updateUser', { data: {}, error: { message: 'User already registered' } }),
     );
 
     expect((await settle(firstValueFrom(repository.updateProfile('u1', { fullName: 'X' })))).error).toEqual(
-      new Error('auth.errors.emailTaken')
+      new Error('auth.errors.emailTaken'),
     );
   });
 
@@ -399,7 +416,9 @@ describe('Perfil', () => {
 
   it('actualizar la foto guarda su URL en el backend y vuelve a leer el perfil', async () => {
     const { repository, http } = setup();
-    vi.spyOn(auth, 'getSession').mockResolvedValue(answer('getSession', { data: { session: SUPABASE_SESSION }, error: null }));
+    vi.spyOn(auth, 'getSession').mockResolvedValue(
+      answer('getSession', { data: { session: SUPABASE_SESSION }, error: null }),
+    );
 
     const result = firstValueFrom(repository.updateAvatar('u1', 'https://cdn.example.invalid/b.png'));
     const patch = await nextRequest(http, 'PATCH');
@@ -424,7 +443,9 @@ describe('Perfil', () => {
 describe('Cambiar la contraseña desde el perfil', () => {
   const payload = { currentPassword: 'Actual-123', newPassword: 'Nueva-456' };
   const withUser = () =>
-    vi.spyOn(auth, 'getUser').mockResolvedValue(answer('getUser', { data: { user: { email: 'demo@example.invalid' } }, error: null }));
+    vi
+      .spyOn(auth, 'getUser')
+      .mockResolvedValue(answer('getUser', { data: { user: { email: 'demo@example.invalid' } }, error: null }));
 
   it('comprueba la contraseña actual con un inicio de sesión y fija la nueva', async () => {
     const { repository } = setup();
@@ -444,7 +465,7 @@ describe('Cambiar la contraseña desde el perfil', () => {
     vi.spyOn(auth, 'getUser').mockResolvedValue(answer('getUser', { data: { user: null }, error: { message: 'x' } }));
 
     expect((await settle(firstValueFrom(repository.changePassword('u1', payload)))).error).toEqual(
-      new Error('auth.errors.userNotFound')
+      new Error('auth.errors.userNotFound'),
     );
   });
 
@@ -452,12 +473,12 @@ describe('Cambiar la contraseña desde el perfil', () => {
     const { repository } = setup();
     withUser();
     vi.spyOn(auth, 'signInWithPassword').mockResolvedValue(
-      answer('signInWithPassword', { data: { session: null }, error: { message: 'Invalid login credentials' } })
+      answer('signInWithPassword', { data: { session: null }, error: { message: 'Invalid login credentials' } }),
     );
     const update = vi.spyOn(auth, 'updateUser');
 
     expect((await settle(firstValueFrom(repository.changePassword('u1', payload)))).error).toEqual(
-      new Error('auth.errors.wrongCurrentPassword')
+      new Error('auth.errors.wrongCurrentPassword'),
     );
     expect(update).not.toHaveBeenCalled();
   });
@@ -466,12 +487,14 @@ describe('Cambiar la contraseña desde el perfil', () => {
     const { repository } = setup();
     withUser();
     vi.spyOn(auth, 'signInWithPassword').mockResolvedValue(
-      answer('signInWithPassword', { data: { session: SUPABASE_SESSION }, error: null })
+      answer('signInWithPassword', { data: { session: SUPABASE_SESSION }, error: null }),
     );
-    vi.spyOn(auth, 'updateUser').mockResolvedValue(answer('updateUser', { data: {}, error: { message: 'Weak password' } }));
+    vi.spyOn(auth, 'updateUser').mockResolvedValue(
+      answer('updateUser', { data: {}, error: { message: 'Weak password' } }),
+    );
 
     expect((await settle(firstValueFrom(repository.changePassword('u1', payload)))).error).toEqual(
-      new Error('auth.errors.unknown')
+      new Error('auth.errors.unknown'),
     );
   });
 });

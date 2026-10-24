@@ -54,7 +54,10 @@ const demoLogin = readDemoLogin();
 
 const values = Object.fromEntries([
   ...Object.entries(VARIABLES).map(([key, name]) => [key, process.env[name].replace(/\/+$/, '')]),
-  ...Object.entries(OPTIONAL_VARIABLES).map(([key, { name, fallback }]) => [key, (process.env[name] || fallback).replace(/\/+$/, '')]),
+  ...Object.entries(OPTIONAL_VARIABLES).map(([key, { name, fallback }]) => [
+    key,
+    (process.env[name] || fallback).replace(/\/+$/, ''),
+  ]),
   ['demoLogin', demoLogin],
 ]);
 
@@ -69,10 +72,9 @@ function readDemoLogin() {
   // Sin recortar barras ni espacios internos: la contraseña debe llegar tal cual.
   const email = (process.env[DEMO_LOGIN_VARIABLES.email] || '').trim();
   const password = process.env[DEMO_LOGIN_VARIABLES.password] || '';
-  const missingDemo = [
-    !email && DEMO_LOGIN_VARIABLES.email,
-    !password && DEMO_LOGIN_VARIABLES.password,
-  ].filter(Boolean);
+  const missingDemo = [!email && DEMO_LOGIN_VARIABLES.email, !password && DEMO_LOGIN_VARIABLES.password].filter(
+    Boolean,
+  );
   if (missingDemo.length > 0) {
     console.error(`[environment] ${DEMO_LOGIN_VARIABLES.enabled}=true but missing: ${missingDemo.join(', ')}`);
     process.exit(1);

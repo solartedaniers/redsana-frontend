@@ -1,4 +1,6 @@
-:host { display: block; }
+:host {
+  display: block;
+}
 
 // El dispositivo como etiqueta de paciente; el borde superior toma el color de su confianza.
 .device-card {
@@ -12,8 +14,12 @@
   border-radius: var(--radius-sm);
   background: var(--color-bg-surface);
 
-  &[data-trust='unknown'] { --severity-fill: var(--color-fill-warning); }
-  &[data-trust='blocked'] { --severity-fill: var(--color-fill-critical); }
+  &[data-trust='unknown'] {
+    --severity-fill: var(--color-fill-warning);
+  }
+  &[data-trust='blocked'] {
+    --severity-fill: var(--color-fill-critical);
+  }
 }
 
 .device-card__row {
@@ -24,7 +30,11 @@
 }
 
 // El papel (router o este equipo) va en su propia línea y solo se parte si la tarjeta es más angosta.
-.device-role { max-width: 100%; margin-top: var(--space-2); white-space: normal; }
+.device-role {
+  max-width: 100%;
+  margin-top: var(--space-2);
+  white-space: normal;
+}
 
 .device-kind-icon {
   flex-shrink: 0;
@@ -39,7 +49,10 @@
 }
 
 // Base de 12rem: las etiquetas bajan de línea en vez de aplastar el nombre y la IP.
-.device-info { flex: 1 1 12rem; min-width: 0; }
+.device-info {
+  flex: 1 1 12rem;
+  min-width: 0;
+}
 
 .device-name {
   margin: 0;
@@ -51,16 +64,26 @@
   overflow-wrap: anywhere;
 }
 
-.device-meta { margin: var(--space-1) 0 0; font: 500 var(--font-size-caption) var(--font-mono); color: var(--color-text-secondary); }
+.device-meta {
+  margin: var(--space-1) 0 0;
+  font: 500 var(--font-size-caption) var(--font-mono);
+  color: var(--color-text-secondary);
+}
 
 .presence-badge {
   font: 700 var(--font-size-caption) var(--font-mono);
   color: var(--color-status-warning);
 
-  &[data-online='true'] { color: var(--color-status-success); }
+  &[data-online='true'] {
+    color: var(--color-status-success);
+  }
 }
 
-.device-actions { display: flex; flex-wrap: wrap; gap: var(--space-2); }
+.device-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
 
 .trust-action,
 .more-info-toggle {
@@ -74,21 +97,41 @@
   cursor: pointer;
   transition: transform var(--motion-duration-fast) var(--motion-easing-spring);
 
-  &:active { transform: scale(0.95); }
+  &:active {
+    transform: scale(0.95);
+  }
 }
 
-.trust-action--trust { background: var(--color-fill-healthy); color: var(--color-on-fill); }
-.trust-action--block { background: var(--color-fill-critical); color: var(--color-on-fill); }
-.more-info-toggle { margin-left: auto; border-style: dashed; }
+.trust-action--trust {
+  background: var(--color-fill-healthy);
+  color: var(--color-on-fill);
+}
+.trust-action--block {
+  background: var(--color-fill-critical);
+  color: var(--color-on-fill);
+}
+.more-info-toggle {
+  margin-left: auto;
+  border-style: dashed;
+}
 
 @media (pointer: coarse) {
-  .trust-action, .more-info-toggle { min-height: var(--touch-target-min); }
+  .trust-action,
+  .more-info-toggle {
+    min-height: var(--touch-target-min);
+  }
 }
 
 .device-detail-table {
   border-collapse: collapse;
   font: 500 var(--font-size-caption) var(--font-mono);
 
-  th { padding: var(--space-1) var(--space-3) var(--space-1) 0; text-align: left; color: var(--color-text-secondary); }
-  td { padding: var(--space-1) 0; }
+  th {
+    padding: var(--space-1) var(--space-3) var(--space-1) 0;
+    text-align: left;
+    color: var(--color-text-secondary);
+  }
+  td {
+    padding: var(--space-1) 0;
+  }
 }

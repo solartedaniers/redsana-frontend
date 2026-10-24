@@ -41,32 +41,46 @@ export class DevicesMap {
   protected readonly connectedDevices = computed(() =>
     this.devices()
       .filter((device) => device.isOnline)
-      .sort((a, b) => ROLE_ORDER[a.networkRole ?? 'other'] - ROLE_ORDER[b.networkRole ?? 'other'])
+      .sort((a, b) => ROLE_ORDER[a.networkRole ?? 'other'] - ROLE_ORDER[b.networkRole ?? 'other']),
   );
   // El router es la red misma (el centro del mapa): se lista aparte y no cuenta. Este equipo sí cuenta.
   protected readonly networkMembers = computed(() =>
-    this.connectedDevices().filter((device) => device.networkRole !== 'gateway')
+    this.connectedDevices().filter((device) => device.networkRole !== 'gateway'),
   );
   // "Todos" suma los que ya no responden (siguen en la base); el contador y el radar siguen solo con los en línea.
   protected readonly presenceFilter = signal<PresenceFilter>(DEFAULT_PRESENCE_FILTER);
   protected readonly listedDevices = computed(() =>
     this.presenceFilter() === 'online'
       ? this.connectedDevices()
-      : [...this.connectedDevices(), ...this.devices().filter((device) => !device.isOnline).sort((a, b) => Date.parse(b.lastSeen) - Date.parse(a.lastSeen))]
+      : [
+          ...this.connectedDevices(),
+          ...this.devices()
+            .filter((device) => !device.isOnline)
+            .sort((a, b) => Date.parse(b.lastSeen) - Date.parse(a.lastSeen)),
+        ],
   );
   // La búsqueda es estado de pantalla: no se guarda y sobrevive a cada escaneo porque vive en su propio signal.
   private readonly searchFilter = new DeviceSearchFilter();
   protected readonly searchQuery = signal('');
   protected readonly isSearching = computed(() => !this.searchFilter.isEmpty(this.searchQuery()));
   // Busco en todo lo cargado, no solo en la página visible; luego pagino las coincidencias igual que la lista.
-  protected readonly matchingDevices = computed(() => this.searchFilter.filter(this.listedDevices(), this.searchQuery()));
-  protected readonly matchingIds = computed(() => (this.isSearching() ? new Set(this.matchingDevices().map((device) => device.id)) : null));
+  protected readonly matchingDevices = computed(() =>
+    this.searchFilter.filter(this.listedDevices(), this.searchQuery()),
+  );
+  protected readonly matchingIds = computed(() =>
+    this.isSearching() ? new Set(this.matchingDevices().map((device) => device.id)) : null,
+  );
   protected readonly visibleCount = signal(DEVICES_PAGE_SIZE);
   protected readonly visibleDevices = computed(() => this.matchingDevices().slice(0, this.visibleCount()));
-  protected readonly hiddenDeviceCount = computed(() => Math.max(0, this.matchingDevices().length - this.visibleCount()));
+  protected readonly hiddenDeviceCount = computed(() =>
+    Math.max(0, this.matchingDevices().length - this.visibleCount()),
+  );
   /** Conteo real por nivel de confianza para la leyenda del radar. */
   protected readonly trustCounts = computed(() =>
-    TRUST_LEVELS.map((trust) => ({ trust, count: this.networkMembers().filter((device) => device.trust === trust).length }))
+    TRUST_LEVELS.map((trust) => ({
+      trust,
+      count: this.networkMembers().filter((device) => device.trust === trust).length,
+    })),
   );
   protected readonly mapShownCount = computed(() => Math.min(this.networkMembers().length, MAX_TOPOLOGY_NODES));
   // Un punto por dispositivo conectado (hasta MAX_TOPOLOGY_NODES), cada uno en su posición.
@@ -82,8 +96,8 @@ export class DevicesMap {
   protected readonly topologyHeightRem = computed(() =>
     Math.max(
       TOPOLOGY_MIN_HEIGHT_REM,
-      ...this.topologyNodes().map((node) => 2 * (node.radiusRem + TOPOLOGY_EDGE_MARGIN_REM))
-    )
+      ...this.topologyNodes().map((node) => 2 * (node.radiusRem + TOPOLOGY_EDGE_MARGIN_REM)),
+    ),
   );
   protected readonly isScanning = signal(false);
   protected readonly lastScanFindings = signal<NetworkDevice[] | null>(null);
@@ -116,7 +130,7 @@ export class DevicesMap {
           this.scanSawNoOtherDevices.set(!devices.some((device) => device.isOnline && device.networkRole === 'other'));
           // El router y este equipo no pueden ser intrusos: solo reviso los demás.
           this.lastScanFindings.set(
-            devices.filter((device) => device.isOnline && device.networkRole === 'other' && device.trust !== 'trusted')
+            devices.filter((device) => device.isOnline && device.networkRole === 'other' && device.trust !== 'trusted'),
           );
         },
         error: (error) => {
@@ -151,7 +165,7 @@ export class DevicesMap {
   protected setTrust(deviceId: string, trust: DeviceTrust): void {
     this.repository.setTrust(deviceId, trust).subscribe(() => {
       this.devices.update((current) =>
-        current.map((device) => (device.id === deviceId ? { ...device, trust } : device))
+        current.map((device) => (device.id === deviceId ? { ...device, trust } : device)),
       );
     });
   }

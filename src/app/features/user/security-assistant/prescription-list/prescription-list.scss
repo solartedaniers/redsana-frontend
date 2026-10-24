@@ -1,4 +1,6 @@
-:host { display: block; }
+:host {
+  display: block;
+}
 
 .rx-header {
   display: flex;
@@ -8,7 +10,10 @@
   padding-bottom: var(--space-3);
   border-bottom: calc(var(--border-width-ink) * 2) double var(--color-card-border);
 
-  h2 { margin: 0; font-size: var(--font-size-heading); }
+  h2 {
+    margin: 0;
+    font-size: var(--font-size-heading);
+  }
 }
 
 .rx-mark {
@@ -54,12 +59,23 @@
     color: var(--color-text-primary);
   }
 
-  strong { font-family: var(--font-display); font-size: var(--font-size-body); }
-  p { margin: var(--space-1) 0 0; font-size: var(--font-size-caption); color: var(--color-text-secondary); }
+  strong {
+    font-family: var(--font-display);
+    font-size: var(--font-size-body);
+  }
+  p {
+    margin: var(--space-1) 0 0;
+    font-size: var(--font-size-caption);
+    color: var(--color-text-secondary);
+  }
 }
 
-.dose[data-urgency='high'] { --severity-fill: var(--color-fill-critical); }
-.dose[data-urgency='medium'] { --severity-fill: var(--color-fill-warning); }
+.dose[data-urgency='high'] {
+  --severity-fill: var(--color-fill-critical);
+}
+.dose[data-urgency='medium'] {
+  --severity-fill: var(--color-fill-warning);
+}
 
 .dose__urgency {
   justify-self: start;
@@ -73,4 +89,7 @@
   text-transform: uppercase;
 }
 
-.all-good { margin: 0; white-space: normal; }
+.all-good {
+  margin: 0;
+  white-space: normal;
+}

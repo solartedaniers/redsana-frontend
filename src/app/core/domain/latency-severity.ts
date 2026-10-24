@@ -10,7 +10,7 @@ const SEVERITY_RANK: Record<LatencySeverity, number> = { healthy: 0, warning: 1,
 export function classifyMeasurement(
   latencyMs: number,
   packetLossPercent: number | undefined,
-  thresholds: NetworkStatusThresholds
+  thresholds: NetworkStatusThresholds,
 ): LatencySeverity {
   if (latencyMs <= 0) {
     return 'cut';
@@ -19,7 +19,9 @@ export function classifyMeasurement(
   if (latencyMs >= thresholds.latencyCriticalMs || loss >= thresholds.packetLossCriticalPercent) {
     return 'critical';
   }
-  return latencyMs >= thresholds.latencyWarningMs || loss >= thresholds.packetLossWarningPercent ? 'warning' : 'healthy';
+  return latencyMs >= thresholds.latencyWarningMs || loss >= thresholds.packetLossWarningPercent
+    ? 'warning'
+    : 'healthy';
 }
 
 export function severityRank(severity: LatencySeverity): number {

@@ -1,4 +1,10 @@
-import { LatencyProbeConfig, LatencyProbeRequest, LatencyProbeResponse, LatencySample, runLatencyProbes } from './latency-probe';
+import {
+  LatencyProbeConfig,
+  LatencyProbeRequest,
+  LatencyProbeResponse,
+  LatencySample,
+  runLatencyProbes,
+} from './latency-probe';
 
 /** Dónde corren los sondeos de la medición web. */
 export interface LatencyProbeRunner {

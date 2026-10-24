@@ -19,9 +19,7 @@ export class I18nService {
   private readonly dictionary = signal<Record<string, unknown>>({});
 
   async load(lang: AppLanguage = this.language()): Promise<void> {
-    const dict = await firstValueFrom(
-      this.http.get<Record<string, unknown>>(`assets/i18n/${lang}.json`)
-    );
+    const dict = await firstValueFrom(this.http.get<Record<string, unknown>>(`assets/i18n/${lang}.json`));
     this.dictionary.set(dict);
     this.language.set(lang);
     if (this.isBrowser) {
@@ -39,7 +37,7 @@ export class I18nService {
     }
     return Object.entries(params).reduce(
       (text, [name, replacement]) => text.replaceAll(`{{${name}}}`, String(replacement)),
-      value
+      value,
     );
   }
 
@@ -65,8 +63,6 @@ export class I18nService {
       return stored as AppLanguage;
     }
     const browserLang = navigator.language.slice(0, 2);
-    return SUPPORTED_LANGUAGES.includes(browserLang as AppLanguage)
-      ? (browserLang as AppLanguage)
-      : DEFAULT_LANGUAGE;
+    return SUPPORTED_LANGUAGES.includes(browserLang as AppLanguage) ? (browserLang as AppLanguage) : DEFAULT_LANGUAGE;
   }
 }

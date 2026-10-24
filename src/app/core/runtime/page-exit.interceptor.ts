@@ -9,7 +9,7 @@ export const pageExitInterceptor: HttpInterceptorFn = (req, next) => {
   const page = inject(PageExitService);
   return next(req).pipe(
     catchError((error: unknown) =>
-      error instanceof HttpErrorResponse && error.status === 0 && page.isLeaving() ? NEVER : throwError(() => error)
-    )
+      error instanceof HttpErrorResponse && error.status === 0 && page.isLeaving() ? NEVER : throwError(() => error),
+    ),
   );
 };

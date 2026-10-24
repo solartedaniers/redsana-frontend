@@ -1,10 +1,5 @@
 import { Observable } from 'rxjs';
-import {
-  AuthSession,
-  PasswordChangePayload,
-  ProfileUpdatePayload,
-  RegisterPayload,
-} from '../models/user.model';
+import { AuthSession, PasswordChangePayload, ProfileUpdatePayload, RegisterPayload } from '../models/user.model';
 
 /** Contrato de autenticación; hoy lo cumple SupabaseAuthRepository y se cambia en app.config.ts. */
 export abstract class AuthRepository {

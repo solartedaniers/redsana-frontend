@@ -1,7 +1,21 @@
-import { LatencyProbeConfig, LatencyProbeRequest, LatencyProbeResponse, handleLatencyProbeRequest } from './latency-probe';
-import { MainThreadLatencyProbeRunner, WorkerLatencyProbeRunner, createLatencyProbeRunner } from './latency-probe-runner';
+import {
+  LatencyProbeConfig,
+  LatencyProbeRequest,
+  LatencyProbeResponse,
+  handleLatencyProbeRequest,
+} from './latency-probe';
+import {
+  MainThreadLatencyProbeRunner,
+  WorkerLatencyProbeRunner,
+  createLatencyProbeRunner,
+} from './latency-probe-runner';
 
-const CONFIG: LatencyProbeConfig = { probeUrl: 'https://api.test/health', sampleCount: 3, sampleIntervalMs: 0, sampleTimeoutMs: 1000 };
+const CONFIG: LatencyProbeConfig = {
+  probeUrl: 'https://api.test/health',
+  sampleCount: 3,
+  sampleIntervalMs: 0,
+  sampleTimeoutMs: 1000,
+};
 
 /** Imita un Worker: responde como el hilo real y registra si se terminó. */
 class FakeWorker {
@@ -10,12 +24,17 @@ class FakeWorker {
   onerror: ((event: ErrorEvent) => void) | null = null;
   terminated = false;
   received: LatencyProbeRequest[] = [];
-  constructor(readonly url: URL, readonly options: WorkerOptions) {
+  constructor(
+    readonly url: URL,
+    readonly options: WorkerOptions,
+  ) {
     FakeWorker.instances.push(this);
   }
   postMessage(request: LatencyProbeRequest): void {
     this.received.push(request);
-    void handleLatencyProbeRequest(request).then((data) => this.onmessage?.({ data } as MessageEvent<LatencyProbeResponse>));
+    void handleLatencyProbeRequest(request).then((data) =>
+      this.onmessage?.({ data } as MessageEvent<LatencyProbeResponse>),
+    );
   }
   terminate(): void {
     this.terminated = true;
@@ -29,7 +48,14 @@ describe('Medición web en Web Worker', () => {
   });
 
   it('el Worker cronometra cada petición y marca como perdidas las fallidas', async () => {
-    vi.stubGlobal('fetch', vi.fn().mockResolvedValueOnce({ ok: true }).mockResolvedValueOnce({ ok: false }).mockRejectedValueOnce(new Error('timeout')));
+    vi.stubGlobal(
+      'fetch',
+      vi
+        .fn()
+        .mockResolvedValueOnce({ ok: true })
+        .mockResolvedValueOnce({ ok: false })
+        .mockRejectedValueOnce(new Error('timeout')),
+    );
 
     const response = await handleLatencyProbeRequest({ type: 'measure', config: CONFIG });
 

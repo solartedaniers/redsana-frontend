@@ -37,7 +37,7 @@ export class NetworkThresholdsService {
         // Un 404 (backend anterior), un 50x (dormido) o un error de red dejan el respaldo, sin reintentos ni avisos.
         switchMap(() => this.http.get<BackendThresholds>(this.url).pipe(catchError(() => EMPTY))),
         map((response) => toThresholds(response)),
-        filter((thresholds): thresholds is NetworkStatusThresholds => thresholds !== null)
+        filter((thresholds): thresholds is NetworkStatusThresholds => thresholds !== null),
       )
       .subscribe((thresholds) => this.thresholds.set(thresholds));
   }

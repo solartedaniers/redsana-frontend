@@ -1,4 +1,6 @@
-:host { display: block; }
+:host {
+  display: block;
+}
 
 .score-gauge {
   --gauge-fill: var(--color-fill-neutral);
@@ -7,18 +9,35 @@
   margin-inline: auto;
 }
 
-.score-gauge[data-band='good'] { --gauge-fill: var(--color-fill-healthy); }
-.score-gauge[data-band='warning'] { --gauge-fill: var(--color-fill-warning); }
-.score-gauge[data-band='critical'] { --gauge-fill: var(--color-fill-critical); }
+.score-gauge[data-band='good'] {
+  --gauge-fill: var(--color-fill-healthy);
+}
+.score-gauge[data-band='warning'] {
+  --gauge-fill: var(--color-fill-warning);
+}
+.score-gauge[data-band='critical'] {
+  --gauge-fill: var(--color-fill-critical);
+}
 
-.dial { position: relative; }
+.dial {
+  position: relative;
+}
 
-svg { display: block; width: 100%; overflow: visible; }
+svg {
+  display: block;
+  width: 100%;
+  overflow: visible;
+}
 
 .track,
-.segment { fill: none; stroke-width: 18; }
+.segment {
+  fill: none;
+  stroke-width: 18;
+}
 
-.track { stroke: var(--color-bg-surface-alt); }
+.track {
+  stroke: var(--color-bg-surface-alt);
+}
 
 .segment {
   stroke: var(--gauge-fill);
@@ -26,7 +45,9 @@ svg { display: block; width: 100%; overflow: visible; }
 }
 
 // Las dos partes reales se leen como dos tintas: violeta el cuestionario y el color de la banda el técnico.
-.segment--questionnaire { stroke: var(--color-fill-brand); }
+.segment--questionnaire {
+  stroke: var(--color-fill-brand);
+}
 
 .tick {
   stroke: var(--color-ink);
@@ -34,7 +55,9 @@ svg { display: block; width: 100%; overflow: visible; }
   transform-origin: 100px 100px;
 }
 
-.tick--split { stroke-width: 4; }
+.tick--split {
+  stroke-width: 4;
+}
 
 // La aguja gira sobre el centro del dial con transform, que es barato de animar.
 .needle {
@@ -71,7 +94,11 @@ svg { display: block; width: 100%; overflow: visible; }
   color: var(--color-text-primary);
 }
 
-.reading__unit { font-size: var(--font-size-body); color: var(--color-text-secondary); letter-spacing: 0; }
+.reading__unit {
+  font-size: var(--font-size-body);
+  color: var(--color-text-secondary);
+  letter-spacing: 0;
+}
 
 .legend {
   display: flex;
@@ -98,4 +125,6 @@ svg { display: block; width: 100%; overflow: visible; }
   }
 }
 
-.legend__item--questionnaire::before { background: var(--color-fill-brand); }
+.legend__item--questionnaire::before {
+  background: var(--color-fill-brand);
+}

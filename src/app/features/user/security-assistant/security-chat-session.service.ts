@@ -4,11 +4,7 @@ import { Observable, filter, map, of, switchMap, take, tap } from 'rxjs';
 import { AiStatusService } from '../../../core/ai-status/ai-status.service';
 import { AiWarmingUpError } from '../../../core/ai-status/ai-warming-up.error';
 import { I18nService } from '../../../core/i18n/i18n.service';
-import {
-  ChatConversationSummary,
-  ChatMessage,
-  UserStartableChatTopic,
-} from '../../../core/models/security.model';
+import { ChatConversationSummary, ChatMessage, UserStartableChatTopic } from '../../../core/models/security.model';
 import { SecurityAssistantRepository } from '../../../core/repositories/security-assistant.repository';
 
 /** Estado del chat; se provee en SecurityAssistant para que cada visita arranque con su propia sesión. */
@@ -52,7 +48,7 @@ export class SecurityChatSession {
       tap((conversation) => {
         this.addConversation(conversation);
         this.messages.set([{ role: 'assistant', text: introKey, isTranslationKey: true }]);
-      })
+      }),
     );
   }
 
@@ -69,7 +65,7 @@ export class SecurityChatSession {
       .pipe(
         tap(() => this.isSending.set(true)),
         switchMap(() => this.repository.startAssessmentBriefing(assessmentId, this.i18n.language())),
-        takeUntilDestroyed(this.destroyRef)
+        takeUntilDestroyed(this.destroyRef),
       )
       .subscribe({
         next: ({ conversation, messages }) => {
@@ -112,7 +108,7 @@ export class SecurityChatSession {
       : this.aiReady$.pipe(
           filter(Boolean),
           take(1),
-          map(() => undefined)
+          map(() => undefined),
         );
   }
 
@@ -127,7 +123,14 @@ export class SecurityChatSession {
     this.repository.sendMessage(conversationId, text).subscribe({
       next: ({ reply, noticeKey, noticeParams }) => {
         const notice: ChatMessage[] = noticeKey
-          ? [{ role: 'assistant', text: noticeKey, isTranslationKey: true, translationParams: noticeParams ?? undefined }]
+          ? [
+              {
+                role: 'assistant',
+                text: noticeKey,
+                isTranslationKey: true,
+                translationParams: noticeParams ?? undefined,
+              },
+            ]
           : [];
         if (reply === null) {
           // El mensaje no se guardó (p. ej. traía una contraseña): lo quito y muestro el aviso.
@@ -146,8 +149,13 @@ export class SecurityChatSession {
         if (isWarmingUp) {
           this.aiStatus.reportWarmingUp();
         }
-        const replyKey = isWarmingUp ? 'user.securityAssistant.chat.aiWarmingUpReply' : 'user.securityAssistant.chat.errorReply';
-        this.messages.update((messages) => [...messages, { role: 'assistant', text: replyKey, isTranslationKey: true }]);
+        const replyKey = isWarmingUp
+          ? 'user.securityAssistant.chat.aiWarmingUpReply'
+          : 'user.securityAssistant.chat.errorReply';
+        this.messages.update((messages) => [
+          ...messages,
+          { role: 'assistant', text: replyKey, isTranslationKey: true },
+        ]);
         this.isSending.set(false);
       },
     });

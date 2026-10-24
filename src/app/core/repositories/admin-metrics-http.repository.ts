@@ -29,7 +29,7 @@ export class AdminMetricsHttpRepository extends AdminMetricsRepository {
         averageSecurityScore: metrics.average_security_score,
         realScoredHouseholds: metrics.real_scored_households ?? null,
         unevaluatedHouseholds: metrics.unevaluated_households ?? null,
-      }))
+      })),
     );
   }
 }

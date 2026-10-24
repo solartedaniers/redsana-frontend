@@ -33,7 +33,10 @@ export class SecurityAssistant {
   constructor() {
     inject(NetworkMetricsRepository)
       .getSnapshot()
-      .subscribe({ next: (snapshot) => this.networkSnapshot.set(snapshot), error: () => this.networkSnapshot.set(null) });
+      .subscribe({
+        next: (snapshot) => this.networkSnapshot.set(snapshot),
+        error: () => this.networkSnapshot.set(null),
+      });
     // Otra pantalla (p. ej. Modo familiar) puede abrir el asistente en un tema.
     const startsFamilyMode = this.route.snapshot.queryParamMap.get(CHAT_TOPIC_QUERY_PARAM) === FAMILY_MODE_TOPIC;
     this.chat.loadConversations(!startsFamilyMode);

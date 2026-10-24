@@ -10,11 +10,17 @@ import { supabaseClient } from './supabase-client';
 
 async function requestResetFrom(isDesktop: boolean): Promise<string | undefined> {
   TestBed.configureTestingModule({
-    providers: [SupabaseAuthRepository, provideHttpClient(), { provide: RuntimeEnvironmentService, useValue: { isDesktop } }],
+    providers: [
+      SupabaseAuthRepository,
+      provideHttpClient(),
+      { provide: RuntimeEnvironmentService, useValue: { isDesktop } },
+    ],
   });
   const reset = vi
     .spyOn(supabaseClient.auth, 'resetPasswordForEmail')
-    .mockResolvedValue({ data: {}, error: null } as Awaited<ReturnType<typeof supabaseClient.auth.resetPasswordForEmail>>);
+    .mockResolvedValue({ data: {}, error: null } as Awaited<
+      ReturnType<typeof supabaseClient.auth.resetPasswordForEmail>
+    >);
   await firstValueFrom(TestBed.inject(SupabaseAuthRepository).requestPasswordReset('user@redsana.dev'));
   return reset.mock.calls[0][1]?.redirectTo;
 }
@@ -35,7 +41,9 @@ type GetSessionResult = Awaited<ReturnType<typeof supabaseClient.auth.getSession
 type SignOutResult = Awaited<ReturnType<typeof supabaseClient.auth.signOut>>;
 
 /** Restaura una sesión guardada y responde /api/users/me con el estado indicado; devuelve el error y el signOut. */
-async function restoreWithProfileStatus(status: number): Promise<{ error: unknown; signOut: ReturnType<typeof vi.fn> }> {
+async function restoreWithProfileStatus(
+  status: number,
+): Promise<{ error: unknown; signOut: ReturnType<typeof vi.fn> }> {
   TestBed.configureTestingModule({
     providers: [
       SupabaseAuthRepository,
@@ -49,11 +57,14 @@ async function restoreWithProfileStatus(status: number): Promise<{ error: unknow
     error: null,
   } as unknown as GetSessionResult);
   const signOut = vi.spyOn(supabaseClient.auth, 'signOut').mockResolvedValue({ error: null } as SignOutResult);
-  const result = firstValueFrom(TestBed.inject(SupabaseAuthRepository).restoreSession()).catch((error: unknown) => error);
-  await vi.waitFor(() => TestBed.inject(HttpTestingController).expectOne(`${environment.apiBaseUrl}/api/users/me`).flush(
-    { detail: 'x' },
-    { status, statusText: 'x' }
-  ));
+  const result = firstValueFrom(TestBed.inject(SupabaseAuthRepository).restoreSession()).catch(
+    (error: unknown) => error,
+  );
+  await vi.waitFor(() =>
+    TestBed.inject(HttpTestingController)
+      .expectOne(`${environment.apiBaseUrl}/api/users/me`)
+      .flush({ detail: 'x' }, { status, statusText: 'x' }),
+  );
   return { error: await result, signOut: signOut as unknown as ReturnType<typeof vi.fn> };
 }
 

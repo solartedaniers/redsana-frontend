@@ -41,7 +41,7 @@ export class SecurityAssessmentPanel {
 
   protected readonly wifiEncryptionStatus = computed(() => evaluateWifiEncryption(this.wifiEncryptionRaw()));
   protected readonly allAnswered = computed(
-    () => this.questions().length > 0 && this.questions().every((q) => q.id in this.answers())
+    () => this.questions().length > 0 && this.questions().every((q) => q.id in this.answers()),
   );
 
   constructor() {

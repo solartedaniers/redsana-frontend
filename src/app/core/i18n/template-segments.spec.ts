@@ -14,7 +14,9 @@ describe('splitTemplate', () => {
       { text: '1.0.0.3', isValue: true },
       { text: ' como DNS secundario.', isValue: false },
     ]);
-    expect(segments.map((s) => s.text).join('')).toBe('Escribe 1.1.1.3 como DNS primario y 1.0.0.3 como DNS secundario.');
+    expect(segments.map((s) => s.text).join('')).toBe(
+      'Escribe 1.1.1.3 como DNS primario y 1.0.0.3 como DNS secundario.',
+    );
   });
 
   it('un texto sin placeholders queda como un solo trozo', () => {

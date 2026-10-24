@@ -18,7 +18,16 @@ import { MeasurementEmptyState } from '../../../shared/components/measurement-em
 // El backend no tiene un endpoint por id para hogares, así que filtro el resultado de getHouseholds().
 @Component({
   selector: 'app-household-detail',
-  imports: [RouterLink, PageHeader, NetworkStatusLight, MetricCard, HistoryChart, ScoreGauge, MeasurementEmptyState, TranslatePipe],
+  imports: [
+    RouterLink,
+    PageHeader,
+    NetworkStatusLight,
+    MetricCard,
+    HistoryChart,
+    ScoreGauge,
+    MeasurementEmptyState,
+    TranslatePipe,
+  ],
   templateUrl: './household-detail.html',
   styleUrl: './household-detail.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

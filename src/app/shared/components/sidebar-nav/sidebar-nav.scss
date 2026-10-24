@@ -26,9 +26,14 @@
     transform var(--motion-duration-fast) var(--motion-easing-spring),
     background-color var(--motion-duration-fast) var(--motion-easing-standard);
 
-  app-icon { color: var(--icon-tone); }
+  app-icon {
+    color: var(--icon-tone);
+  }
 
-  &:hover { color: var(--color-text-primary); background: var(--color-bg-surface-alt); }
+  &:hover {
+    color: var(--color-text-primary);
+    background: var(--color-bg-surface-alt);
+  }
 
   &.active {
     border-color: var(--color-ink);

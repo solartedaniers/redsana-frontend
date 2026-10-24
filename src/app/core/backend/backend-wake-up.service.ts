@@ -17,6 +17,9 @@ export class BackendWakeUpService {
       return;
     }
     // Solo importa que la petición llegue: si falla, el login sigue funcionando igual y no muestro nada.
-    this.http.get(BACKEND_HEALTH_URL).pipe(catchError(() => EMPTY)).subscribe();
+    this.http
+      .get(BACKEND_HEALTH_URL)
+      .pipe(catchError(() => EMPTY))
+      .subscribe();
   }
 }

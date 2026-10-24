@@ -6,7 +6,9 @@ import { AiStatusReport } from '../models/ai.model';
 import { AiStatusHttpRepository } from './ai-status-http.repository';
 
 function setup() {
-  TestBed.configureTestingModule({ providers: [AiStatusHttpRepository, provideHttpClient(), provideHttpClientTesting()] });
+  TestBed.configureTestingModule({
+    providers: [AiStatusHttpRepository, provideHttpClient(), provideHttpClientTesting()],
+  });
   return { repository: TestBed.inject(AiStatusHttpRepository), http: TestBed.inject(HttpTestingController) };
 }
 
@@ -16,7 +18,9 @@ describe('AiStatusHttpRepository', () => {
     let status: AiStatusReport | undefined;
 
     repository.getStatus().subscribe((result) => (status = result));
-    http.expectOne({ method: 'GET', url: `${environment.apiBaseUrl}/api/ai/status` }).flush({ status: 'warming_up', reason: null });
+    http
+      .expectOne({ method: 'GET', url: `${environment.apiBaseUrl}/api/ai/status` })
+      .flush({ status: 'warming_up', reason: null });
 
     expect(status).toEqual({ status: 'warming_up', reason: null });
     http.verify();
@@ -27,7 +31,9 @@ describe('AiStatusHttpRepository', () => {
     let status: AiStatusReport | undefined;
 
     repository.warmUp().subscribe((result) => (status = result));
-    http.expectOne({ method: 'POST', url: `${environment.apiBaseUrl}/api/ai/warm-up` }).flush({ status: 'unavailable', reason: 'timed_out' });
+    http
+      .expectOne({ method: 'POST', url: `${environment.apiBaseUrl}/api/ai/warm-up` })
+      .flush({ status: 'unavailable', reason: 'timed_out' });
 
     expect(status).toEqual({ status: 'unavailable', reason: 'timed_out' });
     http.verify();
@@ -38,7 +44,9 @@ describe('AiStatusHttpRepository', () => {
     let status: AiStatusReport | undefined;
 
     repository.warmUp().subscribe((result) => (status = result));
-    http.expectOne(`${environment.apiBaseUrl}/api/ai/warm-up`).flush({ detail: 'Not Found' }, { status: 404, statusText: 'Not Found' });
+    http
+      .expectOne(`${environment.apiBaseUrl}/api/ai/warm-up`)
+      .flush({ detail: 'Not Found' }, { status: 404, statusText: 'Not Found' });
 
     expect(status).toEqual({ status: 'ready' });
     http.verify();

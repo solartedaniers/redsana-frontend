@@ -8,7 +8,6 @@ import { Icon } from '../../../shared/components/icon/icon';
 import { passwordsMatchValidator } from '../../../core/validators/passwords-match.validator';
 import { MIN_PASSWORD_LENGTH } from '../../../core/auth/password-policy';
 
-
 @Component({
   selector: 'app-profile',
   imports: [ReactiveFormsModule, TranslatePipe, PageHeader, Icon],
@@ -42,7 +41,7 @@ export class Profile {
       newPassword: ['', [Validators.required, Validators.minLength(MIN_PASSWORD_LENGTH)]],
       confirmNewPassword: ['', [Validators.required]],
     },
-    { validators: passwordsMatchValidator('newPassword', 'confirmNewPassword') }
+    { validators: passwordsMatchValidator('newPassword', 'confirmNewPassword') },
   );
 
   protected saveProfile(): void {

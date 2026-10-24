@@ -1,11 +1,11 @@
 // Fuentes variables autoalojadas, sin CDN: la app de escritorio puede estar sin internet.
-@use "@fontsource-variable/bricolage-grotesque/standard";
-@use "@fontsource-variable/plus-jakarta-sans";
-@use "@fontsource-variable/jetbrains-mono";
-@use "styles/tokens";
-@use "styles/motion";
-@use "styles/base";
-@use "styles/primitives";
-@use "styles/forms";
+@use '@fontsource-variable/bricolage-grotesque/standard';
+@use '@fontsource-variable/plus-jakarta-sans';
+@use '@fontsource-variable/jetbrains-mono';
+@use 'styles/tokens';
+@use 'styles/motion';
+@use 'styles/base';
+@use 'styles/primitives';
+@use 'styles/forms';
 // Tailwind va con @use (no @import, deprecado en Sass) y lo procesa @tailwindcss/postcss según .postcssrc.json.
-@use "tailwindcss";
+@use 'tailwindcss';

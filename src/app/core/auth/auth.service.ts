@@ -64,7 +64,7 @@ export class AuthService {
           delay: (error: unknown) =>
             isRejectedSession(error) ? throwError(() => error) : timer(SESSION_RESTORE_CONFIG.retryDelayMs),
         }),
-        timeout({ first: SESSION_RESTORE_CONFIG.profileTimeoutMs })
+        timeout({ first: SESSION_RESTORE_CONFIG.profileTimeoutMs }),
       )
       .subscribe({
         next: (session) => this.settle(session),
@@ -98,7 +98,7 @@ export class AuthService {
         filter((state) => state === 'restored'),
         take(1),
         map(() => undefined),
-        finalize(() => this.waitingGuards.update((count) => count - 1))
+        finalize(() => this.waitingGuards.update((count) => count - 1)),
       );
     });
   }
@@ -130,9 +130,7 @@ export class AuthService {
 
   updateProfile(payload: ProfileUpdatePayload): Observable<AuthSession> {
     const userId = this.requireUserId();
-    return this.repository
-      .updateProfile(userId, payload)
-      .pipe(tap((session) => this.session.set(session)));
+    return this.repository.updateProfile(userId, payload).pipe(tap((session) => this.session.set(session)));
   }
 
   updateAvatar(avatarUrl: string): Observable<AuthSession> {

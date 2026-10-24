@@ -51,7 +51,7 @@ export class NetworkMetricsHttpRepository extends NetworkMetricsRepository {
     // y catchError por consulta salta ese tick en vez de matar el sondeo.
     return interval(LIVE_UPDATE_INTERVAL_MS).pipe(
       startWith(0),
-      switchMap(() => this.getSnapshot(householdId).pipe(catchError(() => EMPTY)))
+      switchMap(() => this.getSnapshot(householdId).pipe(catchError(() => EMPTY))),
     );
   }
 
@@ -64,7 +64,7 @@ export class NetworkMetricsHttpRepository extends NetworkMetricsRepository {
   record(
     measurement: NetworkQualityMeasurement,
     source: MeasurementSource,
-    networkFingerprint: string | null
+    networkFingerprint: string | null,
   ): Observable<NetworkMetricSnapshot> {
     const body = {
       latency_ms: measurement.latencyMs,
@@ -84,7 +84,7 @@ export class NetworkMetricsHttpRepository extends NetworkMetricsRepository {
           status: status.status,
           samplesCollected: status.samples_collected,
           samplesRequired: status.samples_required,
-        }))
+        })),
       );
   }
 
@@ -105,6 +105,10 @@ export class NetworkMetricsHttpRepository extends NetworkMetricsRepository {
   }
 
   private toSample(sample: BackendSample): NetworkMetricSample {
-    return { timestamp: sample.timestamp, latencyMs: sample.latency_ms, packetLossPercent: sample.packet_loss_percent ?? undefined };
+    return {
+      timestamp: sample.timestamp,
+      latencyMs: sample.latency_ms,
+      packetLossPercent: sample.packet_loss_percent ?? undefined,
+    };
   }
 }

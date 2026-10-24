@@ -9,8 +9,7 @@ export const USER_ROUTES: Routes = [
   },
   {
     path: ROUTE_SEGMENTS.securityAssistant,
-    loadComponent: () =>
-      import('./security-assistant/security-assistant').then((m) => m.SecurityAssistant),
+    loadComponent: () => import('./security-assistant/security-assistant').then((m) => m.SecurityAssistant),
   },
   {
     path: ROUTE_SEGMENTS.alerts,

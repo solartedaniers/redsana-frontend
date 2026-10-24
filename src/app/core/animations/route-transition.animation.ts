@@ -10,16 +10,12 @@ export const routeTransitionAnimation = trigger('routeTransition', [
     }),
     query(':enter', style({ opacity: 0 }), { optional: true }),
     group([
-      query(
-        ':leave',
-        animate(`${MOTION_DURATION.base} ${MOTION_EASING.accelerate}`, style({ opacity: 0 })),
-        { optional: true }
-      ),
-      query(
-        ':enter',
-        animate(`${MOTION_DURATION.base} ${MOTION_EASING.decelerate}`, style({ opacity: 1 })),
-        { optional: true }
-      ),
+      query(':leave', animate(`${MOTION_DURATION.base} ${MOTION_EASING.accelerate}`, style({ opacity: 0 })), {
+        optional: true,
+      }),
+      query(':enter', animate(`${MOTION_DURATION.base} ${MOTION_EASING.decelerate}`, style({ opacity: 1 })), {
+        optional: true,
+      }),
     ]),
   ]),
 ]);

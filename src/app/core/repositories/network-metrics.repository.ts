@@ -17,7 +17,7 @@ export abstract class NetworkMetricsRepository {
   abstract record(
     measurement: NetworkQualityMeasurement,
     source: MeasurementSource,
-    networkFingerprint: string | null
+    networkFingerprint: string | null,
   ): Observable<NetworkMetricSnapshot>;
   abstract getAnomalyStatus(householdId?: string): Observable<AnomalyDetectionStatus>;
 }

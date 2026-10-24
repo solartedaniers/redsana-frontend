@@ -7,7 +7,9 @@ import { AlertsHttpRepository } from './alerts-http.repository';
 describe('AlertsHttpRepository', () => {
   it('pide las alertas recientes a /api/alerts/recent con el cursor since', () => {
     vi.useFakeTimers();
-    TestBed.configureTestingModule({ providers: [AlertsHttpRepository, provideHttpClient(), provideHttpClientTesting()] });
+    TestBed.configureTestingModule({
+      providers: [AlertsHttpRepository, provideHttpClient(), provideHttpClientTesting()],
+    });
     const subscription = TestBed.inject(AlertsHttpRepository).watchNewAlerts().subscribe();
 
     vi.runOnlyPendingTimers();
@@ -20,7 +22,9 @@ describe('AlertsHttpRepository', () => {
   });
 
   it('completa la clave de las alertas viejas para que se traduzcan en vez de mostrarse crudas', () => {
-    TestBed.configureTestingModule({ providers: [AlertsHttpRepository, provideHttpClient(), provideHttpClientTesting()] });
+    TestBed.configureTestingModule({
+      providers: [AlertsHttpRepository, provideHttpClient(), provideHttpClientTesting()],
+    });
     const repository = TestBed.inject(AlertsHttpRepository);
     let alerts: NetworkAlert[] = [];
 
@@ -30,7 +34,12 @@ describe('AlertsHttpRepository', () => {
       .expectOne((req) => req.url.endsWith('/api/alerts'))
       .flush([
         { ...base, id: 'old', type: 'outage', message_key: 'alertsCenter.messages.briefOutage' },
-        { ...base, id: 'new', type: 'untrusted_device', message_key: 'user.alertsCenter.messages.untrustedDeviceOnline' },
+        {
+          ...base,
+          id: 'new',
+          type: 'untrusted_device',
+          message_key: 'user.alertsCenter.messages.untrustedDeviceOnline',
+        },
       ]);
 
     expect(alerts.map((alert) => alert.messageKey)).toEqual([

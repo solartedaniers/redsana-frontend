@@ -72,10 +72,10 @@ export class AiStatusService {
           isAuthenticated
             ? this.restart$.pipe(
                 startWith(true),
-                switchMap((showWarmingUp) => this.warmUpCycle(showWarmingUp))
+                switchMap((showWarmingUp) => this.warmUpCycle(showWarmingUp)),
               )
-            : of<AiStatusReport | null>(null)
-        )
+            : of<AiStatusReport | null>(null),
+        ),
       )
       .subscribe((report) => {
         this.unavailableReason.set(report?.reason ?? DEFAULT_REASON);
@@ -119,20 +119,24 @@ export class AiStatusService {
     // Cada ciclo nace de una acción del usuario (sesión, chat, reintentar): también despierto la IA desde aquí.
     this.clientWakeUp.wakeUp();
     const polls$ = from(this.pollDelays).pipe(
-      concatMap((delayMs) => timer(delayMs).pipe(switchMap(() => this.orWarmingUp(this.repository.getStatus()))))
+      concatMap((delayMs) => timer(delayMs).pipe(switchMap(() => this.orWarmingUp(this.repository.getStatus())))),
     );
     // Consultar el estado no despierta nada: si el backend dormido no recibió el pedido, lo repito con la misma espera.
-    const warmUp$ = this.repository.warmUp().pipe(
-      retry({ delay: (_error, attempt) => timer(this.pollDelays[Math.min(attempt, this.pollDelays.length) - 1]) })
-    );
+    const warmUp$ = this.repository
+      .warmUp()
+      .pipe(
+        retry({ delay: (_error, attempt) => timer(this.pollDelays[Math.min(attempt, this.pollDelays.length) - 1]) }),
+      );
     // El tope es de reloj, no la suma de pausas: con el backend dormido cada petición tarda. Agotado el tiempo queda
     // no disponible (con reintentar); normalmente lo decide antes el backend.
     const waiting$ = concat(showWarmingUp ? of(WARMING_UP) : EMPTY, warmUp$, polls$).pipe(
-      takeUntil(timer(AI_STATUS_CONFIG.maxWaitMs))
+      takeUntil(timer(AI_STATUS_CONFIG.maxWaitMs)),
     );
     return concat(waiting$, of(TIMED_OUT)).pipe(
       takeWhile((report) => report.status === 'warming_up', true),
-      distinctUntilChanged((previous, current) => previous.status === current.status && previous.reason === current.reason)
+      distinctUntilChanged(
+        (previous, current) => previous.status === current.status && previous.reason === current.reason,
+      ),
     );
   }
 

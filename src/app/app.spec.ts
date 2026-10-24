@@ -12,8 +12,7 @@ describe('App', () => {
         { provide: SwUpdate, useValue: { isEnabled: false, versionUpdates: NEVER } },
         { provide: AuthRepository, useValue: { restoreSession: () => NEVER } },
       ],
-    })
-      .compileComponents();
+    }).compileComponents();
   });
 
   it('should create the app', () => {

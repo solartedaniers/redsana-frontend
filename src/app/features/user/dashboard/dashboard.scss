@@ -1,5 +1,7 @@
 // Aura ambiental: los bordes toman el tinte del estado REAL de la red (nada si aún no hay medición).
-:host { display: block; }
+:host {
+  display: block;
+}
 
 :host([data-severity])::before {
   content: '';
@@ -7,7 +9,11 @@
   inset: 0;
   z-index: -1;
   pointer-events: none;
-  background: radial-gradient(ellipse at top right, color-mix(in srgb, var(--severity-fill) 22%, transparent), transparent 60%);
+  background: radial-gradient(
+    ellipse at top right,
+    color-mix(in srgb, var(--severity-fill) 22%, transparent),
+    transparent 60%
+  );
 }
 
 .dashboard-hero {
@@ -19,8 +25,13 @@
   margin-bottom: var(--space-5);
 }
 
-.dashboard-hero__heading app-network-status-badge { display: inline-block; margin-bottom: var(--space-3); }
-.dashboard-hero .page-header { margin: 0; }
+.dashboard-hero__heading app-network-status-badge {
+  display: inline-block;
+  margin-bottom: var(--space-3);
+}
+.dashboard-hero .page-header {
+  margin: 0;
+}
 
 .dashboard-hero__actions {
   display: flex;
@@ -53,9 +64,15 @@
   margin-bottom: var(--space-6);
 }
 
-.vitals__latency { grid-area: latency; }
-.vitals__jitter { grid-area: jitter; }
-.vitals__loss { grid-area: loss; }
+.vitals__latency {
+  grid-area: latency;
+}
+.vitals__jitter {
+  grid-area: jitter;
+}
+.vitals__loss {
+  grid-area: loss;
+}
 
 .vitals__updated {
   grid-area: updated;
@@ -67,7 +84,9 @@
   transform: rotate(var(--sticker-tilt-alt));
 }
 
-.history-section app-history-chart { padding: var(--space-5); }
+.history-section app-history-chart {
+  padding: var(--space-5);
+}
 
 @media (max-width: 64rem) {
   .vitals {
@@ -77,5 +96,7 @@
 }
 
 @media (max-width: 28rem) {
-  .vitals { grid-template-areas: 'latency latency' 'jitter jitter' 'loss loss' 'updated updated'; }
+  .vitals {
+    grid-template-areas: 'latency latency' 'jitter jitter' 'loss loss' 'updated updated';
+  }
 }

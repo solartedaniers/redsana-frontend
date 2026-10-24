@@ -1,5 +1,10 @@
 import { NetworkDevice } from '../../../../core/models/device.model';
-import { DEVICE_SEARCH_FIELDS, DeviceSearchField, DeviceSearchNormalization, MAC_SEPARATORS } from './device-search.config';
+import {
+  DEVICE_SEARCH_FIELDS,
+  DeviceSearchField,
+  DeviceSearchNormalization,
+  MAC_SEPARATORS,
+} from './device-search.config';
 
 // Puro: no guarda la búsqueda ni llama al backend, solo filtra los dispositivos ya cargados.
 export class DeviceSearchFilter {

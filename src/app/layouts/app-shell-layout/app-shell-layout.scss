@@ -36,7 +36,9 @@
 
 // En pantallas angostas el menú no desaparece: pasa a ser un cajón que abre el botón de la barra superior.
 @media (max-width: 52rem) {
-  .app-shell { grid-template-columns: minmax(0, 1fr); }
+  .app-shell {
+    grid-template-columns: minmax(0, 1fr);
+  }
 
   .sidebar {
     position: fixed;
@@ -52,8 +54,13 @@
       visibility var(--motion-duration-base);
   }
 
-  .app-shell--nav-open .sidebar { transform: none; visibility: visible; }
-  .shell-content { padding: var(--space-5) var(--space-4) var(--space-6); }
+  .app-shell--nav-open .sidebar {
+    transform: none;
+    visibility: visible;
+  }
+  .shell-content {
+    padding: var(--space-5) var(--space-4) var(--space-6);
+  }
 }
 
 .nav-backdrop {
@@ -64,5 +71,7 @@
   background: color-mix(in srgb, var(--color-ink) 35%, transparent);
   cursor: pointer;
 
-  @media (min-width: 52.0625rem) { display: none; }
+  @media (min-width: 52.0625rem) {
+    display: none;
+  }
 }

@@ -1,7 +1,12 @@
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { NetworkMetricsRepository } from '../../../core/repositories/network-metrics.repository';
-import { AnomalyDetectionStatus, NetworkMetricSample, NetworkMetricSnapshot, NetworkStatus } from '../../../core/models/network.model';
+import {
+  AnomalyDetectionStatus,
+  NetworkMetricSample,
+  NetworkMetricSnapshot,
+  NetworkStatus,
+} from '../../../core/models/network.model';
 import { LatencySeverity } from '../../../core/domain/latency-severity';
 import { latencyLabelKey } from '../../../core/domain/network-status-label';
 import { hasMeasurement, isLiveMeasurement } from '../../../core/domain/measurement-freshness';
@@ -26,7 +31,17 @@ const STATUS_AURA: Record<NetworkStatus, LatencySeverity | null> = {
 
 @Component({
   selector: 'app-dashboard',
-  imports: [PageHeader, NetworkStatusLight, NetworkStatusBadge, MetricCard, HistoryChart, MeasurementEmptyState, TranslatePipe, DatePipe, RouterLink],
+  imports: [
+    PageHeader,
+    NetworkStatusLight,
+    NetworkStatusBadge,
+    MetricCard,
+    HistoryChart,
+    MeasurementEmptyState,
+    TranslatePipe,
+    DatePipe,
+    RouterLink,
+  ],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

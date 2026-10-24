@@ -7,7 +7,12 @@ import { FALLBACK_NETWORK_STATUS_THRESHOLDS } from './network-thresholds.config'
 import { NetworkThresholdsService } from './network-thresholds.service';
 
 const URL_SUFFIX = '/api/network-metrics/thresholds';
-const BACKEND = { latency_warning_ms: 100, latency_critical_ms: 200, packet_loss_warning_percent: 2, packet_loss_critical_percent: 8 };
+const BACKEND = {
+  latency_warning_ms: 100,
+  latency_critical_ms: 200,
+  packet_loss_warning_percent: 2,
+  packet_loss_critical_percent: 8,
+};
 
 function setup(options: { authenticated?: boolean; platform?: 'browser' | 'server' } = {}) {
   const isAuthenticated = signal(options.authenticated ?? true);

@@ -47,7 +47,11 @@ for (const line of manuf.split('\n')) {
   else if (PHONE_VENDORS.some((pattern) => pattern.test(vendor))) phone.add(oui);
 }
 
-const asList = (set) => [...set].sort().map((oui) => `'${oui}'`).join(',');
+const asList = (set) =>
+  [...set]
+    .sort()
+    .map((oui) => `'${oui}'`)
+    .join(',');
 writeFileSync(
   TARGET_FILE,
   `// ARCHIVO GENERADO por scripts/generate-oui-table.mjs; no editar a mano.\n` +

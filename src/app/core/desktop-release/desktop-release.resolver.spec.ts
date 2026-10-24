@@ -15,7 +15,12 @@ const asset = (name: string) => ({ name, browser_download_url: `https://example.
 
 describe('selectInstallerAsset', () => {
   it('elige el .exe del instalador e ignora .msi, .sig y .zip', () => {
-    const assets = [asset('RedSana_1.2.0_x64_en-US.msi'), asset('RedSana_1.2.0_x64-setup.exe.sig'), asset('RedSana_1.2.0_x64.zip'), asset('RedSana_1.2.0_x64-setup.exe')];
+    const assets = [
+      asset('RedSana_1.2.0_x64_en-US.msi'),
+      asset('RedSana_1.2.0_x64-setup.exe.sig'),
+      asset('RedSana_1.2.0_x64.zip'),
+      asset('RedSana_1.2.0_x64-setup.exe'),
+    ];
     expect(selectInstallerAsset(assets, CONFIG.installerAssetSuffix)?.name).toBe('RedSana_1.2.0_x64-setup.exe');
   });
 
@@ -30,7 +35,11 @@ describe('DesktopReleaseResolver', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      providers: [provideHttpClient(), provideHttpClientTesting(), { provide: DESKTOP_RELEASE_CONFIG, useValue: CONFIG }],
+      providers: [
+        provideHttpClient(),
+        provideHttpClientTesting(),
+        { provide: DESKTOP_RELEASE_CONFIG, useValue: CONFIG },
+      ],
     });
     resolver = TestBed.inject(DesktopReleaseResolver);
     http = TestBed.inject(HttpTestingController);
@@ -42,7 +51,10 @@ describe('DesktopReleaseResolver', () => {
     const first = firstValueFrom(resolver.resolve());
     http.expectOne(CONFIG.latestReleaseUrl).flush({ assets: [asset('RedSana_2.0.0_x64-setup.exe')] });
 
-    expect(await first).toEqual({ kind: 'installer', url: 'https://example.test/download/RedSana_2.0.0_x64-setup.exe' });
+    expect(await first).toEqual({
+      kind: 'installer',
+      url: 'https://example.test/download/RedSana_2.0.0_x64-setup.exe',
+    });
     expect(await firstValueFrom(resolver.resolve())).toEqual(await first);
     http.expectNone(CONFIG.latestReleaseUrl);
   });

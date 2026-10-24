@@ -8,7 +8,12 @@ import { DEFAULT_PRESENCE_FILTER, PRESENCE_FILTERS, PresenceFilter } from './pre
   imports: [TranslatePipe],
   template: `<div class="presence" role="group" [attr.aria-label]="'user.devicesMap.presence.label' | translate">
     @for (option of options; track option) {
-      <button type="button" [class.active]="value() === option" [attr.aria-pressed]="value() === option" (click)="value.set(option)">
+      <button
+        type="button"
+        [class.active]="value() === option"
+        [attr.aria-pressed]="value() === option"
+        (click)="value.set(option)"
+      >
         {{ 'user.devicesMap.presence.' + option | translate }}
       </button>
     }

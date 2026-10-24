@@ -1,4 +1,7 @@
-:host { display: block; grid-column: 1 / -1; }
+:host {
+  display: block;
+  grid-column: 1 / -1;
+}
 
 .presence {
   display: inline-flex;
@@ -19,8 +22,12 @@
     text-transform: uppercase;
     cursor: pointer;
 
-    &:hover:not(.active) { color: var(--color-text-primary); }
-    &:focus-visible { outline-offset: calc(var(--focus-ring-width) * -1); }
+    &:hover:not(.active) {
+      color: var(--color-text-primary);
+    }
+    &:focus-visible {
+      outline-offset: calc(var(--focus-ring-width) * -1);
+    }
 
     &.active {
       background: var(--color-fill-healthy);
@@ -30,5 +37,7 @@
 }
 
 @media (pointer: coarse) {
-  .presence button { min-height: var(--touch-target-min); }
+  .presence button {
+    min-height: var(--touch-target-min);
+  }
 }

@@ -9,8 +9,12 @@ describe('NetworkMetricsHttpRepository.getHistory', () => {
       providers: [NetworkMetricsHttpRepository, provideHttpClient(), provideHttpClientTesting()],
     });
     const samples: unknown[] = [];
-    TestBed.inject(NetworkMetricsHttpRepository).getHistory().subscribe((received) => samples.push(...received));
-    TestBed.inject(HttpTestingController).expectOne((req) => req.url.endsWith('/history')).flush(body);
+    TestBed.inject(NetworkMetricsHttpRepository)
+      .getHistory()
+      .subscribe((received) => samples.push(...received));
+    TestBed.inject(HttpTestingController)
+      .expectOne((req) => req.url.endsWith('/history'))
+      .flush(body);
     return samples;
   }
 
@@ -21,7 +25,9 @@ describe('NetworkMetricsHttpRepository.getHistory', () => {
   });
 
   it('con un backend anterior, sin pérdida, la deja sin definir', () => {
-    expect(history([{ timestamp: 't', latency_ms: 50 }])).toEqual([{ timestamp: 't', latencyMs: 50, packetLossPercent: undefined }]);
+    expect(history([{ timestamp: 't', latency_ms: 50 }])).toEqual([
+      { timestamp: 't', latencyMs: 50, packetLossPercent: undefined },
+    ]);
   });
 });
 

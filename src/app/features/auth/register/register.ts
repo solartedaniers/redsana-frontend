@@ -11,7 +11,6 @@ import { PulseLine } from '../../../shared/components/pulse-line/pulse-line';
 import { PasswordStrengthMeter } from '../../../shared/components/password-strength-meter/password-strength-meter';
 import { APP_PATHS } from '../../../core/routing/app-paths';
 
-
 @Component({
   selector: 'app-register',
   imports: [ReactiveFormsModule, RouterLink, TranslatePipe, Icon, PulseLine, PasswordStrengthMeter],
@@ -37,7 +36,7 @@ export class Register {
       password: ['', [Validators.required, Validators.minLength(MIN_PASSWORD_LENGTH), strongPasswordValidator()]],
       confirmPassword: ['', [Validators.required]],
     },
-    { validators: passwordsMatchValidator('password', 'confirmPassword') }
+    { validators: passwordsMatchValidator('password', 'confirmPassword') },
   );
 
   protected submit(): void {

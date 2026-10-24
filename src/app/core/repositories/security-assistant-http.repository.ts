@@ -116,39 +116,50 @@ export class SecurityAssistantHttpRepository extends SecurityAssistantRepository
 
   sendMessage(conversationId: string, message: string): Observable<ChatReply> {
     return this.http
-      .post<{ reply: string | null; notice_key: string | null; notice_params: Record<string, string> | null }>(`${this.conversationsUrl}/${conversationId}/messages`, {
-        message,
-        utc_offset_minutes: new Date().getTimezoneOffset(),
-      })
+      .post<{ reply: string | null; notice_key: string | null; notice_params: Record<string, string> | null }>(
+        `${this.conversationsUrl}/${conversationId}/messages`,
+        {
+          message,
+          utc_offset_minutes: new Date().getTimezoneOffset(),
+        },
+      )
       .pipe(
         mapAiWarmingUp(),
         map((response) => ({
           reply: response.reply,
           noticeKey: response.notice_key,
           noticeParams: response.notice_params,
-        }))
+        })),
       );
   }
 
   startAssessmentBriefing(assessmentId: string, language: AppLanguage): Observable<ChatBriefing> {
     return this.http
-      .post<{ conversation: BackendConversation; messages: BackendChatMessage[] }>(`${this.conversationsUrl}/briefings`, {
-        assessment_id: assessmentId,
-        language,
-        // Para que el asistente escriba las fechas en la hora local del usuario.
-        utc_offset_minutes: new Date().getTimezoneOffset(),
-      })
+      .post<{ conversation: BackendConversation; messages: BackendChatMessage[] }>(
+        `${this.conversationsUrl}/briefings`,
+        {
+          assessment_id: assessmentId,
+          language,
+          // Para que el asistente escriba las fechas en la hora local del usuario.
+          utc_offset_minutes: new Date().getTimezoneOffset(),
+        },
+      )
       .pipe(
         mapAiWarmingUp(),
         map((briefing) => ({
           conversation: this.toConversation(briefing.conversation),
           messages: briefing.messages.map((m) => this.toMessage(m)),
-        }))
+        })),
       );
   }
 
   private toConversation(conversation: BackendConversation): ChatConversationSummary {
-    return { id: conversation.id, title: conversation.title, topic: conversation.topic, updatedAt: conversation.updated_at };
+    return {
+      id: conversation.id,
+      title: conversation.title,
+      topic: conversation.topic,
+      updatedAt: conversation.updated_at,
+    };
   }
 
   private toMessage(message: BackendChatMessage): ChatMessage {
