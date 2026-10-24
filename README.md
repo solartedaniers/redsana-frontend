@@ -48,7 +48,7 @@ Y aunque quisiera revisar la seguridad de su router (¿tiene la contraseña de f
 
 ### 1️⃣ Monitoreo preventivo de la red
 
-La app mide tu conexión de verdad (latencia, jitter, pérdida de paquetes) cada minuto mientras está abierta, **aprende cuál es el comportamiento normal de tu propia red** y te avisa cuando las mediciones se salen de ese comportamiento normal. Cuando las mediciones que llegan al servidor muestran un corte total (100 % de pérdida) seguido de la recuperación, registra una alerta con la duración del corte.
+La app mide tu conexión de verdad (latencia, jitter, pérdida de paquetes) cada minuto mientras está abierta, **aprende cuál es el comportamiento normal de tu propia red** y te avisa cuando las mediciones se salen de ese comportamiento normal. Cuando hay un corte total (100 % de pérdida) seguido de la recuperación, registra una alerta con la duración del corte. En la app de escritorio, lo que se mide sin conexión se guarda en el equipo y se envía en orden al volver la conexión, así que el corte queda registrado con su duración real aunque el servidor no lo haya recibido en su momento. En la web solo cuentan las mediciones que llegan al servidor en el momento.
 
 ### 2️⃣ Auditoría de seguridad guiada
 

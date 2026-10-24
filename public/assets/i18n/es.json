@@ -280,7 +280,7 @@
         "changeDefaultPassword": {
           "title": "Cambia la clave de fábrica de tu router",
           "description": "Las claves de fábrica son públicas y son la vía de entrada más fácil para un atacante.",
-          "how": "1) Escribe en el navegador la dirección que trae la etiqueta del router y entra con el usuario y la clave de esa etiqueta. 2) Busca la opción para cambiar la contraseña del router y pon una larga que solo tú conozcas."
+          "how": "1) Escribe en el navegador la dirección que trae la etiqueta del router y entra con el usuario y la clave de esa etiqueta. 2) Busca la opción para cambiar la contraseña del router y pon una contraseña larga que solo tú conozcas."
         },
         "checkDefaultPassword": {
           "title": "Ve a revisar la clave de tu router",

@@ -280,7 +280,7 @@
         "changeDefaultPassword": {
           "title": "Change your router's factory password",
           "description": "Factory passwords are public and the easiest way in for an attacker.",
-          "how": "1) Type the address printed on the router's label into your browser and log in with the username and password from that label. 2) Find the option to change the router's password and choose a long one only you know."
+          "how": "1) Type the address printed on the router's label into your browser and log in with the username and password from that label. 2) Find the option to change the router's password and choose a long password only you know."
         },
         "checkDefaultPassword": {
           "title": "Go check your router's password",
