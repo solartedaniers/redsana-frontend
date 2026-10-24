@@ -2,7 +2,7 @@
 
 > **Diagnóstico inteligente de salud y seguridad para tu red WiFi doméstica.**
 
-RedSana es una aplicación de escritorio que vigila tu conexión a internet en segundo plano y te dice, en palabras simples, qué está pasando cuando algo anda mal — sin que tengas que reiniciar el router "a ver si arregla" y sin necesitar conocimientos técnicos.
+RedSana es una aplicación web (instalable como PWA) y de escritorio que mide tu conexión a internet cada minuto mientras está abierta y te dice, en palabras simples, qué está pasando cuando algo anda mal, sin necesitar conocimientos técnicos.
 
 ---
 
@@ -44,11 +44,11 @@ Cuando el WiFi de una casa falla, el usuario promedio no tiene forma de saber si
 
 Y aunque quisiera revisar la seguridad de su router (¿tiene la contraseña de fábrica? ¿está bien configurado?), la mayoría de las guías están llenas de jerga técnica que nadie entiende.
 
-**RedSana resuelve esto con dos módulos:**
+**RedSana tiene dos módulos:**
 
 ### 1️⃣ Monitoreo preventivo de la red
 
-La app mide tu conexión de verdad (latencia, jitter, pérdida de paquetes) cada minuto, **aprende cuál es el comportamiento normal de tu propia red** y te avisa cuando empieza a degradarse — antes de que se caiga por completo. También detecta cortes de conectividad reales cuando ocurren.
+La app mide tu conexión de verdad (latencia, jitter, pérdida de paquetes) cada minuto mientras está abierta, **aprende cuál es el comportamiento normal de tu propia red** y te avisa cuando las mediciones se salen de ese comportamiento normal. Cuando las mediciones que llegan al servidor muestran un corte total (100 % de pérdida) seguido de la recuperación, registra una alerta con la duración del corte.
 
 ### 2️⃣ Auditoría de seguridad guiada
 
@@ -60,17 +60,17 @@ Un cuestionario corto, en lenguaje simple (sin "firmware", sin "WPA3" sin explic
 
 ## 🛠️ Tecnologías utilizadas
 
-| Capa                              | Tecnología                     | ¿Para qué se usa?                                                                                                                           |
-| --------------------------------- | ------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------- |
-| 🖥️ **Frontend**                   | Angular + TypeScript           | Interfaz de usuario: dashboard, pantallas de autenticación, asistente de seguridad, panel de administración                                 |
-| 📦 **Empaquetado de escritorio**  | Tauri (Rust)                   | Convierte el frontend web en una app de escritorio nativa real, con acceso al sistema operativo                                             |
-| 🦀 **Mediciones reales de red**   | Rust (dentro de Tauri)         | Ping ICMP real, escaneo ARP de dispositivos conectados, lectura del cifrado WiFi activo — nada de esto es posible desde un navegador normal |
-| ⚙️ **Backend**                    | FastAPI (Python)               | API que expone los datos, valida la sesión del usuario, calcula puntajes de seguridad y ejecuta la detección de anomalías                   |
-| 🗄️ **Base de datos**              | Supabase (PostgreSQL)          | Persistencia de usuarios, dispositivos, métricas históricas, alertas y evaluaciones de seguridad                                            |
-| 🔐 **Autenticación**              | Supabase Auth                  | Login, registro y recuperación de contraseña reales, con JWT verificado por el backend                                                      |
-| 🧠 **Detección de anomalías**     | scikit-learn (IsolationForest) | Aprende el comportamiento normal de cada red y detecta degradaciones reales                                                                 |
-| 💬 **Asistente conversacional**   | Groq API (modelos Llama)       | Responde preguntas del usuario sobre su red/router, usando datos reales como contexto                                                       |
-| 🌐 **Almacenamiento de archivos** | Supabase Storage               | Fotos de perfil de usuario                                                                                                                  |
+| Capa                              | Tecnología                                                             | ¿Para qué se usa?                                                                                                                           |
+| --------------------------------- | ---------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
+| 🖥️ **Frontend**                   | Angular + TypeScript                                                   | Interfaz de usuario: dashboard, pantallas de autenticación, asistente de seguridad, panel de administración                                 |
+| 📦 **Empaquetado de escritorio**  | Tauri (Rust)                                                           | Convierte el frontend web en una app de escritorio nativa real, con acceso al sistema operativo                                             |
+| 🦀 **Mediciones reales de red**   | Rust (dentro de Tauri)                                                 | Ping ICMP real, escaneo ARP de dispositivos conectados, lectura del cifrado WiFi activo — nada de esto es posible desde un navegador normal |
+| ⚙️ **Backend**                    | FastAPI (Python)                                                       | API que expone los datos, valida la sesión del usuario, calcula puntajes de seguridad y ejecuta la detección de anomalías                   |
+| 🗄️ **Base de datos**              | Supabase (PostgreSQL)                                                  | Persistencia de usuarios, dispositivos, métricas históricas, alertas y evaluaciones de seguridad                                            |
+| 🔐 **Autenticación**              | Supabase Auth                                                          | Login, registro y recuperación de contraseña reales, con JWT verificado por el backend                                                      |
+| 🧠 **Detección de anomalías**     | scikit-learn (IsolationForest)                                         | Aprende el comportamiento normal de cada red y detecta degradaciones reales                                                                 |
+| 💬 **Asistente conversacional**   | Groq API (modelo `openai/gpt-oss-120b`, configurable con `GROQ_MODEL`) | Responde preguntas del usuario sobre su red/router, usando datos reales como contexto                                                       |
+| 🌐 **Almacenamiento de archivos** | Supabase Storage                                                       | Fotos de perfil de usuario                                                                                                                  |
 
 ---
 
@@ -87,12 +87,12 @@ RedSana usa **dos motores de IA distintos**, cada uno elegido para el problema q
 | **Costo**                    | 🆓 Gratis — librería open source (`scikit-learn`), corre en el propio backend, sin API externa                                                                                                                                                                                                                                                                                                                                                    |
 | **Cómo aprende "lo normal"** | Cada red es distinta (no es igual la latencia a las 3am que a las 8pm) — el modelo se re-entrena con la ventana de las últimas 1440 mediciones (24h) de **cada usuario individualmente**, así que aprende el patrón específico de esa casa, no un promedio genérico. La app de escritorio empieza a detectar con el día completo (1440); la web, que solo mide con la pestaña abierta, empieza con 720 (12h) y gana precisión al completar el día |
 
-### 💬 Groq (Llama) — asistente conversacional
+### 💬 Groq (`openai/gpt-oss-120b`) — asistente conversacional
 
 |                         |                                                                                                                                                                                                                                                                           |
 | ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **Qué hace**            | Responde preguntas del usuario en lenguaje natural sobre su red, la seguridad de su router, o cómo usar la app                                                                                                                                                            |
-| **Por qué este modelo** | API **gratuita** con límites generosos, inferencia extremadamente rápida, y modelos Llama de código abierto — no requiere entrenar nada propio                                                                                                                            |
+| **Por qué este modelo** | API **gratuita** con límites generosos, inferencia extremadamente rápida, y el modelo de pesos abiertos `openai/gpt-oss-120b` — no requiere entrenar nada propio                                                                                                          |
 | **Alcance controlado**  | El asistente solo responde sobre 4 temas (red del usuario, seguridad del router, calidad de conexión, uso de la app) — controlado por instrucciones de sistema, no por un filtro de palabras clave. Si no tiene un dato real, lo dice explícitamente en vez de inventarlo |
 | **Contexto real**       | Antes de responder, el backend le inyecta los datos reales y actuales del usuario (dispositivos conectados, alertas activas, última medición) para que las respuestas sean concretas, no genéricas                                                                        |
 
@@ -130,6 +130,7 @@ RedSana usa **dos motores de IA distintos**, cada uno elegido para el problema q
 ```
 
 - **Frontend + capa nativa (Rust)**: la misma app Angular se publica como web en Vercel y como app de escritorio (vía Tauri), que se instala en la máquina del usuario junto con la capa nativa en Rust. Solo el escritorio puede medir la red _de verdad_ — un navegador no tiene ese acceso, así que la web mide la latencia al servidor.
+- **Web instalable (PWA)**: la web trae manifest y service worker (`ngsw-config.json`), así que se puede instalar desde el navegador y abrir en su propia ventana: en Chrome o Edge, con el botón de instalar de la barra de direcciones (o menú → Instalar RedSana); en Android, menú → Agregar a la pantalla principal; en iPhone, Safari → Compartir → Agregar a inicio. Instalada o no, mide mientras está abierta.
 - **Backend (FastAPI)**: desplegado en Render (plan gratuito); en desarrollo corre local con `uvicorn` en el puerto 8000. Es la pieza intermedia entre las dos apps y la base de datos en la nube: verifica el JWT de Supabase y guarda mediciones, dispositivos, alertas y evaluaciones. Render lo apaga tras un rato sin uso (ver [Arranque en frío](#-arranque-en-frío-render-plan-gratuito)).
 - **Base de datos y autenticación**: viven en Supabase, en la nube — así los datos persisten entre sesiones y el panel de administración puede ver todos los usuarios desde cualquier lugar. Las dos apps usan Supabase Auth (login, registro y contraseña) y Storage (fotos de perfil) directamente; el resto de los datos pasa siempre por el backend.
 - **Nombres de rutas**: el frontend usa solo los nombres actuales del backend (`/api/users/me`, `/api/chat-conversations`, `/api/alerts/recent`, `/api/admin/platform-metrics`). Los anteriores siguen vivos en el backend como alias ocultos para el instalador 0.1.5; `scripts/route-names.test.mjs` impide volver a escribirlos aquí.
@@ -179,17 +180,18 @@ Render apaga el backend y el servicio de IA tras un rato sin uso, y tardan cerca
 
 ## 🧵 Web Workers y trabajo en segundo plano
 
-**Se evaluó explícitamente su uso y se determinó que no son necesarios — por una razón concreta, no por omisión.**
+**La web usa un Web Worker para medir la latencia; el resto del trabajo pesado vive fuera de JavaScript.**
 
-Un Web Worker tiene sentido cuando hay **cálculo pesado corriendo en JavaScript** en el hilo principal (procesamiento de imágenes, JSON grandes, ML en el navegador, etc.). En RedSana, **todo el trabajo pesado ya vive fuera de JavaScript**:
+En la web, la medición de latencia (peticiones `fetch` cronometradas al servidor) corre en un Web Worker (`latency-probe.worker.ts`), para que una pausa del hilo principal no se sume al tiempo medido; si el navegador no tiene Workers, la misma medición corre en el hilo principal. El resto del trabajo pesado no corre en JavaScript:
 
 | Tarea pesada                              | Dónde corre en su lugar                                   |
 | ----------------------------------------- | --------------------------------------------------------- |
+| Medición de latencia de la web            | 🧵 Web Worker (`latency-probe.worker.ts`)                 |
 | Ping ICMP real, escaneo ARP de la red     | 🦀 Rust (proceso nativo separado del hilo de la UI)       |
 | Detección de anomalías (IsolationForest)  | 🐍 Backend Python, en segundo plano vía `BackgroundTasks` |
 | Lectura de configuración WiFi del sistema | 🦀 Rust                                                   |
 
-Es decir: **el patrón de "sacar el trabajo pesado del hilo principal" sí se aplica en todo el proyecto** — solo que el mecanismo correcto para este caso es Rust nativo (para acceso al sistema operativo) y tareas en segundo plano del backend (para el modelo de ML), no un Web Worker del navegador, que no tendría forma de hacer ping real ni leer el sistema operativo de todas formas.
+Es decir: **el patrón de "sacar el trabajo del hilo principal" se aplica en todo el proyecto**, con el mecanismo que corresponde a cada caso: un Web Worker para la medición de la web, Rust nativo para lo que necesita el sistema operativo (un Worker del navegador no puede hacer ping real ni leer el sistema operativo) y tareas en segundo plano del backend para el modelo de ML.
 
 ---
 
