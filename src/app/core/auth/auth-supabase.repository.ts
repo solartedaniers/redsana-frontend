@@ -1,73 +1,209 @@
+import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
-import { Observable, map, of, switchMap, throwError } from 'rxjs';
+import { Observable, catchError, from, map, of, switchMap, throwError } from 'rxjs';
+import { environment } from '../../../environments/environment';
+import { AccountSuspendedError, isSuspendedProfileResponse } from './account-suspended.error';
 import {
   AuthSession,
+  AuthUser,
   PasswordChangePayload,
   ProfileUpdatePayload,
   RegisterPayload,
+  UserRole,
 } from '../models/user.model';
 import { AuthRepository } from './auth.repository';
-import { BackendProfileLoader } from './backend-profile-loader';
-import { SupabaseCredentials } from './supabase-credentials';
-import { SupabaseSessionStore } from './supabase-session-store';
+import { supabaseClient } from './supabase-client';
+import { APP_PATHS } from '../routing/app-paths';
+import { RuntimeEnvironmentService } from '../runtime/runtime-environment.service';
 
-/** AuthRepository con Supabase Auth y el perfil del backend: solo combina las credenciales, la sesión y el perfil. */
+interface BackendUser {
+  id: string;
+  email: string;
+  full_name: string | null;
+  avatar_url: string | null;
+  role: UserRole;
+  is_active: boolean;
+}
+
 @Injectable()
 export class SupabaseAuthRepository extends AuthRepository {
-  private readonly credentials = inject(SupabaseCredentials);
-  private readonly sessions = inject(SupabaseSessionStore);
-  private readonly profile = inject(BackendProfileLoader);
+  private readonly http = inject(HttpClient);
+  private readonly currentUserUrl = `${environment.apiBaseUrl}/api/users/me`;
+  private readonly isDesktop = inject(RuntimeEnvironmentService).isDesktop;
 
   signIn(email: string, password: string): Observable<AuthSession> {
-    return this.credentials.signIn(email, password).pipe(switchMap((tokens) => this.profile.load(tokens)));
+    return from(supabaseClient.auth.signInWithPassword({ email, password })).pipe(
+      switchMap(({ data, error }) => {
+        if (error || !data.session) {
+          return throwError(() => new Error(this.mapAuthError(error?.message)));
+        }
+        return this.buildSession(data.session.access_token, data.session.expires_at);
+      })
+    );
   }
 
   signUp(payload: RegisterPayload): Observable<AuthSession> {
-    return this.credentials.signUp(payload).pipe(switchMap((tokens) => this.profile.load(tokens)));
+    return from(
+      supabaseClient.auth.signUp({
+        email: payload.email,
+        password: payload.password,
+        options: { data: { full_name: payload.fullName } },
+      })
+    ).pipe(
+      switchMap(({ data, error }) => {
+        if (error) {
+          return throwError(() => new Error(this.mapAuthError(error.message)));
+        }
+        if (!data.session) {
+          // Con confirmación de correo activa en Supabase no hay sesión hasta que el usuario confirme.
+          return throwError(() => new Error('auth.errors.confirmationRequired'));
+        }
+        return this.buildSession(data.session.access_token, data.session.expires_at);
+      })
+    );
   }
 
   signOut(): Observable<void> {
-    return this.credentials.signOut();
+    return from(supabaseClient.auth.signOut()).pipe(map(() => undefined));
   }
 
   requestPasswordReset(email: string): Observable<void> {
-    return this.credentials.requestPasswordReset(email);
+    return from(
+      supabaseClient.auth.resetPasswordForEmail(email, {
+        redirectTo: `${this.recoveryOrigin()}${APP_PATHS.resetPassword}`,
+      })
+    ).pipe(map(() => undefined));
   }
 
   hasRecoverySession(): Observable<boolean> {
-    return this.sessions.current().pipe(map((tokens) => tokens !== null));
+    // getSession espera a que supabase-js termine de leer el token que trae el enlace.
+    return from(supabaseClient.auth.getSession()).pipe(map(({ data }) => data.session !== null));
   }
 
   resetPassword(newPassword: string): Observable<void> {
-    return this.credentials.updatePassword(newPassword);
+    return from(supabaseClient.auth.updateUser({ password: newPassword })).pipe(
+      switchMap(({ error }) => (error ? throwError(() => new Error(this.mapAuthError(error.message))) : of(undefined)))
+    );
   }
 
   updateProfile(_userId: string, payload: ProfileUpdatePayload): Observable<AuthSession> {
-    return this.credentials.updateFullName(payload.fullName).pipe(
-      // Supabase ya quedó actualizado; ahora sincronizo nuestra tabla para que no diverjan.
-      switchMap(() => this.profile.update({ full_name: payload.fullName })),
-      switchMap(() => this.reloadSession())
+    return from(
+      supabaseClient.auth.updateUser({ data: { full_name: payload.fullName } })
+    ).pipe(
+      switchMap(({ error }) => {
+        if (error) {
+          return throwError(() => new Error(this.mapAuthError(error.message)));
+        }
+        // Supabase ya quedó actualizado; ahora sincronizo nuestra tabla para que no diverjan.
+        return this.http.patch<void>(this.currentUserUrl, {
+          full_name: payload.fullName,
+        });
+      }),
+      switchMap(() => from(supabaseClient.auth.getSession())),
+      switchMap(({ data }) => {
+        if (!data.session) {
+          return throwError(() => new Error('auth.errors.userNotFound'));
+        }
+        return this.buildSession(data.session.access_token, data.session.expires_at);
+      })
     );
   }
 
   updateAvatar(_userId: string, avatarUrl: string): Observable<AuthSession> {
     // El archivo ya está en Storage; aquí solo guardo su URL pública, igual que con full_name.
-    return this.profile.update({ avatar_url: avatarUrl }).pipe(switchMap(() => this.reloadSession()));
+    return this.http.patch<void>(this.currentUserUrl, { avatar_url: avatarUrl }).pipe(
+      switchMap(() => from(supabaseClient.auth.getSession())),
+      switchMap(({ data }) => {
+        if (!data.session) {
+          return throwError(() => new Error('auth.errors.userNotFound'));
+        }
+        return this.buildSession(data.session.access_token, data.session.expires_at);
+      })
+    );
   }
 
   changePassword(_userId: string, payload: PasswordChangePayload): Observable<void> {
-    return this.credentials.changePassword(payload);
+    return from(supabaseClient.auth.getUser()).pipe(
+      switchMap(({ data, error }) => {
+        if (error || !data.user?.email) {
+          return throwError(() => new Error('auth.errors.userNotFound'));
+        }
+        return from(
+          supabaseClient.auth.signInWithPassword({
+            email: data.user.email,
+            password: payload.currentPassword,
+          })
+        );
+      }),
+      switchMap(({ error }) => {
+        if (error) {
+          return throwError(() => new Error('auth.errors.wrongCurrentPassword'));
+        }
+        return from(supabaseClient.auth.updateUser({ password: payload.newPassword }));
+      }),
+      switchMap(({ error }) => {
+        if (error) {
+          return throwError(() => new Error(this.mapAuthError(error.message)));
+        }
+        return of(undefined);
+      })
+    );
   }
 
   restoreSession(): Observable<AuthSession | null> {
-    return this.sessions.current().pipe(switchMap((tokens) => (tokens ? this.profile.load(tokens) : of(null))));
+    return from(supabaseClient.auth.getSession()).pipe(
+      switchMap(({ data }) => {
+        if (!data.session) {
+          return of(null);
+        }
+        return this.buildSession(data.session.access_token, data.session.expires_at);
+      })
+    );
   }
 
-  private reloadSession(): Observable<AuthSession> {
-    return this.sessions.current().pipe(
-      switchMap((tokens) =>
-        tokens ? this.profile.load(tokens) : throwError(() => new Error('auth.errors.userNotFound'))
+  /** El enlace del correo se abre en el navegador, donde tauri.localhost no existe: uso la web pública. */
+  private recoveryOrigin(): string {
+    return this.isDesktop ? environment.webAppUrl : window.location.origin;
+  }
+
+  private buildSession(accessToken: string, expiresAt: number | undefined): Observable<AuthSession> {
+    return this.http.get<BackendUser>(this.currentUserUrl).pipe(
+      map((backendUser) => this.toSession(backendUser, accessToken, expiresAt)),
+      catchError((error: unknown) =>
+        isSuspendedProfileResponse(error) ? this.endSuspendedSession() : throwError(() => error)
       )
     );
+  }
+
+  /** Cuenta suspendida: borro la sesión guardada en este equipo (sin pedir nada a la red) para no volver a intentarlo. */
+  private endSuspendedSession(): Observable<never> {
+    return from(supabaseClient.auth.signOut({ scope: 'local' })).pipe(
+      switchMap(() => throwError(() => new AccountSuspendedError()))
+    );
+  }
+
+  private toSession(backendUser: BackendUser, accessToken: string, expiresAt: number | undefined): AuthSession {
+    const user: AuthUser = {
+      id: backendUser.id,
+      email: backendUser.email,
+      fullName: backendUser.full_name ?? '',
+      avatarUrl: backendUser.avatar_url,
+      role: backendUser.role,
+    };
+    return {
+      user,
+      token: accessToken,
+      expiresAt: expiresAt ? new Date(expiresAt * 1000).toISOString() : new Date().toISOString(),
+    };
+  }
+
+  private mapAuthError(message: string | undefined): string {
+    if (message?.includes('Invalid login credentials')) {
+      return 'auth.errors.invalidCredentials';
+    }
+    if (message?.includes('already registered')) {
+      return 'auth.errors.emailTaken';
+    }
+    return 'auth.errors.unknown';
   }
 }
