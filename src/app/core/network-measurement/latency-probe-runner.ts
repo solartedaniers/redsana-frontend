@@ -15,13 +15,24 @@ export interface LatencyProbeRunner {
 export class WorkerLatencyProbeRunner implements LatencyProbeRunner {
   run(config: LatencyProbeConfig): Promise<LatencySample[]> {
     const worker = new Worker(new URL('./latency-probe.worker', import.meta.url), { type: 'module' });
+    // WebKit avisa «access control checks» cuando una recarga cancela un fetch a otro origen en vuelo. Terminar el
+    // Worker en beforeunload corta su fetch antes; esa medición se perdía igual con la recarga.
+    let stopOnPageExit = (): void => undefined;
     return new Promise<LatencySample[]>((resolve, reject) => {
+      stopOnPageExit = () => {
+        worker.terminate();
+        reject(new Error('page exit'));
+      };
+      addEventListener('beforeunload', stopOnPageExit);
       worker.onmessage = ({ data }: MessageEvent<LatencyProbeResponse>) =>
         data.type === 'samples' ? resolve(data.samples) : reject(new Error(data.reason));
       worker.onerror = (event) => reject(new Error(event.message));
       const request: LatencyProbeRequest = { type: 'measure', config };
       worker.postMessage(request);
-    }).finally(() => worker.terminate());
+    }).finally(() => {
+      removeEventListener('beforeunload', stopOnPageExit);
+      worker.terminate();
+    });
   }
 }
 

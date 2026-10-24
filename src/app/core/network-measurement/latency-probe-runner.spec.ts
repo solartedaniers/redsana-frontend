@@ -91,6 +91,21 @@ describe('Medición web en Web Worker', () => {
     expect(FakeWorker.instances[0].terminated).toBe(true);
   });
 
+  it('al salir de la página termina el Worker antes de que el navegador cancele su fetch', async () => {
+    class SlowWorker extends FakeWorker {
+      override postMessage(): void {
+        // Sigue midiendo: nunca responde por sí solo.
+      }
+    }
+    vi.stubGlobal('Worker', SlowWorker);
+
+    const run = new WorkerLatencyProbeRunner().run(CONFIG);
+    window.dispatchEvent(new Event('beforeunload'));
+
+    await expect(run).rejects.toThrow('page exit');
+    expect(FakeWorker.instances[0].terminated).toBe(true);
+  });
+
   it('usa el Worker si el entorno lo soporta y, si no, el mismo bucle en el hilo principal', () => {
     vi.stubGlobal('Worker', undefined);
     expect(createLatencyProbeRunner()).toBeInstanceOf(MainThreadLatencyProbeRunner);

@@ -8,6 +8,7 @@ import { NetworkMeasurementGateway } from './network-measurement.gateway';
 import { NetworkIdentityGateway } from '../network-identity/network-identity.gateway';
 import { MEASUREMENT_CONFIG } from '../domain/measurement-freshness';
 import { LocalNetworkDiagnosisService } from '../local-diagnosis/local-network-diagnosis.service';
+import { PageExitService } from '../runtime/page-exit.service';
 
 const MEASUREMENT_INTERVAL_MS = MEASUREMENT_CONFIG.intervalMs;
 /** Candado entre pestañas (Web Locks): sin él, cada pestaña guardaba su medición y sesgaba la calibración. */
@@ -21,6 +22,7 @@ export class NetworkMeasurementService {
   private readonly delivery = inject(MeasurementDelivery);
   private readonly networkIdentity = inject(NetworkIdentityGateway);
   private readonly localDiagnosis = inject(LocalNetworkDiagnosisService);
+  private readonly pageExit = inject(PageExitService);
   private readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
   // Las mediciones van a nombre del usuario: sin sesión no hay a quién atribuirlas.
   private readonly auth = inject(AuthService);
@@ -80,7 +82,10 @@ export class NetworkMeasurementService {
         });
       }),
       catchError((error) => {
-        console.error('No se pudo registrar la medición de red', error);
+        // Al salir de la página la medición se corta a propósito: no es un error.
+        if (!this.pageExit.isLeaving()) {
+          console.error('No se pudo registrar la medición de red', error);
+        }
         return EMPTY;
       }),
     );

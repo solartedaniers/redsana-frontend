@@ -3,6 +3,7 @@ import { TestBed } from '@angular/core/testing';
 import { AuthService } from '../auth/auth.service';
 import { NetworkIdentityGateway } from '../network-identity/network-identity.gateway';
 import { MeasurementDelivery } from '../pending-measurements/measurement-delivery';
+import { PageExitService } from '../runtime/page-exit.service';
 import { NetworkMeasurementGateway } from './network-measurement.gateway';
 import { NetworkMeasurementService } from './network-measurement.service';
 
@@ -27,6 +28,7 @@ function fakeLockManager() {
 function createTab(
   measure = vi.fn(() => Promise.resolve({ latencyMs: 10, jitterMs: 1, packetLossPercent: 0 })),
   deliver = vi.fn(() => Promise.resolve()),
+  leaving = false,
 ): { service: NetworkMeasurementService; measure: ReturnType<typeof vi.fn> } {
   TestBed.resetTestingModule();
   TestBed.configureTestingModule({
@@ -37,6 +39,7 @@ function createTab(
       { provide: NetworkMeasurementGateway, useValue: { measure, source: 'web' } },
       { provide: NetworkIdentityGateway, useValue: { currentNetworkFingerprint: () => Promise.resolve(null) } },
       { provide: MeasurementDelivery, useValue: { deliver } },
+      { provide: PageExitService, useValue: { isLeaving: () => leaving } },
     ],
   });
   return { service: TestBed.inject(NetworkMeasurementService), measure };
@@ -94,5 +97,25 @@ describe('NetworkMeasurementService cuando la medición falla', () => {
 
     expect(tab.measure).toHaveBeenCalledTimes(1);
     expect(deliver).not.toHaveBeenCalled();
+  });
+
+  it('una medición cortada al salir de la página no se registra como error', async () => {
+    vi.stubGlobal('navigator', { ...navigator, locks: undefined });
+    const consoleError = vi.spyOn(console, 'error').mockImplementation(() => undefined);
+    const tab = createTab(
+      vi.fn(() => Promise.reject(new Error('page exit'))),
+      vi.fn(() => Promise.resolve()),
+      true,
+    );
+
+    tab.service.start();
+    TestBed.tick();
+    await Promise.resolve();
+    await Promise.resolve();
+
+    expect(tab.measure).toHaveBeenCalledTimes(1);
+    // El espía es compartido con la prueba anterior: solo cuento las llamadas con el error de esta medición.
+    const pageExitLogs = consoleError.mock.calls.filter(([, error]) => (error as Error)?.message === 'page exit');
+    expect(pageExitLogs).toHaveLength(0);
   });
 });
