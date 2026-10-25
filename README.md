@@ -4,15 +4,17 @@
 
 RedSana es una aplicación web (instalable como PWA) y de escritorio que mide tu conexión a internet cada minuto (la web, mientras está abierta; la de escritorio, también con la ventana cerrada, desde la bandeja del sistema) y te dice, en palabras simples, qué está pasando cuando algo anda mal, sin necesitar conocimientos técnicos.
 
+**Web:** [www.app-redsana.com](https://www.app-redsana.com) (`app-redsana.com` redirige ahí; `red-sana.vercel.app` sigue funcionando como respaldo). **Escritorio (Windows):** [instalador en Releases](https://github.com/solartedaniers/redsana-frontend/releases/latest).
+
 ---
 
 ## 🔗 Repositorios del proyecto
 
-| Repositorio                                                                   | Qué contiene                                                                                                     |
-| ----------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------- |
-| [redsana-frontend](https://github.com/solartedaniers/redsana-frontend) (este) | App Angular (web en Vercel) y capa nativa Tauri/Rust (instalador de escritorio publicado en Releases)            |
-| [redsana-backend](https://github.com/solartedaniers/redsana-backend)          | API FastAPI, base de datos (SQLAlchemy + Alembic) y orquestación de la IA; desplegada en Render                  |
-| [redsana-ai](https://github.com/solartedaniers/redsana-ai)                    | Paquete Python `redsana-ai`: asistente de seguridad (Groq), detección de anomalías (IsolationForest) y de cortes |
+| Repositorio                                                                   | Qué contiene                                                                                                                                                           |
+| ----------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [redsana-frontend](https://github.com/solartedaniers/redsana-frontend) (este) | App Angular (web en [www.app-redsana.com](https://www.app-redsana.com), publicada en Vercel) y capa nativa Tauri/Rust (instalador de escritorio publicado en Releases) |
+| [redsana-backend](https://github.com/solartedaniers/redsana-backend)          | API FastAPI, base de datos (SQLAlchemy + Alembic) y orquestación de la IA; desplegada en Render                                                                        |
+| [redsana-ai](https://github.com/solartedaniers/redsana-ai)                    | Paquete Python `redsana-ai`: asistente de seguridad (Groq), detección de anomalías (IsolationForest) y de cortes                                                       |
 
 ---
 

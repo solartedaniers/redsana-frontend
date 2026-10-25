@@ -1,4 +1,4 @@
-// Genera public/robots.txt y public/sitemap.xml en cada build. El dominio sale de WEB_APP_URL (aún puede cambiar) y las
+// Genera public/robots.txt y public/sitemap.xml en cada build. El dominio sale de WEB_APP_URL y las
 // rutas de src/app/core/routing/app-paths.ts, así que ninguno de los dos archivos vive en el repo.
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { pathToFileURL, fileURLToPath } from 'node:url';
