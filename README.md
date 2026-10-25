@@ -4,7 +4,7 @@
 
 RedSana es una aplicación web (instalable como PWA) y de escritorio que mide tu conexión a internet cada minuto (la web, mientras está abierta; la de escritorio, también con la ventana cerrada, desde la bandeja del sistema) y te dice, en palabras simples, qué está pasando cuando algo anda mal, sin necesitar conocimientos técnicos.
 
-**Web:** [www.app-redsana.com](https://www.app-redsana.com) (`app-redsana.com` redirige ahí; `red-sana.vercel.app` sigue funcionando como respaldo). **Escritorio (Windows):** [instalador en Releases](https://github.com/solartedaniers/redsana-frontend/releases/latest).
+**Web:** [www.app-redsana.com](https://www.app-redsana.com) (`app-redsana.com` y `red-sana.vercel.app` redirigen ahí con 308, conservando la ruta; la de `red-sana.vercel.app` está en `vercel.json`, limitada a ese host). **Escritorio (Windows):** [instalador en Releases](https://github.com/solartedaniers/redsana-frontend/releases/latest).
 
 ---
 
