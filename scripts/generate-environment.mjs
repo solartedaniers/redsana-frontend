@@ -50,7 +50,9 @@ if (missing.length > 0) {
 // El botón de descarga es un enlace directo: si apunta a la página del release, un clic lleva a GitHub en vez de bajar
 // el instalador. Mejor que falle el build (y siga el despliegue anterior) que publicar eso.
 if (!new URL(process.env.DESKTOP_DOWNLOAD_URL).pathname.toLowerCase().endsWith('.exe')) {
-  console.error('[environment] DESKTOP_DOWNLOAD_URL must be the installer .exe (…/releases/latest/download/<name>.exe)');
+  console.error(
+    '[environment] DESKTOP_DOWNLOAD_URL must be the installer .exe (…/releases/latest/download/<name>.exe)',
+  );
   process.exit(1);
 }
 

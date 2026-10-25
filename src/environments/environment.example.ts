@@ -3,7 +3,8 @@ export const environment = {
   supabaseUrl: 'https://your-project.supabase.co',
   supabaseAnonKey: 'your-anon-key',
   apiBaseUrl: 'http://localhost:8000',
-  desktopDownloadUrl: 'https://github.com/solartedaniers/redsana-frontend/releases/latest/download/RedSana_x64-setup.exe',
+  desktopDownloadUrl:
+    'https://github.com/solartedaniers/redsana-frontend/releases/latest/download/RedSana_x64-setup.exe',
   webAppUrl: 'https://red-sana.vercel.app',
   // /health público del servicio de IA, para despertarlo desde el cliente; vacío lo desactiva.
   aiServicePublicUrl: '',
