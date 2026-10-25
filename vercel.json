@@ -4,6 +4,12 @@
   "outputDirectory": "dist/frontend/browser",
   "redirects": [
     {
+      "source": "/",
+      "has": [{ "type": "host", "value": "red-sana\\.vercel\\.app" }],
+      "destination": "https://www.app-redsana.com/",
+      "permanent": true
+    },
+    {
       "source": "/:path*",
       "has": [{ "type": "host", "value": "red-sana\\.vercel\\.app" }],
       "destination": "https://www.app-redsana.com/:path*",
