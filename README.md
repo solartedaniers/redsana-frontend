@@ -339,11 +339,11 @@ El botón «Descargar» de la web es un enlace normal a `DESKTOP_DOWNLOAD_URL` =
 
 ### 4️⃣ Instalar la app de escritorio (Windows)
 
-Descarga `RedSana_0.1.7_x64-setup.exe` desde [Releases](https://github.com/solartedaniers/redsana-frontend/releases/latest) (o con el botón de descarga de la web). Para comprobar que el archivo es el publicado, compara su SHA-256 en PowerShell:
+Descarga `RedSana_0.1.8_x64-setup.exe` desde [Releases](https://github.com/solartedaniers/redsana-frontend/releases/latest) (o con el botón de descarga de la web, que baja la copia `RedSana_x64-setup.exe`, idéntica). Para comprobar que el archivo es el publicado, compara su SHA-256 en PowerShell:
 
 ```powershell
-Get-FileHash .\RedSana_0.1.7_x64-setup.exe -Algorithm SHA256
-# Debe dar: 43CAEABBE67C7F3EB483187B68763BCEBFE2372C3FC89B550FD58019286E99CE
+Get-FileHash .\RedSana_0.1.8_x64-setup.exe -Algorithm SHA256
+# Debe dar: C063B46B3240ED89631504C6FC66B80197BEA3A418DE03E7F239F2D3431BC12F
 ```
 
 El instalador no está firmado con un certificado de código, así que Windows SmartScreen puede mostrar «Windows protegió su PC». Para instalarlo, pulsa **Más información → Ejecutar de todas formas**. Instalarlo encima de una versión anterior la actualiza y conserva la sesión iniciada.
