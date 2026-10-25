@@ -339,7 +339,7 @@ Esto genera el instalador nativo (`.exe`/`.msi` en Windows, `.dmg` en macOS, `.d
 
 No usa `'unsafe-inline'` ni `'unsafe-eval'`. Tauri agrega un nonce a sus propios scripts y estilos; el `ngCspNonce` de `src/index.html` hace que Angular ponga ese mismo nonce en los `<style>` de sus componentes. Por eso ningún HTML de la app debe llevar atributos `style="…"` fijos: se usan clases o enlaces `[style.x]`. Con `npx tauri dev` la CSP no se aplica.
 
-Si cambias la URL de la API, de Supabase o de la IA en `.env`, agrégala también a la CSP. `tauri build` falla (`scripts/check-tauri-csp.mjs`) si falta alguna, para que no salga un instalador que no puede conectarse.
+Si cambias la URL de la API, de Supabase o de la IA en `.env`, agrégala también a la CSP. `tauri build` falla (`scripts/prepare-desktop-build.mjs`) si falta alguna, para que no salga un instalador que no puede conectarse. Ese mismo script deja el `index.html` del escritorio igual a `index.csr.html`: Tauri lo sirve al recargar (F5) en cualquier ruta, y la landing prerenderizada traería atributos `style` del SSR que la CSP bloquea (el escritorio no hidrata, así que no la necesita).
 
 #### 📦 Publicar una versión
 

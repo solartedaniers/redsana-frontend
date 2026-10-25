@@ -7,7 +7,7 @@
     "frontendDist": "../dist/frontend/browser",
     "devUrl": "http://localhost:4200",
     "beforeDevCommand": "npm start",
-    "beforeBuildCommand": "npm run build && node scripts/check-tauri-csp.mjs"
+    "beforeBuildCommand": "npm run build && node scripts/prepare-desktop-build.mjs"
   },
   "app": {
     "windows": [
