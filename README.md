@@ -56,7 +56,7 @@ La app mide tu conexión de verdad (latencia, jitter, pérdida de paquetes) cada
 
 Un cuestionario corto, en lenguaje simple (sin "firmware", sin "WPA3" sin explicar), que calcula un puntaje de seguridad de tu router y te da una guía priorizada de qué arreglar primero — más un asistente conversacional que responde tus preguntas puntuales sobre tu red o tu router.
 
-**Todo esto corre con datos reales de tu red** — nada de valores simulados: la app se conecta de verdad a tu adaptador de red, hace ping real, escanea tu red local real y lee la configuración real de cifrado WiFi de tu sistema operativo.
+**Todo esto corre con datos reales de tu red** — nada de valores simulados. **Solo la app de escritorio** se conecta de verdad a tu adaptador de red, hace ping real, escanea tu red local real y lee la configuración real de cifrado WiFi de tu sistema operativo; el navegador no permite nada de eso, así que la web mide el tiempo real de respuesta hasta el servidor.
 
 ---
 
@@ -327,6 +327,19 @@ npx tauri build
 ```
 
 Esto genera el instalador nativo (`.exe`/`.msi` en Windows, `.dmg` en macOS, `.deb`/`.AppImage` en Linux) dentro de `src-tauri/target/release/bundle/`. El instalador de Windows (`*-setup.exe`) se publica en los Releases de este repositorio.
+
+#### 🔒 CSP de la app de escritorio
+
+`src-tauri/tauri.conf.json` define la Content Security Policy del escritorio. Solo permite:
+
+- los archivos de la propia app (scripts, estilos, fuentes, imágenes y el Web Worker de la medición);
+- la IPC de Tauri (`ipc:` / `http://ipc.localhost`);
+- conexiones a la API, a Supabase (autenticación y Storage) y al `/health` de la IA;
+- imágenes de Supabase Storage (fotos de perfil) y `data:` (la textura de fondo del CSS).
+
+No usa `'unsafe-inline'` ni `'unsafe-eval'`. Tauri agrega un nonce a sus propios scripts y estilos; el `ngCspNonce` de `src/index.html` hace que Angular ponga ese mismo nonce en los `<style>` de sus componentes. Por eso ningún HTML de la app debe llevar atributos `style="…"` fijos: se usan clases o enlaces `[style.x]`. Con `npx tauri dev` la CSP no se aplica.
+
+Si cambias la URL de la API, de Supabase o de la IA en `.env`, agrégala también a la CSP. `tauri build` falla (`scripts/check-tauri-csp.mjs`) si falta alguna, para que no salga un instalador que no puede conectarse.
 
 #### 📦 Publicar una versión
 

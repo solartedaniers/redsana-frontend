@@ -23,9 +23,12 @@ test('la marca que carga la app es la que genera el script de branding', () => {
   assert.ok(existsSync(resolve(PUBLIC_DIR, symbolMaskUrl)), `${symbolMaskUrl} does not exist`);
 });
 
-test('el splash de index.html usa la misma marca que la app', () => {
-  const indexHtml = readFileSync(resolve(ROOT, 'src/index.html'), 'utf8');
-  assert.ok(indexHtml.includes(`--brand-symbol-mask: url(${symbolMaskUrl})`), 'index.html splash mask is out of date');
+test('el splash usa la misma marca que la app', () => {
+  const baseStyles = readFileSync(resolve(ROOT, 'src/styles/_base.scss'), 'utf8');
+  assert.ok(
+    baseStyles.includes(`--brand-symbol-mask: url(/${symbolMaskUrl})`),
+    '_base.scss splash mask is out of date',
+  );
 });
 
 test('la marca es un PNG con transparencia', () => {

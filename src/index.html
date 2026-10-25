@@ -12,10 +12,11 @@
   <meta name="theme-color" content="#07090a">
 </head>
 <body>
-  <!-- Splash mientras carga Angular, que reemplaza el contenido de app-root al arrancar. La ruta de la marca es
-       BRAND_ASSETS.symbolMask (lo comprueba scripts/brand-assets.test.mjs). -->
-  <app-root>
-    <div class="startup-screen" aria-hidden="true" style="--brand-symbol-mask: url(assets/branding/brand-symbol-mask.png)">
+  <!-- Splash mientras carga Angular, que reemplaza el contenido de app-root al arrancar; su marca está en _base.scss.
+       ngCspNonce: en el escritorio Tauri cambia el token por un nonce de su CSP y Angular lo pone en sus <style>.
+       En la web no hay CSP y el atributo no hace nada. -->
+  <app-root ngCspNonce="__TAURI_STYLE_NONCE__">
+    <div class="startup-screen" aria-hidden="true">
       <span class="startup-screen__symbol"></span>
     </div>
   </app-root>

@@ -83,6 +83,9 @@ data {
   padding: var(--space-5);
   text-align: center;
   background: var(--texture-chart-grid), var(--color-bg-app);
+  // Aquí y no en un atributo style del HTML: la CSP del escritorio no permite estilos en línea. La ruta es
+  // BRAND_ASSETS.symbolMask (lo comprueba scripts/brand-assets.test.mjs).
+  --brand-symbol-mask: url(/assets/branding/brand-symbol-mask.png);
 }
 
 .startup-screen__symbol {
