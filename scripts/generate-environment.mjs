@@ -15,9 +15,6 @@ const VARIABLES = {
 // Optional: they have documented defaults so an existing deployment keeps
 // building before these are added to its environment.
 const OPTIONAL_VARIABLES = {
-  githubApiUrl: { name: 'GITHUB_API_URL', fallback: 'https://api.github.com' },
-  desktopReleaseRepo: { name: 'DESKTOP_RELEASE_REPO', fallback: 'solartedaniers/redsana-frontend' },
-  desktopInstallerAssetSuffix: { name: 'DESKTOP_INSTALLER_ASSET_SUFFIX', fallback: '-setup.exe' },
   // Vacía desactiva el despertar de la IA desde el cliente.
   aiServicePublicUrl: { name: 'AI_SERVICE_PUBLIC_URL', fallback: '' },
 };
@@ -47,6 +44,13 @@ if (missing.length === Object.keys(VARIABLES).length && existsSync(TARGET_FILE))
 
 if (missing.length > 0) {
   console.error(`[environment] missing variables: ${missing.join(', ')}`);
+  process.exit(1);
+}
+
+// El botón de descarga es un enlace directo: si apunta a la página del release, un clic lleva a GitHub en vez de bajar
+// el instalador. Mejor que falle el build (y siga el despliegue anterior) que publicar eso.
+if (!new URL(process.env.DESKTOP_DOWNLOAD_URL).pathname.toLowerCase().endsWith('.exe')) {
+  console.error('[environment] DESKTOP_DOWNLOAD_URL must be the installer .exe (…/releases/latest/download/<name>.exe)');
   process.exit(1);
 }
 

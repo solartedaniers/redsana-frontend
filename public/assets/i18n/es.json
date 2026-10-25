@@ -584,9 +584,7 @@
     "hero": {
       "kicker": "Sana tu red",
       "stepsLabel": "Cómo funciona"
-    },
-    "downloadPreparing": "Preparando la descarga…",
-    "downloadFallback": "No pudimos iniciar la descarga directa; te abrimos la página de la versión para que descargues el instalador desde allí."
+    }
   },
   "desktopTray": {
     "open": "Abrir RedSana",

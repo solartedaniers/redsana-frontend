@@ -584,9 +584,7 @@
     "hero": {
       "kicker": "Heal your network",
       "stepsLabel": "How it works"
-    },
-    "downloadPreparing": "Preparing the download…",
-    "downloadFallback": "We could not start the direct download; we opened the release page so you can get the installer there."
+    }
   },
   "desktopTray": {
     "open": "Open RedSana",

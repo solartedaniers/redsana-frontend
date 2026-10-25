@@ -1,16 +1,3 @@
 :host {
   display: contents;
 }
-
-// Mientras resuelve el instalador el botón se queda en su sitio pero se ve ocupado.
-.submit-button.is-busy {
-  cursor: progress;
-  opacity: 0.75;
-}
-
-.download-notice {
-  margin: 0;
-  font-family: var(--font-mono);
-  font-size: var(--font-size-caption);
-  color: var(--color-text-secondary);
-}

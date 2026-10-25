@@ -204,7 +204,7 @@ Es decir: **el patrón de "sacar el trabajo del hilo principal" se aplica en tod
 | ---------------------------------------- | -------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | 🧭 **CSR** (render en el cliente)        | Toda la app: login, registro, dashboard, asistente, alertas, dispositivos, administración y perfil | Son datos privados de cada usuario que llegan del backend después de iniciar sesión. Prerenderizarlos no aporta nada: no hay nada que indexar ni que compartir, y el HTML sería distinto para cada persona. Vercel sirve `index.csr.html` para cualquier ruta que no sea un archivo (`vercel.json`).                                                                                               |
 | 📄 **SSG** (prerender en el build)       | Solo la landing (`/`), en `app.routes.server.ts`                                                   | Es pública e igual para todos. Al prerenderizarla, el HTML llega con el contenido, el título, la descripción, la URL canónica y las etiquetas Open Graph y Twitter Card, así que los buscadores y las vistas previas de redes la leen sin ejecutar JavaScript.                                                                                                                                     |
-| 💧 **Hidratación** (complemento del SSG) | La landing, con `provideClientHydration`                                                           | El navegador reutiliza el HTML prerenderizado en vez de borrarlo y volver a pintarlo, así que no hay parpadeo y el fondo 3D no se reconstruye. La activo sin la caché de transferencia HTTP: el cliente pide el diccionario y el release del instalador igual que antes, y nada del build queda congelado en el HTML. En las rutas CSR no hay datos de hidratación y Angular simplemente la salta. |
+| 💧 **Hidratación** (complemento del SSG) | La landing, con `provideClientHydration`                                                           | El navegador reutiliza el HTML prerenderizado en vez de borrarlo y volver a pintarlo, así que no hay parpadeo y el fondo 3D no se reconstruye. La activo sin la caché de transferencia HTTP: el cliente pide el diccionario igual que antes, y nada del build queda congelado en el HTML. En las rutas CSR no hay datos de hidratación y Angular simplemente la salta. |
 
 **Lo que no aplica, y por qué:**
 
@@ -280,7 +280,7 @@ Este repositorio contiene solo el **frontend**: la app Angular (web) y su capa n
 ```bash
 npm ci
 
-# Variables de entorno: URL y anon key de Supabase, URL de la API, URL web y datos del release de escritorio
+# Variables de entorno: URL y anon key de Supabase, URL de la API, URL web y enlace del instalador de escritorio
 cp .env.example .env
 # Editar .env (cada variable está documentada en .env.example)
 ```
@@ -324,7 +324,16 @@ npx tauri dev       # app de escritorio con recarga en caliente
 npx tauri build
 ```
 
-Esto genera el instalador nativo (`.exe`/`.msi` en Windows, `.dmg` en macOS, `.deb`/`.AppImage` en Linux) dentro de `src-tauri/target/release/bundle/`. El instalador de Windows (`*-setup.exe`) se publica en los Releases de este repositorio: el botón de descarga de la web lo busca en el repo indicado por `DESKTOP_RELEASE_REPO`.
+Esto genera el instalador nativo (`.exe`/`.msi` en Windows, `.dmg` en macOS, `.deb`/`.AppImage` en Linux) dentro de `src-tauri/target/release/bundle/`. El instalador de Windows (`*-setup.exe`) se publica en los Releases de este repositorio.
+
+#### 📦 Publicar una versión
+
+Cada Release lleva **dos copias idénticas** del instalador de Windows:
+
+- `RedSana_<versión>_x64-setup.exe`, el nombre que genera Tauri;
+- `RedSana_x64-setup.exe`, con **nombre fijo**.
+
+El botón «Descargar» de la web es un enlace normal a `DESKTOP_DOWNLOAD_URL` = `https://github.com/solartedaniers/redsana-frontend/releases/latest/download/RedSana_x64-setup.exe`. GitHub redirige esa URL al asset con ese nombre del último Release, así que la descarga empieza desde el HTML prerenderizado, aunque se pulse antes de que cargue Angular o sin JavaScript, y sin consultar la API de GitHub. **Si un Release sale sin el asset de nombre fijo, el botón da 404.** Al publicar, sube las dos copias y comprueba que tienen el mismo SHA-256. El build falla si `DESKTOP_DOWNLOAD_URL` no termina en `.exe`, para que no vuelva a apuntar a la página del Release.
 
 ### 4️⃣ Instalar la app de escritorio (Windows)
 
