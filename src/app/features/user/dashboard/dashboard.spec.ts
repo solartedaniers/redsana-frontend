@@ -380,3 +380,41 @@ describe('Dashboard abierto durante el corte (escritorio, sin ningún snapshot d
     expect(panel(element)).toBeNull();
   });
 });
+
+describe('Dashboard calibración', () => {
+  function snapshotAt(updatedAt: string): NetworkMetricSnapshot {
+    return { status: 'good', latencyMs: 20, jitterMs: 2, packetLossPercent: 0, updatedAt };
+  }
+
+  it('mientras calibra, cada medición nueva vuelve a pedir el conteo; una repetida o ya activa no', () => {
+    const snapshots = new Subject<NetworkMetricSnapshot>();
+    const statuses = [
+      { status: 'calibrating', samplesCollected: 1, samplesRequired: 3 },
+      { status: 'active', samplesCollected: 3, samplesRequired: 3 },
+    ] as const;
+    let calls = 0;
+    TestBed.configureTestingModule({
+      providers: [
+        provideHttpClient(),
+        provideRouter([]),
+        {
+          provide: NetworkMetricsRepository,
+          useValue: {
+            watchSnapshot: () => snapshots,
+            getHistory: () => of([]),
+            getAnomalyStatus: () => of(statuses[Math.min(calls++, statuses.length - 1)]),
+          },
+        },
+      ],
+    });
+    TestBed.createComponent(Dashboard);
+
+    snapshots.next(snapshotAt('2026-11-04T10:00:00Z'));
+    snapshots.next(snapshotAt('2026-11-04T10:00:00Z'));
+    expect(calls).toBe(1);
+    snapshots.next(snapshotAt('2026-11-04T10:01:00Z'));
+    expect(calls).toBe(2);
+    snapshots.next(snapshotAt('2026-11-04T10:02:00Z'));
+    expect(calls).toBe(2);
+  });
+});

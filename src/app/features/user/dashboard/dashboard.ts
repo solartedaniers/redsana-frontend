@@ -103,8 +103,13 @@ export class Dashboard {
       .watchSnapshot()
       .pipe(takeUntilDestroyed())
       .subscribe((snapshot) => {
+        const previous = this.snapshot();
         this.snapshot.set(snapshot);
         this.snapshotReceivedAt.set(Date.now());
+        // Mientras calibra (o la red es nueva), cada medición nueva cambia el conteo: lo vuelvo a pedir.
+        if (previous && previous.updatedAt !== snapshot.updatedAt && this.anomalyStatus()?.status !== 'active') {
+          this.loadAnomalyStatus();
+        }
       });
     // Si fallan, el panel queda como sin datos (gráfico vacío, sin aviso de calibración) en vez de dejar un error sin
     // manejar; el snapshot sigue sondeando por su cuenta.
@@ -112,7 +117,11 @@ export class Dashboard {
       next: (history) => this.history.set(history),
       error: () => this.history.set([]),
     });
-    // Lo consulto una sola vez: el conteo solo importa mientras calibra.
+    this.loadAnomalyStatus();
+  }
+
+  // Si falla queda sin aviso de calibración; la próxima medición nueva lo vuelve a intentar.
+  private loadAnomalyStatus(): void {
     this.metricsRepository.getAnomalyStatus().subscribe({
       next: (status) => this.anomalyStatus.set(status),
       error: () => this.anomalyStatus.set(null),
