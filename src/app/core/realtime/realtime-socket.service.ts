@@ -4,6 +4,7 @@ import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
 import {
   EMPTY,
   Observable,
+  Subscription,
   combineLatest,
   defer,
   distinctUntilChanged,
@@ -13,6 +14,7 @@ import {
   retry,
   startWith,
   switchMap,
+  tap,
   timer,
 } from 'rxjs';
 import { environment } from '../../../environments/environment';
@@ -44,6 +46,20 @@ export const REALTIME_ACCESS_TOKEN = new InjectionToken<() => Promise<string | n
   factory: () => async () => (await supabaseClient.auth.getSession()).data.session?.access_token ?? null,
 });
 
+/** Cada token nuevo que supabase-js obtiene al renovar la sesión (lo hace solo, antes de que venza). */
+export const REALTIME_TOKEN_REFRESHES = new InjectionToken<Observable<string>>('REALTIME_TOKEN_REFRESHES', {
+  providedIn: 'root',
+  factory: () =>
+    new Observable<string>((subscriber) => {
+      const { data } = supabaseClient.auth.onAuthStateChange((event, session) => {
+        if (event === 'TOKEN_REFRESHED' && session) {
+          subscriber.next(session.access_token);
+        }
+      });
+      return () => data.subscription.unsubscribe();
+    }),
+});
+
 class SocketClosed extends Error {
   constructor(
     readonly code: number,
@@ -66,6 +82,7 @@ export class RealtimeSocketService {
   private readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
   private readonly createSocket = inject(WEB_SOCKET_FACTORY);
   private readonly accessToken = inject(REALTIME_ACCESS_TOKEN);
+  private readonly tokenRefreshes = inject(REALTIME_TOKEN_REFRESHES);
   private readonly isAuthenticated$ = toObservable(this.auth.isAuthenticated);
   private readonly url = `${environment.apiBaseUrl.replace(/^http/, 'ws')}/api/realtime/ws`;
   private failedAttempts = 0;
@@ -78,6 +95,8 @@ export class RealtimeSocketService {
     const visible$ = fromEvent(this.document, 'visibilitychange').pipe(
       startWith(null),
       map(() => this.document.visibilityState === 'visible'),
+      distinctUntilChanged(),
+      tap((visible) => this.liveUpdates.setVisible(visible)),
     );
     combineLatest([this.isAuthenticated$, visible$])
       .pipe(
@@ -111,6 +130,7 @@ export class RealtimeSocketService {
     return new Observable<RealtimeEvent>((subscriber) => {
       const socket = this.createSocket(this.url);
       let liveSince: number | null = null;
+      let renewals: Subscription | undefined;
       const finish = (code: number): void => {
         const wasStable = liveSince !== null && Date.now() - liveSince >= LIVE_UPDATES_CONFIG.stableConnectionMs;
         if (FINAL_CLOSE_CODES.has(code)) {
@@ -124,6 +144,10 @@ export class RealtimeSocketService {
         const parsed = parseMessage(message.data);
         if (parsed?.['type'] === 'ready') {
           liveSince = Date.now();
+          // El token renovado se manda por el mismo socket: así no hay que reconectar cuando vence el anterior.
+          renewals ??= this.tokenRefreshes.subscribe((renewed) =>
+            socket.send(JSON.stringify({ type: 'auth', token: renewed })),
+          );
           this.liveUpdates.setLive(true);
           this.liveUpdates.resync();
         } else if (parsed?.['type'] === 'close' && typeof parsed['code'] === 'number') {
@@ -138,6 +162,7 @@ export class RealtimeSocketService {
       socket.onclose = (event: CloseEvent) => finish(event.code);
       return () => {
         socket.onopen = socket.onmessage = socket.onclose = null;
+        renewals?.unsubscribe();
         this.liveUpdates.setLive(false);
         if (socket.readyState === SOCKET_CONNECTING || socket.readyState === SOCKET_OPEN) {
           socket.close(CLIENT_CLOSE_CODE);

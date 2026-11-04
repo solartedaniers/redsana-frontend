@@ -3,7 +3,13 @@ import { TestBed } from '@angular/core/testing';
 import { AuthService } from '../auth/auth.service';
 import { LIVE_UPDATES_CONFIG, reconnectDelayMs } from './live-updates.config';
 import { LiveUpdates } from './live-updates';
-import { REALTIME_ACCESS_TOKEN, RealtimeSocketService, WEB_SOCKET_FACTORY } from './realtime-socket.service';
+import { Subject } from 'rxjs';
+import {
+  REALTIME_ACCESS_TOKEN,
+  REALTIME_TOKEN_REFRESHES,
+  RealtimeSocketService,
+  WEB_SOCKET_FACTORY,
+} from './realtime-socket.service';
 
 class FakeSocket {
   readyState = 0;
@@ -42,6 +48,7 @@ describe('RealtimeSocketService', () => {
   let visibility: DocumentVisibilityState;
   const isAuthenticated = signal(true);
   const signOut = vi.fn();
+  let tokenRefreshes: Subject<string>;
 
   function start(): LiveUpdates {
     TestBed.configureTestingModule({
@@ -56,6 +63,7 @@ describe('RealtimeSocketService', () => {
           },
         },
         { provide: REALTIME_ACCESS_TOKEN, useValue: () => Promise.resolve('token') },
+        { provide: REALTIME_TOKEN_REFRESHES, useValue: tokenRefreshes },
       ],
     });
     TestBed.inject(RealtimeSocketService).start();
@@ -82,6 +90,7 @@ describe('RealtimeSocketService', () => {
     vi.useFakeTimers();
     vi.spyOn(Math, 'random').mockReturnValue(1);
     sockets = [];
+    tokenRefreshes = new Subject<string>();
     visibility = 'visible';
     isAuthenticated.set(true);
     signOut.mockClear();
@@ -170,6 +179,40 @@ describe('RealtimeSocketService', () => {
     sockets[1].open();
     sockets[1].receive({ type: 'close', code: 4403 });
     await settle(LIVE_UPDATES_CONFIG.maxReconnectDelayMs * 2);
+    expect(sockets).toHaveLength(2);
+  });
+
+  it('al renovarse el token lo manda por el mismo socket, sin reconectar', async () => {
+    start();
+    const socket = await connectLive();
+
+    tokenRefreshes.next('renewed');
+
+    expect(socket.sent).toEqual([
+      { type: 'auth', token: 'token' },
+      { type: 'auth', token: 'renewed' },
+    ]);
+    expect(sockets).toHaveLength(1);
+  });
+
+  it('con la pestaña oculta no sondea ni deja un reintento pendiente, y al volver pide todo una vez', async () => {
+    const live = start();
+    const resyncs: number[] = [];
+    live.resyncs().subscribe(() => resyncs.push(1));
+    const socket = await connectLive();
+    socket.drop();
+    expect(live.shouldPoll()).toBe(true);
+
+    visibility = 'hidden';
+    document.dispatchEvent(new Event('visibilitychange'));
+    await settle(LIVE_UPDATES_CONFIG.maxReconnectDelayMs * 2);
+    expect(live.shouldPoll()).toBe(false);
+    expect(sockets).toHaveLength(1);
+
+    visibility = 'visible';
+    document.dispatchEvent(new Event('visibilitychange'));
+    expect(resyncs).toHaveLength(2);
+    await settle();
     expect(sockets).toHaveLength(2);
   });
 
