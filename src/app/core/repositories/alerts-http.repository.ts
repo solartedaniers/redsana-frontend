@@ -1,11 +1,12 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
-import { EMPTY, Observable, catchError, from, interval, map, mergeMap, switchMap, tap } from 'rxjs';
+import { EMPTY, Observable, catchError, filter, from, interval, map, merge, mergeMap, switchMap, tap } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { NetworkAlert } from '../models/alert.model';
 import { AlertsRepository } from './alerts.repository';
+import { LiveUpdates } from '../realtime/live-updates';
+import { LIVE_UPDATES_CONFIG } from '../realtime/live-updates.config';
 
-const NEW_ALERTS_POLL_INTERVAL_MS = 10000;
 // Alertas viejas guardadas sin la ruta completa del diccionario; sin el prefijo se veía la clave cruda.
 const LEGACY_ALERT_KEY_PREFIX = 'alertsCenter.';
 const ALERT_KEY_NAMESPACE = 'user.';
@@ -24,6 +25,7 @@ interface BackendAlert {
 export class AlertsHttpRepository extends AlertsRepository {
   private readonly http = inject(HttpClient);
   private readonly baseUrl = `${environment.apiBaseUrl}/api/alerts`;
+  private readonly liveUpdates = inject(LiveUpdates);
 
   getAlerts(): Observable<NetworkAlert[]> {
     return this.http
@@ -32,9 +34,11 @@ export class AlertsHttpRepository extends AlertsRepository {
   }
 
   watchNewAlerts(): Observable<NetworkAlert> {
-    // No hay push: consulto /recent con un cursor "since" que avanza con la última alerta vista.
+    // Consulto /recent con un cursor "since" que avanza con la última alerta vista: cada alerta nueva o reconexión del
+    // socket lo pide una vez, y sin socket en vivo sondeo cada pocos segundos.
     let since = new Date().toISOString();
-    return interval(NEW_ALERTS_POLL_INTERVAL_MS).pipe(
+    const polls = interval(LIVE_UPDATES_CONFIG.newAlertsPollIntervalMs).pipe(filter(() => !this.liveUpdates.isLive()));
+    return merge(polls, this.liveUpdates.refreshesFor('alert.created')).pipe(
       // Si una consulta falla el cursor no avanza, así la siguiente lo vuelve a pedir y no se pierde nada.
       switchMap(() =>
         this.http.get<BackendAlert[]>(`${this.baseUrl}/recent`, { params: { since } }).pipe(catchError(() => EMPTY)),

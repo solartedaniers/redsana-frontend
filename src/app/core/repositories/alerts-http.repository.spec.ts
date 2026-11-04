@@ -3,6 +3,8 @@ import { HttpTestingController, provideHttpClientTesting } from '@angular/common
 import { TestBed } from '@angular/core/testing';
 import { NetworkAlert } from '../models/alert.model';
 import { AlertsHttpRepository } from './alerts-http.repository';
+import { LiveUpdates } from '../realtime/live-updates';
+import { LIVE_UPDATES_CONFIG } from '../realtime/live-updates.config';
 
 describe('AlertsHttpRepository', () => {
   it('pide las alertas recientes a /api/alerts/recent con el cursor since', () => {
@@ -46,5 +48,33 @@ describe('AlertsHttpRepository', () => {
       'user.alertsCenter.messages.briefOutage',
       'user.alertsCenter.messages.untrustedDeviceOnline',
     ]);
+  });
+});
+
+describe('AlertsHttpRepository.watchNewAlerts con el socket', () => {
+  afterEach(() => vi.useRealTimers());
+
+  it('en vivo no sondea y pide /recent con cada alerta propia y al reconectar; al caerse vuelve a sondear', () => {
+    vi.useFakeTimers();
+    TestBed.configureTestingModule({
+      providers: [AlertsHttpRepository, provideHttpClient(), provideHttpClientTesting()],
+    });
+    const live = TestBed.inject(LiveUpdates);
+    const http = TestBed.inject(HttpTestingController);
+    const recent = (req: { url: string }) => req.url.endsWith('/api/alerts/recent');
+    const subscription = TestBed.inject(AlertsHttpRepository).watchNewAlerts().subscribe();
+
+    live.setLive(true);
+    vi.advanceTimersByTime(LIVE_UPDATES_CONFIG.newAlertsPollIntervalMs * 3);
+    http.expectNone(recent);
+    live.publish({ type: 'alert.created', owner_id: 'me', data: {}, at: 't' });
+    http.expectOne(recent).flush([]);
+    live.resync();
+    http.expectOne(recent).flush([]);
+
+    live.setLive(false);
+    vi.advanceTimersByTime(LIVE_UPDATES_CONFIG.newAlertsPollIntervalMs);
+    http.expectOne(recent).flush([]);
+    subscription.unsubscribe();
   });
 });

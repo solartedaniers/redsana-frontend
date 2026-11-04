@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
-import { EMPTY, Observable, catchError, interval, map, startWith, switchMap } from 'rxjs';
+import { EMPTY, Observable, catchError, filter, interval, map, merge, startWith, switchMap } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import {
   AnomalyDetectionStatus,
@@ -12,8 +12,8 @@ import {
   NetworkStatus,
 } from '../models/network.model';
 import { NetworkMetricsRepository } from './network-metrics.repository';
-
-const LIVE_UPDATE_INTERVAL_MS = 4000;
+import { LiveUpdates } from '../realtime/live-updates';
+import { LIVE_UPDATES_CONFIG } from '../realtime/live-updates.config';
 
 interface BackendSnapshot {
   status: NetworkStatus;
@@ -43,6 +43,7 @@ interface BackendAnomalyStatus {
 export class NetworkMetricsHttpRepository extends NetworkMetricsRepository {
   private readonly http = inject(HttpClient);
   private readonly baseUrl = `${environment.apiBaseUrl}/api/network-metrics`;
+  private readonly liveUpdates = inject(LiveUpdates);
 
   getSnapshot(householdId?: string): Observable<NetworkMetricSnapshot> {
     return this.http
@@ -51,9 +52,14 @@ export class NetworkMetricsHttpRepository extends NetworkMetricsRepository {
   }
 
   watchSnapshot(householdId?: string): Observable<NetworkMetricSnapshot> {
-    // Sin streaming en el backend, reconsulto cada pocos segundos; switchMap evita acumular pedidos
-    // y catchError por consulta salta ese tick en vez de matar el sondeo.
-    return interval(LIVE_UPDATE_INTERVAL_MS).pipe(
+    // Con el socket en vivo no sondeo: cada medición nueva o cada reconexión pide /latest una vez. Sin socket, o si el
+    // admin mira otro hogar (los avisos son solo de su propia red), reconsulto cada pocos segundos. switchMap evita
+    // acumular pedidos y catchError por consulta salta ese tick en vez de matar el sondeo.
+    const polls = interval(LIVE_UPDATES_CONFIG.snapshotPollIntervalMs).pipe(
+      filter(() => householdId !== undefined || !this.liveUpdates.isLive()),
+    );
+    const triggers = householdId ? polls : merge(polls, this.liveUpdates.refreshesFor('measurement.created'));
+    return triggers.pipe(
       startWith(0),
       switchMap(() => this.getSnapshot(householdId).pipe(catchError(() => EMPTY))),
     );

@@ -2,6 +2,8 @@ import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 import { NetworkMetricsHttpRepository } from './network-metrics-http.repository';
+import { LiveUpdates } from '../realtime/live-updates';
+import { LIVE_UPDATES_CONFIG } from '../realtime/live-updates.config';
 
 describe('NetworkMetricsHttpRepository.getHistory', () => {
   function history(body: object[]) {
@@ -126,3 +128,53 @@ describe('NetworkMetricsHttpRepository: latencia al router y diagnóstico', () =
     ]);
   });
 });
+
+describe('NetworkMetricsHttpRepository.watchSnapshot con el socket', () => {
+  afterEach(() => vi.useRealTimers());
+
+  it('en vivo no sondea: pide /latest con cada medición propia y al reconectar; al caerse vuelve a sondear', () => {
+    vi.useFakeTimers();
+    TestBed.configureTestingModule({
+      providers: [NetworkMetricsHttpRepository, provideHttpClient(), provideHttpClientTesting()],
+    });
+    const live = TestBed.inject(LiveUpdates);
+    const http = TestBed.inject(HttpTestingController);
+    const latest = (req: { url: string }) => req.url.endsWith('/latest');
+    const subscription = TestBed.inject(NetworkMetricsHttpRepository).watchSnapshot().subscribe();
+    http.expectOne(latest).flush(SNAPSHOT);
+
+    live.setLive(true);
+    vi.advanceTimersByTime(LIVE_UPDATES_CONFIG.snapshotPollIntervalMs * 3);
+    http.expectNone(latest);
+
+    live.publish({ type: 'measurement.created', owner_id: 'me', data: {}, at: 't' });
+    http.expectOne(latest).flush(SNAPSHOT);
+    live.publish({ type: 'alert.created', owner_id: 'me', data: {}, at: 't' });
+    http.expectNone(latest);
+    live.resync();
+    http.expectOne(latest).flush(SNAPSHOT);
+
+    live.setLive(false);
+    vi.advanceTimersByTime(LIVE_UPDATES_CONFIG.snapshotPollIntervalMs);
+    http.expectOne(latest).flush(SNAPSHOT);
+    subscription.unsubscribe();
+  });
+
+  it('el admin mirando otro hogar sigue sondeando aunque su socket esté en vivo', () => {
+    vi.useFakeTimers();
+    TestBed.configureTestingModule({
+      providers: [NetworkMetricsHttpRepository, provideHttpClient(), provideHttpClientTesting()],
+    });
+    TestBed.inject(LiveUpdates).setLive(true);
+    const http = TestBed.inject(HttpTestingController);
+    const subscription = TestBed.inject(NetworkMetricsHttpRepository).watchSnapshot('household').subscribe();
+    http.expectOne((req) => req.url.endsWith('/latest')).flush(SNAPSHOT);
+
+    vi.advanceTimersByTime(LIVE_UPDATES_CONFIG.snapshotPollIntervalMs);
+
+    http.expectOne((req) => req.params.get('user_id') === 'household').flush(SNAPSHOT);
+    subscription.unsubscribe();
+  });
+});
+
+const SNAPSHOT = { latency_ms: 12, jitter_ms: 1, packet_loss_percent: 0, updated_at: '2026-11-04T00:00:00Z' };
