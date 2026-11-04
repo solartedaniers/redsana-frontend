@@ -10,7 +10,10 @@ import {
   concat,
   concatMap,
   distinctUntilChanged,
+  filter,
   from,
+  map,
+  merge,
   of,
   retry,
   startWith,
@@ -22,6 +25,7 @@ import {
 import { AuthService } from '../auth/auth.service';
 import { AiAvailability, AiStatusReport, AiUnavailableReason } from '../models/ai.model';
 import { AiStatusRepository } from '../repositories/ai-status.repository';
+import { LiveUpdates, RealtimeEvent } from '../realtime/live-updates';
 import { AiClientWakeUp } from './ai-client-wake-up';
 import { AI_STATUS_CONFIG, buildPollDelays } from './ai-status.config';
 
@@ -40,6 +44,7 @@ const DEFAULT_REASON: AiUnavailableReason = 'service_error';
 export class AiStatusService {
   private readonly repository = inject(AiStatusRepository);
   private readonly clientWakeUp = inject(AiClientWakeUp);
+  private readonly liveUpdates = inject(LiveUpdates);
   private readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
   private readonly isAuthenticated$ = toObservable(inject(AuthService).isAuthenticated);
   /** Cada valor reinicia el ciclo; true muestra "encendiendo" de inmediato, false espera lo que diga el backend. */
@@ -118,8 +123,19 @@ export class AiStatusService {
   private warmUpCycle(showWarmingUp: boolean): Observable<AiStatusReport> {
     // Cada ciclo nace de una acción del usuario (sesión, chat, reintentar): también despierto la IA desde aquí.
     this.clientWakeUp.wakeUp();
+    // Con el socket en vivo el estado llega solo (ai.status.changed) y salto la consulta de ese turno; si el socket no
+    // está, consulto como siempre. Al reconectar pido el estado una vez por si cambió mientras estaba caído.
     const polls$ = from(this.pollDelays).pipe(
-      concatMap((delayMs) => timer(delayMs).pipe(switchMap(() => this.orWarmingUp(this.repository.getStatus())))),
+      concatMap((delayMs) =>
+        timer(delayMs).pipe(switchMap(() => (this.liveUpdates.isLive() ? EMPTY : this.currentStatus()))),
+      ),
+    );
+    const pushed$ = merge(
+      this.liveUpdates.eventsOf('ai.status.changed').pipe(
+        map(toReport),
+        filter((pushed): pushed is AiStatusReport => pushed !== null),
+      ),
+      this.liveUpdates.resyncs().pipe(switchMap(() => this.currentStatus())),
     );
     // Consultar el estado no despierta nada: si el backend dormido no recibió el pedido, lo repito con la misma espera.
     const warmUp$ = this.repository
@@ -129,7 +145,7 @@ export class AiStatusService {
       );
     // El tope es de reloj, no la suma de pausas: con el backend dormido cada petición tarda. Agotado el tiempo queda
     // no disponible (con reintentar); normalmente lo decide antes el backend.
-    const waiting$ = concat(showWarmingUp ? of(WARMING_UP) : EMPTY, warmUp$, polls$).pipe(
+    const waiting$ = merge(concat(showWarmingUp ? of(WARMING_UP) : EMPTY, warmUp$, polls$), pushed$).pipe(
       takeUntil(timer(AI_STATUS_CONFIG.maxWaitMs)),
     );
     return concat(waiting$, of(TIMED_OUT)).pipe(
@@ -140,8 +156,26 @@ export class AiStatusService {
     );
   }
 
+  private currentStatus(): Observable<AiStatusReport> {
+    return this.orWarmingUp(this.repository.getStatus());
+  }
+
   /** Un error de red es lo normal mientras Render despierta el backend: sigo esperando en vez de fallar. */
   private orWarmingUp(source: Observable<AiStatusReport>): Observable<AiStatusReport> {
     return source.pipe(catchError(() => of(WARMING_UP)));
   }
+}
+
+const AVAILABILITIES: ReadonlySet<string> = new Set<AiAvailability>(['ready', 'warming_up', 'unavailable']);
+
+/** data de ai.status.changed tiene la forma de /api/ai/status; algo distinto se ignora. */
+function toReport(event: RealtimeEvent): AiStatusReport | null {
+  const { status, reason } = event.data;
+  if (typeof status !== 'string' || !AVAILABILITIES.has(status)) {
+    return null;
+  }
+  return {
+    status: status as AiAvailability,
+    reason: reason === 'timed_out' || reason === 'service_error' ? reason : null,
+  };
 }

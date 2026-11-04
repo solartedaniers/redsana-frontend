@@ -11,6 +11,8 @@ export interface RealtimeEvent {
   readonly at: string;
 }
 
+const RESYNC = 'resync';
+
 /**
  * Lo que el socket deja a la app: si está en vivo y un aviso por cada cambio del usuario. Los repositorios no saben del
  * socket: con isLive en false sondean como siempre y cada aviso solo les pide volver a consultar el REST.
@@ -19,7 +21,7 @@ export interface RealtimeEvent {
 export class LiveUpdates {
   private readonly live = signal(false);
   readonly isLive = this.live.asReadonly();
-  private readonly changes = new Subject<RealtimeEventType | 'resync'>();
+  private readonly changes = new Subject<RealtimeEvent | typeof RESYNC>();
 
   setLive(live: boolean): void {
     this.live.set(live);
@@ -27,18 +29,30 @@ export class LiveUpdates {
 
   /** Un evento del usuario que llegó por el socket. */
   publish(event: RealtimeEvent): void {
-    this.changes.next(event.type);
+    this.changes.next(event);
   }
 
   /** El socket volvió a estar en vivo: lo que pasó mientras no lo estaba se vuelve a pedir por REST. */
   resync(): void {
-    this.changes.next('resync');
+    this.changes.next(RESYNC);
   }
 
   /** Emite cada vez que hay que reconsultar lo que depende de type, incluido cada resync. */
   refreshesFor(type: RealtimeEventType): Observable<void> {
     return this.changes.pipe(
-      filter((change) => change === type || change === 'resync'),
+      filter((change) => change === RESYNC || change.type === type),
+      map(() => undefined),
+    );
+  }
+
+  /** Los eventos de type con sus datos, para quien los usa directamente en vez de reconsultar. */
+  eventsOf(type: RealtimeEventType): Observable<RealtimeEvent> {
+    return this.changes.pipe(filter((change): change is RealtimeEvent => change !== RESYNC && change.type === type));
+  }
+
+  resyncs(): Observable<void> {
+    return this.changes.pipe(
+      filter((change) => change === RESYNC),
       map(() => undefined),
     );
   }

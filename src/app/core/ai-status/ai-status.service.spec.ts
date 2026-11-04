@@ -7,13 +7,14 @@ import { AiStatusRepository } from '../repositories/ai-status.repository';
 import { AiClientWakeUp } from './ai-client-wake-up';
 import { AI_STATUS_CONFIG, buildPollDelays } from './ai-status.config';
 import { AiStatusService } from './ai-status.service';
+import { LiveUpdates } from '../realtime/live-updates';
 
 const DELAYS = buildPollDelays(AI_STATUS_CONFIG);
 
 const report = (status: AiAvailability, reason?: AiStatusReport['reason']): AiStatusReport => ({ status, reason });
 
 function setup(
-  statuses: Array<AiAvailability | AiStatusReport | Error>,
+  statuses: (AiAvailability | AiStatusReport | Error)[],
   options: { warmUp?: () => Observable<AiStatusReport>; platform?: 'browser' | 'server'; authenticated?: boolean } = {},
 ) {
   const isAuthenticated = signal(options.authenticated ?? true);
@@ -273,5 +274,71 @@ describe('AiStatusService', () => {
 
     expect(service.status()).toBe('idle');
     expect(repository.warmUp).not.toHaveBeenCalled();
+  });
+});
+
+describe('AiStatusService con el socket', () => {
+  beforeEach(() => vi.useFakeTimers());
+  afterEach(() => vi.useRealTimers());
+
+  const aiEvent = (data: Record<string, unknown>) =>
+    ({ type: 'ai.status.changed', owner_id: null, data, at: '2026-11-04T00:00:00Z' }) as const;
+
+  it('en vivo no consulta /api/ai/status: ai.status.changed termina el calentamiento', () => {
+    const { service, repository } = setup(['warming_up']);
+    const live = TestBed.inject(LiveUpdates);
+    live.setLive(true);
+
+    vi.advanceTimersByTime(DELAYS[0] + DELAYS[1] + DELAYS[2]);
+    expect(repository.getStatus).not.toHaveBeenCalled();
+    live.publish(aiEvent({ status: 'ready', reason: null }));
+
+    expect(service.status()).toBe('ready');
+    vi.advanceTimersByTime(AI_STATUS_CONFIG.maxWaitMs);
+    expect(repository.getStatus).not.toHaveBeenCalled();
+    expect(repository.warmUp).toHaveBeenCalledOnce();
+  });
+
+  it('el motivo de "no disponible" llega con el evento y un evento roto se ignora', () => {
+    const { service } = setup(['warming_up']);
+    const live = TestBed.inject(LiveUpdates);
+    live.setLive(true);
+
+    live.publish(aiEvent({ status: 'sleeping' }));
+    expect(service.status()).toBe('warming_up');
+    live.publish(aiEvent({ status: 'unavailable', reason: 'timed_out' }));
+
+    expect(service.status()).toBe('unavailable');
+    expect(service.unavailableReason()).toBe('timed_out');
+  });
+
+  it('si el socket se cae vuelve a consultar, y al reconectar pide el estado una vez', () => {
+    const { service, repository } = setup(['warming_up', 'warming_up', 'ready']);
+    const live = TestBed.inject(LiveUpdates);
+    live.setLive(true);
+    vi.advanceTimersByTime(DELAYS[0]);
+    expect(repository.getStatus).not.toHaveBeenCalled();
+
+    live.setLive(false);
+    vi.advanceTimersByTime(DELAYS[1]);
+    expect(repository.getStatus).toHaveBeenCalledOnce();
+
+    live.setLive(true);
+    live.resync();
+    expect(repository.getStatus).toHaveBeenCalledTimes(2);
+    live.resync();
+    expect(service.status()).toBe('ready');
+  });
+
+  it('fuera de un calentamiento los eventos no cambian nada ni despiertan la IA', () => {
+    const { service, repository, clientWakeUp } = setup(['ready']);
+    vi.advanceTimersByTime(DELAYS[0]);
+    expect(service.status()).toBe('ready');
+
+    TestBed.inject(LiveUpdates).publish(aiEvent({ status: 'warming_up' }));
+
+    expect(service.status()).toBe('ready');
+    expect(repository.warmUp).toHaveBeenCalledOnce();
+    expect(clientWakeUp.wakeUp).toHaveBeenCalledOnce();
   });
 });
