@@ -57,6 +57,12 @@
       },
       "slowWarmUp": "The first time each day it can take a few minutes. You can keep using RedSana in the meantime."
     },
+    "liveUpdates": {
+      "live": "Live",
+      "polling": "Updating",
+      "liveHint": "Changes arrive instantly.",
+      "pollingHint": "The server is checked every few seconds."
+    },
     "sessionRestore": {
       "wakingTitle": "Waking up the server…",
       "wakingBody": "If nobody used it for a while, it takes about a minute to wake up. Thanks for waiting.",

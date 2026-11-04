@@ -57,6 +57,12 @@
       },
       "slowWarmUp": "La primera vez del día puede tardar unos minutos. Puedes seguir usando RedSana mientras tanto."
     },
+    "liveUpdates": {
+      "live": "En vivo",
+      "polling": "Actualizando",
+      "liveHint": "Los cambios llegan al instante.",
+      "pollingHint": "Se consulta el servidor cada pocos segundos."
+    },
     "sessionRestore": {
       "wakingTitle": "Despertando el servidor…",
       "wakingBody": "Si nadie lo usó en un rato, tarda alrededor de un minuto en despertar. Gracias por esperar.",

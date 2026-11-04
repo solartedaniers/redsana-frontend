@@ -19,6 +19,7 @@ import { NetworkStatusBadge } from '../../../shared/components/network-status-ba
 import { MetricCard } from '../../../shared/components/metric-card/metric-card';
 import { HistoryChart } from '../../../shared/components/history-chart/history-chart';
 import { NetworkDiagnosisPanel } from '../../../shared/components/network-diagnosis-panel/network-diagnosis-panel';
+import { LiveUpdatesIndicator } from '../../../shared/components/live-updates-indicator/live-updates-indicator';
 import { TranslatePipe } from '../../../core/i18n/translate.pipe';
 import { DatePipe, NgTemplateOutlet } from '@angular/common';
 import { RouterLink } from '@angular/router';
@@ -43,6 +44,7 @@ const STATUS_AURA: Record<NetworkStatus, LatencySeverity | null> = {
     MetricCard,
     HistoryChart,
     NetworkDiagnosisPanel,
+    LiveUpdatesIndicator,
     MeasurementEmptyState,
     TranslatePipe,
     DatePipe,

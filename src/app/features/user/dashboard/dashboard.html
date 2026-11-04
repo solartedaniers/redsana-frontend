@@ -4,6 +4,7 @@
     <app-page-header titleKey="user.dashboard.title" subtitleKey="user.dashboard.subtitle" />
   </div>
   <div class="dashboard-hero__actions">
+    <app-live-updates-indicator />
     @if (snapshot(); as data) { <app-network-status-light [status]="data.status" [source]="data.source" /> }
     <a class="action-button" [routerLink]="paths.securityAssistant">{{ 'user.dashboard.diagnose' | translate }}</a>
   </div>

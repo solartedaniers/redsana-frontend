@@ -1,0 +1,12 @@
+// Mismo punto que el indicador de la IA: late mientras llegan los cambios al instante.
+.live-updates::before {
+  content: '';
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.live-updates[data-live-updates='live']::before {
+  animation: heartbeat var(--motion-heartbeat) var(--motion-easing-standard) infinite;
+}

@@ -1,0 +1,10 @@
+<span
+  class="sticker live-updates"
+  role="status"
+  aria-live="polite"
+  [attr.data-tone]="mode() === 'live' ? 'healthy' : null"
+  [attr.data-live-updates]="mode()"
+  [attr.title]="'common.liveUpdates.' + mode() + 'Hint' | translate"
+>
+  {{ 'common.liveUpdates.' + mode() | translate }}
+</span>
