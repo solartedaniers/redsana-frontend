@@ -37,7 +37,9 @@ export class AlertsHttpRepository extends AlertsRepository {
     // Consulto /recent con un cursor "since" que avanza con la última alerta vista: cada alerta nueva o reconexión del
     // socket lo pide una vez, y sin socket en vivo sondeo cada pocos segundos.
     let since = new Date().toISOString();
-    const polls = interval(LIVE_UPDATES_CONFIG.newAlertsPollIntervalMs).pipe(filter(() => !this.liveUpdates.isLive()));
+    const polls = interval(LIVE_UPDATES_CONFIG.newAlertsPollIntervalMs).pipe(
+      filter(() => this.liveUpdates.shouldPoll()),
+    );
     return merge(polls, this.liveUpdates.refreshesFor('alert.created')).pipe(
       // Si una consulta falla el cursor no avanza, así la siguiente lo vuelve a pedir y no se pierde nada.
       switchMap(() =>

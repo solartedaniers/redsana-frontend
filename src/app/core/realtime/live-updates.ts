@@ -1,4 +1,4 @@
-import { Injectable, signal } from '@angular/core';
+import { Injectable, computed, signal } from '@angular/core';
 import { Observable, Subject, filter, map } from 'rxjs';
 
 export type RealtimeEventType = 'measurement.created' | 'alert.created' | 'devices.updated' | 'ai.status.changed';
@@ -21,10 +21,23 @@ const RESYNC = 'resync';
 export class LiveUpdates {
   private readonly live = signal(false);
   readonly isLive = this.live.asReadonly();
+  private readonly visible = signal(true);
+  /** Con la pestaña oculta no se sondea: una pestaña escondida no debe mantener despierto al backend en Render. */
+  readonly shouldPoll = computed(() => this.visible() && !this.live());
+  readonly isVisible = this.visible.asReadonly();
   private readonly changes = new Subject<RealtimeEvent | typeof RESYNC>();
 
   setLive(live: boolean): void {
     this.live.set(live);
+  }
+
+  /** Al volver a la pestaña se pide una vez lo que cambió mientras estaba oculta. */
+  setVisible(visible: boolean): void {
+    const reappeared = visible && !this.visible();
+    this.visible.set(visible);
+    if (reappeared) {
+      this.resync();
+    }
   }
 
   /** Un evento del usuario que llegó por el socket. */

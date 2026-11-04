@@ -160,6 +160,26 @@ describe('NetworkMetricsHttpRepository.watchSnapshot con el socket', () => {
     subscription.unsubscribe();
   });
 
+  it('con la pestaña oculta no sondea, y al volver pide /latest una vez', () => {
+    vi.useFakeTimers();
+    TestBed.configureTestingModule({
+      providers: [NetworkMetricsHttpRepository, provideHttpClient(), provideHttpClientTesting()],
+    });
+    const live = TestBed.inject(LiveUpdates);
+    const http = TestBed.inject(HttpTestingController);
+    const latest = (req: { url: string }) => req.url.endsWith('/latest');
+    const subscription = TestBed.inject(NetworkMetricsHttpRepository).watchSnapshot().subscribe();
+    http.expectOne(latest).flush(SNAPSHOT);
+
+    live.setVisible(false);
+    vi.advanceTimersByTime(LIVE_UPDATES_CONFIG.snapshotPollIntervalMs * 5);
+    http.expectNone(latest);
+    live.setVisible(true);
+
+    http.expectOne(latest).flush(SNAPSHOT);
+    subscription.unsubscribe();
+  });
+
   it('el admin mirando otro hogar sigue sondeando aunque su socket esté en vivo', () => {
     vi.useFakeTimers();
     TestBed.configureTestingModule({

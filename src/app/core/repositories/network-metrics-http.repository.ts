@@ -56,7 +56,7 @@ export class NetworkMetricsHttpRepository extends NetworkMetricsRepository {
     // admin mira otro hogar (los avisos son solo de su propia red), reconsulto cada pocos segundos. switchMap evita
     // acumular pedidos y catchError por consulta salta ese tick en vez de matar el sondeo.
     const polls = interval(LIVE_UPDATES_CONFIG.snapshotPollIntervalMs).pipe(
-      filter(() => householdId !== undefined || !this.liveUpdates.isLive()),
+      filter(() => (householdId !== undefined ? this.liveUpdates.isVisible() : this.liveUpdates.shouldPoll())),
     );
     const triggers = householdId ? polls : merge(polls, this.liveUpdates.refreshesFor('measurement.created'));
     return triggers.pipe(
