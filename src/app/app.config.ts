@@ -62,6 +62,7 @@ import { QueuedMeasurementDelivery } from './core/pending-measurements/queued-me
 import { PendingMeasurementRepository } from './core/pending-measurements/pending-measurement.repository';
 import { PendingMeasurementTauriRepository } from './core/pending-measurements/pending-measurement-tauri.repository';
 import { AiStatusService } from './core/ai-status/ai-status.service';
+import { RealtimeSocketService } from './core/realtime/realtime-socket.service';
 import { NetworkThresholdsService } from './core/network-thresholds/network-thresholds.service';
 import { SecurityScoreConfigService } from './core/security-score-config/security-score-config.service';
 
@@ -115,6 +116,8 @@ export const appConfig: ApplicationConfig = {
     provideAppInitializer(() => inject(NetworkMeasurementService).start()),
     // Igual: al haber sesión despierta la IA en segundo plano y sigue su estado.
     provideAppInitializer(() => inject(AiStatusService).start()),
+    // El socket solo avisa de cambios; sin él la app sondea por REST como siempre.
+    provideAppInitializer(() => inject(RealtimeSocketService).start()),
     // Los umbrales del estado llegan con la sesión; hasta entonces, y si fallan, valen los de respaldo.
     provideAppInitializer(() => inject(NetworkThresholdsService).start()),
     // Igual con los rangos y pesos del puntaje de seguridad.
