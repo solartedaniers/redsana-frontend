@@ -19,6 +19,8 @@ const sources = (directive) => (csp[directive] ?? '').split(/\s+/);
 
 const required = [
   ['connect-src', value('apiBaseUrl')],
+  // El socket de tiempo real: una fuente https:// no habilita wss:// en el WebView.
+  ['connect-src', value('apiBaseUrl').replace(/^http/, 'ws')],
   ['connect-src', value('supabaseUrl')],
   ['img-src', value('supabaseUrl')], // fotos de perfil (Storage)
   ['connect-src', value('aiServicePublicUrl')], // vacía = sin despertar la IA desde el cliente

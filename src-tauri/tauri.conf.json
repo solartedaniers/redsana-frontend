@@ -32,7 +32,7 @@
         "style-src": "'self'",
         "img-src": "'self' data: https://kvnhnobjtwqirndmukts.supabase.co",
         "font-src": "'self'",
-        "connect-src": "'self' ipc: http://ipc.localhost https://redsana-api.onrender.com https://kvnhnobjtwqirndmukts.supabase.co https://redsana-ai-engine.onrender.com",
+        "connect-src": "'self' ipc: http://ipc.localhost https://redsana-api.onrender.com wss://redsana-api.onrender.com https://kvnhnobjtwqirndmukts.supabase.co https://redsana-ai-engine.onrender.com",
         "worker-src": "'self'",
         "object-src": "'none'",
         "base-uri": "'self'",
