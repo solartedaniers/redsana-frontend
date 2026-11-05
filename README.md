@@ -123,7 +123,7 @@ flowchart LR
   WEB -->|"HTTPS REST + JWT"| API
   WEB <-->|"WebSocket wss://"| API
   DESK -->|"HTTPS REST + JWT<br/>mediciones cada 60 s, con cola sin conexión"| API
-  DESK <-.->|"WebSocket wss://<br/>desde el próximo instalador; la 0.1.8 sondea"| API
+  DESK <-->|"WebSocket wss://"| API
   WEB -->|"login, registro"| AUTH
   DESK -->|"login, registro"| AUTH
   WEB -->|"fotos"| ST
@@ -137,7 +137,7 @@ flowchart LR
   AI -->|"HTTPS"| GROQ
 ```
 
-La línea punteada del escritorio al backend es el socket que todavía no llega a los usuarios: el instalador publicado (0.1.8) es anterior al tiempo real y sigue consultando cada pocos segundos, como antes.
+Desde la 0.2.1 la app de escritorio también recibe los cambios por el socket. Con la ventana en la bandeja la medición de 60 s sigue y el socket se mantiene abierto.
 
 - **Frontend + capa nativa (Rust)**: la misma app Angular se publica como web en Vercel y como app de escritorio (vía Tauri), que se instala en la máquina del usuario junto con la capa nativa en Rust. Solo el escritorio puede medir la red _de verdad_ — un navegador no tiene ese acceso, así que la web mide la latencia al servidor.
 - **Web instalable (PWA)**: la web trae manifest y service worker (`ngsw-config.json`), así que se puede instalar desde el navegador y abrir en su propia ventana: en Chrome o Edge, con el botón de instalar de la barra de direcciones (o menú → Instalar RedSana); en Android, menú → Agregar a la pantalla principal; en iPhone, Safari → Compartir → Agregar a inicio. Instalada o no, mide mientras está abierta (a diferencia de la app de escritorio, que sigue midiendo desde la bandeja).
@@ -431,14 +431,14 @@ El botón «Descargar» de la web es un enlace normal a `DESKTOP_DOWNLOAD_URL` =
 
 ### 4️⃣ Instalar la app de escritorio (Windows)
 
-Descarga `RedSana_0.1.8_x64-setup.exe` desde [Releases](https://github.com/solartedaniers/redsana-frontend/releases/latest) (o con el botón de descarga de la web, que baja la copia `RedSana_x64-setup.exe`, idéntica). Para comprobar que el archivo es el publicado, compara su SHA-256 en PowerShell:
+Descarga `RedSana_0.2.1_x64-setup.exe` desde [Releases](https://github.com/solartedaniers/redsana-frontend/releases/latest) (o con el botón de descarga de la web, que baja la copia `RedSana_x64-setup.exe`, idéntica). Para comprobar que el archivo es el publicado, compara su SHA-256 en PowerShell:
 
 ```powershell
-Get-FileHash .\RedSana_0.1.8_x64-setup.exe -Algorithm SHA256
-# Debe dar: C063B46B3240ED89631504C6FC66B80197BEA3A418DE03E7F239F2D3431BC12F
+Get-FileHash .\RedSana_0.2.1_x64-setup.exe -Algorithm SHA256
+# Debe dar: ED624EE8F14FB7F73FA4C00A5385591F1FF69F7C759507D62D14DF2892ACC6DD
 ```
 
-La CSP de la app de escritorio ([más arriba](#-csp-de-la-app-de-escritorio)) está en el código desde `9375638`, pero la 0.1.8 todavía no la trae: saldrá en el próximo instalador.
+La 0.2.1 trae la CSP de la app de escritorio ([más arriba](#-csp-de-la-app-de-escritorio)).
 
 El instalador no está firmado con un certificado de código, así que Windows SmartScreen puede mostrar «Windows protegió su PC». Para instalarlo, pulsa **Más información → Ejecutar de todas formas**. Instalarlo encima de una versión anterior la actualiza y conserva la sesión iniciada.
 
