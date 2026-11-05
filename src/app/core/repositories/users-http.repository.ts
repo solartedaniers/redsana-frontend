@@ -12,9 +12,12 @@ import {
 import { UsersRepository } from './users.repository';
 
 // El backend responde 409 si la operación dejaría al admin sin acceso o a la plataforma sin admin activo,
-// y 404 si el usuario ya no existe. Cualquier otro fallo (un correo repetido hoy llega como 500) usa la genérica.
+// 404 si el usuario ya no existe y 422 con detail "email_taken" si el correo ya está registrado.
+// Cualquier otro fallo usa la genérica.
 export const ADMIN_LOCKOUT_ERROR_KEY = 'admin.userManagement.errors.adminLockout';
 export const USER_NOT_FOUND_ERROR_KEY = 'admin.userManagement.errors.userNotFound';
+export const EMAIL_TAKEN_ERROR_KEY = 'admin.userManagement.errors.emailTaken';
+const EMAIL_TAKEN_DETAIL = 'email_taken';
 export const GENERIC_ERROR_KEY = 'admin.userManagement.errors.generic';
 
 interface BackendUser {
@@ -63,14 +66,23 @@ export class UsersHttpRepository extends UsersRepository {
   }
 
   private toErrorKey(error: unknown): Observable<never> {
-    const status = error instanceof HttpErrorResponse ? error.status : null;
-    const key =
-      status === HttpStatusCode.Conflict
-        ? ADMIN_LOCKOUT_ERROR_KEY
-        : status === HttpStatusCode.NotFound
-          ? USER_NOT_FOUND_ERROR_KEY
-          : GENERIC_ERROR_KEY;
-    return throwError(() => new Error(key));
+    return throwError(() => new Error(this.errorKeyFor(error)));
+  }
+
+  private errorKeyFor(error: unknown): string {
+    if (!(error instanceof HttpErrorResponse)) {
+      return GENERIC_ERROR_KEY;
+    }
+    switch (error.status) {
+      case HttpStatusCode.Conflict:
+        return ADMIN_LOCKOUT_ERROR_KEY;
+      case HttpStatusCode.NotFound:
+        return USER_NOT_FOUND_ERROR_KEY;
+      case HttpStatusCode.UnprocessableEntity:
+        return error.error?.detail === EMAIL_TAKEN_DETAIL ? EMAIL_TAKEN_ERROR_KEY : GENERIC_ERROR_KEY;
+      default:
+        return GENERIC_ERROR_KEY;
+    }
   }
 
   private toManagedUser(user: BackendUser): ManagedUser {

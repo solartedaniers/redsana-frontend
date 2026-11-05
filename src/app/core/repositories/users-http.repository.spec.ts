@@ -6,18 +6,25 @@ import en from '../../../../public/assets/i18n/en.json';
 import es from '../../../../public/assets/i18n/es.json';
 import {
   ADMIN_LOCKOUT_ERROR_KEY,
+  EMAIL_TAKEN_ERROR_KEY,
   GENERIC_ERROR_KEY,
   USER_NOT_FOUND_ERROR_KEY,
   UsersHttpRepository,
 } from './users-http.repository';
 
-function failWith(status: HttpStatusCode, call: (repository: UsersHttpRepository) => Observable<unknown>): unknown {
+const NEW_USER = { fullName: 'Yo', email: 'yo@example.invalid', role: 'standard' } as const;
+
+function failWith(
+  status: HttpStatusCode,
+  call: (repository: UsersHttpRepository) => Observable<unknown>,
+  body: object = { detail: 'x' },
+): unknown {
   TestBed.configureTestingModule({ providers: [UsersHttpRepository, provideHttpClient(), provideHttpClientTesting()] });
   let received: unknown;
   call(TestBed.inject(UsersHttpRepository)).subscribe({ error: (error: unknown) => (received = error) });
   TestBed.inject(HttpTestingController)
     .expectOne((req) => req.url.includes('/api/admin/users'))
-    .flush({ detail: 'x' }, { status, statusText: 'x' });
+    .flush(body, { status, statusText: 'x' });
   return received;
 }
 
@@ -51,8 +58,24 @@ describe('UsersHttpRepository', () => {
     expect((error as Error).message).toBe(GENERIC_ERROR_KEY);
   });
 
+  it('un 422 email_taken al crear muestra que el correo ya está registrado', () => {
+    const error = failWith(HttpStatusCode.UnprocessableEntity, (repository) => repository.createUser(NEW_USER), {
+      detail: 'email_taken',
+    });
+
+    expect((error as Error).message).toBe(EMAIL_TAKEN_ERROR_KEY);
+  });
+
+  it('un 422 de validación sigue usando la clave genérica', () => {
+    const error = failWith(HttpStatusCode.UnprocessableEntity, (repository) => repository.createUser(NEW_USER), {
+      detail: [{ loc: ['body', 'email'], msg: 'Field required' }],
+    });
+
+    expect((error as Error).message).toBe(GENERIC_ERROR_KEY);
+  });
+
   it('las claves de error existen en español y en inglés', () => {
-    for (const key of [ADMIN_LOCKOUT_ERROR_KEY, USER_NOT_FOUND_ERROR_KEY, GENERIC_ERROR_KEY]) {
+    for (const key of [ADMIN_LOCKOUT_ERROR_KEY, USER_NOT_FOUND_ERROR_KEY, EMAIL_TAKEN_ERROR_KEY, GENERIC_ERROR_KEY]) {
       const name = key.split('.').at(-1) as keyof typeof es.admin.userManagement.errors;
       expect(es.admin.userManagement.errors[name]).toBeTruthy();
       expect(en.admin.userManagement.errors[name]).toBeTruthy();
