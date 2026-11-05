@@ -87,6 +87,13 @@ export class SecurityChatPanel {
     this.isHistoryOpen.set(false);
   }
 
+  protected selectConversationWithKeyboard(event: Event, conversationId: string): void {
+    // Enter en el campo de renombrar o en su botón también sube hasta la fila; solo cuenta sobre la fila misma.
+    if (event.target === event.currentTarget) {
+      this.selectConversation(conversationId);
+    }
+  }
+
   protected startNewConversation(): void {
     this.session.startNewConversation();
     this.isHistoryOpen.set(false);

@@ -2,7 +2,7 @@ import { computed, signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { AiStatusService, AiStatusState } from '../../../../core/ai-status/ai-status.service';
 import { PageScrollController } from '../../../../core/layout/page-scroll.controller';
-import { ChatMessage } from '../../../../core/models/security.model';
+import { ChatConversationSummary, ChatMessage } from '../../../../core/models/security.model';
 import { SecurityChatSession } from '../security-chat-session.service';
 import { ChatScrollAnchor } from './chat-scroll-anchor';
 import { SecurityChatPanel } from './security-chat-panel';
@@ -14,11 +14,12 @@ async function render(initial: AiStatusState) {
   const notReadyKey = computed(() => (status() === 'unavailable' ? 'service_error' : status()));
   const wakeUp = vi.fn();
   const session = {
-    conversations: signal([]),
+    conversations: signal<ChatConversationSummary[]>([]),
     currentConversationId: signal(null),
     messages: signal<ChatMessage[]>([]),
     isSending: signal(false),
     send: vi.fn(),
+    selectConversation: vi.fn(),
   };
   // Como el servicio real: la pregunta aparece enseguida y el chat queda esperando la respuesta.
   session.send.mockImplementation((text: string) => {
@@ -162,6 +163,34 @@ describe('SecurityChatPanel', () => {
 
     expect(panel.classList).not.toContain('chat-panel--expanded');
     expect(document.activeElement).toBe(input);
+  });
+
+  it('en el historial, Enter sobre una conversación la abre como el clic', async () => {
+    const { element, session, refresh } = await render('ready');
+    session.conversations.set([{ id: 'c1', topic: null, title: 'Mi red', updatedAt: '2026-11-05T00:00:00Z' }]);
+    element.querySelector<HTMLButtonElement>('button[aria-label="user.securityAssistant.chat.history"]')!.click();
+    await refresh();
+    const item = element.querySelector<HTMLElement>('.chat-history__item')!;
+
+    item.querySelector('button')!.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
+    expect(session.selectConversation).not.toHaveBeenCalled();
+
+    item.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
+    expect(item.tabIndex).toBe(0);
+    expect(session.selectConversation).toHaveBeenCalledExactlyOnceWith('c1');
+  });
+
+  it('Esc lo minimiza también con el foco en el propio panel', async () => {
+    const { panel, toggle, refresh } = await render('ready');
+    toggle.click();
+    await refresh();
+
+    panel.focus();
+    expect(document.activeElement).toBe(panel);
+    panel.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+    await refresh();
+
+    expect(panel.classList).not.toContain('chat-panel--expanded');
   });
 
   it('salir de la pantalla con el chat ampliado no deja la página bloqueada', async () => {

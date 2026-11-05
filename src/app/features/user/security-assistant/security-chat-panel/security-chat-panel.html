@@ -2,6 +2,7 @@
   id="security-chat-panel"
   class="chat-panel surface-panel"
   [class.chat-panel--expanded]="isExpanded()"
+  tabindex="-1"
   (keydown.escape)="collapse()"
 >
   <div class="chat-panel__header">
@@ -48,7 +49,9 @@
           <div
             class="chat-history__item"
             [class.chat-history__item--active]="conversation.id === session.currentConversationId()"
+            tabindex="0"
             (click)="selectConversation(conversation.id)"
+            (keydown.enter)="selectConversationWithKeyboard($event, conversation.id)"
           >
             @if (renamingConversationId() === conversation.id) {
               <input
