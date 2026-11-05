@@ -97,10 +97,23 @@ describe('Dashboard sin mediciones', () => {
     });
 
     expect(element.querySelector('.status-badge')?.textContent?.trim()).toBe('common.serverLatencyStatus.critical');
-    expect(element.querySelector('.status-light .label')?.textContent?.trim()).toBe(
-      'common.serverLatencyStatus.critical',
-    );
     expect(element.querySelector('.vitals__latency')?.textContent).toContain('user.dashboard.serverLatency');
+  });
+  it('muestra el estado de la red una sola vez y conserva el indicador En vivo', () => {
+    const element = render({
+      status: 'good',
+      latencyMs: 20,
+      jitterMs: 2,
+      packetLossPercent: 0,
+      updatedAt: new Date().toISOString(),
+    });
+
+    const statusTexts = [...element.querySelectorAll('.dashboard-hero *')]
+      .filter((node) => node.children.length === 0)
+      .map((node) => node.textContent?.trim())
+      .filter((text) => text === 'common.networkStatus.good');
+    expect(statusTexts).toEqual(['common.networkStatus.good']);
+    expect(element.querySelector('app-live-updates-indicator')).not.toBeNull();
   });
 });
 

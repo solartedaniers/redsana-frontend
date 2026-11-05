@@ -14,7 +14,6 @@ import { hasMeasurement, isLiveMeasurement } from '../../../core/domain/measurem
 import { injectMeasurementClock } from '../../../core/network-measurement/measurement-clock';
 import { MeasurementEmptyState } from '../../../shared/components/measurement-empty-state/measurement-empty-state';
 import { PageHeader } from '../../../shared/components/page-header/page-header';
-import { NetworkStatusLight } from '../../../shared/components/network-status-light/network-status-light';
 import { NetworkStatusBadge } from '../../../shared/components/network-status-badge/network-status-badge';
 import { MetricCard } from '../../../shared/components/metric-card/metric-card';
 import { HistoryChart } from '../../../shared/components/history-chart/history-chart';
@@ -39,7 +38,6 @@ const STATUS_AURA: Record<NetworkStatus, LatencySeverity | null> = {
   selector: 'app-dashboard',
   imports: [
     PageHeader,
-    NetworkStatusLight,
     NetworkStatusBadge,
     MetricCard,
     HistoryChart,
