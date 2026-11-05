@@ -1388,6 +1388,83 @@ Wireless LAN adapter Wi-Fi:
         println!("{} dispositivos", devices.len());
     }
 
+    /// Diagnóstico de estabilidad en la red real, solo en una red propia y con permiso: varios escaneos seguidos con
+    /// los mismos ajustes de la app. No habla con el backend ni con Supabase y no muestra IPs ni MACs: cada equipo
+    /// sale con un código que cambia en cada ejecución.
+    /// `cargo test --lib presence_stability_on_this_network -- --ignored --nocapture --test-threads=1`
+    /// REDSANA_LAN_SCAN_DIAG_RUNS (5) y REDSANA_LAN_SCAN_DIAG_INTERVAL_SECONDS (30), más los REDSANA_LAN_SCAN_* del escaneo.
+    #[test]
+    #[ignore]
+    fn presence_stability_on_this_network() {
+        use std::collections::hash_map::RandomState;
+        use std::collections::BTreeMap;
+        use std::hash::BuildHasher;
+
+        let runs = env_count("REDSANA_LAN_SCAN_DIAG_RUNS").unwrap_or(5);
+        let interval = Duration::from_secs(env_amount("REDSANA_LAN_SCAN_DIAG_INTERVAL_SECONDS").unwrap_or(30) as u64);
+        let limits = PresenceScanLimits::from_env();
+        let salt = RandomState::new();
+        let mask = |mac: &str| format!("eq-{:06x}", salt.hash_one(mac) & 0xff_ffff);
+        let runtime = tokio::runtime::Builder::new_multi_thread().enable_all().build().unwrap();
+        println!(
+            "{runs} escaneos cada {interval:?}; reconfirmación: {} pasada(s) tras {:?}",
+            limits.recheck_passes, limits.recheck_delay
+        );
+
+        // P: contestó en la primera pasada, R: en la reconfirmación, ·: estaba en la tabla y no contestó, -: no estaba.
+        let mut marks: BTreeMap<String, Vec<char>> = BTreeMap::new();
+        let mut router = None;
+        for run in 0..runs {
+            if run > 0 {
+                std::thread::sleep(interval);
+            }
+            let interface = local_interface().unwrap();
+            let probe = Arc::new(SystemProbe {
+                client: new_client(IpAddr::V4(interface.ip)).unwrap(),
+                local_ip: interface.ip,
+                mask: interface.mask,
+            });
+            let started = Instant::now();
+            let decisions = runtime.block_on(decide_presence(probe, interface.ip, interface.mask, limits)).unwrap();
+            let elapsed = started.elapsed();
+
+            let mut by_evidence: BTreeMap<String, usize> = BTreeMap::new();
+            let mut members = usize::from(interface.mac.is_some());
+            for decision in &decisions {
+                let Some(mac) = decision.mac.as_deref() else { continue };
+                let id = mask(mac);
+                if Some(decision.ip) == interface.gateway {
+                    router = Some(id.clone());
+                }
+                let present = decision.present_mac().is_some();
+                let mark = match (present, decision.recheck_pass) {
+                    (true, 0) => 'P',
+                    (true, _) => 'R',
+                    (false, _) => '·',
+                };
+                marks.entry(id).or_insert_with(|| vec!['-'; runs])[run] = mark;
+                if present && Some(decision.ip) != interface.gateway {
+                    members += 1;
+                }
+                let kind = match decision.evidence {
+                    Some(evidence) if decision.recheck_pass > 0 => format!("{evidence:?} (reconfirmación)"),
+                    Some(evidence) => format!("{evidence:?}"),
+                    None => "sin respuesta".to_string(),
+                };
+                *by_evidence.entry(kind).or_default() += 1;
+            }
+            println!("escaneo {}: {members} en el conteo de la pantalla, {elapsed:.1?}, {by_evidence:?}", run + 1);
+        }
+
+        println!("por equipo (P primera pasada, R reconfirmación, · no contestó, - no estaba en la tabla):");
+        let mut rows: Vec<(&String, String)> = marks.iter().map(|(id, row)| (id, row.iter().collect())).collect();
+        rows.sort_by(|a, b| a.1.cmp(&b.1).then(a.0.cmp(b.0)));
+        for (id, row) in rows {
+            let note = if router.as_ref() == Some(id) { "  (router, no cuenta)" } else { "" };
+            println!("  {id}  {row}{note}");
+        }
+    }
+
     #[test]
     fn device_roles_serialize_as_the_backend_expects() {
         assert_eq!(serde_json::to_string(&DeviceRole::ThisDevice).unwrap(), "\"this_device\"");
