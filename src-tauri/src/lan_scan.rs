@@ -1406,6 +1406,7 @@ Wireless LAN adapter Wi-Fi:
         let salt = RandomState::new();
         let mask = |mac: &str| format!("eq-{:06x}", salt.hash_one(mac) & 0xff_ffff);
         let runtime = tokio::runtime::Builder::new_multi_thread().enable_all().build().unwrap();
+        let _runtime_context = runtime.enter();
         println!(
             "{runs} escaneos cada {interval:?}; reconfirmación: {} pasada(s) tras {:?}",
             limits.recheck_passes, limits.recheck_delay
