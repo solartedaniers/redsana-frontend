@@ -45,6 +45,9 @@ const PRESENCE_MAX_HOSTS_ENV: &str = "REDSANA_LAN_SCAN_MAX_HOSTS";
 const PRESENCE_PING_CONCURRENCY_ENV: &str = "REDSANA_LAN_SCAN_PING_CONCURRENCY";
 const PRESENCE_ARP_CONCURRENCY_ENV: &str = "REDSANA_LAN_SCAN_ARP_CONCURRENCY";
 const PRESENCE_ARP_ATTEMPTS_ENV: &str = "REDSANA_LAN_SCAN_ARP_ATTEMPTS";
+/// 0 apaga la reconfirmación.
+const PRESENCE_RECHECK_PASSES_ENV: &str = "REDSANA_LAN_SCAN_RECHECK_PASSES";
+const PRESENCE_RECHECK_DELAY_MS_ENV: &str = "REDSANA_LAN_SCAN_RECHECK_DELAY_MS";
 /// Con esta variable (solo en compilaciones de desarrollo) cada escaneo manual explica en la consola qué decidió
 /// con cada equipo y por qué.
 const PRESENCE_DIAGNOSTICS_ENV: &str = "REDSANA_LAN_SCAN_DIAGNOSTICS";
@@ -77,6 +80,13 @@ struct PresenceScanLimits {
     /// despierta la radio, mientras que un celular dormido puede ignorar el ARP de difusión (en casa, 62 % de los
     /// escaneos con la pantalla apagada).
     direct_ping_timeout: Duration,
+    /// Pasadas cortas, en el mismo escaneo, solo para los de la tabla que no contestaron nada: un celular que dormía
+    /// en la primera puede contestar segundos después. Un equipo apagado tampoco contesta aquí y queda fuera.
+    recheck_passes: usize,
+    /// Espera antes de cada reconfirmación, para darle tiempo a la radio del celular.
+    recheck_delay: Duration,
+    /// Intentos de SendARP por equipo en cada reconfirmación; uno solo para que la pasada sea corta.
+    recheck_arp_attempts: usize,
 }
 
 impl Default for PresenceScanLimits {
@@ -92,6 +102,9 @@ impl Default for PresenceScanLimits {
             ping_timeout: Duration::from_millis(1000),
             settle_delay: Duration::from_millis(3000),
             direct_ping_timeout: Duration::from_millis(3000),
+            recheck_passes: 1,
+            recheck_delay: Duration::from_millis(1500),
+            recheck_arp_attempts: 1,
         }
     }
 }
@@ -104,6 +117,10 @@ impl PresenceScanLimits {
             ping_concurrency: env_count(PRESENCE_PING_CONCURRENCY_ENV).unwrap_or(default.ping_concurrency),
             arp_concurrency: env_count(PRESENCE_ARP_CONCURRENCY_ENV).unwrap_or(default.arp_concurrency),
             arp_attempts: env_count(PRESENCE_ARP_ATTEMPTS_ENV).unwrap_or(default.arp_attempts),
+            recheck_passes: env_amount(PRESENCE_RECHECK_PASSES_ENV).unwrap_or(default.recheck_passes),
+            recheck_delay: env_amount(PRESENCE_RECHECK_DELAY_MS_ENV)
+                .map(|ms| Duration::from_millis(ms as u64))
+                .unwrap_or(default.recheck_delay),
             ..default
         }
     }
@@ -115,7 +132,16 @@ fn env_count(name: &str) -> Option<usize> {
 }
 
 fn parse_count(raw: &str) -> Option<usize> {
-    raw.trim().parse().ok().filter(|value| *value > 0)
+    parse_amount(raw).filter(|value| *value > 0)
+}
+
+/// Como env_count pero acepta 0 (apagar algo); vacía o inválida deja el valor por defecto.
+fn env_amount(name: &str) -> Option<usize> {
+    parse_amount(&std::env::var(name).ok()?)
+}
+
+fn parse_amount(raw: &str) -> Option<usize> {
+    raw.trim().parse().ok()
 }
 
 /// Papel en la red: el router es la red misma y este equipo no sale en su propia tabla ARP; los marco para no confundirlos.
@@ -166,8 +192,8 @@ pub async fn scan_connected_devices() -> Result<Vec<DiscoveredDevice>, String> {
     Ok(classify_devices(&interface, parse_arp_table(&arp_output)))
 }
 
-/// Para el botón "Escanear en busca de intrusos": cuenta solo a quien respondió en este escaneo (ping o ARP),
-/// no a quien sigue en la tabla ARP de un rato antes. El escaneo automático sigue usando scan_connected_devices.
+/// El escaneo de Dispositivos (al entrar y con el botón): cuenta solo a quien respondió en este escaneo (ping o ARP),
+/// no a quien sigue en la tabla ARP de un rato antes.
 #[tauri::command]
 pub async fn scan_present_devices() -> Result<Vec<DiscoveredDevice>, String> {
     let diagnostics = cfg!(debug_assertions) && std::env::var_os(PRESENCE_DIAGNOSTICS_ENV).is_some();
@@ -266,6 +292,7 @@ async fn decide_presence<P: PresenceProbe>(
         evidence: Some(PresenceEvidence::AppearedDuringScan),
         arp_attempts: 0,
         elapsed: Duration::ZERO,
+        recheck_pass: 0,
     }));
     // Contestaron el ping pero no figuran en ninguna tabla: solo falta su MAC.
     let unmapped: Vec<Ipv4Addr> = replied
@@ -273,8 +300,38 @@ async fn decide_presence<P: PresenceProbe>(
         .filter(|ip| !known.contains_key(ip) && !after_sweep.contains_key(ip))
         .copied()
         .collect();
-    decisions.extend(verify_by_arp(probe, unmapped, Arc::new(HashMap::new()), limits).await);
+    decisions.extend(verify_by_arp(probe.clone(), unmapped, Arc::new(HashMap::new()), limits).await);
+    recheck_silent(&probe, &mut decisions, &known, limits).await;
     Ok(decisions)
+}
+
+/// Reconfirma, en el mismo escaneo, a los de la tabla que no contestaron nada. Solo cambia a presente al que
+/// contesta ahora; el que sigue callado queda ausente, así una desconexión real baja del conteo.
+async fn recheck_silent<P: PresenceProbe>(
+    probe: &Arc<P>,
+    decisions: &mut [PresenceDecision],
+    known: &Arc<HashMap<Ipv4Addr, String>>,
+    limits: PresenceScanLimits,
+) {
+    let short = PresenceScanLimits { arp_attempts: limits.recheck_arp_attempts, ..limits };
+    for pass in 1..=limits.recheck_passes {
+        let silent: Vec<Ipv4Addr> = decisions.iter().filter(|decision| decision.evidence.is_none()).map(|decision| decision.ip).collect();
+        if silent.is_empty() {
+            return;
+        }
+        tokio::time::sleep(limits.recheck_delay).await;
+        let mut rechecked: HashMap<Ipv4Addr, PresenceDecision> =
+            verify_by_arp(probe.clone(), silent, known.clone(), short).await.into_iter().map(|decision| (decision.ip, decision)).collect();
+        for decision in decisions.iter_mut() {
+            let Some(found) = rechecked.remove(&decision.ip) else { continue };
+            let arp_attempts = decision.arp_attempts + found.arp_attempts;
+            if found.evidence.is_some() {
+                *decision = PresenceDecision { arp_attempts, recheck_pass: pass, ..found };
+            } else {
+                decision.arp_attempts = arp_attempts;
+            }
+        }
+    }
 }
 
 async fn read_neighbors<P: PresenceProbe>(probe: &Arc<P>) -> Result<HashMap<Ipv4Addr, String>, String> {
@@ -343,6 +400,7 @@ async fn verify_by_arp<P: PresenceProbe>(
                     evidence: Some(PresenceEvidence::DirectPing),
                     arp_attempts: 0,
                     elapsed: started.elapsed(),
+                    recheck_pass: 0,
                 };
             }
 
@@ -351,7 +409,7 @@ async fn verify_by_arp<P: PresenceProbe>(
                 Some(mac) => (Some(mac), Some(PresenceEvidence::Arp)),
                 None => (table_mac, answered_ping.then_some(PresenceEvidence::DirectPing)),
             };
-            PresenceDecision { ip, mac, evidence, arp_attempts, elapsed: started.elapsed() }
+            PresenceDecision { ip, mac, evidence, arp_attempts, elapsed: started.elapsed(), recheck_pass: 0 }
         });
     }
 
@@ -433,6 +491,8 @@ struct PresenceDecision {
     evidence: Option<PresenceEvidence>,
     arp_attempts: usize,
     elapsed: Duration,
+    /// 0: decidido en la primera pasada; n: contestó recién en la reconfirmación n.
+    recheck_pass: usize,
 }
 
 impl PresenceDecision {
@@ -480,7 +540,7 @@ fn log_presence_decisions(decisions: &[PresenceDecision], states: &HashMap<Ipv4A
     sorted.sort_by_key(|decision| decision.ip);
     for decision in sorted {
         eprintln!(
-            "[lan-scan]   {:<15} {} estado-antes={} arp={} ({} intento(s), {:.1?}) -> {}: {}",
+            "[lan-scan]   {:<15} {} estado-antes={} arp={} ({} intento(s), {:.1?}) -> {}: {}{}",
             decision.ip.to_string(),
             decision.mac.as_deref().unwrap_or("-"),
             states.get(&decision.ip).map(String::as_str).unwrap_or("-"),
@@ -489,6 +549,7 @@ fn log_presence_decisions(decisions: &[PresenceDecision], states: &HashMap<Ipv4A
             decision.elapsed,
             if decision.present_mac().is_some() { "PRESENTE" } else { "AUSENTE" },
             decision.reason(),
+            if decision.recheck_pass > 0 { " (en la reconfirmación)" } else { "" },
         );
     }
 }
@@ -1077,15 +1138,30 @@ Wireless LAN adapter Wi-Fi:
                 ping_timeout: scaled(limits.ping_timeout),
                 settle_delay: scaled(limits.settle_delay),
                 direct_ping_timeout: scaled(limits.direct_ping_timeout),
+                recheck_delay: scaled(limits.recheck_delay),
                 ..limits
             }
         }
 
         pub fn run(network: Arc<SimulatedNetwork>, local_ip: Ipv4Addr, mask: Ipv4Addr) -> (Vec<PresenceDecision>, Duration) {
+            run_with(network, local_ip, mask, scaled_limits())
+        }
+
+        pub fn run_with(
+            network: Arc<SimulatedNetwork>,
+            local_ip: Ipv4Addr,
+            mask: Ipv4Addr,
+            limits: PresenceScanLimits,
+        ) -> (Vec<PresenceDecision>, Duration) {
             let runtime = tokio::runtime::Builder::new_current_thread().enable_all().build().unwrap();
             let started = Instant::now();
-            let decisions = runtime.block_on(decide_presence(network, local_ip, mask, scaled_limits())).unwrap();
+            let decisions = runtime.block_on(decide_presence(network, local_ip, mask, limits)).unwrap();
             (decisions, started.elapsed() * TIME_SCALE)
+        }
+
+        /// Cuántos SendARP recibió esa IP en todo el escaneo.
+        pub fn arp_attempts_to(network: &SimulatedNetwork, ip: Ipv4Addr) -> usize {
+            network.attempts.lock().unwrap().get(&ip).copied().unwrap_or(0)
         }
     }
 
@@ -1232,6 +1308,75 @@ Wireless LAN adapter Wi-Fi:
         let gone: HashSet<Ipv4Addr> = present_ips(&before).difference(&present_ips(&after)).copied().collect();
         assert_eq!(gone, leaving.iter().map(|index| university_ip(*index)).collect());
         assert_eq!(present_ips(&before).len() - present_ips(&after).len(), 6);
+    }
+
+    /// Un celular que deja pasar los dos ARP de la primera pasada y no contesta el ping: sin la reconfirmación salía
+    /// ausente en un escaneo y presente en el siguiente, y el conteo saltaba.
+    fn phone_asleep_during_the_first_pass() -> (Ipv4Addr, Arc<SimulatedNetwork>) {
+        let phone = ip("192.168.0.100");
+        let table = HashMap::from([(phone, simulated::mac_for(phone))]);
+        let sleepy = Host { arp_delay: Some(Duration::from_millis(400)), misses_first_attempts: 2, answers_ping: false };
+        (phone, Arc::new(SimulatedNetwork::new(table.clone(), table, HashMap::from([(phone, sleepy)]))))
+    }
+
+    #[test]
+    fn a_phone_that_misses_the_first_pass_is_confirmed_by_the_recheck_in_the_same_scan() {
+        let (phone, network) = phone_asleep_during_the_first_pass();
+
+        let (decisions, _) = simulated::run(network.clone(), ip("192.168.0.101"), ip("255.255.255.0"));
+
+        assert_eq!(present_ips(&decisions), HashSet::from([phone]));
+        assert_eq!(decisions[0].recheck_pass, 1);
+        assert_eq!(decisions[0].evidence, Some(PresenceEvidence::Arp));
+        assert_eq!(simulated::arp_attempts_to(&network, phone), 3);
+    }
+
+    #[test]
+    fn without_recheck_passes_the_same_phone_is_left_out_as_before() {
+        let (_, network) = phone_asleep_during_the_first_pass();
+        let limits = PresenceScanLimits { recheck_passes: 0, ..simulated::scaled_limits() };
+
+        let (decisions, _) = simulated::run_with(network, ip("192.168.0.101"), ip("255.255.255.0"), limits);
+
+        assert!(present_ips(&decisions).is_empty());
+    }
+
+    #[test]
+    fn a_device_turned_off_stays_absent_after_the_recheck_and_is_asked_only_once_more() {
+        let off = ip("192.168.0.100");
+        let table = HashMap::from([(off, simulated::mac_for(off))]);
+        let silent = Host { arp_delay: None, misses_first_attempts: 0, answers_ping: false };
+        let network = Arc::new(SimulatedNetwork::new(table.clone(), table, HashMap::from([(off, silent)])));
+
+        let (decisions, _) = simulated::run(network.clone(), ip("192.168.0.101"), ip("255.255.255.0"));
+
+        assert!(present_ips(&decisions).is_empty());
+        let limits = PresenceScanLimits::default();
+        assert_eq!(simulated::arp_attempts_to(&network, off), limits.arp_attempts + limits.recheck_arp_attempts);
+        assert_eq!(decisions[0].arp_attempts, limits.arp_attempts + limits.recheck_arp_attempts);
+    }
+
+    #[test]
+    fn the_recheck_only_asks_again_the_devices_that_did_not_answer() {
+        let (table, hosts) = university_like_network(450, &HashSet::new());
+        let network = Arc::new(SimulatedNetwork::new(table.clone(), table, hosts.clone()));
+
+        let (decisions, _) = simulated::run(network.clone(), ip(LOCAL_IP), ip(UNIVERSITY_MASK));
+
+        let limits = PresenceScanLimits::default();
+        for decision in decisions.iter().filter(|decision| decision.present_mac().is_some() && decision.recheck_pass == 0) {
+            assert!(simulated::arp_attempts_to(&network, decision.ip) <= limits.arp_attempts, "{}", decision.ip);
+        }
+        let gone = hosts.values().filter(|host| host.arp_delay.is_none() && !host.answers_ping).count();
+        assert_eq!(decisions.iter().filter(|decision| decision.present_mac().is_none()).count(), gone);
+    }
+
+    #[test]
+    fn parse_amount_accepts_zero_to_turn_the_recheck_off() {
+        assert_eq!(parse_amount("0"), Some(0));
+        assert_eq!(parse_amount(" 2 "), Some(2));
+        assert_eq!(parse_amount(""), None);
+        assert_eq!(parse_amount("x"), None);
     }
 
     /// Prueba manual en la red real (solo en una red propia): `cargo test --lib presence_scan_on_this_network -- --ignored --nocapture`.
