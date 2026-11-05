@@ -11,8 +11,11 @@ import {
 } from '../models/user.model';
 import { UsersRepository } from './users.repository';
 
-// El backend responde 409 si la operación dejaría al admin sin acceso o a la plataforma sin admin activo.
+// El backend responde 409 si la operación dejaría al admin sin acceso o a la plataforma sin admin activo,
+// y 404 si el usuario ya no existe. Cualquier otro fallo (un correo repetido hoy llega como 500) usa la genérica.
 export const ADMIN_LOCKOUT_ERROR_KEY = 'admin.userManagement.errors.adminLockout';
+export const USER_NOT_FOUND_ERROR_KEY = 'admin.userManagement.errors.userNotFound';
+export const GENERIC_ERROR_KEY = 'admin.userManagement.errors.generic';
 
 interface BackendUser {
   id: string;
@@ -36,7 +39,10 @@ export class UsersHttpRepository extends UsersRepository {
 
   createUser(payload: ManagedUserCreatePayload): Observable<ManagedUser> {
     const body = { full_name: payload.fullName, email: payload.email, role: payload.role };
-    return this.http.post<BackendUser>(this.baseUrl, body).pipe(map((user) => this.toManagedUser(user)));
+    return this.http.post<BackendUser>(this.baseUrl, body).pipe(
+      map((user) => this.toManagedUser(user)),
+      catchError((error: unknown) => this.toErrorKey(error)),
+    );
   }
 
   updateUser(id: string, payload: ManagedUserUpdatePayload): Observable<ManagedUser> {
@@ -48,19 +54,23 @@ export class UsersHttpRepository extends UsersRepository {
     };
     return this.http.patch<BackendUser>(`${this.baseUrl}/${id}`, body).pipe(
       map((user) => this.toManagedUser(user)),
-      catchError((error: unknown) => this.toLockoutError(error)),
+      catchError((error: unknown) => this.toErrorKey(error)),
     );
   }
 
   deleteUser(id: string): Observable<void> {
-    return this.http
-      .delete<void>(`${this.baseUrl}/${id}`)
-      .pipe(catchError((error: unknown) => this.toLockoutError(error)));
+    return this.http.delete<void>(`${this.baseUrl}/${id}`).pipe(catchError((error: unknown) => this.toErrorKey(error)));
   }
 
-  private toLockoutError(error: unknown): Observable<never> {
-    const lockout = error instanceof HttpErrorResponse && error.status === HttpStatusCode.Conflict;
-    return throwError(() => (lockout ? new Error(ADMIN_LOCKOUT_ERROR_KEY) : error));
+  private toErrorKey(error: unknown): Observable<never> {
+    const status = error instanceof HttpErrorResponse ? error.status : null;
+    const key =
+      status === HttpStatusCode.Conflict
+        ? ADMIN_LOCKOUT_ERROR_KEY
+        : status === HttpStatusCode.NotFound
+          ? USER_NOT_FOUND_ERROR_KEY
+          : GENERIC_ERROR_KEY;
+    return throwError(() => new Error(key));
   }
 
   private toManagedUser(user: BackendUser): ManagedUser {
