@@ -102,34 +102,40 @@ RedSana usa **dos motores de IA distintos**, cada uno elegido para el problema q
 
 ## ☁️ Arquitectura y despliegue
 
+```mermaid
+flowchart LR
+  subgraph PC["Equipo del usuario"]
+    WEB["Web Angular<br/>Vercel"]
+    DESK["Escritorio Tauri<br/>Angular + Rust: ping, ARP, WiFi"]
+  end
+  API["Backend FastAPI<br/>Render"]
+  AI["Servicio de IA<br/>redsana-ai · Render"]
+  REDIS[("Upstash Redis<br/>caché + Pub/Sub")]
+  subgraph SB["Supabase"]
+    AUTH["Auth"]
+    PG[("PostgreSQL<br/>fuente de la verdad")]
+    ST["Storage<br/>fotos de perfil"]
+  end
+  GROQ["Groq<br/>modelo de lenguaje"]
+
+  WEB -->|"HTTPS REST + JWT"| API
+  WEB <-->|"WebSocket wss://"| API
+  DESK -->|"HTTPS REST + JWT<br/>mediciones cada 60 s, con cola sin conexión"| API
+  DESK <-.->|"WebSocket wss://<br/>desde el próximo instalador; la 0.1.8 sondea"| API
+  WEB -->|"login, registro"| AUTH
+  DESK -->|"login, registro"| AUTH
+  WEB -->|"fotos"| ST
+  DESK -->|"fotos"| ST
+  WEB -.->|"GET /health para despertarla"| AI
+  DESK -.->|"GET /health para despertarla"| AI
+  API -->|"SQL"| PG
+  API -->|"JWKS para verificar el JWT;<br/>el admin borra cuentas"| AUTH
+  API -->|"TLS rediss://<br/>MGET/SET y PUBLISH/SUBSCRIBE"| REDIS
+  API -->|"HTTPS + clave<br/>chat, resumen y detectores"| AI
+  AI -->|"HTTPS"| GROQ
 ```
-┌─────────────────────────────┐   ┌─────────────────────────────┐
-│  App de escritorio (Tauri)  │   │        Web (Vercel)         │
-│  ┌───────────────────────┐  │   │  ┌───────────────────────┐  │
-│  │  Angular (interfaz)   │  │   │  │  Angular (interfaz)   │  │
-│  └───────────┬───────────┘  │   │  └───────────────────────┘  │
-│  ┌───────────▼───────────┐  │   │   Sin capa nativa: no mide  │
-│  │  Rust (capa nativa):  │  │   │   la red local de verdad    │
-│  │  ping ICMP, ARP, WiFi │  │   │                             │
-│  └───────────────────────┘  │   │                             │
-└──────────────┬──────────────┘   └──────────────┬──────────────┘
-               └────────────────┬────────────────┘
-                     ┌──────────┴────────────────────────────┐
-                     │ API: HTTPS + JWT                      │ Auth y Storage (directo)
-                     ▼                                       ▼
-          ┌─────────────────────┐   SQL + JWT    ┌─────────────────────┐
-          │   FastAPI backend   │───────────────▶│  Supabase (nube)    │
-          │   (Render, plan     │                │  · PostgreSQL       │
-          │   gratuito)         │                │  · Auth             │
-          └──────────┬──────────┘                │  · Storage          │
-                     │ HTTPS                     └─────────────────────┘
-                     ▼
-          ┌─────────────────────┐     HTTPS      ┌─────────────────────┐
-          │   Servicio de IA    │───────────────▶│  Groq (modelo de    │
-          │   (Render, plan     │                │  lenguaje)          │
-          │   gratuito)         │                └─────────────────────┘
-          └─────────────────────┘
-```
+
+La línea punteada del escritorio al backend es el socket que todavía no llega a los usuarios: el instalador publicado (0.1.8) es anterior al tiempo real y sigue consultando cada pocos segundos, como antes.
 
 - **Frontend + capa nativa (Rust)**: la misma app Angular se publica como web en Vercel y como app de escritorio (vía Tauri), que se instala en la máquina del usuario junto con la capa nativa en Rust. Solo el escritorio puede medir la red _de verdad_ — un navegador no tiene ese acceso, así que la web mide la latencia al servidor.
 - **Web instalable (PWA)**: la web trae manifest y service worker (`ngsw-config.json`), así que se puede instalar desde el navegador y abrir en su propia ventana: en Chrome o Edge, con el botón de instalar de la barra de direcciones (o menú → Instalar RedSana); en Android, menú → Agregar a la pantalla principal; en iPhone, Safari → Compartir → Agregar a inicio. Instalada o no, mide mientras está abierta (a diferencia de la app de escritorio, que sigue midiendo desde la bandeja).
@@ -137,6 +143,64 @@ RedSana usa **dos motores de IA distintos**, cada uno elegido para el problema q
 - **Base de datos y autenticación**: viven en Supabase, en la nube — así los datos persisten entre sesiones y el panel de administración puede ver todos los usuarios desde cualquier lugar. Las dos apps usan Supabase Auth (login, registro y contraseña) y Storage (fotos de perfil) directamente; el resto de los datos pasa siempre por el backend.
 - **Nombres de rutas**: el frontend usa solo los nombres actuales del backend (`/api/users/me`, `/api/chat-conversations`, `/api/alerts/recent`, `/api/admin/platform-metrics`). Los anteriores siguen vivos en el backend como alias ocultos para el instalador 0.1.5; `scripts/route-names.test.mjs` impide volver a escribirlos aquí.
 - **Servicio de IA**: en producción el backend llama a [redsana-ai](https://github.com/solartedaniers/redsana-ai), desplegado aparte en Render (plan gratuito), que usa Groq para el asistente (`AI_MODE=remote` en el backend). En desarrollo el backend también puede usar la IA en su propio proceso (`AI_MODE=local`).
+- **Redis (Upstash)**: solo caché y mensajería; Postgres sigue siendo la fuente de la verdad. Guarda copias cortas de `/latest`, del progreso de calibración y de `/devices`, y lleva los eventos entre los procesos del backend (Pub/Sub). La conexión va cifrada (`rediss://`). Los detalles están en el [README del backend](https://github.com/solartedaniers/redsana-backend#caché-en-redis-redis_url).
+- **Tiempo real (WebSocket)**: con la sesión iniciada y la pestaña visible, la web abre un socket a `/api/realtime/ws`, manda el JWT en el primer mensaje y recibe los eventos de su cuenta. El frontend usa tres: medición nueva, alerta nueva y cambio del estado de la IA. El backend también avisa cuando cambian los dispositivos, pero la pantalla de Dispositivos todavía no escucha ese aviso. Cada evento solo avisa; los datos se piden por el REST de siempre.
+
+#### 🔴 En vivo o sondeo de respaldo
+
+El panel muestra **«En vivo»** cuando el socket está conectado y **«Actualizando»** cuando no.
+
+- **En vivo**: no se sondea. Cada `measurement.created` pide `/latest` una vez y cada `alert.created` pide `/api/alerts/recent` una vez. Al conectar o reconectar se pide todo una vez, por si algo pasó mientras no estaba.
+- **Sin socket**: se vuelve al sondeo, `/latest` cada 4 s y alertas cada 10 s (`LIVE_UPDATES_CONFIG`). La app funciona igual, solo con unos segundos de retraso.
+- **Reconexión**: espera 2 s y la duplica en cada fallo hasta 60 s, con algo de azar para que muchas pestañas no vuelvan a la vez. Vuelve a la espera inicial solo tras 30 s seguidos en vivo, así una conexión que se cae enseguida no genera un bucle. Si el servidor avisa que la cuenta está suspendida (4403) no reintenta, y un token vencido (4401) reconecta con el token vigente sin cerrar la sesión.
+- **Pestaña oculta**: se cierra el socket y no se sondea; al volver se pide todo una vez.
+- **Admin mirando otro hogar**: los eventos son de la red propia, así que esa vista sondea cada 4 s mientras está visible.
+
+#### 🧯 Si Redis falla
+
+La API sigue funcionando con Postgres:
+
+- **Caché**: la lectura va directo a Postgres. Tras un fallo, cada proceso del backend deja de intentar Redis durante 30 s, así que solo una de sus peticiones paga la espera.
+- **Socket**: si el backend no logra suscribirse al canal, cierra el socket con 1013 y el cliente sigue con el sondeo de respaldo mientras reintenta.
+- **Escrituras**: guardar una medición, una alerta o un escaneo no depende de Redis. Si publicar el evento falla, el dato queda guardado igual. Si Redis cayó, los sockets se cierran y el sondeo lo trae. Si fue un fallo aislado con el socket en vivo, aparece con el siguiente evento o la siguiente reconexión.
+- **Reintentos del backend**: la espera entre intentos de suscripción se duplica hasta 5 minutos. Sin sockets abiertos no se suscribe ni gasta comandos.
+
+#### 🔁 De la medición a la pantalla
+
+```mermaid
+sequenceDiagram
+  autonumber
+  participant C as Escritorio o web
+  participant A as Backend FastAPI
+  participant P as PostgreSQL
+  participant R as Upstash Redis
+  participant W as Workers con sockets abiertos
+  participant U as Pestañas del usuario
+  C->>A: POST /api/network-metrics (JWT)
+  A->>P: guarda la medición con su estado
+  A->>R: invalida la caché del usuario
+  A-)R: PUBLISH measurement.created
+  A-->>C: 201 con la medición
+  R-)W: el canal reparte el evento
+  W-)U: evento por WebSocket, en lotes
+  U->>A: GET /api/network-metrics/latest
+  A->>R: busca copia vigente (no hay)
+  A->>P: lee la última medición y su diagnóstico
+  A->>R: guarda la copia nueva
+  A-->>U: /latest actualizado
+  Note over A: En paralelo desde el paso 5: detectores de anomalías y de cortes
+  A->>P: guarda la alerta, si la hay
+  A-)R: PUBLISH alert.created
+```
+
+1. **Medir.** Cada 60 s el escritorio hace ping real con Rust (a internet y al router) y la web mide cuánto tarda en llegar al servidor (en un Web Worker). La web solo mide con la página abierta. El escritorio sigue midiendo desde la bandeja y, sin conexión, guarda la medición en el equipo y la envía después en orden con su hora original.
+2. **Guardar.** El backend verifica el JWT, calcula el estado (bueno, advertencia o crítico) con sus umbrales y guarda la medición en Postgres. Un reenvío de la cola que ya estaba guardado no se duplica ni dispara nada otra vez.
+3. **Invalidar y avisar.** Después de guardar, el backend invalida la caché de ese usuario y publica `measurement.created` en Redis, sin hacer esperar al que midió.
+4. **Repartir.** Cada proceso del backend que tiene sockets abiertos recibe el evento del canal y lo envía a los sockets de ese usuario y de los administradores, en lotes, cediendo el turno entre lote y lote para no frenar otras peticiones. Un cliente lento se cierra (1013) sin demorar a los demás.
+5. **Mostrar.** La pestaña pide `/latest`. Como la caché se invalidó, esa primera lectura sale de Postgres y queda guardada para las siguientes. El panel se actualiza sin recargar.
+6. **Detectar.** Después de responder, el backend busca anomalías (IsolationForest) y cortes en segundo plano, solo si esa es la medición más reciente. En producción usa el servicio de IA si alguien lo está usando, y si no, el mismo paquete dentro del backend. Si hay alerta, la guarda y publica `alert.created`, y el panel la muestra. Una medición que llega tarde registra el corte con su duración real, pero no avisa de una degradación que ya pasó.
+
+Sin socket (o con Redis caído) los pasos 4 y 5 los reemplaza el sondeo: la pestaña ve la medición en los siguientes 4 s.
 
 #### 💤 Arranque en frío (Render, plan gratuito)
 
