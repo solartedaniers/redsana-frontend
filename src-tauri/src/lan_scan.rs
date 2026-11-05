@@ -302,7 +302,31 @@ async fn decide_presence<P: PresenceProbe>(
         .collect();
     decisions.extend(verify_by_arp(probe.clone(), unmapped, Arc::new(HashMap::new()), limits).await);
     recheck_silent(&probe, &mut decisions, &known, limits).await;
+    add_late_arrivals(&probe, &mut decisions, &known).await?;
     Ok(decisions)
+}
+
+/// Una última lectura de la tabla, sin enviar nada: el ARP que provocó el barrido puede contestarse después de la
+/// primera lectura. Solo suma IPs que no estaban al empezar y que nadie decidió aún; un equipo de la tabla de antes
+/// que no contestó sigue ausente aunque Windows lo siga listando.
+async fn add_late_arrivals<P: PresenceProbe>(
+    probe: &Arc<P>,
+    decisions: &mut Vec<PresenceDecision>,
+    known: &HashMap<Ipv4Addr, String>,
+) -> Result<(), String> {
+    let decided: HashSet<Ipv4Addr> = decisions.iter().map(|decision| decision.ip).collect();
+    let late = read_neighbors(probe).await?;
+    decisions.extend(late.into_iter().filter(|(ip, _)| !known.contains_key(ip) && !decided.contains(ip)).map(|(ip, mac)| {
+        PresenceDecision {
+            ip,
+            mac: Some(mac),
+            evidence: Some(PresenceEvidence::AppearedAtTheEnd),
+            arp_attempts: 0,
+            elapsed: Duration::ZERO,
+            recheck_pass: 0,
+        }
+    }));
+    Ok(())
 }
 
 /// Reconfirma, en el mismo escaneo, a los de la tabla que no contestaron nada. Solo cambia a presente al que
@@ -479,6 +503,8 @@ enum PresenceEvidence {
     Arp,
     Ping,
     AppearedDuringScan,
+    /// Apareció en la lectura final de la tabla, tras la reconfirmación.
+    AppearedAtTheEnd,
     DirectPing,
 }
 
@@ -505,6 +531,7 @@ impl PresenceDecision {
             (Some(PresenceEvidence::Arp), _) => "respondió el ARP de este escaneo",
             (Some(PresenceEvidence::Ping), true) => "respondió el ping",
             (Some(PresenceEvidence::AppearedDuringScan), _) => "apareció en la tabla durante este escaneo",
+            (Some(PresenceEvidence::AppearedAtTheEnd), _) => "apareció en la tabla al final de este escaneo",
             (Some(PresenceEvidence::DirectPing), true) => "respondió el ping directo",
             (Some(_), false) => "respondió el ping pero no se obtuvo su MAC",
             (None, _) => "no respondió ni ARP ni ping: estaba en la tabla de antes",
@@ -1073,6 +1100,8 @@ Wireless LAN adapter Wi-Fi:
         pub struct SimulatedNetwork {
             pub table_before: HashMap<Ipv4Addr, String>,
             pub table_after: HashMap<Ipv4Addr, String>,
+            /// Lo que muestra la tabla en la lectura final; None: lo mismo que table_after.
+            pub table_at_the_end: Option<HashMap<Ipv4Addr, String>>,
             pub hosts: HashMap<Ipv4Addr, Host>,
             reads: AtomicUsize,
             attempts: Mutex<HashMap<Ipv4Addr, usize>>,
@@ -1085,6 +1114,7 @@ Wireless LAN adapter Wi-Fi:
                 Self {
                     table_before,
                     table_after,
+                    table_at_the_end: None,
                     hosts,
                     reads: AtomicUsize::new(0),
                     attempts: Mutex::new(HashMap::new()),
@@ -1100,8 +1130,11 @@ Wireless LAN adapter Wi-Fi:
 
         impl PresenceProbe for SimulatedNetwork {
             fn neighbors(&self) -> Result<HashMap<Ipv4Addr, String>, String> {
-                let first = self.reads.fetch_add(1, Ordering::SeqCst) == 0;
-                Ok(if first { self.table_before.clone() } else { self.table_after.clone() })
+                Ok(match self.reads.fetch_add(1, Ordering::SeqCst) {
+                    0 => self.table_before.clone(),
+                    1 => self.table_after.clone(),
+                    _ => self.table_at_the_end.clone().unwrap_or_else(|| self.table_after.clone()),
+                })
             }
 
             fn resolve_mac(&self, ip: Ipv4Addr) -> Option<String> {
@@ -1308,6 +1341,55 @@ Wireless LAN adapter Wi-Fi:
         let gone: HashSet<Ipv4Addr> = present_ips(&before).difference(&present_ips(&after)).copied().collect();
         assert_eq!(gone, leaving.iter().map(|index| university_ip(*index)).collect());
         assert_eq!(present_ips(&before).len() - present_ips(&after).len(), 6);
+    }
+
+    fn network_with_table_at_the_end(
+        before: HashMap<Ipv4Addr, String>,
+        after: HashMap<Ipv4Addr, String>,
+        at_the_end: HashMap<Ipv4Addr, String>,
+        hosts: HashMap<Ipv4Addr, Host>,
+    ) -> Arc<SimulatedNetwork> {
+        let mut network = SimulatedNetwork::new(before, after, hosts);
+        network.table_at_the_end = Some(at_the_end);
+        Arc::new(network)
+    }
+
+    #[test]
+    fn a_device_whose_arp_answer_arrives_after_the_first_read_is_counted_by_the_final_read() {
+        let late = ip("192.168.0.130");
+        let at_the_end = HashMap::from([(late, simulated::mac_for(late))]);
+        let network = network_with_table_at_the_end(HashMap::new(), HashMap::new(), at_the_end, HashMap::new());
+
+        let (decisions, _) = simulated::run(network.clone(), ip("192.168.0.101"), ip("255.255.255.0"));
+
+        assert_eq!(present_ips(&decisions), HashSet::from([late]));
+        assert_eq!(decisions[0].evidence, Some(PresenceEvidence::AppearedAtTheEnd));
+        assert_eq!(network.max_in_flight.load(std::sync::atomic::Ordering::SeqCst), 0, "no envía ARP de más");
+    }
+
+    #[test]
+    fn a_device_that_left_but_is_still_listed_at_the_end_stays_absent() {
+        let gone = ip("192.168.0.100");
+        let table = HashMap::from([(gone, simulated::mac_for(gone))]);
+        let silent = Host { arp_delay: None, misses_first_attempts: 0, answers_ping: false };
+        let network = network_with_table_at_the_end(table.clone(), table.clone(), table, HashMap::from([(gone, silent)]));
+
+        let (decisions, _) = simulated::run(network, ip("192.168.0.101"), ip("255.255.255.0"));
+
+        assert!(present_ips(&decisions).is_empty());
+        assert_eq!(decisions.len(), 1, "no se suma dos veces");
+    }
+
+    #[test]
+    fn a_device_already_counted_during_the_scan_is_not_added_again_at_the_end() {
+        let newcomer = ip("192.168.0.120");
+        let table = HashMap::from([(newcomer, simulated::mac_for(newcomer))]);
+        let network = network_with_table_at_the_end(HashMap::new(), table.clone(), table, HashMap::new());
+
+        let (decisions, _) = simulated::run(network, ip("192.168.0.101"), ip("255.255.255.0"));
+
+        assert_eq!(decisions.len(), 1);
+        assert_eq!(decisions[0].evidence, Some(PresenceEvidence::AppearedDuringScan));
     }
 
     /// Un celular que deja pasar los dos ARP de la primera pasada y no contesta el ping: sin la reconfirmación salía
