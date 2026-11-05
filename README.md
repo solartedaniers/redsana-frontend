@@ -112,7 +112,7 @@ flowchart LR
   end
   API["Backend FastAPI<br/>Render"]
   AI["Servicio de IA<br/>redsana-ai · Render"]
-  REDIS[("Upstash Redis<br/>caché + Pub/Sub")]
+  REDIS[("Upstash Redis<br/>Oregon · AWS us-west-2<br/>caché + Pub/Sub")]
   subgraph SB["Supabase"]
     AUTH["Auth"]
     PG[("PostgreSQL<br/>fuente de la verdad")]
@@ -145,7 +145,7 @@ La línea punteada del escritorio al backend es el socket que todavía no llega 
 - **Base de datos y autenticación**: viven en Supabase, en la nube — así los datos persisten entre sesiones y el panel de administración puede ver todos los usuarios desde cualquier lugar. Las dos apps usan Supabase Auth (login, registro y contraseña) y Storage (fotos de perfil) directamente; el resto de los datos pasa siempre por el backend.
 - **Nombres de rutas**: el frontend usa solo los nombres actuales del backend (`/api/users/me`, `/api/chat-conversations`, `/api/alerts/recent`, `/api/admin/platform-metrics`). Los anteriores siguen vivos en el backend como alias ocultos para el instalador 0.1.5; `scripts/route-names.test.mjs` impide volver a escribirlos aquí.
 - **Servicio de IA**: en producción el backend llama a [redsana-ai](https://github.com/solartedaniers/redsana-ai), desplegado aparte en Render (plan gratuito), que usa Groq para el asistente (`AI_MODE=remote` en el backend). En desarrollo el backend también puede usar la IA en su propio proceso (`AI_MODE=local`).
-- **Redis (Upstash)**: solo caché y mensajería; Postgres sigue siendo la fuente de la verdad. Guarda copias cortas de `/latest`, del progreso de calibración y de `/devices`, y lleva los eventos entre los procesos del backend (Pub/Sub). La conexión va cifrada (`rediss://`). Los detalles están en el [README del backend](https://github.com/solartedaniers/redsana-backend#caché-en-redis-redis_url).
+- **Redis (Upstash, en Oregon: AWS us-west-2)**: solo caché y mensajería; Postgres sigue siendo la fuente de la verdad. Guarda copias cortas de `/latest`, del progreso de calibración y de `/devices`, y lleva los eventos entre los procesos del backend (Pub/Sub). La conexión va cifrada (`rediss://`). Los detalles están en el [README del backend](https://github.com/solartedaniers/redsana-backend#caché-en-redis-redis_url).
 - **Tiempo real (WebSocket)**: con la sesión iniciada y la pestaña visible, la web abre un socket a `/api/realtime/ws`, manda el JWT en el primer mensaje y recibe los eventos de su cuenta. El frontend usa tres: medición nueva, alerta nueva y cambio del estado de la IA. El backend también avisa cuando cambian los dispositivos, pero la pantalla de Dispositivos todavía no escucha ese aviso. Cada evento solo avisa; los datos se piden por el REST de siempre.
 
 #### 🔴 En vivo o sondeo de respaldo
