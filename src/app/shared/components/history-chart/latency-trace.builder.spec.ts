@@ -11,7 +11,7 @@ const sample = (latencyMs: number, minute: number, packetLossPercent?: number) =
 
 // Los mismos casos que tests/test_network_status.py del backend, traducidos a su severidad en el gráfico
 // (good → healthy). Si uno cambia sin el otro, el dashboard y el gráfico dejarían de coincidir.
-const BACKEND_CASES: Array<[number, number, string]> = [
+const BACKEND_CASES: [number, number, string][] = [
   [79.9, 0, 'healthy'],
   [80, 0, 'warning'],
   [149.9, 0, 'warning'],

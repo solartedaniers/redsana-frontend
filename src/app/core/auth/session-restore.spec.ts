@@ -18,7 +18,7 @@ const session = (role: UserRole): AuthSession => ({
 });
 
 /** Cada llamada a restoreSession toma la siguiente respuesta; la última se repite. */
-function setup(...answers: Array<() => Observable<AuthSession | null>>) {
+function setup(...answers: (() => Observable<AuthSession | null>)[]) {
   let call = 0;
   const repository = { restoreSession: vi.fn(() => answers[Math.min(call++, answers.length - 1)]()) };
   TestBed.configureTestingModule({ providers: [provideRouter([]), { provide: AuthRepository, useValue: repository }] });
