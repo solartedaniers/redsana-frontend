@@ -5,6 +5,7 @@ import { LanScanGateway } from '../../../core/lan-scan/lan-scan.gateway';
 import { NetworkDevice } from '../../../core/models/device.model';
 import { DevicesRepository } from '../../../core/repositories/devices.repository';
 import { LAN_SCAN_CONFIG } from '../../../core/lan-scan/lan-scan.config';
+import { LiveUpdates } from '../../../core/realtime/live-updates';
 import { DevicesMap } from './devices-map';
 
 function device(index: number, isOnline: boolean, networkRole: NetworkDevice['networkRole'] = 'other'): NetworkDevice {
@@ -521,5 +522,27 @@ describe('DevicesMap al entrar, escaneo reciente y avisos de cambios', () => {
     // Solo se sincronizó el escaneo forzado; el de entrada terminó después y no cuenta.
     expect(repository.syncDiscoveredDevices).toHaveBeenCalledTimes(1);
     expect(element.querySelector(COUNTER)?.textContent?.trim()).toBe('7');
+  });
+
+  it('con devices.updated vuelve a pedir la lista, salvo mientras la pantalla escanea', async () => {
+    let finishScan: (value: unknown[]) => void = () => undefined;
+    const backend = fakeBackend(network(1));
+    configure(backend, () => new Promise((resolve) => (finishScan = resolve)));
+    const fixture = await open();
+    const live = TestBed.inject(LiveUpdates);
+    const event = { type: 'devices.updated' as const, owner_id: 'me', data: {}, at: '2026-11-05T00:00:00Z' };
+    backend.getDevices.mockClear();
+
+    live.publish(event);
+    expect(backend.getDevices).not.toHaveBeenCalled();
+
+    finishScan([]);
+    await fixture.whenStable();
+    backend.setScanResult(network(3));
+    live.publish(event);
+    fixture.detectChanges();
+
+    expect(backend.getDevices).toHaveBeenCalledTimes(1);
+    expect((fixture.nativeElement as HTMLElement).querySelector(COUNTER)?.textContent?.trim()).toBe('4');
   });
 });

@@ -1,7 +1,9 @@
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { DevicesRepository } from '../../../core/repositories/devices.repository';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { LanScanGateway } from '../../../core/lan-scan/lan-scan.gateway';
 import { RecentLanScan } from '../../../core/lan-scan/recent-lan-scan';
+import { LiveUpdates } from '../../../core/realtime/live-updates';
 import { DeviceNetworkRole, DeviceTrust, NetworkDevice } from '../../../core/models/device.model';
 import { layoutTopologyNodes } from '../../../core/domain/topology-layout';
 import { PageHeader } from '../../../shared/components/page-header/page-header';
@@ -36,6 +38,7 @@ export class DevicesMap {
   private readonly repository = inject(DevicesRepository);
   private readonly lanScanGateway = inject(LanScanGateway);
   private readonly recentScan = inject(RecentLanScan);
+  private readonly liveUpdates = inject(LiveUpdates);
 
   protected readonly isScanAvailable = this.lanScanGateway.isAvailable;
   protected readonly devices = signal<NetworkDevice[]>([]);
@@ -119,6 +122,15 @@ export class DevicesMap {
     if (this.isScanAvailable && !this.recentScan.isRecent()) {
       void this.scan();
     }
+    // Un cambio de dispositivos desde otra pestaña o equipo; durante un escaneo propio sobra, ya trae la lista.
+    this.liveUpdates
+      .refreshesFor('devices.updated')
+      .pipe(takeUntilDestroyed())
+      .subscribe(() => {
+        if (!this.isScanning()) {
+          this.loadSavedList();
+        }
+      });
   }
 
   private loadSavedList(): void {
