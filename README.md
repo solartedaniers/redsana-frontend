@@ -223,8 +223,10 @@ Render apaga el backend y el servicio de IA tras un rato sin uso, y tardan cerca
 
 #### 📶 Escaneo de dispositivos (app de escritorio)
 
-- **Al entrar a Dispositivos** se hace el escaneo de siempre (`scan_connected_devices`): ping a la subred y lectura de `arp -a`.
-- **El botón "Escanear en busca de intrusos"** usa `scan_present_devices` y cuenta solo a quien responde en ese momento: Windows deja por minutos en `arp -a` a un celular que ya se fue, así que cada equipo de la tabla se confirma con un ARP propio (`SendARP`, 2 intentos) y, a la vez, con un ping directo, que un celular dormido sí contesta aunque ignore el ARP. Un equipo que no responde a nada baja del conteo en ese mismo escaneo. Envía `manual: true` a `POST /api/devices/sync`.
+- **Una sola regla** (desde 0.2.0): el escaneo al entrar y el botón "Escanear en busca de intrusos" usan `scan_present_devices` y cuentan solo a quien responde en ese momento: Windows deja por minutos en `arp -a` a un celular que ya se fue, así que cada equipo de la tabla se confirma con un ARP propio (`SendARP`, 2 intentos) y, a la vez, con un ping directo, que un celular dormido sí contesta aunque ignore el ARP. Un equipo que no responde a nada baja del conteo en ese mismo escaneo. Envía `manual: true` a `POST /api/devices/sync`.
+- **Al entrar a Dispositivos** se muestra enseguida la lista guardada y el escaneo corre en segundo plano, con el indicador «Escaneando la red...» en el botón y el radar. Si hubo un escaneo hace menos de `LAN_SCAN_CONFIG.recentScanWindowMs` (2 min) no se repite. El botón siempre fuerza uno nuevo, aunque haya otro en curso, y el resultado del anterior se descarta. Una lista guardada que llega después del escaneo no lo pisa.
+- **Conectado es lo que vio el último escaneo**: el backend guarda la misma hora en todos los equipos de un sync, y la lista, el diagnóstico y la supervisión del admin cuentan solo esos. Un equipo que se fue no reaparece al volver a la pantalla.
+- **Cambios desde otro lado**: con el socket en vivo, `devices.updated` vuelve a pedir la lista, salvo mientras la pantalla escanea (su propio resultado ya la trae).
 - **Redes grandes**: barre hasta 4096 direcciones (un /20; si la subred es mayor, las más cercanas a este equipo) con pings y ARP en paralelo pero acotados. Con ~450 equipos el escaneo manual tarda unos 14 s (simulado con los tiempos medidos en una red universitaria de ~290 equipos, donde tardó 12–22 s). Los límites se ajustan sin recompilar con `REDSANA_LAN_SCAN_MAX_HOSTS`, `REDSANA_LAN_SCAN_PING_CONCURRENCY`, `REDSANA_LAN_SCAN_ARP_CONCURRENCY` y `REDSANA_LAN_SCAN_ARP_ATTEMPTS`.
 - **Límite físico**: un celular con la radio dormida puede no contestar durante todo el escaneo y verse como desconectado hasta el siguiente. En la red universitaria medida, en un escaneo típico ~8 de ~250 equipos presentes no contestaron a tiempo.
 - **Redes con aislamiento de clientes** (algunas redes públicas o de campus): la red no deja que un equipo vea a los demás, así que el escaneo solo encuentra al router y a este equipo. La pantalla lo explica con un aviso; no es un fallo de RedSana.
@@ -416,6 +418,14 @@ Cada Release lleva **dos copias idénticas** del instalador de Windows:
 - `RedSana_x64-setup.exe`, con **nombre fijo**.
 
 El botón «Descargar» de la web es un enlace normal a `DESKTOP_DOWNLOAD_URL` = `https://github.com/solartedaniers/redsana-frontend/releases/latest/download/RedSana_x64-setup.exe`. GitHub redirige esa URL al asset con ese nombre del último Release, así que la descarga empieza desde el HTML prerenderizado, aunque se pulse antes de que cargue Angular o sin JavaScript, y sin consultar la API de GitHub. **Si un Release sale sin el asset de nombre fijo, el botón da 404.** Al publicar, sube las dos copias y comprueba que tienen el mismo SHA-256. El build falla si `DESKTOP_DOWNLOAD_URL` no termina en `.exe`, para que no vuelva a apuntar a la página del Release.
+
+**Antes de anunciar un Release, comprueba la descarga pública** en un equipo con Windows Defender al día:
+
+1. Descarga las dos copias desde el Release publicado (no desde la carpeta del build), con el navegador, para que lleven la marca de descarga de Internet.
+2. `Get-FileHash .\RedSana_<versión>_x64-setup.exe, .\RedSana_x64-setup.exe -Algorithm SHA256`: los dos SHA-256 deben ser iguales al del build.
+3. `Get-Content .\RedSana_x64-setup.exe -Stream Zone.Identifier` debe mostrar `ZoneId=3` (vino de Internet; es lo que hace aparecer SmartScreen).
+4. `& "$env:ProgramFiles\Windows Defender\MpCmdRun.exe" -Scan -ScanType 3 -File "$PWD\RedSana_x64-setup.exe"` y después `Get-MpThreatDetection`: no debe aparecer ninguna detección nueva con ese archivo.
+5. Al abrirlo, SmartScreen puede mostrar «Windows protegió su PC» porque el instalador no está firmado: es esperado (ver [Instalar](#4️⃣-instalar-la-app-de-escritorio-windows)). Una detección de Defender, en cambio, no lo es: deja el Release como borrador y envía el archivo como falso positivo en el [portal de Microsoft](https://www.microsoft.com/wdsi/filesubmission).
 
 ### 4️⃣ Instalar la app de escritorio (Windows)
 
