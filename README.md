@@ -431,11 +431,11 @@ El botón «Descargar» de la web es un enlace normal a `DESKTOP_DOWNLOAD_URL` =
 
 ### 4️⃣ Instalar la app de escritorio (Windows)
 
-Descarga `RedSana_0.2.1_x64-setup.exe` desde [Releases](https://github.com/solartedaniers/redsana-frontend/releases/latest) (o con el botón de descarga de la web, que baja la copia `RedSana_x64-setup.exe`, idéntica). Para comprobar que el archivo es el publicado, compara su SHA-256 en PowerShell:
+Descarga `RedSana_0.2.2_x64-setup.exe` desde [Releases](https://github.com/solartedaniers/redsana-frontend/releases/latest) (o con el botón de descarga de la web, que baja la copia `RedSana_x64-setup.exe`, idéntica). Para comprobar que el archivo es el publicado, compara su SHA-256 en PowerShell:
 
 ```powershell
-Get-FileHash .\RedSana_0.2.1_x64-setup.exe -Algorithm SHA256
-# Debe dar: ED624EE8F14FB7F73FA4C00A5385591F1FF69F7C759507D62D14DF2892ACC6DD
+Get-FileHash .\RedSana_0.2.2_x64-setup.exe -Algorithm SHA256
+# Debe dar: 22E2ED714433257B6C0E408E28273DEC17A5322C50589DDA626994CF76F3F470
 ```
 
 La 0.2.1 trae la CSP de la app de escritorio ([más arriba](#-csp-de-la-app-de-escritorio)).
