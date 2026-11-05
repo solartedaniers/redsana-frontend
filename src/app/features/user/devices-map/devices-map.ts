@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { DevicesRepository } from '../../../core/repositories/devices.repository';
 import { LanScanGateway } from '../../../core/lan-scan/lan-scan.gateway';
+import { RecentLanScan } from '../../../core/lan-scan/recent-lan-scan';
 import { DeviceNetworkRole, DeviceTrust, NetworkDevice } from '../../../core/models/device.model';
 import { layoutTopologyNodes } from '../../../core/domain/topology-layout';
 import { PageHeader } from '../../../shared/components/page-header/page-header';
@@ -34,6 +35,7 @@ const ROLE_ORDER: Record<DeviceNetworkRole, number> = { gateway: 0, this_device:
 export class DevicesMap {
   private readonly repository = inject(DevicesRepository);
   private readonly lanScanGateway = inject(LanScanGateway);
+  private readonly recentScan = inject(RecentLanScan);
 
   protected readonly isScanAvailable = this.lanScanGateway.isAvailable;
   protected readonly devices = signal<NetworkDevice[]>([]);
@@ -105,16 +107,32 @@ export class DevicesMap {
   // El escaneo salió bien pero solo vio al router y a este equipo: puede ser una red que aísla a sus clientes.
   protected readonly scanSawNoOtherDevices = signal(false);
 
+  // Sube con cada resultado de escaneo: una lista guardada pedida antes no puede pisarlo si llega después.
+  private listVersion = 0;
+  // Cada escaneo nuevo deja sin efecto al que estaba en curso (el botón puede forzar uno mientras corre otro).
+  private scanRun = 0;
+
   constructor() {
-    this.repository.getDevices().subscribe((devices) => this.devices.set(devices));
-    // En escritorio escaneo al entrar para que la lista refleje la red actual.
-    if (this.isScanAvailable) {
+    // Primero la lista guardada, sin esperar al escaneo.
+    this.loadSavedList();
+    // En escritorio escaneo en segundo plano al entrar, con la misma regla del botón, salvo que haya uno reciente.
+    if (this.isScanAvailable && !this.recentScan.isRecent()) {
       void this.scan();
     }
   }
 
-  /** manual: lo pidió el usuario con el botón; el escaneo al entrar sigue como siempre. */
-  protected async scan(manual = false): Promise<void> {
+  private loadSavedList(): void {
+    const version = this.listVersion;
+    this.repository.getDevices().subscribe((devices) => {
+      if (version === this.listVersion) {
+        this.devices.set(devices);
+      }
+    });
+  }
+
+  /** Confirma cada equipo en el momento: cuenta solo a quien responde en este escaneo. */
+  protected async scan(): Promise<void> {
+    const run = ++this.scanRun;
     this.isScanning.set(true);
     this.lastScanFindings.set(null);
     this.scanFailed.set(false);
@@ -122,9 +140,17 @@ export class DevicesMap {
 
     try {
       // Primero descubro lo que hay en la red y luego lo sincronizo con el backend.
-      const discovered = await this.lanScanGateway.scan(manual);
-      this.repository.syncDiscoveredDevices(discovered, manual).subscribe({
+      const discovered = await this.lanScanGateway.scan(true);
+      if (run !== this.scanRun) {
+        return;
+      }
+      this.repository.syncDiscoveredDevices(discovered, true).subscribe({
         next: (devices) => {
+          if (run !== this.scanRun) {
+            return;
+          }
+          this.listVersion++;
+          this.recentScan.markScanned();
           this.isScanning.set(false);
           this.devices.set(devices);
           this.scanSawNoOtherDevices.set(!devices.some((device) => device.isOnline && device.networkRole === 'other'));
@@ -136,15 +162,19 @@ export class DevicesMap {
         error: (error) => {
           // La causa real queda en consola; en pantalla solo va el mensaje genérico.
           console.error('[DevicesMap] fallo al sincronizar dispositivos escaneados', error);
-          this.isScanning.set(false);
-          this.scanFailed.set(true);
+          if (run === this.scanRun) {
+            this.isScanning.set(false);
+            this.scanFailed.set(true);
+          }
         },
       });
     } catch (error) {
       // Sin Tauri, sin permisos o con ipconfig/arp fallando; el detalle llega en el Err de Rust.
       console.error('[DevicesMap] fallo al escanear la LAN', error);
-      this.isScanning.set(false);
-      this.scanFailed.set(true);
+      if (run === this.scanRun) {
+        this.isScanning.set(false);
+        this.scanFailed.set(true);
+      }
     }
   }
 

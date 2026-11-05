@@ -4,6 +4,7 @@ import { Subject, of } from 'rxjs';
 import { LanScanGateway } from '../../../core/lan-scan/lan-scan.gateway';
 import { NetworkDevice } from '../../../core/models/device.model';
 import { DevicesRepository } from '../../../core/repositories/devices.repository';
+import { LAN_SCAN_CONFIG } from '../../../core/lan-scan/lan-scan.config';
 import { DevicesMap } from './devices-map';
 
 function device(index: number, isOnline: boolean, networkRole: NetworkDevice['networkRole'] = 'other'): NetworkDevice {
@@ -80,7 +81,7 @@ describe('DevicesMap trust marking', () => {
 });
 
 describe('DevicesMap manual scan', () => {
-  it('el botón pide un escaneo manual y el escaneo al entrar sigue siendo el de siempre', async () => {
+  it('el escaneo al entrar y el del botón usan la misma regla: confirmar cada equipo en el momento', async () => {
     const repository = { getDevices: () => of([]), syncDiscoveredDevices: vi.fn(() => of([])) };
     const lanScan = { isAvailable: true, scan: vi.fn(() => Promise.resolve([])) };
     TestBed.configureTestingModule({
@@ -95,8 +96,8 @@ describe('DevicesMap manual scan', () => {
     await fixture.whenStable();
     fixture.detectChanges();
 
-    expect(lanScan.scan).toHaveBeenCalledExactlyOnceWith(false);
-    expect(repository.syncDiscoveredDevices).toHaveBeenCalledExactlyOnceWith([], false);
+    expect(lanScan.scan).toHaveBeenCalledExactlyOnceWith(true);
+    expect(repository.syncDiscoveredDevices).toHaveBeenCalledExactlyOnceWith([], true);
 
     (fixture.nativeElement as HTMLElement).querySelector<HTMLButtonElement>('.scan-button')!.click();
     await fixture.whenStable();
@@ -390,5 +391,135 @@ describe('DevicesMap presence filter', () => {
     expect(element.querySelector('.device-card .presence-badge')?.getAttribute('data-online')).toBe('false');
     expect(element.querySelector('.devices-hero .status-badge')?.textContent?.trim()).toBe('2');
     expect(element.querySelectorAll('.topology__node')).toHaveLength(2);
+  });
+});
+
+describe('DevicesMap al entrar, escaneo reciente y avisos de cambios', () => {
+  const COUNTER = '.devices-hero .status-badge';
+
+  /** Backend falso: guarda lo que llega en cada sync y lo devuelve en la lista, como haría /devices. */
+  function fakeBackend(initial: NetworkDevice[]) {
+    let saved = initial;
+    return {
+      getDevices: vi.fn(() => of(saved)),
+      syncDiscoveredDevices: vi.fn(() => of(saved)),
+      setScanResult(devices: NetworkDevice[]) {
+        saved = devices;
+      },
+    };
+  }
+
+  function configure(repository: object, scan: () => Promise<unknown>): void {
+    TestBed.configureTestingModule({
+      providers: [
+        provideHttpClient(),
+        { provide: DevicesRepository, useValue: repository },
+        { provide: LanScanGateway, useValue: { isAvailable: true, scan: vi.fn(scan) } },
+      ],
+    });
+  }
+
+  async function open() {
+    const fixture = TestBed.createComponent(DevicesMap);
+    fixture.detectChanges();
+    await fixture.whenStable();
+    fixture.detectChanges();
+    return fixture;
+  }
+
+  const network = (others: number) => [
+    device(1, true, 'gateway'),
+    device(2, true, 'this_device'),
+    ...Array.from({ length: others }, (_, i) => device(i + 10, true)),
+  ];
+
+  afterEach(() => vi.useRealTimers());
+
+  it('muestra la lista guardada sin esperar al escaneo, que sigue en segundo plano con su indicador', async () => {
+    configure(fakeBackend(network(4)), () => new Promise(() => undefined));
+
+    const element = (await open()).nativeElement as HTMLElement;
+
+    expect(element.querySelector(COUNTER)?.textContent?.trim()).toBe('5');
+    expect(element.querySelector('.scan-button')?.textContent?.trim()).toBe('user.devicesMap.scanning');
+    expect(element.querySelector('.topology--scanning')).not.toBeNull();
+  });
+
+  it('una lista guardada que llega después del escaneo no lo pisa', async () => {
+    const lateList = new Subject<NetworkDevice[]>();
+    configure({ getDevices: () => lateList, syncDiscoveredDevices: () => of(network(2)) }, () => Promise.resolve([]));
+    const fixture = await open();
+
+    lateList.next(network(7));
+    fixture.detectChanges();
+
+    expect((fixture.nativeElement as HTMLElement).querySelector(COUNTER)?.textContent?.trim()).toBe('3');
+  });
+
+  it('quitar equipos baja el conteo y no reaparecen al volver a la pantalla', async () => {
+    const backend = fakeBackend([]);
+    let lanScanResult = network(5);
+    configure(backend, () => {
+      backend.setScanResult(lanScanResult);
+      return Promise.resolve([]);
+    });
+    const first = await open();
+    expect((first.nativeElement as HTMLElement).querySelector(COUNTER)?.textContent?.trim()).toBe('6');
+
+    lanScanResult = network(2);
+    (first.nativeElement as HTMLElement).querySelector<HTMLButtonElement>('.scan-button')!.click();
+    await first.whenStable();
+    first.detectChanges();
+    expect((first.nativeElement as HTMLElement).querySelector(COUNTER)?.textContent?.trim()).toBe('3');
+    first.destroy();
+
+    // Volver enseguida: hubo un escaneo reciente, así que no se barre de nuevo y se ve lo que guardó el último.
+    const scansBefore = backend.syncDiscoveredDevices.mock.calls.length;
+    const reopened = await open();
+    expect(backend.syncDiscoveredDevices.mock.calls.length).toBe(scansBefore);
+    expect((reopened.nativeElement as HTMLElement).querySelector(COUNTER)?.textContent?.trim()).toBe('3');
+  });
+
+  it('vuelve a escanear al entrar cuando pasó la ventana de la configuración, y el botón siempre escanea', async () => {
+    vi.useFakeTimers({ toFake: ['Date'] });
+    const backend = fakeBackend(network(1));
+    configure(backend, () => Promise.resolve([]));
+    (await open()).destroy();
+    expect(backend.syncDiscoveredDevices).toHaveBeenCalledTimes(1);
+
+    vi.setSystemTime(Date.now() + LAN_SCAN_CONFIG.recentScanWindowMs - 1);
+    const recent = await open();
+    expect(backend.syncDiscoveredDevices).toHaveBeenCalledTimes(1);
+    (recent.nativeElement as HTMLElement).querySelector<HTMLButtonElement>('.scan-button')!.click();
+    await recent.whenStable();
+    expect(backend.syncDiscoveredDevices).toHaveBeenCalledTimes(2);
+    recent.destroy();
+
+    vi.setSystemTime(Date.now() + LAN_SCAN_CONFIG.recentScanWindowMs);
+    await open();
+    expect(backend.syncDiscoveredDevices).toHaveBeenCalledTimes(3);
+  });
+
+  it('el botón fuerza un escaneo nuevo mientras corre otro, y el resultado del anterior se descarta', async () => {
+    const pending: ((value: unknown[]) => void)[] = [];
+    const syncs = [network(6), network(1)];
+    const repository = {
+      getDevices: () => of([]),
+      syncDiscoveredDevices: vi.fn(() => of(syncs.shift()!)),
+    };
+    configure(repository, () => new Promise((resolve) => pending.push(resolve)));
+    const fixture = await open();
+    const element = fixture.nativeElement as HTMLElement;
+
+    element.querySelector<HTMLButtonElement>('.scan-button')!.click();
+    pending[1]([]);
+    await fixture.whenStable();
+    pending[0]([]);
+    await fixture.whenStable();
+    fixture.detectChanges();
+
+    // Solo se sincronizó el escaneo forzado; el de entrada terminó después y no cuenta.
+    expect(repository.syncDiscoveredDevices).toHaveBeenCalledTimes(1);
+    expect(element.querySelector(COUNTER)?.textContent?.trim()).toBe('7');
   });
 });
